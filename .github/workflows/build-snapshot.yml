@@ -31,6 +31,6 @@ jobs:
         with:
           name: ./snapshot_firmware
           path: |
-		./bin/target/**/*squashfs-sysupgrade.bin
-		./bin/target/**/*squashfs-sysupgrade.img
-		./bin/target/**/*squashfs-sysupgrade.tar
+            ./bin/target/**/*squashfs-sysupgrade.bin
+            ./bin/target/**/*squashfs-sysupgrade.img
+            ./bin/target/**/*squashfs-sysupgrade.tar
