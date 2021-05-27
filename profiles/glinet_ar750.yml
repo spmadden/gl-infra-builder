@@ -1,0 +1,34 @@
+---
+description: Add the glinet dependencies
+feeds:
+  - name: glinet
+    path: ../feeds_dir/glinet
+  - name: glinet_package
+    path: ../feeds_dir/glinet_package
+
+packages:
+  - curl
+  - oui-httpd
+  - oui-librpc
+  - oui-ui-core
+  - oui-app-admin
+  - oui-app-diagnostics
+  - oui-app-firewall
+  - oui-app-home
+  - oui-app-interfaces
+  - oui-app-login
+  - oui-app-system
+  - oui-app-upgrade
+  - oui-app-wireless
+  - oui-app-wizard
+  - kmod-gl-sdk4-hw-info
+  - gl-sdk4-utils
+  - gl-sdk4-uci
+  - gl-iot-bridge
+  # - gl-goodcloud
+  - gl-iot-zigbee2mqtt
+  - gl-iot-dm
+  - gl-iot-wifi-provision
+
+diffconfig: |
+

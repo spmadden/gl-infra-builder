@@ -1,0 +1,5 @@
+---
+profile: glinet_vixmini
+target: ramips
+subtarget: mt76x8
+description: Build image for the GL.iNET VIXMINI

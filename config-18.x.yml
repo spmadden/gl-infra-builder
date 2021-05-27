@@ -1,0 +1,8 @@
+repo: https://github.com/gl-inet/openwrt.git
+branch: develop
+git_clone_dir: openwrt-18.06
+openwrt_root_dir: openwrt-18.06
+revision: c7ff4f3290b7cd621c142917918c8ec6bd374b37
+
+patch_folders:
+  - patches-18.x/

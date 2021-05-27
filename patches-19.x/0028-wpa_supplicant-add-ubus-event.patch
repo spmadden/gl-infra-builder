@@ -1,0 +1,108 @@
+From cda25a76fd0fb346e82c41cef3f25ddc83943871 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 29 Apr 2021 18:36:29 +0800
+Subject: [PATCH] wpa_supplicant: add ubus event
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../hostapd/patches/802-ubus-event.patch      | 30 +++++++++++++++++++
+ .../hostapd/src/wpa_supplicant/ubus.c         | 11 +++++++
+ .../hostapd/src/wpa_supplicant/ubus.h         | 12 ++++++++
+ 3 files changed, 53 insertions(+)
+ create mode 100644 package/network/services/hostapd/patches/802-ubus-event.patch
+
+diff --git a/package/network/services/hostapd/patches/802-ubus-event.patch b/package/network/services/hostapd/patches/802-ubus-event.patch
+new file mode 100644
+index 0000000000..942ecf6e99
+--- /dev/null
++++ b/package/network/services/hostapd/patches/802-ubus-event.patch
+@@ -0,0 +1,30 @@
++--- a/wpa_supplicant/events.c
+++++ b/wpa_supplicant/events.c
++@@ -2991,6 +2991,8 @@ static void wpa_supplicant_event_disasso
++ 			" reason=%d%s",
++ 			MAC2STR(bssid), reason_code,
++ 			locally_generated ? " locally_generated=1" : "");
+++		
+++		wpas_ubus_event(wpa_s, WPA_UBUS_EVENT_DISCONNECTED, "disconnected");
++ 	}
++ }
++ 
++--- a/wpa_supplicant/wpa_supplicant.c
+++++ b/wpa_supplicant/wpa_supplicant.c
++@@ -974,6 +974,7 @@ void wpa_supplicant_set_state(struct wpa
++ 			ssid ? ssid->id : -1,
++ 			ssid && ssid->id_str ? ssid->id_str : "",
++ 			fils_hlp_sent ? " FILS_HLP_SENT" : "");
+++		wpas_ubus_event(wpa_s, WPA_UBUS_EVENT_CONNECTED, "connected");
++ #endif /* CONFIG_CTRL_IFACE || !CONFIG_NO_STDOUT_DEBUG */
++ 		wpas_clear_temp_disabled(wpa_s, ssid, 1);
++ 		wpa_blacklist_clear(wpa_s);
++@@ -7181,6 +7182,8 @@ void wpas_auth_failed(struct wpa_supplic
++ 		"id=%d ssid=\"%s\" auth_failures=%u duration=%d reason=%s",
++ 		ssid->id, wpa_ssid_txt(ssid->ssid, ssid->ssid_len),
++ 		ssid->auth_failures, dur, reason);
+++	
+++	wpas_ubus_event(wpa_s, WPA_UBUS_EVENT_AUTH_FAILED, "authentication failure");
++ }
++ 
++ 
+diff --git a/package/network/services/hostapd/src/wpa_supplicant/ubus.c b/package/network/services/hostapd/src/wpa_supplicant/ubus.c
+index 5fdb57be7a..13aff0801c 100644
+--- a/package/network/services/hostapd/src/wpa_supplicant/ubus.c
++++ b/package/network/services/hostapd/src/wpa_supplicant/ubus.c
+@@ -263,3 +263,14 @@ void wpas_ubus_notify(struct wpa_supplicant *wpa_s, const struct wps_credential
+ 	ubus_send_event(ctx, "wps_credentials", b.head);
+ }
+ #endif /* CONFIG_WPS */
++
++void wpas_ubus_event(struct wpa_supplicant *wpa_s, int ev, const char *reason)
++{
++	blob_buf_init(&b, 0);
++
++	blobmsg_add_u32(&b, "event", ev);
++
++	blobmsg_add_string(&b, "reason", reason ? reason : "");
++
++	ubus_send_event(ctx, "wpa", b.head);
++}
+diff --git a/package/network/services/hostapd/src/wpa_supplicant/ubus.h b/package/network/services/hostapd/src/wpa_supplicant/ubus.h
+index c37e743e73..cac69eb17d 100644
+--- a/package/network/services/hostapd/src/wpa_supplicant/ubus.h
++++ b/package/network/services/hostapd/src/wpa_supplicant/ubus.h
+@@ -19,6 +19,12 @@ struct wpas_ubus_bss {
+ 	struct ubus_object obj;
+ };
+ 
++enum {
++	WPA_UBUS_EVENT_CONNECTED,
++	WPA_UBUS_EVENT_DISCONNECTED,
++	WPA_UBUS_EVENT_AUTH_FAILED
++};
++
+ void wpas_ubus_add_bss(struct wpa_supplicant *wpa_s);
+ void wpas_ubus_free_bss(struct wpa_supplicant *wpa_s);
+ 
+@@ -26,6 +32,8 @@ void wpas_ubus_free_bss(struct wpa_supplicant *wpa_s);
+ void wpas_ubus_notify(struct wpa_supplicant *wpa_s, const struct wps_credential *cred);
+ #endif
+ 
++void wpas_ubus_event(struct wpa_supplicant *wpa_s, int ev, const char *reason);
++
+ #else
+ struct wpas_ubus_bss {};
+ 
+@@ -48,6 +56,10 @@ static inline void wpas_ubus_free_bss(struct wpa_supplicant *wpa_s)
+ static inline void wpas_ubus_notify(struct wpa_supplicant *wpa_s, struct wps_credential *cred)
+ {
+ }
++
++static inline void wpas_ubus_event(struct wpa_supplicant *wpa_s, int ev, const char *reason)
++{	
++}
+ #endif
+ 
+ #endif
+-- 
+2.17.1
+

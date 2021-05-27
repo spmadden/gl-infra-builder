@@ -1,0 +1,5 @@
+---
+profile: gl-mt300n-v2
+target: ramips
+subtarget: mt76x8
+description: Build image for the GL.iNET MT300N-V2

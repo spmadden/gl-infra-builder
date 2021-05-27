@@ -1,0 +1,80 @@
+From f6e7046e9258050b0a2c4feb9a59f3f21fba5865 Mon Sep 17 00:00:00 2001
+From: Lancer <luoyejiang0701@gmail.com>
+Date: Fri, 9 Apr 2021 16:27:14 +0800
+Subject: [PATCH] improve feeds.conf.default
+
+---
+ feeds.conf         | 19 -------------------
+ feeds.conf.default | 29 ++++++++++++++++++++++++-----
+ 2 files changed, 24 insertions(+), 24 deletions(-)
+ delete mode 100644 feeds.conf
+
+diff --git a/feeds.conf b/feeds.conf
+deleted file mode 100644
+index 090db16..0000000
+--- a/feeds.conf
++++ /dev/null
+@@ -1,19 +0,0 @@
+-src-git gli_pub https://github.com/gl-inet/gli-pub.git
+-src-link packages ../qca/feeds/packages
+-src-link networking ../qca/feeds/networking
+-src-link luci ../qca/feeds/luci
+-src-link routing ../qca/feeds/routing
+-src-link nss_host ../qca/feeds/nss-host
+-src-link wlan_open ../qca/feeds/wlan-open
+-src-link alljoyn ../qca/feeds/alljoyn
+-src-link qca ../qca/feeds/qca
+-src-link athdiag ../qca/feeds/athdiag
+-src-link shortcut_fe ../qca/feeds/shortcut-fe
+-src-link qca_mcs ../qca/feeds/qca-mcs
+-src-link qca_lib ../qca/feeds/qca-lib
+-src-link ieee1905_security ../qca/feeds/ieee1905-security
+-src-link hyfi ../qca/feeds/hyfi
+-src-link whc ../qca/feeds/whc
+-src-link weave ../qca/feeds/weave
+-src-link bluetopia ../qca/feeds/bluetopia
+-src-link ssdk ../qca/feeds/ssdk
+diff --git a/feeds.conf.default b/feeds.conf.default
+index 8e14901..e83a1a5 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,8 +1,8 @@
+-src-git packages https://github.com/openwrt/packages.git;for-15.05
+-src-git luci https://github.com/openwrt/luci.git;for-15.05
+-src-git routing https://github.com/openwrt-routing/packages.git;for-15.05
+-src-git telephony https://github.com/openwrt/telephony.git;for-15.05
+-src-git management https://github.com/openwrt-management/packages.git;for-15.05
++#src-git packages https://github.com/openwrt/packages.git;for-15.05
++#src-git luci https://github.com/openwrt/luci.git;for-15.05
++#src-git routing https://github.com/openwrt-routing/packages.git;for-15.05
++#src-git telephony https://github.com/openwrt/telephony.git;for-15.05
++#src-git management https://github.com/openwrt-management/packages.git;for-15.05
+ #src-git targets https://github.com/openwrt/targets.git
+ #src-git oldpackages http://git.openwrt.org/packages.git
+ #src-svn xwrt http://x-wrt.googlecode.com/svn/trunk/package
+@@ -13,3 +13,22 @@ src-git management https://github.com/openwrt-management/packages.git;for-15.05
+ #src-svn xfce svn://svn.openwrt.org/openwrt/feeds/xfce
+ #src-svn lxde svn://svn.openwrt.org/openwrt/feeds/lxde
+ #src-link custom /usr/src/openwrt/custom-feed
++src-git gli_pub https://github.com/gl-inet/gli-pub.git
++src-link packages ../qca/feeds/packages
++src-link networking ../qca/feeds/networking
++src-link luci ../qca/feeds/luci
++src-link routing ../qca/feeds/routing
++src-link nss_host ../qca/feeds/nss-host
++src-link wlan_open ../qca/feeds/wlan-open
++src-link alljoyn ../qca/feeds/alljoyn
++src-link qca ../qca/feeds/qca
++src-link athdiag ../qca/feeds/athdiag
++src-link shortcut_fe ../qca/feeds/shortcut-fe
++src-link qca_mcs ../qca/feeds/qca-mcs
++src-link qca_lib ../qca/feeds/qca-lib
++src-link ieee1905_security ../qca/feeds/ieee1905-security
++src-link hyfi ../qca/feeds/hyfi
++src-link whc ../qca/feeds/whc
++src-link weave ../qca/feeds/weave
++src-link bluetopia ../qca/feeds/bluetopia
++src-link ssdk ../qca/feeds/ssdk
+-- 
+2.7.4
+

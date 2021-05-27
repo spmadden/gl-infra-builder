@@ -1,0 +1,5 @@
+---
+profile: gl-mifi
+target: ar71xx
+subtarget: generic
+description: Build image for the GL.iNET MIFI

@@ -1,0 +1,26 @@
+From 7a98998d6f2097fbfbb45772fc78edaab1d8867b Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 19:39:22 +0800
+Subject: [PATCH 19/26] upgrade: fix process kill failed
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/base-files/files/lib/upgrade/stage2 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/base-files/files/lib/upgrade/stage2 b/package/base-files/files/lib/upgrade/stage2
+index 41a3b2aeb3..758765726a 100755
+--- a/package/base-files/files/lib/upgrade/stage2
++++ b/package/base-files/files/lib/upgrade/stage2
+@@ -102,7 +102,7 @@ kill_remaining() { # [ <signal> [ <loop> ] ]
+ 		done
+ 
+ 		let loop_limit--
+-		[ $loop_limit -eq 0 ] && {
++		[ $loop_limit -eq 0 ] && [ $sig = "KILL" ] && {
+ 			echo
+ 			echo "Failed to kill all processes."
+ 			exit 1
+-- 
+2.17.1
+

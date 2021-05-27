@@ -1,0 +1,862 @@
+From 39b36bf30f50c8bca0a01b1d1bdeca22e5c970de Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 15:24:22 +0800
+Subject: [PATCH 04/26] package/openvpn: update to 2.5.0
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../services/openvpn/Config-mbedtls.in        |   6 +-
+ .../network/services/openvpn/Config-nossl.in  |  50 -------
+ .../services/openvpn/Config-openssl.in        |   6 +-
+ package/network/services/openvpn/Makefile     |  45 +++---
+ .../files/etc/hotplug.d/openvpn/01-user       |  22 +++
+ .../services/openvpn/files/etc/openvpn.user   |  11 ++
+ .../openvpn/files/lib/functions/openvpn.sh    |  16 +++
+ .../services/openvpn/files/openvpn.config     | 132 +++++++++++++++---
+ .../services/openvpn/files/openvpn.init       |  50 ++++++-
+ .../services/openvpn/files/openvpn.options    |  17 ++-
+ .../services/openvpn/files/openvpn.upgrade    |   0
+ .../openvpn/files/usr/libexec/openvpn-hotplug |  10 ++
+ .../001-reproducible-remove_DATE.patch        |   6 +-
+ ...bedtls-disable-runtime-version-check.patch |   2 +-
+ .../210-build_always_use_internal_lz4.patch   |   2 +-
+ .../openvpn/patches/220-disable_des.patch     |  21 +--
+ 16 files changed, 266 insertions(+), 130 deletions(-)
+ mode change 100644 => 100755 package/network/services/openvpn/Config-mbedtls.in
+ delete mode 100644 package/network/services/openvpn/Config-nossl.in
+ mode change 100644 => 100755 package/network/services/openvpn/Config-openssl.in
+ mode change 100644 => 100755 package/network/services/openvpn/Makefile
+ create mode 100755 package/network/services/openvpn/files/etc/hotplug.d/openvpn/01-user
+ create mode 100755 package/network/services/openvpn/files/etc/openvpn.user
+ create mode 100755 package/network/services/openvpn/files/lib/functions/openvpn.sh
+ mode change 100644 => 100755 package/network/services/openvpn/files/openvpn.config
+ mode change 100644 => 100755 package/network/services/openvpn/files/openvpn.init
+ mode change 100644 => 100755 package/network/services/openvpn/files/openvpn.options
+ mode change 100644 => 100755 package/network/services/openvpn/files/openvpn.upgrade
+ create mode 100755 package/network/services/openvpn/files/usr/libexec/openvpn-hotplug
+
+diff --git a/package/network/services/openvpn/Config-mbedtls.in b/package/network/services/openvpn/Config-mbedtls.in
+old mode 100644
+new mode 100755
+index beac492022..3cf233b8f7
+--- a/package/network/services/openvpn/Config-mbedtls.in
++++ b/package/network/services/openvpn/Config-mbedtls.in
+@@ -2,16 +2,12 @@ if PACKAGE_openvpn-mbedtls
+ 
+ config OPENVPN_mbedtls_ENABLE_LZO
+ 	bool "Enable LZO compression support"
+-	default y
++	default n
+ 
+ config OPENVPN_mbedtls_ENABLE_LZ4
+ 	bool "Enable LZ4 compression support"
+ 	default y
+ 
+-config OPENVPN_mbedtls_ENABLE_SERVER
+-	bool "Enable server support (otherwise only client mode is support)"
+-	default y
+-
+ #config OPENVPN_mbedtls_ENABLE_EUREPHIA
+ #	bool "Enable support for the eurephia plug-in"
+ #	default n
+diff --git a/package/network/services/openvpn/Config-nossl.in b/package/network/services/openvpn/Config-nossl.in
+deleted file mode 100644
+index 79140ad5d1..0000000000
+--- a/package/network/services/openvpn/Config-nossl.in
++++ /dev/null
+@@ -1,50 +0,0 @@
+-if PACKAGE_openvpn-nossl
+-
+-config OPENVPN_nossl_ENABLE_LZO
+-	bool "Enable LZO compression support"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_LZ4
+-	bool "Enable LZ4 compression support"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_SERVER
+-	bool "Enable server support (otherwise only client mode is support)"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_MANAGEMENT
+-	bool "Enable management server support"
+-	default n
+-
+-config OPENVPN_nossl_ENABLE_FRAGMENT
+-	bool "Enable internal fragmentation support (--fragment)"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_MULTIHOME
+-	bool "Enable multi-homed UDP server support (--multihome)"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_PORT_SHARE
+-	bool "Enable TCP server port-share support (--port-share)"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_DEF_AUTH
+-	bool "Enable deferred authentication"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_PF
+-	bool "Enable internal packet filter"
+-	default y
+-
+-config OPENVPN_nossl_ENABLE_IPROUTE2
+-	bool "Enable support for iproute2"
+-	default n
+-
+-config OPENVPN_nossl_ENABLE_SMALL
+-	bool "Enable size optimization"
+-	default y
+-	help
+-	  enable smaller executable size (disable OCC, usage
+-	  message, and verb 4 parm list)
+-
+-endif
+diff --git a/package/network/services/openvpn/Config-openssl.in b/package/network/services/openvpn/Config-openssl.in
+old mode 100644
+new mode 100755
+index f2b618eff1..335bbaa2c4
+--- a/package/network/services/openvpn/Config-openssl.in
++++ b/package/network/services/openvpn/Config-openssl.in
+@@ -2,7 +2,7 @@ if PACKAGE_openvpn-openssl
+ 
+ config OPENVPN_openssl_ENABLE_LZO
+ 	bool "Enable LZO compression support"
+-	default y
++	default n
+ 
+ config OPENVPN_openssl_ENABLE_LZ4
+ 	bool "Enable LZ4 compression support"
+@@ -12,10 +12,6 @@ config OPENVPN_openssl_ENABLE_X509_ALT_USERNAME
+ 	bool "Enable the --x509-username-field feature"
+ 	default n
+ 
+-config OPENVPN_openssl_ENABLE_SERVER
+-	bool "Enable server support (otherwise only client mode is support)"
+-	default y
+-
+ #config OPENVPN_openssl_ENABLE_EUREPHIA
+ #	bool "Enable support for the eurephia plug-in"
+ #	default n
+diff --git a/package/network/services/openvpn/Makefile b/package/network/services/openvpn/Makefile
+old mode 100644
+new mode 100755
+index aed9f43f80..5c8a0a4fae
+--- a/package/network/services/openvpn/Makefile
++++ b/package/network/services/openvpn/Makefile
+@@ -9,14 +9,14 @@ include $(TOPDIR)/rules.mk
+ 
+ PKG_NAME:=openvpn
+ 
+-PKG_VERSION:=2.4.7
+-PKG_RELEASE:=2
++PKG_VERSION:=2.5.0
++PKG_RELEASE:=1
+ 
+ PKG_SOURCE_URL:=\
+ 	https://build.openvpn.net/downloads/releases/ \
+ 	https://swupdate.openvpn.net/community/releases/
+ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
+-PKG_HASH:=a42f53570f669eaf10af68e98d65b531015ff9e12be7a62d9269ea684652f648
++PKG_HASH:=029a426e44d656cb4e1189319c95fe6fc9864247724f5599d99df9c4c3478fbd
+ 
+ PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
+ 
+@@ -37,16 +37,11 @@ define Package/openvpn/Default
+   MENU:=1
+   DEPENDS:=+kmod-tun +OPENVPN_$(1)_ENABLE_LZO:liblzo +OPENVPN_$(1)_ENABLE_IPROUTE2:ip $(3)
+   VARIANT:=$(1)
+-ifeq ($(1),nossl)
+-  PROVIDES:=openvpn
+-else
+   PROVIDES:=openvpn openvpn-crypto
+-endif
+ endef
+ 
+-Package/openvpn-openssl=$(call Package/openvpn/Default,openssl,OpenSSL,+PACKAGE_openvpn-openssl:libopenssl +@OPENSSL_WITH_DEPRECATED)
++Package/openvpn-openssl=$(call Package/openvpn/Default,openssl,OpenSSL,+PACKAGE_openvpn-openssl:libopenssl)
+ Package/openvpn-mbedtls=$(call Package/openvpn/Default,mbedtls,mbedTLS,+PACKAGE_openvpn-mbedtls:libmbedtls)
+-Package/openvpn-nossl=$(call Package/openvpn/Default,nossl,plaintext (no SSL))
+ 
+ define Package/openvpn/config/Default
+ 	source "$(SOURCE)/Config-$(1).in"
+@@ -54,7 +49,6 @@ endef
+ 
+ Package/openvpn-openssl/config=$(call Package/openvpn/config/Default,openssl)
+ Package/openvpn-mbedtls/config=$(call Package/openvpn/config/Default,mbedtls)
+-Package/openvpn-nossl/config=$(call Package/openvpn/config/Default,nossl)
+ 
+ ifeq ($(BUILD_VARIANT),mbedtls)
+ CONFIG_OPENVPN_MBEDTLS:=y
+@@ -62,13 +56,8 @@ endif
+ ifeq ($(BUILD_VARIANT),openssl)
+ CONFIG_OPENVPN_OPENSSL:=y
+ endif
+-ifeq ($(BUILD_VARIANT),nossl)
+-CONFIG_OPENVPN_NOSSL:=y
+-endif
+ 
+ CONFIGURE_VARS += \
+-	IFCONFIG=/sbin/ifconfig \
+-	ROUTE=/sbin/route \
+ 	IPROUTE=/sbin/ip \
+ 	NETSTAT=/sbin/netstat
+ 
+@@ -86,7 +75,6 @@ define Build/Configure
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_LZO),--enable,--disable)-lzo \
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_LZ4),--enable,--disable)-lz4 \
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_X509_ALT_USERNAME),--enable,--disable)-x509-alt-username \
+-		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_SERVER),--enable,--disable)-server \
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_MANAGEMENT),--enable,--disable)-management \
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_FRAGMENT),--enable,--disable)-fragment \
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_MULTIHOME),--enable,--disable)-multihome \
+@@ -94,7 +82,6 @@ define Build/Configure
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_DEF_AUTH),--enable,--disable)-def-auth \
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_PF),--enable,--disable)-pf \
+ 		$(if $(CONFIG_OPENVPN_$(BUILD_VARIANT)_ENABLE_PORT_SHARE),--enable,--disable)-port-share \
+-		$(if $(CONFIG_OPENVPN_NOSSL),--disable-crypto,--enable-crypto) \
+ 		$(if $(CONFIG_OPENVPN_OPENSSL),--with-crypto-library=openssl) \
+ 		$(if $(CONFIG_OPENVPN_MBEDTLS),--with-crypto-library=mbedtls) \
+ 	)
+@@ -102,6 +89,7 @@ endef
+ 
+ define Package/openvpn-$(BUILD_VARIANT)/conffiles
+ /etc/config/openvpn
++/etc/openvpn.user
+ endef
+ 
+ define Package/openvpn-$(BUILD_VARIANT)/install
+@@ -111,7 +99,10 @@ define Package/openvpn-$(BUILD_VARIANT)/install
+ 		$(1)/etc/init.d \
+ 		$(1)/etc/config \
+ 		$(1)/etc/openvpn \
+-		$(1)/lib/upgrade/keep.d
++		$(1)/lib/functions \
++		$(1)/lib/upgrade/keep.d \
++		$(1)/usr/libexec \
++		$(1)/etc/hotplug.d/openvpn
+ 
+ 	$(INSTALL_BIN) \
+ 		$(PKG_INSTALL_DIR)/usr/sbin/openvpn \
+@@ -120,6 +111,23 @@ define Package/openvpn-$(BUILD_VARIANT)/install
+ 	$(INSTALL_BIN) \
+ 		files/openvpn.init \
+ 		$(1)/etc/init.d/openvpn
++
++	$(INSTALL_BIN) \
++		files/usr/libexec/openvpn-hotplug \
++		$(1)/usr/libexec/openvpn-hotplug
++
++	$(INSTALL_DATA) \
++		files/lib/functions/openvpn.sh \
++		$(1)/lib/functions/openvpn.sh
++
++	$(INSTALL_DATA) \
++		files/etc/hotplug.d/openvpn/01-user \
++		$(1)/etc/hotplug.d/openvpn/01-user
++
++	$(INSTALL_DATA) \
++		files/etc/openvpn.user \
++		$(1)/etc/openvpn.user
++
+ 	$(INSTALL_DATA) \
+ 		files/openvpn.options \
+ 		$(1)/usr/share/openvpn/openvpn.options
+@@ -134,4 +142,3 @@ endef
+ 
+ $(eval $(call BuildPackage,openvpn-openssl))
+ $(eval $(call BuildPackage,openvpn-mbedtls))
+-$(eval $(call BuildPackage,openvpn-nossl))
+diff --git a/package/network/services/openvpn/files/etc/hotplug.d/openvpn/01-user b/package/network/services/openvpn/files/etc/hotplug.d/openvpn/01-user
+new file mode 100755
+index 0000000000..f93823e5c5
+--- /dev/null
++++ b/package/network/services/openvpn/files/etc/hotplug.d/openvpn/01-user
+@@ -0,0 +1,22 @@
++#!/bin/sh
++
++. /lib/functions/openvpn.sh
++
++[ -e "/etc/openvpn.user" ] && {
++	env -i ACTION="$ACTION" INSTANCE="$INSTANCE" \
++		/bin/sh \
++		/etc/openvpn.user \
++		$*
++}
++
++# Wrap user defined scripts on up/down events
++case "$ACTION" in
++	up|down)
++		if get_openvpn_option "$config" command "$ACTION"; then
++			shift
++			exec /bin/sh -c "$command $*"
++		fi
++	;;
++esac
++
++exit 0
+diff --git a/package/network/services/openvpn/files/etc/openvpn.user b/package/network/services/openvpn/files/etc/openvpn.user
+new file mode 100755
+index 0000000000..a77566556a
+--- /dev/null
++++ b/package/network/services/openvpn/files/etc/openvpn.user
+@@ -0,0 +1,11 @@
++#!/bin/sh
++#
++# This file is interpreted as shell script.
++# Put your custom openvpn action here, they will
++# be executed with each opevnp event.
++#
++# $ACTION
++#      <down>    down action is generated after the TUN/TAP device is closed
++#      <up>      up action is generated after the TUN/TAP device is opened
++# $INSTANCE  Name of the openvpn instance which went up or down
++
+diff --git a/package/network/services/openvpn/files/lib/functions/openvpn.sh b/package/network/services/openvpn/files/lib/functions/openvpn.sh
+new file mode 100755
+index 0000000000..83fb1bb453
+--- /dev/null
++++ b/package/network/services/openvpn/files/lib/functions/openvpn.sh
+@@ -0,0 +1,16 @@
++#!/bin/sh
++
++get_openvpn_option() {
++	local config="$1"
++	local variable="$2"
++	local option="$3"
++
++	local value="$(sed -rne 's/^[ \t]*'"$option"'[ \t]+(([^ \t\\]|\\.)+)[ \t]*$/\1/p' "$config" | tail -n1 | sed -re 's/\\(.)/\1/g')"
++	[ -n "$value" ] || value="$(sed -rne 's/^[ \t]*'"$option"'[ \t]+'"'([^']+)'"'[ \t]*$/\1/p' "$config" | tail -n1)"
++	[ -n "$value" ] || value="$(sed -rne 's/^[ \t]*'"$option"'[ \t]+"(([^"\\]|\\.)+)"[ \t]*$/\1/p' "$config" | tail -n1 | sed -re 's/\\(.)/\1/g')"
++	[ -n "$value" ] || return 1
++
++	export -n "$variable=$value"
++	return 0
++}
++
+diff --git a/package/network/services/openvpn/files/openvpn.config b/package/network/services/openvpn/files/openvpn.config
+old mode 100644
+new mode 100755
+index 1fd846f558..09d504da28
+--- a/package/network/services/openvpn/files/openvpn.config
++++ b/package/network/services/openvpn/files/openvpn.config
+@@ -77,10 +77,10 @@ config openvpn sample_server
+ 
+ 	# Diffie hellman parameters.
+ 	# Generate your own with:
+-	#   openssl dhparam -out dh1024.pem 1024
++	#   openssl dhparam -out dh2048.pem 2048
+ 	# Substitute 2048 for 1024 if you are using
+-	# 2048 bit keys.
+-	option dh /etc/openvpn/dh1024.pem
++	# 1024 bit keys.
++	option dh /etc/openvpn/dh2048.pem
+ 
+ 	# Configure server mode and supply a VPN subnet
+ 	# for OpenVPN to draw client addresses from.
+@@ -228,24 +228,81 @@ config openvpn sample_server
+ 	# This file is secret:
+ #	option tls_auth "/etc/openvpn/ta.key 0"
+ 
+-	# Select a cryptographic cipher.
+-	# This config item must be copied to
+-	# the client config file as well.
+-	# Blowfish (default):
+-#	option cipher BF-CBC
+-	# AES:
+-#	option cipher AES-128-CBC
+-	# Triple-DES:
+-#	option cipher DES-EDE3-CBC
++	# For additional privacy, a shared secret key
++	# can be used for both authentication (as in tls_auth)
++	# and encryption of the TLS control channel.
++	#
++	# Generate a shared secret with:
++	# openvpn --genkey --secret ta.key
++	#
++	# The server and each client must have
++	# a copy of this key.
++	#
++	# tls_auth and tls_crypt should NOT
++	# be combined, as tls_crypt implies tls_auth.
++	# Use EITHER tls_crypt, tls_auth, or neither option.
++#	option tls_crypt "/etc/openvpn/ta.key"
++
++	# Set the minimum required TLS protocol version
++	# for all connections.
++	#
++	# Require at least TLS 1.1
++#	option tls_version_min "1.1"
++	# Require at least TLS 1.2
++#	option tls_version_min "1.2"
++	# Require TLS 1.2, or the highest version supported
++	# on the system
++#	option tls_version_min "1.2 'or-highest'"
++
++	# List the preferred ciphers to use for the data channel.
++	# Run openvpn --show-ciphers to see all supported ciphers.
++#	list data_ciphers 'AES-256-GCM'
++#	list data_ciphers 'AES-128-GCM'
++#	list data_ciphers 'CHACHA20-POLY1305'
++
++	# Set a fallback cipher in order to be compatible with
++	# peers that do not support cipher negotiation.
++	#
++	# Use AES-256-CBC as fallback
++#	option data_ciphers_fallback 'AES-128-CBC'
++	# Use AES-128-CBC as fallback
++#	option data_ciphers_fallback 'AES-256-CBC'
++	# Use Triple-DES as fallback
++#	option data_ciphers_fallback 'DES-EDE3-CBC'
++	# Use BF-CBC as fallback
++#	option data_ciphers_fallback 'BF-CBC'
++
++	# OpenVPN versions 2.4 and later will attempt to
++	# automatically negotiate the most secure cipher
++	# between the client and server, regardless of a
++	# configured "option cipher" (see below).
++	# Automatic negotiation is recommended.
++	#
++	# Uncomment this option to disable this behavior,
++	# and force all OpenVPN peers to use the configured
++	# cipher option instead (not recommended).
++#	option ncp_disable
+ 
+ 	# Enable compression on the VPN link.
+ 	# If you enable it here, you must also
+ 	# enable it in the client config file.
++	#
++	# Compression is not recommended, as compression and
++	# encryption in combination can weaken the security
++	# of the connection.
++	#
+ 	# LZ4 requires OpenVPN 2.4+ client and server
+ #	option compress lz4
+-	# LZO is compatible with most OpenVPN versions
+-	# (set "compress lzo" on 2.4+ clients, and "comp-lzo yes" on older clients)
+-	option compress lzo
++	
++	# Control how OpenVPN handles peers using compression
++	#
++	# Do not allow any connections using compression
++#	option allow_compression 'no'
++	# Allow incoming compressed packets, but do not send compressed packets to other peers
++	# This can be useful when migrating old configurations with compression activated
++#	option allow_compression 'asym'
++	# Both incoming and outgoing packets may be compressed
++#	option allow_compression 'yes'
+ 
+ 	# The maximum number of concurrently connected
+ 	# clients we want to allow.
+@@ -371,7 +428,7 @@ config openvpn sample_client
+ 	option key /etc/openvpn/client.key
+ 
+ 	# Verify server certificate by checking
+-	# that the certicate has the nsCertType
++	# that the certicate has the key usage
+ 	# field set to "server".  This is an
+ 	# important precaution to protect against
+ 	# a potential attack discussed here:
+@@ -381,24 +438,53 @@ config openvpn sample_client
+ 	# your server certificates with the nsCertType
+ 	# field set to "server".  The build_key_server
+ 	# script in the easy_rsa folder will do this.
+-#	option ns_cert_type server
++#	option remote_cert_tls server
+ 
+ 	# If a tls_auth key is used on the server
+ 	# then every client must also have the key.
+ #	option tls_auth "/etc/openvpn/ta.key 1"
+ 
+-	# Select a cryptographic cipher.
+-	# If the cipher option is used on the server
+-	# then you must also specify it here.
+-#	option cipher x
++	# If a tls_crypt key is used on the server
++	# every client must also have the key.
++#	option tls_crypt "/etc/openvpn/ta.key"
++
++	# Set the minimum required TLS protocol version
++	# for all connections.
++	#
++	# Require at least TLS 1.1
++#	option tls_version_min "1.1"
++	# Require at least TLS 1.2
++#	option tls_version_min "1.2"
++	# Require TLS 1.2, or the highest version supported
++	# on the system
++#	option tls_version_min "1.2 'or-highest'"
++
++	# List the preferred ciphers for the data channel.
++#	list data_ciphers 'AES-256-GCM'
++#	list data_ciphers 'AES-128-GCM'
++#	list data_ciphers 'CHACHA20-POLY1305'
++
++	# Set a fallback cipher if you connect to a peer that does
++	# not support cipher negotiation.
++	# Use AES-256-CBC as fallback
++#	option data_ciphers_fallback 'AES-128-CBC'
++	# Use AES-128-CBC as fallback
++#	option data_ciphers_fallback 'AES-256-CBC'
++	# Use Triple-DES as fallback
++#	option data_ciphers_fallback 'DES-EDE3-CBC'
++	# Use BF-CBC as fallback
++#	option data_ciphers_fallback 'BF-CBC'
+ 
+ 	# Enable compression on the VPN link.
+ 	# Don't enable this unless it is also
+ 	# enabled in the server config file.
++	#
++	# Compression is not recommended, as compression and
++	# encryption in combination can weaken the security
++	# of the connection.
++	#
+ 	# LZ4 requires OpenVPN 2.4+ on server and client
+ #	option compress lz4
+-	# LZO is compatible with most OpenVPN versions
+-	option compress lzo
+ 
+ 	# Set log file verbosity.
+ 	option verb 3
+diff --git a/package/network/services/openvpn/files/openvpn.init b/package/network/services/openvpn/files/openvpn.init
+old mode 100644
+new mode 100755
+index a7d35d1a98..487a2269e2
+--- a/package/network/services/openvpn/files/openvpn.init
++++ b/package/network/services/openvpn/files/openvpn.init
+@@ -43,7 +43,7 @@ append_params() {
+ 		IFS="$LIST_SEP"
+ 		for v in $v; do
+ 			[ -n "$v" ] && [ "$p" != "push" ] && append_param "$s" "$p" && echo " $v" >> "/var/etc/openvpn-$s.conf"
+-			[ -n "$v" ] && [ "$p" == "push" ] && append_param "$s" "$p" && echo " \"$v\"" >> "/var/etc/openvpn-$s.conf"
++			[ -n "$v" ] && [ "$p" = "push" ] && append_param "$s" "$p" && echo " \"$v\"" >> "/var/etc/openvpn-$s.conf"
+ 		done
+ 		unset IFS
+ 	done
+@@ -69,17 +69,56 @@ section_enabled() {
+ 	[ $enable -gt 0 ] || [ $enabled -gt 0 ]
+ }
+ 
++openvpn_get_dev() {
++	local dev dev_type
++	local name="$1"
++	local conf="$2"
++
++	# Do override only for configurations with config_file
++	config_get config_file "$name" config
++	[ -n "$config_file" ] || return
++
++	# Check there is someething to override
++	config_get dev "$name" dev
++	config_get dev_type "$name" dev_type
++	[ -n "$dev" ] || return
++
++	# If there is a no dev_type, try to guess it
++	if [ -z "$dev_type" ]; then
++		. /lib/functions/openvpn.sh
++
++		local odev odev_type
++		get_openvpn_option "$conf" odev dev
++		get_openvpn_option "$conf" odev_type dev-type
++		[ -n "$odev_type" ] || odev_type="$odev"
++
++		case "$odev_type" in
++			tun*) dev_type="tun" ;;
++			tap*) dev_type="tap" ;;
++			*) return;;
++		esac
++	fi
++
++	# Return overrides
++	echo "--dev-type $dev_type --dev $dev"
++}
++
+ openvpn_add_instance() {
+ 	local name="$1"
+ 	local dir="$2"
+ 	local conf="$3"
++	local security="$4"
+ 
+ 	procd_open_instance "$name"
+ 	procd_set_param command "$PROG"	\
+ 		--syslog "openvpn($name)" \
+ 		--status "/var/run/openvpn.$name.status" \
+ 		--cd "$dir" \
+-		--config "$conf"
++		--config "$conf" \
++		--up "/usr/libexec/openvpn-hotplug up $name" \
++		--down "/usr/libexec/openvpn-hotplug down $name" \
++		--script-security "${security:-2}" \
++		$(openvpn_get_dev "$name" "$conf")
+ 	procd_set_param file "$dir/$conf"
+ 	procd_set_param term_timeout 15
+ 	procd_set_param respawn
+@@ -100,11 +139,14 @@ start_instance() {
+ 		return 1
+ 	}
+ 
++	local script_security
++	config_get script_security "$s" script_security
++
+ 	[ ! -d "/var/run" ] && mkdir -p "/var/run"
+ 
+ 	if [ ! -z "$config" ]; then
+ 		append UCI_STARTED "$config" "$LIST_SEP"
+-		openvpn_add_instance "$s" "${config%/*}" "$config"
++		openvpn_add_instance "$s" "${config%/*}" "$config" "$script_security"
+ 		return
+ 	fi
+ 
+@@ -115,7 +157,7 @@ start_instance() {
+ 	append_params "$s" $OPENVPN_PARAMS
+ 	append_list "$s" $OPENVPN_LIST
+ 
+-	openvpn_add_instance "$s" "/var/etc" "openvpn-$s.conf"
++	openvpn_add_instance "$s" "/var/etc" "openvpn-$s.conf" "$script_security"
+ }
+ 
+ start_service() {
+diff --git a/package/network/services/openvpn/files/openvpn.options b/package/network/services/openvpn/files/openvpn.options
+old mode 100644
+new mode 100755
+index 2da563968c..7c641f7d4c
+--- a/package/network/services/openvpn/files/openvpn.options
++++ b/package/network/services/openvpn/files/openvpn.options
+@@ -1,10 +1,12 @@
+ OPENVPN_PARAMS='
++allow_compression
+ askpass
+ auth
+ auth_retry
+ auth_user_pass
+ auth_user_pass_verify
+ bcast_buffers
++bind_dev
+ ca
+ capath
+ cd
+@@ -21,11 +23,11 @@ connect_retry
+ connect_retry_max
+ connect_timeout
+ crl_verify
++data_ciphers_fallback
+ dev
+ dev_node
+ dev_type
+ dh
+-down
+ ecdh_curve
+ echo
+ engine
+@@ -52,7 +54,6 @@ iroute_ipv6
+ keepalive
+ key
+ key_direction
+-key_method
+ keysize
+ learn_address
+ link_mtu
+@@ -70,7 +71,6 @@ mssfix
+ mtu_disc
+ mute
+ nice
+-ns_cert_type
+ ping
+ ping_exit
+ ping_restart
+@@ -103,7 +103,6 @@ route_metric
+ route_pre_down
+ route_up
+ rport
+-script_security
+ secret
+ server
+ server_bridge
+@@ -118,6 +117,9 @@ syslog
+ tcp_queue_limit
+ tls_auth
+ tls_crypt
++tls_crypt_v2
++tls_crypt_v2_verify
++tls_export_cert
+ tls_timeout
+ tls_verify
+ tls_version_min
+@@ -127,11 +129,12 @@ tran_window
+ tun_mtu
+ tun_mtu_extra
+ txqueuelen
+-up
+ user
+ verb
+ verify_client_cert
+ verify_x509_name
++vlan_accept
++vlan_pvid
+ x509_username_field
+ '
+ 
+@@ -140,6 +143,7 @@ allow_recursive_routing
+ auth_nocache
+ auth_user_pass_optional
+ bind
++block_ipv6
+ ccd_exclusive
+ client
+ client_to_client
+@@ -188,10 +192,13 @@ tls_server
+ up_delay
+ up_restart
+ username_as_common_name
++vlan_tagging
+ '
+ 
+ OPENVPN_LIST='
++data_ciphers
+ ncp_ciphers
+ tls_cipher
+ tls_ciphersuites
++tls_groups
+ '
+diff --git a/package/network/services/openvpn/files/openvpn.upgrade b/package/network/services/openvpn/files/openvpn.upgrade
+old mode 100644
+new mode 100755
+diff --git a/package/network/services/openvpn/files/usr/libexec/openvpn-hotplug b/package/network/services/openvpn/files/usr/libexec/openvpn-hotplug
+new file mode 100755
+index 0000000000..9235fbacfe
+--- /dev/null
++++ b/package/network/services/openvpn/files/usr/libexec/openvpn-hotplug
+@@ -0,0 +1,10 @@
++#!/bin/sh
++
++ACTION=$1
++shift
++INSTANCE=$1
++shift
++
++export ACTION=$ACTION
++export INSTANCE=$INSTANCE
++exec /sbin/hotplug-call openvpn "$@"
+diff --git a/package/network/services/openvpn/patches/001-reproducible-remove_DATE.patch b/package/network/services/openvpn/patches/001-reproducible-remove_DATE.patch
+index 101fa12ba2..e4e6d39413 100644
+--- a/package/network/services/openvpn/patches/001-reproducible-remove_DATE.patch
++++ b/package/network/services/openvpn/patches/001-reproducible-remove_DATE.patch
+@@ -1,9 +1,9 @@
+ --- a/src/openvpn/options.c
+ +++ b/src/openvpn/options.c
+-@@ -106,7 +106,6 @@ const char title_string[] =
+- #ifdef HAVE_AEAD_CIPHER_MODES
+-     " [AEAD]"
++@@ -105,7 +105,6 @@ const char title_string[] =
++ #endif
+  #endif
++     " [AEAD]"
+ -    " built on " __DATE__
+  ;
+  
+diff --git a/package/network/services/openvpn/patches/100-mbedtls-disable-runtime-version-check.patch b/package/network/services/openvpn/patches/100-mbedtls-disable-runtime-version-check.patch
+index 7fc0089000..4141c2863c 100644
+--- a/package/network/services/openvpn/patches/100-mbedtls-disable-runtime-version-check.patch
++++ b/package/network/services/openvpn/patches/100-mbedtls-disable-runtime-version-check.patch
+@@ -1,6 +1,6 @@
+ --- a/src/openvpn/ssl_mbedtls.c
+ +++ b/src/openvpn/ssl_mbedtls.c
+-@@ -1406,7 +1406,7 @@ const char *
++@@ -1520,7 +1520,7 @@ const char *
+  get_ssl_library_version(void)
+  {
+      static char mbedtls_version[30];
+diff --git a/package/network/services/openvpn/patches/210-build_always_use_internal_lz4.patch b/package/network/services/openvpn/patches/210-build_always_use_internal_lz4.patch
+index dc4039c3e6..a99f923644 100644
+--- a/package/network/services/openvpn/patches/210-build_always_use_internal_lz4.patch
++++ b/package/network/services/openvpn/patches/210-build_always_use_internal_lz4.patch
+@@ -1,6 +1,6 @@
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1078,68 +1078,15 @@ dnl
++@@ -1077,68 +1077,15 @@ dnl
+  AC_ARG_VAR([LZ4_CFLAGS], [C compiler flags for lz4])
+  AC_ARG_VAR([LZ4_LIBS], [linker flags for lz4])
+  if test "$enable_lz4" = "yes" && test "$enable_comp_stub" = "no"; then
+diff --git a/package/network/services/openvpn/patches/220-disable_des.patch b/package/network/services/openvpn/patches/220-disable_des.patch
+index 030958d1bc..9ddf1047b5 100644
+--- a/package/network/services/openvpn/patches/220-disable_des.patch
++++ b/package/network/services/openvpn/patches/220-disable_des.patch
+@@ -1,24 +1,17 @@
+ --- a/src/openvpn/syshead.h
+ +++ b/src/openvpn/syshead.h
+-@@ -597,11 +597,11 @@ socket_defined(const socket_descriptor_t
++@@ -572,7 +572,7 @@ socket_defined(const socket_descriptor_t
+  /*
+   * Should we include NTLM proxy functionality
+   */
+--#if defined(ENABLE_CRYPTO)
+ -#define NTLM 1
+--#else
+-+//#if defined(ENABLE_CRYPTO)
+ +//#define NTLM 1
+-+//#else
+- #define NTLM 0
+--#endif
+-+//#endif
+  
+  /*
+   * Should we include proxy digest auth functionality
+ --- a/src/openvpn/crypto_mbedtls.c
+ +++ b/src/openvpn/crypto_mbedtls.c
+-@@ -319,6 +319,7 @@ int
++@@ -383,6 +383,7 @@ int
+  key_des_num_cblocks(const mbedtls_cipher_info_t *kt)
+  {
+      int ret = 0;
+@@ -26,7 +19,7 @@
+      if (kt->type == MBEDTLS_CIPHER_DES_CBC)
+      {
+          ret = 1;
+-@@ -331,6 +332,7 @@ key_des_num_cblocks(const mbedtls_cipher
++@@ -395,6 +396,7 @@ key_des_num_cblocks(const mbedtls_cipher
+      {
+          ret = 3;
+      }
+@@ -34,7 +27,7 @@
+  
+      dmsg(D_CRYPTO_DEBUG, "CRYPTO INFO: n_DES_cblocks=%d", ret);
+      return ret;
+-@@ -339,6 +341,7 @@ key_des_num_cblocks(const mbedtls_cipher
++@@ -403,6 +405,7 @@ key_des_num_cblocks(const mbedtls_cipher
+  bool
+  key_des_check(uint8_t *key, int key_len, int ndc)
+  {
+@@ -42,7 +35,7 @@
+      int i;
+      struct buffer b;
+  
+-@@ -367,11 +370,15 @@ key_des_check(uint8_t *key, int key_len,
++@@ -431,11 +434,15 @@ key_des_check(uint8_t *key, int key_len,
+  
+  err:
+      return false;
+@@ -58,7 +51,7 @@
+      int i;
+      struct buffer b;
+  
+-@@ -386,6 +393,7 @@ key_des_fixup(uint8_t *key, int key_len,
++@@ -450,6 +457,7 @@ key_des_fixup(uint8_t *key, int key_len,
+          }
+          mbedtls_des_key_set_parity(key);
+      }
+@@ -66,7 +59,7 @@
+  }
+  
+  /*
+-@@ -710,10 +718,12 @@ cipher_des_encrypt_ecb(const unsigned ch
++@@ -770,10 +778,12 @@ cipher_des_encrypt_ecb(const unsigned ch
+                         unsigned char *src,
+                         unsigned char *dst)
+  {
+-- 
+2.17.1
+

@@ -1,0 +1,8 @@
+repo: https://github.com/gl-inet/openwrt.git
+branch: openwrt-trunk
+git_clone_dir: openwrt-trunk
+openwrt_root_dir: openwrt-trunk
+revision: b7349722a31deb5b7ec5f7698b1ab8a0afa4a56d
+
+patch_folders:
+  - patches-trunk/

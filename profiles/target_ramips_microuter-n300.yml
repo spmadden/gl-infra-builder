@@ -1,0 +1,5 @@
+---
+profile: microuter-n300
+target: ramips
+subtarget: mt76x8
+description: Build image for the GL.iNET Microuter N300

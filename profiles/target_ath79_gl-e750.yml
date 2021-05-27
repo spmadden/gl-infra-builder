@@ -1,0 +1,5 @@
+---
+profile: glinet_gl-e750-nor-nand
+target: ath79
+subtarget: nand
+description: Build image for the GL.iNET E750

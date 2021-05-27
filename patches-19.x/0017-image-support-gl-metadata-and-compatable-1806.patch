@@ -1,0 +1,64 @@
+From f90b9140dae502b8f09c17dfe85d524b462bec71 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 19:30:29 +0800
+Subject: [PATCH 16/26] image: support gl-metadata and compatable 1806
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ include/image-commands.mk | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/include/image-commands.mk b/include/image-commands.mk
+index 182f5f831d..32865b9a7d 100644
+--- a/include/image-commands.mk
++++ b/include/image-commands.mk
+@@ -321,6 +321,14 @@ define Build/sysupgrade-tar
+ 		$@
+ endef
+ 
++define Build/sysupgrade-tar-compat-1806
++	sh $(TOPDIR)/scripts/sysupgrade-tar-compat-1806.sh \
++		--board $(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)) \
++		--kernel $(call param_get_default,kernel,$(1),$(IMAGE_KERNEL)) \
++		--rootfs $(call param_get_default,rootfs,$(1),$(IMAGE_ROOTFS)) \
++		$@
++endef
++
+ define Build/tplink-v1-header
+ 	$(STAGING_DIR_HOST)/bin/mktplinkfw \
+ 		-c -H $(TPLINK_HWID) -W $(TPLINK_HWREV) -L $(KERNEL_LOADADDR) \
+@@ -376,6 +384,31 @@ define Build/append-metadata
+ 	}
+ endef
+ 
++metadata_gl_json = \
++	'{ $(if $(IMAGE_METADATA),$(IMAGE_METADATA)$(comma)) \
++		"metadata_version": "1.0", \
++		"supported_devices":[$(call metadata_devices,$(1))], \
++		"version": { \
++			"release": "$(shell cat $(TOPDIR)/release)", \
++			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
++			"dist": "$(call json_quote,$(VERSION_DIST))", \
++			"version": "$(call json_quote,$(VERSION_NUMBER))", \
++			"revision": "$(call json_quote,$(REVISION))", \
++			"target": "$(call json_quote,$(TARGETID))", \
++			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
++		} \
++	}'
++
++define Build/append-gl-metadata
++	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
++	[ ! -s "$(BUILD_KEY)" -o ! -s "$(BUILD_KEY).ucert" -o ! -s "$@" ] || { \
++		cp "$(BUILD_KEY).ucert" "$@.ucert" ;\
++		usign -S -m "$@" -s "$(BUILD_KEY)" -x "$@.sig" ;\
++		ucert -A -c "$@.ucert" -x "$@.sig" ;\
++		fwtool -S "$@.ucert" "$@" ;\
++	}
++endef
++
+ define Build/kernel2minor
+ 	kernel2minor -k $@ -r $@.new $(1)
+ 	mv $@.new $@
+-- 
+2.17.1
+

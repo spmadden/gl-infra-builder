@@ -1,0 +1,219 @@
+From 9424e8c163562f79d90df4ca3561ce1c0508da4e Mon Sep 17 00:00:00 2001
+From: "GL.iNet-YeJiang.Luo" <luoyejiang@gl-inet.com>
+Date: Sat, 8 May 2021 10:30:32 +0800
+Subject: [PATCH] gen_config.py requires the latest version of the feeds
+ script.
+
+Signed-off-by: GL.iNet-YeJiang.Luo <luoyejiang@gl-inet.com>
+---
+ scripts/feeds | 142 +++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 123 insertions(+), 19 deletions(-)
+
+diff --git a/scripts/feeds b/scripts/feeds
+index f8f29cd9d..9e39885aa 100755
+--- a/scripts/feeds
++++ b/scripts/feeds
+@@ -22,7 +22,10 @@ my @mkver = split /\s+/, `$mk -v`, 4;
+ my $valid_mk = 1;
+ $mkver[0] =~ /^GNU/ or $valid_mk = 0;
+ $mkver[1] =~ /^Make/ or $valid_mk = 0;
+-$mkver[2] >= "3.81" or $valid_mk = 0;
++
++my ($mkv1, $mkv2) = split /\./, $mkver[2];
++($mkv1 >= 4 || ($mkv1 == 3 && $mkv2 >= 81)) or $valid_mk = 0;
++
+ $valid_mk or die "Unsupported version of make found: $mk\n";
+ 
+ my @feeds;
+@@ -35,33 +38,57 @@ my $feed_package = {};
+ my $feed_src = {};
+ my $feed_target = {};
+ 
+-sub parse_config() {
++
++sub parse_file($$);
++
++sub parse_file($$) {
++	my ($fname, $existing) = @_;
+ 	my $line = 0;
+-	my %name;
++	my $fh;
+ 
+-	open FEEDS, "feeds.conf" or
+-		open FEEDS, "feeds.conf.default" or
+-		die "Unable to open feeds configuration";
+-	while (<FEEDS>) {
++	open $fh, $fname or return undef;
++	while (<$fh>) {
+ 		chomp;
+ 		s/#.+$//;
+-		next unless /\S/;
+-		my @line = split /\s+/, $_, 3;
+-		my @src;
+ 		$line++;
++		next unless /\S/;
+ 
+-		my $valid = 1;
+-		$line[0] =~ /^src-[\w-]+$/ or $valid = 0;
+-		$line[1] =~ /^\w+$/ or $valid = 0;
+-		@src = split /\s+/, $line[2];
+-		$valid or die "Syntax error in feeds.conf, line: $line\n";
++		my ($type, $flags, $name, $urls) = m!^src-([\w\-]+)((?:\s+--\w+(?:=\S+)?)*)\s+(\w+)(?:\s+(\S.*))?$!;
++		unless ($type && $name) {
++			die "Syntax error in $fname, line $line\n";
++		}
++
++		if ($existing->{$name}++) {
++			die "Duplicate feed name '$name' in '$fname' line: $line\n";
++		}
++
++		my @src = defined($urls) ? split /\s+/, $urls : ();
++		push @src, '' if @src == 0;
++
++		my %flags;
++		if (defined $flags) {
++			while ($flags =~ m!\s+--(\w+)(?:=(\S+))?!g) {
++				$flags{$1} = defined($2) ? $2 : 1;
++			}
++		}
+ 
+-		$name{$line[1]} and die "Duplicate feed name '$line[1]', line: $line\n";
+-		$name{$line[1]} = 1;
++		if ($type eq "include") {
++			parse_file($urls, $existing) or
++			    die "Unable to open included file '$urls'";
++			next;
++		}
+ 
+-		push @feeds, [$line[0], $line[1], \@src];
++		push @feeds, ["src-$type", $name, \@src, \%flags];
+ 	}
+-	close FEEDS;
++	close $fh;
++	return 1;
++}
++
++sub parse_config() {
++	my %name;
++	parse_file("feeds.conf", \%name) or
++	    parse_file("feeds.conf.default", \%name)  or
++	    die "Unable to open feeds configuration";
+ }
+ 
+ sub update_location($$)
+@@ -534,6 +561,36 @@ sub refresh_config {
+ 	}
+ }
+ 
++sub install_profiles {
++	my $feed = shift;
++	my $dir = sprintf('feeds/%s/', $feed->[1]);
++
++	-d "./feeds/profiles" or mkdir "./feeds/profiles" or return 1;
++
++	opendir (DIR, $dir) or return 0;
++	while (my $file = readdir(DIR)) {
++		next unless (-f "$dir/$file");
++		next unless ($file =~ m/\.profile$/);
++		-e "./feeds/profiles/$file" or system("ln -s ../$feed->[1]/$file ./feeds/profiles/");
++	}
++	closedir(DIR);
++}
++
++sub install_dl {
++	my $feed = shift;
++	my $dir = sprintf('feeds/%s/dl/', $feed->[1]);
++
++	-d "./dl" or mkdir "./dl" or return 1;
++
++	opendir (DIR, $dir) or return 0;
++	while (my $file = readdir(DIR)) {
++		next unless (-f "$dir/$file");
++		-e "./dl/$file" or system("ln -s ../feeds/$feed->[1]/dl/$file ./dl/");
++	}
++	closedir(DIR);
++}
++
++
+ sub install {
+ 	my $name;
+ 	my %opts;
+@@ -569,6 +626,8 @@ sub install {
+ 						install_package($feed, $p->{name}, exists($opts{f})) == 0 or $ret = 1;
+ 						get_feed($f->[1]);
+ 					}
++					install_profiles($f);
++					install_dl($f);
+ 				}
+ 			}
+ 		}
+@@ -731,6 +790,48 @@ sub update {
+ 	return 0;
+ }
+ 
++sub setup {
++	my %opts;
++
++	getopts('bh', \%opts);
++
++	if ($opts{h}) {
++		usage();
++		return 0;
++	}
++
++	if (-e "feeds.conf") {
++		warn "The file feeds.conf already exists.\n";
++		return 1;
++	}
++
++	open(my $fd, ">>feeds.conf");
++
++	if ($opts{b}) {
++		printf $fd "src-include defaults feeds.conf.default\n";
++	}
++
++	while (my $entry = shift @ARGV) {
++		my ($type, $name, $src) = split /,/, $entry;
++
++		$update_method{$type} or do {
++			warn "Unknown type '$type' in parameter $entry\n";
++			unlink "feeds.conf";
++			return 1;
++		};
++
++		if ($name =~ /[\s-]/) {
++			warn "Feed names or sources may not contain whitespace or - characters in parameter $entry\n";
++			unlink "feeds.conf";
++			return 1;
++		}
++		printf $fd "%s %s %s\n", $type, $name, $src;
++	}
++
++	return 0;
++}
++
++
+ sub feed_config() {
+ 	foreach my $feed (@feeds) {
+ 		my $installed = (-f "feeds/$feed->[1].index");
+@@ -775,7 +876,9 @@ Commands:
+ 	    -a :           Uninstalls all packages.
+ 
+ 	update -a|<feedname(s)>: Update packages and lists of feeds in feeds.conf .
++	setup [options] <type,name,link> <type,name,link> ...: generate feeds.conf
+ 	Options:
++		-b :		   Use feeds.conf.default as base for new feeds.conf.
+ 	    -a :           Update all feeds listed within feeds.conf. Otherwise the specified feeds will be updated.
+ 	    -i :           Recreate the index only. No feed update from repository is performed.
+ 
+@@ -792,6 +895,7 @@ my %commands = (
+ 	'search' => \&search,
+ 	'uninstall' => \&uninstall,
+ 	'feed_config' => \&feed_config,
++	'setup' => \&setup,
+ 	'clean' => sub {
+ 		system("rm -rf ./feeds ./package/feeds");
+ 	}
+-- 
+2.25.1
+

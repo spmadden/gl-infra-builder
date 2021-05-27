@@ -1,0 +1,43 @@
+From 19ff46ebe34cc79e01ef251160cb0ba54c722448 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 27 Apr 2021 10:57:57 +0800
+Subject: [PATCH 26/26] base-files: set bootcount for ar300m
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/base-files/files/etc/diag.sh | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/package/base-files/files/etc/diag.sh b/package/base-files/files/etc/diag.sh
+index 8eb36c6feb..1df38f1acf 100644
+--- a/package/base-files/files/etc/diag.sh
++++ b/package/base-files/files/etc/diag.sh
+@@ -1,6 +1,7 @@
+ #!/bin/sh
+ # Copyright (C) 2006-2019 OpenWrt.org
+ 
++. /lib/functions.sh
+ . /lib/functions/leds.sh
+ 
+ boot="$(get_dt_led boot)"
+@@ -45,6 +46,17 @@ set_led_state() {
+ 	esac
+ }
+ 
++
+ set_state() {
+ 	[ -n "$boot" -o -n "$failsafe" -o -n "$running" -o -n "$upgrade" ] && set_led_state "$1"
++	[ "$1" = "done" ] && {
++		local board=$(board_name)
++		case $board in
++			glinet,gl-ar300m|\
++			glinet,gl-ar300m-nor|\
++			glinet,gl-ar300m-nand)
++				fw_setenv "bootcount" 0
++			;;
++		esac
++	}
+ }
+-- 
+2.17.1
+

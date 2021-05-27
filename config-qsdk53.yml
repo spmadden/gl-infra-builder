@@ -1,0 +1,8 @@
+repo: https://gitlab.com/gl.router/gl-b1300-gl-s1300-product/qsdk53.git
+branch: allpkg
+git_clone_dir: qsdk53
+openwrt_root_dir: qsdk53
+revision: aa12b0bcdee056a3cd5e21c444a45b6c0d74cfe5
+
+patch_folders:
+  - patches-qsdk53/

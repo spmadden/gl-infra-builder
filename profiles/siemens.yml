@@ -1,0 +1,22 @@
+---
+description: Add the siemens dependencies
+feeds:
+  - name: siemens
+    path: ../feeds_dir/siemens
+
+packages:
+  - openthread-br
+  - mdnsresponder
+  - kmod-usb-acm
+  - kmod-tun
+  - luci-nginx
+  - luci-base
+  - libuci-lua
+  - node
+  - node-npm
+  - kmod-ipt-nat6
+  - gl-ipv6
+  - dnsmasq-full
+
+diffconfig: |
+  CONFIG_PACKAGE_dnsmasq=n

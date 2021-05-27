@@ -1,0 +1,25 @@
+From b16581ac045779a196e124c57b3f4a2cc1ac5ea5 Mon Sep 17 00:00:00 2001
+From: Lancer <luoyejiang0701@gmail.com>
+Date: Fri, 9 Apr 2021 17:50:21 +0800
+Subject: [PATCH] Makefile: auto generate img
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index dd62226..45d550e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -110,7 +110,7 @@ prereq: $(target/stamp-prereq) tmp/.prereq_packages
+ 	fi
+ 
+ prepare: .config $(tools/stamp-install) $(toolchain/stamp-install)
+-world: prepare $(target/stamp-compile) $(package/stamp-compile) $(package/stamp-install) $(target/stamp-install) FORCE
++world: prepare $(target/stamp-compile) $(package/stamp-compile) $(package/stamp-install) $(target/stamp-install) si FORCE
+ 	$(_SINGLE)$(SUBMAKE) -r package/index
+ 
+ .PHONY: clean dirclean prereq prepare world package/symlinks package/symlinks-install package/symlinks-clean
+-- 
+2.7.4
+

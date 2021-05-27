@@ -1,0 +1,5 @@
+---
+profile: glinet_gl-ar300m-lite
+target: ath79
+subtarget: generic
+description: Build image for the GL.iNET AR300M Lite

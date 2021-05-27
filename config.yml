@@ -1,0 +1,8 @@
+repo: https://github.com/gl-inet/openwrt.git
+branch: openwrt-19.07.7
+git_clone_dir: openwrt-19.07.7
+openwrt_root_dir: openwrt-19.07.7
+revision: e0b067cc33f85dab4a4b69de91598f79aac7af17
+
+patch_folders:
+  - patches-19.x/

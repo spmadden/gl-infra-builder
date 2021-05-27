@@ -1,0 +1,5 @@
+---
+profile: glinet_gl-ap1300
+target: ipq40xx
+subtarget: generic
+description: Build image for the GL.iNET AP1300

@@ -1,0 +1,5 @@
+---
+profile: glinet_gl-ar150
+target: ath79
+subtarget: nand
+description: Build image for the GL.iNET AR150
