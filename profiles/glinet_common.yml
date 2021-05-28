@@ -35,10 +35,9 @@ packages:
   - gl-sdk4-macclone
   - gl-sdk4-ddns
   - gl-sdk4-plug-ins
-  - gl-sdk4-tertf
+  - kmod-gl-sdk4-tertf
   - gl-sdk4-repeater
   - gl-sdk4-custom-dns
-  - gl-sdk4-repeater
 
 diffconfig: |
 
