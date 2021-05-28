@@ -25,10 +25,7 @@ jobs:
 
       # build source code
       - name: build
-        run: |
-          echo $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
-          echo $GITHUB_ACTION_PATH $GITHUB_REF
-          cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source
+        run: cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_JOB
 
       - uses: actions/upload-artifact@v2
         with:
