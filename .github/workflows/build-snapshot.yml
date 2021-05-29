@@ -29,7 +29,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: ./snapshot_firmware
+          name: snapshot_firmware
           path: |
             ./output/**/*squashfs-sysupgrade.bin
             ./output/**/*squashfs-factory.img
