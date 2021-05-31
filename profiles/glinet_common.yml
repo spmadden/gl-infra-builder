@@ -8,9 +8,7 @@ feeds:
 
 packages:
   - libopenssl
-  - libcap
   - ipset
-  - ip-full
   - unzip
   - ethtool
   - dnsmasq-full
