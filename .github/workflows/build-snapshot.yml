@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: snapshot_firmware_"${{ env.COMPILE_DATE }}"
+          name: snapshot_firmware_${{ env.COMPILE_DATE }}
           path: |
             ./output/**/*squashfs-sysupgrade.bin
             ./output/**/*squashfs-factory.img
