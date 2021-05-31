@@ -1,21 +1,21 @@
-From 40d33c8799e3c4a01644fa5ffb2e6b2be99af68c Mon Sep 17 00:00:00 2001
+From 4d6c09e5564a6a29fa8ce0356cc76b89fb5a8b54 Mon Sep 17 00:00:00 2001
 From: Yejiang Luo <luoyejiang@gl-inet.com>
-Date: Sat, 22 May 2021 14:52:31 +0800
-Subject: [PATCH] pending: scripts: add gen_config.py
+Date: Mon, 31 May 2021 15:14:43 +0800
+Subject: [PATCH] scripts: add gen_config.py
 
 This script is used to setup the tree based on the profiles/.
 
 Signed-off-by: Yejiang Luo <luoyejiang@gl-inet.com>
 ---
- scripts/gen_config.py | 197 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ openwrt-18.06/scripts/gen_config.py | 197 ++++++++++++++++++++++++++++++++++++
  1 file changed, 197 insertions(+)
- create mode 100755 scripts/gen_config.py
+ create mode 100755 openwrt-18.06/scripts/gen_config.py
 
-diff --git a/scripts/gen_config.py b/scripts/gen_config.py
+diff --git a/openwrt-18.06/scripts/gen_config.py b/openwrt-18.06/scripts/gen_config.py
 new file mode 100755
-index 0000000..d4c5e97
+index 0000000..fcf3178
 --- /dev/null
-+++ b/scripts/gen_config.py
++++ b/openwrt-18.06/scripts/gen_config.py
 @@ -0,0 +1,197 @@
 +#!/usr/bin/env python3
 +
@@ -152,7 +152,7 @@ index 0000000..d4c5e97
 +def generate_config(profile):
 +    config_output = f"""CONFIG_TARGET_{profile["target"]}=y
 +CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}=y
-+CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}_DEVICE_{profile["profile"]}=y
++CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}_{profile["profile"]}=y
 +"""
 +
 +    config_output += f"{profile.get('diffconfig', '')}"

@@ -1,17 +1,19 @@
-From c382cd1ca4b813d68f01962585a7fda2fac9770b Mon Sep 17 00:00:00 2001
-From: Lancer <luoyejiang0701@gmail.com>
-Date: Fri, 16 Apr 2021 15:12:17 +0800
+From c8a8ed15c7b8d31cbdc24c981dfbb36d42a87fa8 Mon Sep 17 00:00:00 2001
+From: Yejiang Luo <luoyejiang@gl-inet.com>
+Date: Mon, 31 May 2021 14:28:54 +0800
 Subject: [PATCH] scripts: update feed script
 
 gen_config.py requires the latest version of the feeds script.
----
- scripts/feeds | 137 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 118 insertions(+), 19 deletions(-)
 
-diff --git a/scripts/feeds b/scripts/feeds
-index 304ef6c..fe1f2b9 100755
---- a/scripts/feeds
-+++ b/scripts/feeds
+Signed-off-by: Yejiang Luo <luoyejiang@gl-inet.com>
+---
+ openwrt-18.06/scripts/feeds | 142 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 123 insertions(+), 19 deletions(-)
+
+diff --git a/openwrt-18.06/scripts/feeds b/openwrt-18.06/scripts/feeds
+index 304ef6c..46c5f5c 100755
+--- a/openwrt-18.06/scripts/feeds
++++ b/openwrt-18.06/scripts/feeds
 @@ -41,34 +41,56 @@ my $feed_src = {};
  my $feed_target = {};
  my $feed_vpackage = {};
@@ -53,20 +55,20 @@ index 304ef6c..fe1f2b9 100755
 +		if ($existing->{$name}++) {
 +			die "Duplicate feed name '$name' in '$fname' line: $line\n";
 +		}
-+
-+		my @src = defined($urls) ? split /\s+/, $urls : ();
-+		push @src, '' if @src == 0;
  
 -		$name{$line[1]} and die "Duplicate feed name '$line[1]', line: $line\n";
 -		$name{$line[1]} = 1;
++		my @src = defined($urls) ? split /\s+/, $urls : ();
++		push @src, '' if @src == 0;
+ 
+-		push @feeds, [$line[0], $line[1], \@src];
 +		my %flags;
 +		if (defined $flags) {
 +			while ($flags =~ m!\s+--(\w+)(?:=(\S+))?!g) {
 +				$flags{$1} = defined($2) ? $2 : 1;
 +			}
 +		}
- 
--		push @feeds, [$line[0], $line[1], \@src];
++
 +		if ($type eq "include") {
 +			parse_file($urls, $existing) or
 +			    die "Unable to open included file '$urls'";
@@ -88,7 +90,19 @@ index 304ef6c..fe1f2b9 100755
  }
  
  sub update_location($$)
-@@ -617,6 +639,35 @@ sub refresh_config {
+@@ -506,6 +528,11 @@ sub install_src {
+ 	get_feed($feed->[1]);
+ 	my $src = $feed_src->{$name} or return 1;
+ 
++	# enable force flag if feed src line was declared with --force
++	if (exists($feed->[3]{force})) {
++		$force = 1;
++	}
++
+ 	# If it's a core package and we don't want to override, just return
+ 	my $override = 0;
+ 	if (is_core_src($name)) {
+@@ -617,6 +644,35 @@ sub refresh_config {
  	}
  }
  
@@ -124,7 +138,7 @@ index 304ef6c..fe1f2b9 100755
  sub install {
  	my $name;
  	my %opts;
-@@ -649,6 +700,8 @@ sub install {
+@@ -649,6 +705,8 @@ sub install {
  					install_src($feed, $name, exists($opts{f})) == 0 or $ret = 1;
  					get_feed($f->[1]);
  				}
@@ -133,7 +147,7 @@ index 304ef6c..fe1f2b9 100755
  			}
  		}
  	} else {
-@@ -819,6 +872,47 @@ sub update {
+@@ -819,6 +877,47 @@ sub update {
  	return $failed;
  }
  
@@ -181,7 +195,7 @@ index 304ef6c..fe1f2b9 100755
  sub feed_config() {
  	foreach my $feed (@feeds) {
  		my $installed = (-f "feeds/$feed->[1].index");
-@@ -870,6 +964,10 @@ Commands:
+@@ -870,6 +969,10 @@ Commands:
  	    -i :           Recreate the index only. No feed update from repository is performed.
  	    -f :           Force updating feeds even if there are changed, uncommitted files.
  
@@ -192,7 +206,7 @@ index 304ef6c..fe1f2b9 100755
  	clean:             Remove downloaded/generated files.
  
  EOF
-@@ -883,6 +981,7 @@ my %commands = (
+@@ -883,6 +986,7 @@ my %commands = (
  	'search' => \&search,
  	'uninstall' => \&uninstall,
  	'feed_config' => \&feed_config,
