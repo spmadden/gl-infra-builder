@@ -1,0 +1,66 @@
+From 567ecf0289f829e7fa306dfdb958f6b0f5f7e09e Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Thu, 27 May 2021 15:17:18 +0800
+Subject: [PATCH] fix: configure the WiFi configuration according to the
+ features of GLiNet
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ .../package/kernel/sf_smac/config/sfwifi-a28.sh    |  4 +--
+ .../772-avoid-radar-channel-when-auto.patch        | 29 ++++++++++++++++++++++
+ 2 files changed, 31 insertions(+), 2 deletions(-)
+ create mode 100755 openwrt-18.06/package/network/services/hostapd/patches/772-avoid-radar-channel-when-auto.patch
+
+diff --git a/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh b/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh
+index 780c586..6474cca 100755
+--- a/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh
++++ b/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh
+@@ -56,8 +56,8 @@ insmod_umac(){
+     use_80=${use_80-1}
+     custregd=${custregd-0}
+     lp_clk_ppm=${lp_clk_ppm-1000}
+-    addr_maskall=${addr_maskall-0}
+-	not_send_null=${not_send_null-0}
++    addr_maskall=${addr_maskall-1}
++    not_send_null=${not_send_null-1}
+     ps_on=${ps_on-1}
+     tx_lft=${tx_lft-100}
+     tdls=${tdls-1}
+diff --git a/openwrt-18.06/package/network/services/hostapd/patches/772-avoid-radar-channel-when-auto.patch b/openwrt-18.06/package/network/services/hostapd/patches/772-avoid-radar-channel-when-auto.patch
+new file mode 100755
+index 0000000..417bc13
+--- /dev/null
++++ b/openwrt-18.06/package/network/services/hostapd/patches/772-avoid-radar-channel-when-auto.patch
+@@ -0,0 +1,29 @@
++--- a/src/ap/acs.c
+++++ b/src/ap/acs.c
++@@ -558,6 +558,16 @@ static int is_common_24ghz_chan(int chan
++ #define ACS_24GHZ_PREFER_1_6_11 0.8
++ #endif /* ACS_24GHZ_PREFER_1_6_11 */
++ 
+++static int acs_radar_chan(const struct hostapd_channel_data *chan)
+++{
+++	const int allowed[] = { 52, 56, 60, 64 };
+++	unsigned int i;
+++	for (i = 0; i < ARRAY_SIZE(allowed); i++)
+++	if (chan->chan == allowed[i])
+++		return 1;
+++	return 0;
+++}
+++
++ /*
++  * At this point it's assumed chan->interface_factor has been computed.
++  * This function should be reusable regardless of interference computation
++@@ -636,6 +646,9 @@ acs_find_ideal_chan(struct hostapd_iface
++ 		if (!chan_pri_allowed(chan))
++ 			continue;
++ 
+++		if (acs_radar_chan(chan))
+++			continue;
+++
++ 		if (!is_in_chanlist(iface, chan))
++ 			continue;
++ 
+-- 
+2.7.4
+

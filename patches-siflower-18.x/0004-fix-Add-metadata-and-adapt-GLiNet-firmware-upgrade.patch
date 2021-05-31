@@ -1,0 +1,147 @@
+From 0c90d642cdb5b76acdb748bd9cd49816eaddfe54 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Thu, 27 May 2021 15:13:31 +0800
+Subject: [PATCH] fix: Add metadata and adapt GLiNet firmware upgrade
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ openwrt-18.06/include/image-commands.mk            | 27 ++++++++++++++++++++++
+ .../package/base-files/files/lib/upgrade/fwtool.sh |  1 +
+ .../base-files/files/lib/upgrade/platform.sh       |  3 ++-
+ .../package/base-files/files/sbin/sysupgrade       | 19 +++++++++------
+ openwrt-18.06/target/linux/siflower/image/Makefile |  1 +
+ 5 files changed, 43 insertions(+), 8 deletions(-)
+
+diff --git a/openwrt-18.06/include/image-commands.mk b/openwrt-18.06/include/image-commands.mk
+index 5e24c5e..ec7b7e8 100644
+--- a/openwrt-18.06/include/image-commands.mk
++++ b/openwrt-18.06/include/image-commands.mk
+@@ -326,7 +326,34 @@ metadata_json = \
+ 		} \
+ 	}'
+ 
++ifeq ($(TOPDIR)/glinet/images.json, $(wildcard $(TOPDIR)/glinet/images.json))
++    supported_devices=$(shell echo \"glinet,gl-$(EXTRA_IMAGE_NAME)\")
++    metadate_board=gl-$(EXTRA_IMAGE_NAME)
++    release=$(shell cat $(TOPDIR)/glinet/images.json | \
++         python -c "import json; import sys; obj=json.load(sys.stdin); print obj['profiles']['$(EXTRA_IMAGE_NAME)']['version'].encode('utf-8')")
++else
++    supported_devices="unknown"
++    metadate_board=unknown
++    release=Unknown
++endif
++
++metadata_gl_json = \
++	'{ $(if $(IMAGE_METADATA),$(IMAGE_METADATA)$(comma)) \
++		"metadata_version": "1.0", \
++		"supported_devices":[$(supported_devices)], \
++		"version": { \
++			"release": "$(release)", \
++			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
++			"dist": "$(call json_quote,$(VERSION_DIST))", \
++			"version": "$(call json_quote,$(VERSION_NUMBER))", \
++			"revision": "$(call json_quote,$(REVISION))", \
++			"target": "$(call json_quote,$(TARGETID))", \
++			"board": "$(metadate_board)" \
++		} \
++	}'
++
+ define Build/append-metadata
++	echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $1
+ 	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
+ 	[ ! -s "$(BUILD_KEY)" -o ! -s "$(BUILD_KEY).ucert" -o ! -s "$@" ] || { \
+ 		cp "$(BUILD_KEY).ucert" "$@.ucert" ;\
+diff --git a/openwrt-18.06/package/base-files/files/lib/upgrade/fwtool.sh b/openwrt-18.06/package/base-files/files/lib/upgrade/fwtool.sh
+index 3f28fcc..7b802c4 100644
+--- a/openwrt-18.06/package/base-files/files/lib/upgrade/fwtool.sh
++++ b/openwrt-18.06/package/base-files/files/lib/upgrade/fwtool.sh
+@@ -50,6 +50,7 @@ fwtool_check_image() {
+ 	for k in $dev_keys; do
+ 		json_get_var dev "$k"
+ 		[ "$dev" = "$device" ] && return 0
++		[ "$dev" = "unknown" ] && return 0
+ 	done
+ 
+ 	echo "Device $device not supported by this image"
+diff --git a/openwrt-18.06/package/base-files/files/lib/upgrade/platform.sh b/openwrt-18.06/package/base-files/files/lib/upgrade/platform.sh
+index d0468bd..60666e7 100644
+--- a/openwrt-18.06/package/base-files/files/lib/upgrade/platform.sh
++++ b/openwrt-18.06/package/base-files/files/lib/upgrade/platform.sh
+@@ -9,6 +9,7 @@ platform_expected_image() {
+ 
+ 	case "$machine" in
+ 		# this is from dts
++		"GL")		echo "siwifi-1688a"; return;;
+ 		"sf16a18")	echo "siwifi-1688a"; return;;
+ 		"sf19a28")	echo "siwifi-1688a"; return;;
+ 	esac
+@@ -42,7 +43,7 @@ platform_check_image() {
+ 	case "$file_type" in
+ 		"a18")
+ 			local dev_siwifi_id=$(platform_expected_image)
+-			echo "Found A18 image with device siwifi_id $dev_siwifi_id"
++			#echo "Found A18 image with device siwifi_id $dev_siwifi_id"
+ 
+ 			if [ "$dev_siwifi_id" != "siwifi-1688a" ]; then
+ 				echo "Invalid image type."
+diff --git a/openwrt-18.06/package/base-files/files/sbin/sysupgrade b/openwrt-18.06/package/base-files/files/sbin/sysupgrade
+index 58b613b..ba03534 100755
+--- a/openwrt-18.06/package/base-files/files/sbin/sysupgrade
++++ b/openwrt-18.06/package/base-files/files/sbin/sysupgrade
+@@ -2,6 +2,8 @@
+ 
+ . /lib/functions.sh
+ . /lib/functions/system.sh
++. /usr/share/libubox/jshn.sh
++. /lib/functions/gl_util.sh
+ 
+ # initialize defaults
+ export MTD_CONFIG_ARGS=""
+@@ -227,7 +229,6 @@ do_save_conffiles() {
+ 	ask_bool 0 "Edit config file list" && vi "$CONFFILES"
+ 
+ 	if [ "$SAVE_INSTALLED_PKGS" -eq 1 ]; then
+-		echo "${INSTALLED_PACKAGES}" >> "$CONFFILES"
+ 		mkdir -p "$ETCBACKUP_DIR"
+ 		# Avoid touching filesystem on each backup
+ 		RAMFS="$(mktemp -d -t sysupgrade.XXXXXX)"
+@@ -237,14 +238,18 @@ do_save_conffiles() {
+ 				echo "Cannot mount '$ETCBACKUP_DIR' as tmpfs to avoid touching disk while saving the list of installed packages." >&2
+ 				ask_bool 0 "Abort" && exit
+ 			}
+-
++		local user_apps="$(get_user_apps)"
++		[ -n "$user_apps" ] && {
++			echo "${INSTALLED_PACKAGES}" >> "$CONFFILES"
++			echo "$user_apps" > ${INSTALLED_PACKAGES}
++		}
+ 		# Format: pkg-name<TAB>{rom,overlay,unkown}
+ 		# rom is used for pkgs in /rom, even if updated later
+-		find /usr/lib/opkg/info -name "*.control" \( \
+-			\( -exec test -f /rom/{} \; -exec echo {} rom \; \) -o \
+-			\( -exec test -f /overlay/upper/{} \; -exec echo {} overlay \; \) -o \
+-			\( -exec echo {} unknown \; \) \
+-			\) | sed -e 's,.*/,,;s/\.control /\t/' > ${INSTALLED_PACKAGES}
++		# find /usr/lib/opkg/info -name "*.control" \( \
++		#	\( -exec test -f /rom/{} \; -exec echo {} rom \; \) -o \
++		#	\( -exec test -f /overlay/upper/{} \; -exec echo {} overlay \; \) -o \
++		#	\( -exec echo {} unknown \; \) \
++		#	\) | sed -e 's,.*/,,;s/\.control /\t/' > ${INSTALLED_PACKAGES}
+ 	fi
+ 
+ 	v "Saving config files..."
+diff --git a/openwrt-18.06/target/linux/siflower/image/Makefile b/openwrt-18.06/target/linux/siflower/image/Makefile
+index 2655412..ae229da 100644
+--- a/openwrt-18.06/target/linux/siflower/image/Makefile
++++ b/openwrt-18.06/target/linux/siflower/image/Makefile
+@@ -58,6 +58,7 @@ define Image/MakeSysupgradeBinary
+ 	cat $(KDIR)/uImage.lzma $(KDIR)/root.squashfs > $(KDIR)/$(output_name)
+ 	$(call prepare_generic_squashfs,$(KDIR)/$(output_name))
+ 	$(CP) $(KDIR)/$(output_name) $(BIN_DIR)/$(output_name)
++	$(call Build/append-metadata,$(BIN_DIR)/$(output_name))
+ endef
+ 
+ define Image/Build/Initramfs
+-- 
+2.7.4
+
