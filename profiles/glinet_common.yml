@@ -58,6 +58,7 @@ packages:
   - kmod-gl-sdk4-tertf
   - gl-sdk4-repeater
   - gl-sdk4-custom-dns
+  - select-sdk4-ui-all
 
 diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
