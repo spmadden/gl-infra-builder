@@ -94,11 +94,22 @@ def setup_tree():
         )
 
         feeds_dir = str(base_dir) + "/feeds"
+
         if not Path("feeds_dir").exists():
             run(
                 ["ln", "-s", feeds_dir, "feeds_dir"],
                 check=True,
             )
+
+        offline_dl_dir = str(base_dir) + "/feeds/dl"
+
+        if os.path.exists(offline_dl_dir):
+            if not Path("dl").exists():
+                print(f"Install offline dl folder...")
+                run(
+                    ["ln", "-s", offline_dl_dir, "dl"],
+                    check=True,
+                )
         print("### Patches done")
     except:
         print("### Setting up the tree failed")

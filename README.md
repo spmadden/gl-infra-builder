@@ -36,3 +36,32 @@ $ ls -l /usr/bin/python3*
 
 ### Quickstart
 
+1. Clone repository,
+
+```
+$ git clone https://github.com/gl-inet/gl-infra-builder.git
+```
+
+2. If you have a [offline dl folder](https://sources.openwrt.org/), you can make a symlink to feeds/dl, it will make compilation easier,
+
+```
+$ cd gl-infra-builder
+$ cd feeds/
+$ ln -sf /data/dl .
+```
+
+3. Setup, auto download openwrt-19.07.7 by default and auto config,
+
+```
+$ python3 setup.py
+```
+
+4. Generate your target configuration,
+
+```
+$ ./scripts/gen_config.py list		# show available profile
+$ ./scripts/gen_config.py <target_profile> <function_profile>
+```
+
+5. Run `make` to build your firmware.
+
