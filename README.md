@@ -46,8 +46,7 @@ $ git clone https://github.com/gl-inet/gl-infra-builder.git
 
 ```
 $ cd gl-infra-builder
-$ cd feeds/
-$ ln -sf /data/dl .
+$ ln -sf /data/dl feeds/
 ```
 
 3. Setup, auto download openwrt-19.07.7 by default and auto config,
