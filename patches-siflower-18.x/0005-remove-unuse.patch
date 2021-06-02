@@ -1,0 +1,26 @@
+From 9d67fc4c5fcc2944b8778a9adfe631b5284fe64f Mon Sep 17 00:00:00 2001
+From: Yejiang Luo <luoyejiang@gl-inet.com>
+Date: Tue, 1 Jun 2021 14:08:12 +0800
+Subject: [PATCH] remove unuse
+
+Signed-off-by: Yejiang Luo <luoyejiang@gl-inet.com>
+---
+ openwrt-18.06/include/version.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openwrt-18.06/include/version.mk b/openwrt-18.06/include/version.mk
+index c4abf9b..0b386b6 100644
+--- a/openwrt-18.06/include/version.mk
++++ b/openwrt-18.06/include/version.mk
+@@ -94,7 +94,7 @@ endef
+ #'
+ 
+ # add siwifi software version
+-include $(TOPDIR)/include/siwifi_version.mk
++#include $(TOPDIR)/include/siwifi_version.mk
+ 
+ VERSION_SED_SCRIPT:=$(SED) 's,%U,$(call sed_escape,$(VERSION_REPO)),g' \
+ 	-e 's,%V,$(call sed_escape,$(VERSION_NUMBER)),g' \
+-- 
+2.7.4
+
