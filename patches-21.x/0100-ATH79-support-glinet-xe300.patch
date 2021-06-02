@@ -1,0 +1,386 @@
+From 2ee38824815e2f7e8310705845eb00d5af9cd9cc Mon Sep 17 00:00:00 2001
+From: Luochongjun <luochongjun@gl-inet.com>
+Date: Wed, 2 Jun 2021 14:48:14 +0800
+Subject: [PATCH] ATH79: support glinet xe300
+
+Signed-off-by: Luochongjun <luochongjun@gl-inet.com>
+---
+ .../ath79/dts/qca9531_glinet_gl-xe300-iot.dts      |  29 ++++
+ .../ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts |  25 +++
+ .../ath79/dts/qca9531_glinet_gl-xe300-nor.dts      |  18 +++
+ .../linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi   | 178 +++++++++++++++++++++
+ target/linux/ath79/dts/qca953x.dtsi                |   2 +-
+ target/linux/ath79/image/nand.mk                   |  46 ++++++
+ .../ath79/nand/base-files/etc/board.d/01_leds      |   8 +
+ 7 files changed, 305 insertions(+), 1 deletion(-)
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300-iot.dts
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor.dts
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-iot.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-iot.dts
+new file mode 100644
+index 0000000..3d830fb
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-iot.dts
+@@ -0,0 +1,29 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++/dts-v1/;
++
++#include "qca9531_glinet_gl-xe300.dtsi"
++
++/ {
++	compatible = "glinet,gl-xe300-iot", "qca,qca9531";
++	model = "GL.iNet GL-XE300 (NOR/NAND IOT)";
++};
++
++&nor_partitions {
++	partition@60000 {
++		label = "kernel";
++		reg = <0x060000 0x400000>;
++	};
++	parition@260000 {
++		label = "nor_reserved";
++		reg = <0x460000 0xba0000>;
++	};
++};
++
++&nand_ubi {
++	label = "ubi";
++};
++
++&bootargs {
++	bootargs="";
++};
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+new file mode 100644
+index 0000000..4e92f30
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+@@ -0,0 +1,25 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++/dts-v1/;
++
++#include "qca9531_glinet_gl-xe300.dtsi"
++
++/ {
++	compatible = "glinet,gl-xe300-nor-nand", "qca,qca9531";
++	model = "GL.iNet GL-XE300 (NOR/NAND)";
++};
++
++&nor_partitions {
++	partition@60000 {
++		label = "kernel";
++		reg = <0x060000 0x400000>;
++	};
++	parition@260000 {
++		label = "nor_reserved";
++		reg = <0x460000 0xba0000>;
++	};
++};
++
++&nand_ubi {
++	label = "ubi";
++};
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor.dts
+new file mode 100644
+index 0000000..9b67f49
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor.dts
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++/dts-v1/;
++
++#include "qca9531_glinet_gl-xe300.dtsi"
++
++/ {
++	compatible = "glinet,gl-xe300-nor", "qca,qca9531";
++	model = "GL.iNet GL-XE300 (NOR)";
++};
++
++&nor_partitions {
++	partition@60000 {
++		compatible = "denx,uimage";
++		label = "firmware";
++		reg = <0x060000 0xfa0000>;
++	};
++};
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi
+new file mode 100644
+index 0000000..95d5e3e
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi
+@@ -0,0 +1,178 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/dts-v1/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++#include "qca953x.dtsi"
++
++/ {
++	compatible = "glinet,gl-xe300", "qca,qca9531";
++	model = "GL.iNet GL-XE300";
++
++	keys {
++		compatible = "gpio-keys-polled";
++
++		poll-interval = <20>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&jtag_disable_pins>;
++
++		button0 {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		wan {
++			label = "green:wan";
++			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
++		};
++
++		lan {
++			label = "green:lan";
++			gpios = <&gpio 10 GPIO_ACTIVE_LOW>;
++		};
++
++		wlan {
++			label = "green:wlan";
++			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "phy0tpt";
++		};
++
++		lte {
++			label = "green:lte";
++			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
++		 };
++	};
++
++	gpio-export {
++		compatible = "gpio-export";
++
++		gpio_lte_power {
++			gpio-export,name = "lte_power";
++			gpio-export,output = <1>;
++			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
++		};
++
++		gpio_sd_detect {
++			gpio-export,name = "sd_detect";
++			gpio-export,output = <0>;
++			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
++		};
++	 };
++
++	i2c: i2c {
++		compatible = "i2c-gpio";
++
++		sda-gpios = <&gpio 14 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
++		scl-gpios = <&gpio 16 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
++
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		rtc@32 {
++                        compatible = "rtc-sd2068";
++                        reg = <0x32>;
++		};
++
++	};
++};
++
++&pcie0 {
++	status = "okay";
++};
++
++&uart {
++	status = "okay";
++};
++
++&usb0 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	hub_port: port@1 {
++		reg = <1>;
++		#trigger-source-cells = <0>;
++	};
++};
++
++&usb_phy {
++	status = "okay";
++};
++
++&spi {
++	status = "okay";
++	num-cs = <2>;
++	cs-gpios = <0>, <0>;
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <25000000>;
++
++		nor_partitions: partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x000000 0x040000>;
++				read-only;
++			};
++
++			partition@40000 {
++				label = "u-boot-env";
++				reg = <0x040000 0x010000>;
++			};
++
++			art: partition@50000 {
++				label = "art";
++				reg = <0x050000 0x010000>;
++				read-only;
++			};
++		};
++	};
++
++	flash_nand: flash@1 {
++		compatible = "spi-nand";
++		reg = <1>;
++		spi-max-frequency = <25000000>;
++
++		nand_partitions: partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			nand_ubi: partition@0 {
++				label = "nand_ubi";
++				reg = <0x000000 0x8000000>;
++			};
++		};
++	};
++
++};
++
++&eth0 {
++	status = "okay";
++	mtd-mac-address = <&art 0x0>;
++	phy-handle = <&swphy4>;
++	ifname = "eth1";
++};
++
++&eth1 {
++	mtd-mac-address = <&art 0x0>;
++	mtd-mac-address-increment = <1>;
++	ifname = "eth0";
++};
++
++&wmac {
++	status = "okay";
++	mtd-cal-data = <&art 0x1000>;
++	mtd-mac-address = <&art 0x1002>;
++};
+diff --git a/target/linux/ath79/dts/qca953x.dtsi b/target/linux/ath79/dts/qca953x.dtsi
+index 801438b..00237b2 100644
+--- a/target/linux/ath79/dts/qca953x.dtsi
++++ b/target/linux/ath79/dts/qca953x.dtsi
+@@ -8,7 +8,7 @@
+ 	#address-cells = <1>;
+ 	#size-cells = <1>;
+ 
+-	chosen {
++	bootargs: chosen {
+ 		bootargs = "console=ttyS0,115200n8";
+ 	};
+ 
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index abf269a..d024cac 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -150,6 +150,52 @@ define Device/glinet_gl-e750
+ endef
+ TARGET_DEVICES += glinet_gl-e750
+ 
++define Device/glinet_gl-xe300-nor
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE300-NOR
++  DEVICE_TITLE := GL.iNet GL-XE300 (NOR)
++  DEVICE_PACKAGES := kmod-usb2 block-mount  kmod-usb-serial-ch341
++  IMAGE_SIZE := 16000k
++  SUPPORTED_DEVICES += gl-xe300 glinet,gl-xe300
++endef
++TARGET_DEVICES += glinet_gl-xe300-nor
++
++define Device/glinet_gl-xe300-nor-nand
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE300-NOR-NAND
++  DEVICE_TITLE := GL.iNet GL-XE300 (NOR/NAND)
++  DEVICE_PACKAGES := kmod-usb2 block-mount kmod-usb-serial-ch341
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-metadata
++  SUPPORTED_DEVICES += gl-xe300 glinet,gl-xe300
++endef
++TARGET_DEVICES += glinet_gl-xe300-nor-nand
++
++define Device/glinet_gl-xe300-iot
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE300-IOT
++  DEVICE_TITLE := GL.iNet GL-XE300 (NOR/NAND IOT)
++  DEVICE_PACKAGES := kmod-usb2 block-mount kmod-usb-serial-ch341
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-metadata
++  SUPPORTED_DEVICES += gl-xe300 glinet,gl-xe300
++endef
++TARGET_DEVICES += glinet_gl-xe300-iot
++
++
+ # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
+ define Device/netgear_ath79_nand
+   DEVICE_VENDOR := NETGEAR
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index 8eda666..2c049c1 100755
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -11,6 +11,14 @@ glinet,gl-ar300m-nand|\
+ glinet,gl-ar300m-nor)
+ 	ucidef_set_led_netdev "lan" "LAN" "green:lan" "eth0"
+ 	;;
++glinet,gl-xe300|\
++glinet,gl-xe300-nor|\
++glinet,gl-xe300-iot|\
++glinet,gl-xe300-nor-nand)
++        ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x10"
++        ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
++        ucidef_set_led_netdev "3gnet" "LTE" "green:lte" "wwan0"
++        ;;
+ netgear,wndr3700-v4|\
+ netgear,wndr4300|\
+ netgear,wndr4300sw|\
+-- 
+2.7.4
+
