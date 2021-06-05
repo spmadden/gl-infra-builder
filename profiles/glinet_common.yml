@@ -62,3 +62,4 @@ packages:
 
 diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
+  CONFIG_OUI_HTTPD_OPENSSL=y
