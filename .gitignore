@@ -1,3 +1,5 @@
 openwrt*
 allpkg
 qsdk*
+feeds/dl
+feeds/glinet
