@@ -1,22 +1,22 @@
-From 40d33c8799e3c4a01644fa5ffb2e6b2be99af68c Mon Sep 17 00:00:00 2001
+From 7b4b29036bcf4bc2bd1226db687d9d6b70719e09 Mon Sep 17 00:00:00 2001
 From: Yejiang Luo <luoyejiang@gl-inet.com>
-Date: Sat, 22 May 2021 14:52:31 +0800
-Subject: [PATCH] pending: scripts: add gen_config.py
+Date: Mon, 7 Jun 2021 12:24:58 +0800
+Subject: [PATCH] scripts: add gen_config.py
 
 This script is used to setup the tree based on the profiles/.
 
 Signed-off-by: Yejiang Luo <luoyejiang@gl-inet.com>
 ---
- scripts/gen_config.py | 197 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 197 insertions(+)
+ scripts/gen_config.py | 199 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 199 insertions(+)
  create mode 100755 scripts/gen_config.py
 
 diff --git a/scripts/gen_config.py b/scripts/gen_config.py
 new file mode 100755
-index 0000000..d4c5e97
+index 0000000..00c4420
 --- /dev/null
 +++ b/scripts/gen_config.py
-@@ -0,0 +1,197 @@
+@@ -0,0 +1,199 @@
 +#!/usr/bin/env python3
 +
 +from os import getenv
@@ -148,11 +148,15 @@ index 0000000..d4c5e97
 +        if run(["./scripts/feeds", "install", profile["target"]]).returncode:
 +            die(f"Error installing external target {profile['target']}")
 +
++def setup_all_feeds():
++    print("Install all feeds...")
++    if run(["./scripts/feeds", "install", "-a", "-f"]).returncode:
++        die(f"Error installing")
 +
 +def generate_config(profile):
 +    config_output = f"""CONFIG_TARGET_{profile["target"]}=y
 +CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}=y
-+CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}_DEVICE_{profile["profile"]}=y
++CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}_{profile["profile"]}=y
 +"""
 +
 +    config_output += f"{profile.get('diffconfig', '')}"
@@ -201,15 +205,13 @@ index 0000000..d4c5e97
 +
 +    clean_tree()
 +    setup_feeds(profile)
++    setup_all_feeds()
 +    generate_config(profile)
 +    generate_files(profile)
 +
 +    print("Running make defconfig")
 +    if run(["make", "defconfig"]).returncode:
 +        die(f"Error running make defconfig")
-+
-+    if call("grep 'CONFIG_TARGET_PROFILE' .config|grep %s" % (profile['profile']), shell=True) != 0:
-+        die(f"Error: Cant not find the profile '%s'! Please check again!" % (profile['profile']))
 +
 +    for package in profile['packages']:
 +        if call("grep 'CONFIG_PACKAGE_%s=y' .config" % (package), shell=True) != 0:
