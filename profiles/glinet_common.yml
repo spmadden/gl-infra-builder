@@ -5,7 +5,6 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
-  - libopenssl
   - ipset
   - unzip
   - ethtool
