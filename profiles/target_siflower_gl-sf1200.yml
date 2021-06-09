@@ -5,6 +5,7 @@ subtarget: sf19a28_fullmask
 description: Build image for the GL.iNET SF1200
 
 diffconfig: |
+  CONFIG_SOFT_FLOAT=n
   CONFIG_MODULES=y
   CONFIG_HAVE_DOT_CONFIG=y
   CONFIG_TARGET_siflower=y
