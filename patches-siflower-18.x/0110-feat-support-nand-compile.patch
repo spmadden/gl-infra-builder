@@ -1,0 +1,100 @@
+From a6fa972f09e1e50319f18671f815f5932b15c216 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Wed, 2 Jun 2021 17:46:16 +0800
+Subject: [PATCH] feat: support nand compile
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ openwrt-18.06/include/image-commands.mk            |  4 ++++
+ openwrt-18.06/include/image.mk                     |  1 +
+ openwrt-18.06/include/version.mk                   |  2 +-
+ openwrt-18.06/target/linux/siflower/image/Makefile |  3 ++-
+ openwrt-18.06/target/linux/siflower/image/nand.mk  | 15 +++++++++++++++
+ 5 files changed, 23 insertions(+), 2 deletions(-)
+ create mode 100644 openwrt-18.06/target/linux/siflower/image/nand.mk
+
+diff --git a/openwrt-18.06/include/image-commands.mk b/openwrt-18.06/include/image-commands.mk
+index ec7b7e8..4fbc74a 100644
+--- a/openwrt-18.06/include/image-commands.mk
++++ b/openwrt-18.06/include/image-commands.mk
+@@ -352,6 +352,10 @@ metadata_gl_json = \
+ 		} \
+ 	}'
+ 
++define Build/append-gl-metadata
++	echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@
++endef
++
+ define Build/append-metadata
+ 	echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $1
+ 	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
+diff --git a/openwrt-18.06/include/image.mk b/openwrt-18.06/include/image.mk
+index 795c6ca..ae68b67 100644
+--- a/openwrt-18.06/include/image.mk
++++ b/openwrt-18.06/include/image.mk
+@@ -486,6 +486,7 @@ define Device/Build/image
+   endif
+   $(KDIR)/tmp/$(call IMAGE_NAME,$(1),$(2)): $$(KDIR_KERNEL_IMAGE) $$(ROOTFS/$(1)/$(3))
+ 	@rm -f $$@
++	cp $(KDIR)/uImage.lzma $$(KDIR_KERNEL_IMAGE)
+ 	[ -f $$(word 1,$$^) -a -f $$(word 2,$$^) ]
+ 	$$(call concat_cmd,$(if $(IMAGE/$(2)/$(1)),$(IMAGE/$(2)/$(1)),$(IMAGE/$(2))))
+ 
+diff --git a/openwrt-18.06/include/version.mk b/openwrt-18.06/include/version.mk
+index c4abf9b..1a44287 100644
+--- a/openwrt-18.06/include/version.mk
++++ b/openwrt-18.06/include/version.mk
+@@ -94,7 +94,7 @@ endef
+ #'
+ 
+ # add siwifi software version
+-include $(TOPDIR)/include/siwifi_version.mk
++# include $(TOPDIR)/include/siwifi_version.mk
+ 
+ VERSION_SED_SCRIPT:=$(SED) 's,%U,$(call sed_escape,$(VERSION_REPO)),g' \
+ 	-e 's,%V,$(call sed_escape,$(VERSION_NUMBER)),g' \
+diff --git a/openwrt-18.06/target/linux/siflower/image/Makefile b/openwrt-18.06/target/linux/siflower/image/Makefile
+index ae229da..3c63684 100644
+--- a/openwrt-18.06/target/linux/siflower/image/Makefile
++++ b/openwrt-18.06/target/linux/siflower/image/Makefile
+@@ -6,6 +6,7 @@
+ #
+ include $(TOPDIR)/rules.mk
+ include $(INCLUDE_DIR)/image.mk
++include ./nand.mk
+ 
+ define get_kernel_entry
+ 0x$(shell $(TARGET_CROSS)nm $(1) 2>/dev/null | grep " kernel_entry" | cut -f1 -d ' ')
+@@ -72,7 +73,7 @@ endef
+ define Image/Build
+ 	$(call Image/Build/$(1))
+ 	dd if=$(KDIR)/root.$(1) of=$(BIN_DIR)/$(IMG_PREFIX)-root.$(1) bs=128k conv=sync
+-	$(call Image/MakeSysupgradeBinary)
++	$(if $(TARGET_DEVICES),,$(call Image/MakeSysupgradeBinary))
+ endef
+ 
+ $(eval $(call BuildImage))
+diff --git a/openwrt-18.06/target/linux/siflower/image/nand.mk b/openwrt-18.06/target/linux/siflower/image/nand.mk
+new file mode 100644
+index 0000000..4d6d539
+--- /dev/null
++++ b/openwrt-18.06/target/linux/siflower/image/nand.mk
+@@ -0,0 +1,15 @@
++define Device/glinet_gl-sft1200
++  ATH_SOC := sf16a18
++  DEVICE_TITLE := GL-SFT1200
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES += factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++endef
++
++ifdef CONFIG_TARGET_siflower_sf19a28_fullmask_SF19A28-GL-SFT1200
++TARGET_DEVICES += glinet_gl-sft1200
++endif
+-- 
+2.7.4
+
