@@ -1,15 +1,15 @@
-From 350821edddad89fd53f9dcc99504b9cd645d2373 Mon Sep 17 00:00:00 2001
-From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
-Date: Thu, 27 May 2021 15:53:56 +0800
+From 17a81861cb8199a86fb7141d9c1101dda470ab09 Mon Sep 17 00:00:00 2001
+From: Yejiang Luo <luoyejiang@gl-inet.com>
+Date: Thu, 10 Jun 2021 14:21:37 +0800
 Subject: [PATCH] fix: use openwrt18.06 feeds
 
-Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+Signed-off-by: Yejiang Luo <luoyejiang@gl-inet.com>
 ---
  openwrt-18.06/feeds.conf.default | 14 +++++---------
  1 file changed, 5 insertions(+), 9 deletions(-)
 
 diff --git a/openwrt-18.06/feeds.conf.default b/openwrt-18.06/feeds.conf.default
-index da6c665..4d2c147 100644
+index da6c665..3bb472e 100644
 --- a/openwrt-18.06/feeds.conf.default
 +++ b/openwrt-18.06/feeds.conf.default
 @@ -1,9 +1,5 @@
@@ -22,7 +22,7 @@ index da6c665..4d2c147 100644
 -#src-git management https://github.com/openwrt-management/packages.git
 -#src-git oldpackages http://git.openwrt.org/packages.git
 -#src-link custom /usr/src/openwrt/custom-feed
-+src-git gli_pub https://github.com/gl-inet/gli-pub.git
++src-git gl https://github.com/gl-inet/gl-feeds.git;18.06
 +src-git packages https://git.openwrt.org/feed/packages.git^35e0b737ab496f5b51e80079b0d8c9b442e223f5
 +src-git luci https://git.openwrt.org/project/luci.git^f64b1523447547032d5280fb0bcdde570f2ca913
 +src-git routing https://git.openwrt.org/feed/routing.git^1b9d1c419f0ecefda51922a7845ab2183d6acd76
