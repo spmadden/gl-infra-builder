@@ -424,8 +424,8 @@ index 6a0adc7..5ba886b
 +		#address-cells = <1>;
 +		#size-cells = <1>;
 +		model = "mt1300";
-+		wan = "eth0"
-+		lan = "eth1";
++		wan = "eth0.2";
++		lan = "eth0.1";
 +		switch-button = "gpio-16";
 +		reset-button = "gpio-50";
 +		usb-port = "1-1.3";
