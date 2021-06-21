@@ -8,9 +8,8 @@ Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
  openwrt-18.06/include/image-commands.mk            | 27 ++++++++++++++++++++++
  .../package/base-files/files/lib/upgrade/fwtool.sh |  1 +
  .../base-files/files/lib/upgrade/platform.sh       |  3 ++-
- .../package/base-files/files/sbin/sysupgrade       | 19 +++++++++------
  openwrt-18.06/target/linux/siflower/image/Makefile |  1 +
- 5 files changed, 43 insertions(+), 8 deletions(-)
+ 4 files changed, 31 insertions(+), 1 deletions(-)
 
 diff --git a/openwrt-18.06/include/image-commands.mk b/openwrt-18.06/include/image-commands.mk
 index 5e24c5e..ec7b7e8 100644
@@ -84,52 +83,6 @@ index d0468bd..60666e7 100644
  
  			if [ "$dev_siwifi_id" != "siwifi-1688a" ]; then
  				echo "Invalid image type."
-diff --git a/openwrt-18.06/package/base-files/files/sbin/sysupgrade b/openwrt-18.06/package/base-files/files/sbin/sysupgrade
-index 58b613b..ba03534 100755
---- a/openwrt-18.06/package/base-files/files/sbin/sysupgrade
-+++ b/openwrt-18.06/package/base-files/files/sbin/sysupgrade
-@@ -2,6 +2,8 @@
- 
- . /lib/functions.sh
- . /lib/functions/system.sh
-+. /usr/share/libubox/jshn.sh
-+. /lib/functions/gl_util.sh
- 
- # initialize defaults
- export MTD_CONFIG_ARGS=""
-@@ -227,7 +229,6 @@ do_save_conffiles() {
- 	ask_bool 0 "Edit config file list" && vi "$CONFFILES"
- 
- 	if [ "$SAVE_INSTALLED_PKGS" -eq 1 ]; then
--		echo "${INSTALLED_PACKAGES}" >> "$CONFFILES"
- 		mkdir -p "$ETCBACKUP_DIR"
- 		# Avoid touching filesystem on each backup
- 		RAMFS="$(mktemp -d -t sysupgrade.XXXXXX)"
-@@ -237,14 +238,18 @@ do_save_conffiles() {
- 				echo "Cannot mount '$ETCBACKUP_DIR' as tmpfs to avoid touching disk while saving the list of installed packages." >&2
- 				ask_bool 0 "Abort" && exit
- 			}
--
-+		local user_apps="$(get_user_apps)"
-+		[ -n "$user_apps" ] && {
-+			echo "${INSTALLED_PACKAGES}" >> "$CONFFILES"
-+			echo "$user_apps" > ${INSTALLED_PACKAGES}
-+		}
- 		# Format: pkg-name<TAB>{rom,overlay,unkown}
- 		# rom is used for pkgs in /rom, even if updated later
--		find /usr/lib/opkg/info -name "*.control" \( \
--			\( -exec test -f /rom/{} \; -exec echo {} rom \; \) -o \
--			\( -exec test -f /overlay/upper/{} \; -exec echo {} overlay \; \) -o \
--			\( -exec echo {} unknown \; \) \
--			\) | sed -e 's,.*/,,;s/\.control /\t/' > ${INSTALLED_PACKAGES}
-+		# find /usr/lib/opkg/info -name "*.control" \( \
-+		#	\( -exec test -f /rom/{} \; -exec echo {} rom \; \) -o \
-+		#	\( -exec test -f /overlay/upper/{} \; -exec echo {} overlay \; \) -o \
-+		#	\( -exec echo {} unknown \; \) \
-+		#	\) | sed -e 's,.*/,,;s/\.control /\t/' > ${INSTALLED_PACKAGES}
- 	fi
- 
- 	v "Saving config files..."
 diff --git a/openwrt-18.06/target/linux/siflower/image/Makefile b/openwrt-18.06/target/linux/siflower/image/Makefile
 index 2655412..ae229da 100644
 --- a/openwrt-18.06/target/linux/siflower/image/Makefile

@@ -1,0 +1,25 @@
+From b00110c3c28b05fa61c24c8928b55a53eb6a7624 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Fri, 18 Jun 2021 17:09:15 +0800
+Subject: [PATCH] fix: iproute2 depends
+
+---
+ openwrt-18.06/package/network/utils/iproute2/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openwrt-18.06/package/network/utils/iproute2/Makefile b/openwrt-18.06/package/network/utils/iproute2/Makefile
+index c79d751..e9cfdd9 100644
+--- a/openwrt-18.06/package/network/utils/iproute2/Makefile
++++ b/openwrt-18.06/package/network/utils/iproute2/Makefile
+@@ -47,7 +47,7 @@ $(call Package/iproute2/Default)
+  VARIANT:=full
+  PROVIDES:=ip
+  ALTERNATIVES:=300:/sbin/ip:/sbin/ip-full
+- DEPENDS:=+libnl-tiny +(PACKAGE_devlink||PACKAGE_rdma):libmnl
++ DEPENDS:=+libnl-tiny +(PACKAGE_devlink||PACKAGE_rdma):libmnl +libcap
+ endef
+ 
+ define Package/tc
+-- 
+2.7.4
+

@@ -1,0 +1,181 @@
+From b398467460b81a18f45b4857c92b877244a51702 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Wed, 16 Jun 2021 16:33:47 +0800
+Subject: [PATCH] fix: modify the Siflower SDK according to the feature
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ .../package/base-files/files/bin/config_generate     |  4 ++--
+ openwrt-18.06/package/base-files/files/etc/shadow    |  2 +-
+ .../mac80211/files/lib/netifd/wireless/mac80211.sh   | 11 ++++++-----
+ .../kernel/mac80211/files/lib/wifi/mac80211.sh       | 20 ++++++++++++--------
+ .../network/config/firewall/files/firewall.config    |  9 ---------
+ .../network/config/netifd/files/etc/init.d/network   |  1 -
+ 6 files changed, 21 insertions(+), 26 deletions(-)
+
+diff --git a/openwrt-18.06/package/base-files/files/bin/config_generate b/openwrt-18.06/package/base-files/files/bin/config_generate
+index 9de0c3a..f2bee1f 100755
+--- a/openwrt-18.06/package/base-files/files/bin/config_generate
++++ b/openwrt-18.06/package/base-files/files/bin/config_generate
+@@ -89,7 +89,7 @@ generate_network() {
+ 	uci -q batch <<-EOF
+ 		set network.$1.type='bridge'
+ 		set network.$1.proto='static'
+-		set network.$1.ipaddr='192.168.4.1'
++		set network.$1.ipaddr='192.168.8.1'
+ 		set network.$1.netmask='255.255.255.0'
+ 		set network.$1.ip6assign='60'
+ 	EOF
+@@ -145,7 +145,7 @@ generate_network() {
+ 		static)
+ 			local ipad
+ 			case "$1" in
+-				lan) ipad=${ipaddr:-"192.168.4.1"} ;;
++				lan) ipad=${ipaddr:-"192.168.8.1"} ;;
+ 				*) ipad=${ipaddr:-"192.168.$((addr_offset++)).1"} ;;
+ 			esac
+ 
+diff --git a/openwrt-18.06/package/base-files/files/etc/shadow b/openwrt-18.06/package/base-files/files/etc/shadow
+index 8f87824..21c26e6 100644
+--- a/openwrt-18.06/package/base-files/files/etc/shadow
++++ b/openwrt-18.06/package/base-files/files/etc/shadow
+@@ -1,4 +1,4 @@
+-root:$1$wEehtjxj$YBu4quNfVUjzfv8p/PBo5.:0:0:99999:7:::
++root::0:0:99999:7:::
+ daemon:*:0:0:99999:7:::
+ ftp:*:0:0:99999:7:::
+ network:*:0:0:99999:7:::
+diff --git a/openwrt-18.06/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh b/openwrt-18.06/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh
+index 1f8868b..2a4a12e 100755
+--- a/openwrt-18.06/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh
++++ b/openwrt-18.06/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh
+@@ -1,6 +1,7 @@
+ #!/bin/sh
+ . /lib/netifd/netifd-wireless.sh
+ . /lib/netifd/hostapd.sh
++. /lib/functions/system.sh
+ 
+ init_wireless_driver "$@"
+ 
+@@ -398,18 +399,18 @@ mac80211_generate_mac() {
+ 	local oIFS="$IFS"; IFS=":"; set -- $ref; IFS="$oIFS"
+ 
+ 	macidx=$(($id + 2))
+-	[ "$mask" = "ff:ff:ff:ff:ff:ff" ] && {
++#	[ "$mask" = "ff:ff:ff:ff:ff:ff" ] && {
+ #		modified by robert
+ #		for if mask is FF:FF:FF:FF:FF:FF, the previous logic will generate a wrong mac-address
+-		printf "%s:%s:%s:%s:%s:%02x" $1 $2 $3 $4 $5 $(( 0x$6 ^ $id ))
+-		return
+-	}
++#		printf "%s:%s:%s:%s:%s:%02x" $1 $2 $3 $4 $5 $(( 0x$6 ^ $id ))
++#		return
++#	}
+ 
+ 	[ "$((0x$mask1))" -gt 0 ] && {
+ 		b1="0x$1"
+ 		[ "$id" -gt 0 ] && \
+ 			b1=$(($b1 ^ ((($id - 1) << 2) | 0x2)))
+-		printf "%02x:%s:%s:%s:%s:%s" $b1 $2 $3 $4 $5 $6
++		printf "%02x:%s:%s:%s:%s:%s" $(($b1%256)) $2 $3 $4 $5 $6
+ 		return
+ 	}
+ 
+diff --git a/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh b/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+index a8e53f6..dcb0a8c 100755
+--- a/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
++++ b/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+@@ -67,7 +67,8 @@ detect_mac80211() {
+ 		devidx=$(($devidx + 1))
+ 	done
+ 
+-	for _dev in /sys/class/ieee80211/*; do
++	for _dev in `ls /sys/class/ieee80211/ -r`; do
++		_dev="/sys/class/ieee80211/$_dev"
+ 		[ -e "$_dev" ] || continue
+ 
+ 		dev="${_dev##*/}"
+@@ -80,19 +81,19 @@ detect_mac80211() {
+ 		channel="1"
+ 		htmode=""
+ 		ht_capab=""
+-		ssidprefix="-2.4G"
++		ssidprefix=""
+ 		noscan="0"
+ 		band="2.4G"
+ 		htcodex="0"
+ 		txpower="20"
+ 
+ 
+-		iw phy "$dev" info | grep -q 'Capabilities:' && htmode=HT20
++		iw phy "$dev" info | grep -q 'Capabilities:' && htmode=HT40
+ 
+ 		iw phy "$dev" info | grep -q '5180 MHz' && {
+ 			mode_band="a"
+ 			channel="161"
+-			ssidprefix=""
++			ssidprefix="-5G"
+ 			band="5G"
+ 			txpower="25"
+ 			iw phy "$dev" info | grep -q 'VHT Capabilities' && htmode="VHT80"
+@@ -117,8 +118,11 @@ detect_mac80211() {
+ 		[ -f "/sys/devices/factory-read/countryid" ] && {
+ 			country=`cat /sys/devices/factory-read/countryid`
+ 		}
+-		ssid=SiWiFi-`cat /sys/class/ieee80211/${dev}/macaddress | cut -c 13- | sed 's/://g'`$ssidprefix
+-		ssid_lease=SiWiFi-租赁-$ssidprefix`cat /sys/class/ieee80211/${dev}/macaddress | cut -c 13- | sed 's/://g'`
++		#ssid=SiWiFi-`cat /sys/class/ieee80211/${dev}/macaddress | cut -c 13- | sed 's/://g'`$ssidprefix
++		#ssid_lease=SiWiFi-租赁-$ssidprefix`cat /sys/class/ieee80211/${dev}/macaddress | cut -c 13- | sed 's/://g'`
++
++		ssid=OpenWrt$ssidprefix
++		ssid_lease=OpenWrt-lease$ssidprefix
+ 		if [ ! -n "$country" ]; then
+ 			country='CN'
+ 		fi
+@@ -131,9 +135,9 @@ detect_mac80211() {
+ 			set wireless.radio${devidx}=wifi-device
+ 			set wireless.radio${devidx}.type=mac80211
+ 			set wireless.radio${devidx}.country=${country}
+-			set wireless.radio${devidx}.txpower_lvl=${txpower_lvl}
+ 			set wireless.radio${devidx}.txpower=${txpower}
+-			set wireless.radio${devidx}.channel=${channel}
++			set wireless.radio${devidx}.txpower_max=${txpower}
++			set wireless.radio${devidx}.channel=auto
+ 			set wireless.radio${devidx}.band=${band}
+ 			set wireless.radio${devidx}.hwmode=11${mode_band}
+ 			set wireless.radio${devidx}.noscan=${noscan}
+diff --git a/openwrt-18.06/package/network/config/firewall/files/firewall.config b/openwrt-18.06/package/network/config/firewall/files/firewall.config
+index d6e311c..584ed85 100644
+--- a/openwrt-18.06/package/network/config/firewall/files/firewall.config
++++ b/openwrt-18.06/package/network/config/firewall/files/firewall.config
+@@ -16,15 +16,6 @@ config zone
+ 	option forward		ACCEPT
+ 
+ config zone
+-	option name		wwan
+-	list   network		'wwan'
+-	option input		REJECT
+-	option output		ACCEPT
+-	option forward		REJECT
+-	option masq		1
+-	option mtu_fix		1
+-
+-config zone
+ 	option name		wan
+ 	list   network		'wan'
+ 	list   network		'wan6'
+diff --git a/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network b/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network
+index 2501824..7af9df3 100755
+--- a/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network
++++ b/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network
+@@ -15,7 +15,6 @@ init_switch() {
+ start_service() {
+ 	./usr/bin/hnat_update_interface.sh
+ 	local lanip=$(uci get network.lan.ipaddr)
+-	echo ${lanip} siwifi.cn > /etc/hosts
+ 
+ 	init_switch
+ 
+-- 
+2.7.4
+

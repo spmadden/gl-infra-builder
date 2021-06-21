@@ -1,0 +1,25 @@
+From c354e5a0ca8ad862c3c1f3c1b71a13a2d634939f Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Mon, 21 Jun 2021 15:44:41 +0800
+Subject: [PATCH] fix: siflower support nand tar upgrade
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ openwrt-18.06/target/linux/siflower/sf19a28-fullmask/target.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/openwrt-18.06/target/linux/siflower/sf19a28-fullmask/target.mk b/openwrt-18.06/target/linux/siflower/sf19a28-fullmask/target.mk
+index af34c96..868da4a 100644
+--- a/openwrt-18.06/target/linux/siflower/sf19a28-fullmask/target.mk
++++ b/openwrt-18.06/target/linux/siflower/sf19a28-fullmask/target.mk
+@@ -6,6 +6,7 @@ SUBTARGET:=sf19a28-fullmask
+ BOARDNAME:=sf19a28 full mask based boards
+ ARCH_PACKAGES:=mips_siflower
+ CPU_TYPE:=mips-interAptiv
++FEATURES+=usb nand gpio
+ 
+ define Target/Description
+ 	Build firmware images for siflower sf19a28 full mask based boards.
+-- 
+2.7.4
+
