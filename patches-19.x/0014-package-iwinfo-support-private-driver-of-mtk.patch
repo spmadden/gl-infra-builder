@@ -1,4 +1,4 @@
-From fa821249e3454807eb35172d908437575c244a88 Mon Sep 17 00:00:00 2001
+From 854c30faa0f358181b044750595004b071c8455a Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 26 Apr 2021 15:53:05 +0800
 Subject: [PATCH] package/iwinfo: support private driver of mtk
@@ -8,10 +8,10 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  package/network/utils/iwinfo/Makefile         |  14 +-
  .../001-add-htmodelist-for-scan-results.patch | 170 +++++
  .../patches/002-fix-station-mode-scan.patch   |  28 +
- .../patches/003-support-mtk-driver.patch      | 192 ++++++
+ .../patches/003-support-mtk-driver.patch      | 166 +++++
  package/network/utils/iwinfo/src/api/mtk.h    |  71 +++
  package/network/utils/iwinfo/src/iwinfo_mtk.c | 596 ++++++++++++++++++
- 6 files changed, 1068 insertions(+), 3 deletions(-)
+ 6 files changed, 1042 insertions(+), 3 deletions(-)
  create mode 100644 package/network/utils/iwinfo/patches/001-add-htmodelist-for-scan-results.patch
  create mode 100644 package/network/utils/iwinfo/patches/002-fix-station-mode-scan.patch
  create mode 100644 package/network/utils/iwinfo/patches/003-support-mtk-driver.patch
@@ -269,10 +269,10 @@ index 0000000000..009a920290
 + 	else if (!nl80211_get_mode(ifname, &mode) &&
 diff --git a/package/network/utils/iwinfo/patches/003-support-mtk-driver.patch b/package/network/utils/iwinfo/patches/003-support-mtk-driver.patch
 new file mode 100644
-index 0000000000..91f526b0ee
+index 0000000000..3aaa24f6b0
 --- /dev/null
 +++ b/package/network/utils/iwinfo/patches/003-support-mtk-driver.patch
-@@ -0,0 +1,192 @@
+@@ -0,0 +1,166 @@
 +--- a/Makefile
 ++++ b/Makefile
 +@@ -32,6 +32,13 @@ ifneq ($(filter nl80211,$(IWINFO_BACKEND
@@ -418,32 +418,6 @@ index 0000000000..91f526b0ee
 + 	luaL_newmetatable(L, IWINFO_WEXT_META);
 + 	luaL_register(L, NULL, R_common);
 + 	luaL_register(L, NULL, R_wext);
-+--- a/iwinfo_cli.c
-++++ b/iwinfo_cli.c
-+@@ -111,7 +111,11 @@ static char * format_signal(int sig)
-+ 	if (!sig)
-+ 		snprintf(buf, sizeof(buf), "unknown");
-+ 	else
-++#ifdef USE_MTK
-++		snprintf(buf, sizeof(buf), "%d %%", sig);
-++#else
-+ 		snprintf(buf, sizeof(buf), "%d dBm", sig);
-++#endif
-+ 
-+ 	return buf;
-+ }
-+@@ -609,7 +613,11 @@ static void print_scanlist(const struct
-+ 			IWINFO_OPMODE_NAMES[e->mode],
-+ 			format_channel(e->channel));
-+ 		printf("          Signal: %s  Quality: %s/%s\n",
-++#ifdef USE_MTK
-++			format_signal(e->signal),
-++#else
-+ 			format_signal(e->signal - 0x100),
-++#endif
-+ 			format_quality(e->quality),
-+ 			format_quality_max(e->quality_max));
-+ 		printf("          Encryption: %s\n",
 +--- a/hardware.txt
 ++++ b/hardware.txt
 +@@ -175,4 +175,8 @@
@@ -544,7 +518,7 @@ index 0000000000..82a5ed7fce
 +#endif // __MTK_H__
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..7e3d651ba2
+index 0000000000..aeaef61db7
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 @@ -0,0 +1,596 @@
@@ -876,7 +850,7 @@ index 0000000000..7e3d651ba2
 +
 +	line = strtok(NULL, "\n");
 +
-+	while (line && (survey_count < 64))
++	while (line && (survey_count < 200))
 +	{
 +		memset(&st[survey_count], 0, sizeof(st[survey_count]));
 +
@@ -933,7 +907,7 @@ index 0000000000..7e3d651ba2
 +{
 +	int i = 0, h, sc;
 +	struct iwinfo_scanlist_entry sce;
-+	struct survey_table stl[64];
++	struct survey_table stl[200];
 +	
 +	sc = mtk_get_scan(ifname, stl);
 +	*len = 0;
@@ -952,7 +926,7 @@ index 0000000000..7e3d651ba2
 +		sce.channel = atoi(stl[i].channel);
 +		sce.quality = atoi(stl[i].signal);
 +		sce.quality_max = 100;
-+		sce.signal = atoi(stl[i].signal);
++		sce.signal = atoi(stl[i].signal) + 100;
 +		sce.mode = IWINFO_OPMODE_MASTER;
 +
 +		if (!strcmp(stl[i].security, "NONE") || !strcmp(stl[i].security, "OPEN")) {
