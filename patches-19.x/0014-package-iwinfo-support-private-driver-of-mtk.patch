@@ -1,4 +1,4 @@
-From 854c30faa0f358181b044750595004b071c8455a Mon Sep 17 00:00:00 2001
+From 4d73403ef3c0b7156d4eacd1cb837026ccbff549 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 26 Apr 2021 15:53:05 +0800
 Subject: [PATCH] package/iwinfo: support private driver of mtk
@@ -19,7 +19,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
 
 diff --git a/package/network/utils/iwinfo/Makefile b/package/network/utils/iwinfo/Makefile
-index cee7253a3a..3ad1066bb4 100644
+index cee7253a3a..f4b50b311f 100644
 --- a/package/network/utils/iwinfo/Makefile
 +++ b/package/network/utils/iwinfo/Makefile
 @@ -7,7 +7,7 @@
@@ -27,7 +27,7 @@ index cee7253a3a..3ad1066bb4 100644
  
  PKG_NAME:=libiwinfo
 -PKG_RELEASE:=1
-+PKG_RELEASE:=4
++PKG_RELEASE:=5
  
  PKG_SOURCE_PROTO:=git
  PKG_SOURCE_URL=$(PROJECT_GIT)/project/iwinfo.git
