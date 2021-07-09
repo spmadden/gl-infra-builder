@@ -22,7 +22,7 @@ index 0000000000..310b1bfcf8
 + {
 +   struct iwreq	wrq;
 +-  u_char	buffer[4096];	/* Only that big in v25 and later */
-++  u_char	buffer[8192];	/* Only that big in v25 and later */
+++  u_char	buffer[20 * 1024];	/* Only that big in v25 and later */
 +   int		i = 0;		/* Start with first command arg */
 +   int		k;		/* Index in private description table */
 +   int		temp;
