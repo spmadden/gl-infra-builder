@@ -1,4 +1,4 @@
-From 4d73403ef3c0b7156d4eacd1cb837026ccbff549 Mon Sep 17 00:00:00 2001
+From b0c028b9166969610a947ec3b3a4ef09245bb2ff Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 26 Apr 2021 15:53:05 +0800
 Subject: [PATCH] package/iwinfo: support private driver of mtk
