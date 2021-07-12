@@ -1,7 +1,7 @@
 From c354e5a0ca8ad862c3c1f3c1b71a13a2d634939f Mon Sep 17 00:00:00 2001
 From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
 Date: Mon, 21 Jun 2021 15:44:41 +0800
-Subject: [PATCH] fix: siflower support nand tar upgrade
+Subject: [PATCH] feat: siflower add usb nand gpio feature
 
 Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
 ---
