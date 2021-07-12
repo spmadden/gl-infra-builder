@@ -1,4 +1,4 @@
-From 0dbf7d2351587aac1a17f87478ab3b5bbaf035aa Mon Sep 17 00:00:00 2001
+From 3588257dc206b0dc1910bbe9c07119b59bf7ffde Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 26 Apr 2021 15:53:05 +0800
 Subject: [PATCH] package/iwinfo: support private driver of mtk
@@ -8,10 +8,10 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  package/network/utils/iwinfo/Makefile         |  14 +-
  .../001-add-htmodelist-for-scan-results.patch | 170 +++++++
  .../patches/002-fix-station-mode-scan.patch   |  28 ++
- .../patches/003-support-mtk-driver.patch      | 166 +++++++
+ .../patches/003-support-mtk-driver.patch      | 166 ++++++
  package/network/utils/iwinfo/src/api/mtk.h    |  71 +++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 462 ++++++++++++++++++
- 6 files changed, 908 insertions(+), 3 deletions(-)
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 473 ++++++++++++++++++
+ 6 files changed, 919 insertions(+), 3 deletions(-)
  create mode 100644 package/network/utils/iwinfo/patches/001-add-htmodelist-for-scan-results.patch
  create mode 100644 package/network/utils/iwinfo/patches/002-fix-station-mode-scan.patch
  create mode 100644 package/network/utils/iwinfo/patches/003-support-mtk-driver.patch
@@ -518,10 +518,10 @@ index 0000000000..82a5ed7fce
 +#endif // __MTK_H__
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..9f5f648213
+index 0000000000..96a92beeb1
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,462 @@
+@@ -0,0 +1,473 @@
 +/*
 + * iwinfo - Wireless Information Library - Linux Wireless Extension Backend
 + *
@@ -552,8 +552,18 @@ index 0000000000..9f5f648213
 +{
 +	strncpy(wrq->ifr_name, ifname, IFNAMSIZ);
 +
-+	wrq->u.data.pointer = data;
-+	wrq->u.data.length = len;
++	if(data != NULL)
++	{
++		if(len < IFNAMSIZ)
++		{
++			memcpy(wrq->u.name, data, len);
++		}
++		else
++		{
++			wrq->u.data.pointer = data;
++			wrq->u.data.length = len;
++		}
++	}
 +
 +	return iwinfo_ioctl(cmd, wrq);
 +}
@@ -784,10 +794,11 @@ index 0000000000..9f5f648213
 +static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
 +{
 +	struct iwinfo_scanlist_entry sce;
++	char action[64] = "SiteSurvey=";
 +	char buf2[IWINFO_BUFSIZE];
 +	int i, j, length;
 +
-+	if(mtk_get80211priv(ifname, RTPRIV_IOCTL_SET, "SiteSurvey=", sizeof("SiteSurvey=") - 1) < 0)
++	if(mtk_get80211priv(ifname, RTPRIV_IOCTL_SET, action, sizeof(action)) < 0)
 +		return -1;
 +
 +	sleep(5);
