@@ -37,10 +37,12 @@ packages:
   - oui-httpd
   - oui-librpc
   - kmod-gl-sdk4-hw-info
+  - kmod-gl-sdk4-tertf
   - gl-sdk4-utils
   - gl-sdk4-uci
   - gl-sdk4-cable
   - gl-sdk4-clients
+  - gl-sdk4-modem
   - gl-sdk4-wifi
   - gl-sdk4-switch-button
   - gl-sdk4-netmode
