@@ -40,6 +40,7 @@ packages:
   - gl-sdk4-utils
   - gl-sdk4-uci
   - gl-sdk4-cable
+  - gl-sdk4-clients
   - gl-sdk4-wifi
   - gl-sdk4-switch-button
   - gl-sdk4-netmode
