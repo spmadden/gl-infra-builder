@@ -1,0 +1,57 @@
+From 687f363d9405ced40b9e0af06f5803c8dca3dba2 Mon Sep 17 00:00:00 2001
+From: xinshouyong <xinshouyong@gl-inet.com>
+Date: Tue, 20 Jul 2021 03:21:32 -0400
+Subject: [PATCH] fix: gcc detect error on ubuntu20.10
+
+Signed-off-by: xinshouyong <xinshouyong@gl-inet.com>
+---
+ openwrt-18.06/include/prereq-build.mk | 26 ++++++--------------------
+ 1 file changed, 6 insertions(+), 20 deletions(-)
+
+diff --git a/openwrt-18.06/include/prereq-build.mk b/openwrt-18.06/include/prereq-build.mk
+index a416a2d23..f01e2aea5 100644
+--- a/openwrt-18.06/include/prereq-build.mk
++++ b/openwrt-18.06/include/prereq-build.mk
+@@ -28,16 +28,9 @@ $(eval $(call TestHostCommand,proper-umask, \
+ 
+ $(eval $(call SetupHostCommand,gcc, \
+ 	Please install the GNU C Compiler (gcc) 4.8 or later, \
+-	$(CC) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?)', \
+-	gcc -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?)', \
+-	gcc48 --version | grep gcc, \
+-	gcc49 --version | grep gcc, \
+-	gcc5 --version | grep gcc, \
+-	gcc6 --version | grep gcc, \
+-	gcc7 --version | grep gcc, \
+-	gcc8 --version | grep gcc, \
+-	gcc9 --version | grep gcc, \
+-	gcc --version | grep Apple.LLVM ))
++	$(CC) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
++	gcc -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
++	gcc --version | grep -E 'Apple.(LLVM|clang)' ))
+ 
+ $(eval $(call TestHostCommand,working-gcc, \
+ 	\nPlease reinstall the GNU C Compiler (4.8 or later) - \
+@@ -47,16 +40,9 @@ $(eval $(call TestHostCommand,working-gcc, \
+ 
+ $(eval $(call SetupHostCommand,g++, \
+ 	Please install the GNU C++ Compiler (g++) 4.8 or later, \
+-	$(CXX) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?)', \
+-	g++ -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?)', \
+-	g++48 --version | grep g++, \
+-	g++49 --version | grep g++, \
+-	g++5 --version | grep g++, \
+-	g++6 --version | grep g++, \
+-	g++7 --version | grep g++, \
+-	g++8 --version | grep g++, \
+-	g++9 --version | grep g++, \
+-	g++ --version | grep Apple.LLVM ))
++	$(CXX) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
++	g++ -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
++	g++ --version | grep -E 'Apple.(LLVM|clang)' ))
+ 
+ $(eval $(call TestHostCommand,working-g++, \
+ 	\nPlease reinstall the GNU C++ Compiler (4.8 or later) - \
+-- 
+2.27.0
+
