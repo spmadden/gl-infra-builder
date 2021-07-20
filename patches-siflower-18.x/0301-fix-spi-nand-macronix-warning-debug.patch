@@ -1,0 +1,26 @@
+From 83ec1f2a8371f4ec1838a4f133f158e8701e9a34 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Mon, 19 Jul 2021 15:29:15 +0800
+Subject: [PATCH] fix: spi-nand macronix warning debug
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/macronix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/macronix.c b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/macronix.c
+index b0bd395..e8a7e56 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/macronix.c
++++ b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/macronix.c
+@@ -80,7 +80,7 @@ static int mx35lf1ge4ab_ecc_get_status(struct spinand_device *spinand,
+ 		if (mx35lf1ge4ab_get_eccsr(spinand, &eccsr))
+ 			return nand->eccreq.strength;
+ 
+-		if (WARN_ON(eccsr > nand->eccreq.strength || !eccsr))
++		if (WARN_ON((eccsr&0xf) > nand->eccreq.strength || !eccsr))
+ 			return nand->eccreq.strength;
+ 
+ 		return eccsr;
+-- 
+2.7.4
+
