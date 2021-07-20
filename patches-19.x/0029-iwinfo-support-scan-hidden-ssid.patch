@@ -1,4 +1,4 @@
-From 130c0d6441c6b02cd132a1534ac1816d2e0c29b6 Mon Sep 17 00:00:00 2001
+From c118deaf413c0a3bfeaf1e4d643886fd0ae3691c Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 19 Jul 2021 16:10:29 +0800
 Subject: [PATCH] iwinfo: support scan hidden ssid
@@ -12,7 +12,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 
 diff --git a/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch b/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch
 new file mode 100644
-index 0000000000..832f1ffe8b
+index 0000000000..23c1cafea3
 --- /dev/null
 +++ b/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch
 @@ -0,0 +1,318 @@
@@ -176,7 +176,7 @@ index 0000000000..832f1ffe8b
 ++	int len = 0;
 ++	char rv[IWINFO_BUFSIZE];
 ++	const char *ifname = luaL_checkstring(L, 1);
-++	const char *ssid = luaL_checkstring(L, 2);
+++	const char *ssid = lua_tostring(L, 2);
 ++
 ++	lua_newtable(L);
 ++	memset(rv, 0, sizeof(rv));
