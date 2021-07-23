@@ -62,6 +62,7 @@ packages:
   - gl-sdk4-repeater
   - gl-sdk4-custom-dns
   - gl-sdk4-system
+  - gl-sdk4-acl
   - select-sdk4-ui-all
 
 diffconfig: |
