@@ -1,4 +1,4 @@
-From c118deaf413c0a3bfeaf1e4d643886fd0ae3691c Mon Sep 17 00:00:00 2001
+From 6e08816f26cdd9ae54a55b68d3d4e0ea6f9ccb6e Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 19 Jul 2021 16:10:29 +0800
 Subject: [PATCH] iwinfo: support scan hidden ssid
@@ -6,8 +6,8 @@ Subject: [PATCH] iwinfo: support scan hidden ssid
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  .../patches/004-support-scan-hidden.patch     | 318 ++++++++++++++++++
- package/network/utils/iwinfo/src/iwinfo_mtk.c |  14 +-
- 2 files changed, 331 insertions(+), 1 deletion(-)
+ package/network/utils/iwinfo/src/iwinfo_mtk.c |  24 +-
+ 2 files changed, 337 insertions(+), 5 deletions(-)
  create mode 100644 package/network/utils/iwinfo/patches/004-support-scan-hidden.patch
 
 diff --git a/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch b/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch
@@ -335,10 +335,10 @@ index 0000000000..23c1cafea3
 + 	.countrylist      = nl80211_get_countrylist,
 + 	.survey           = nl80211_get_survey,
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-index 96a92beeb1..df632aee5e 100644
+index 96a92beeb1..1e81f44a4c 100644
 --- a/package/network/utils/iwinfo/src/iwinfo_mtk.c
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -267,13 +267,16 @@ struct site_survey_info {
+@@ -267,12 +267,15 @@ struct site_survey_info {
  	int htmodelist;
  };
  
@@ -348,25 +348,35 @@ index 96a92beeb1..df632aee5e 100644
  	struct iwinfo_scanlist_entry sce;
  	char action[64] = "SiteSurvey=";
  	char buf2[IWINFO_BUFSIZE];
- 	int i, j, length;
- 
+-	int i, j, length;
++	int i, length;
++
 +	if (ssid && ssid[0])
 +		snprintf(action, sizeof(action), "SiteSurvey=%s", ssid);
-+
+ 
  	if(mtk_get80211priv(ifname, RTPRIV_IOCTL_SET, action, sizeof(action)) < 0)
  		return -1;
+@@ -287,11 +290,16 @@ static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
+ 	
+ 	*len = 0;
  
-@@ -292,6 +295,9 @@ static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
- 		struct iwinfo_scanlist_entry *e = (struct iwinfo_scanlist_entry *)&buf[j];
+-	for (i = 0; i < length; i += sizeof(struct site_survey_info),
+-		j += sizeof(struct iwinfo_scanlist_entry)) {
+-		struct iwinfo_scanlist_entry *e = (struct iwinfo_scanlist_entry *)&buf[j];
++	for (i = 0; i < length; i += sizeof(struct site_survey_info)) {
++		struct iwinfo_scanlist_entry *e = (struct iwinfo_scanlist_entry *)&buf[*len];
  		struct site_survey_info *si = (struct site_survey_info *)&buf2[i];
  
++		if (!si->ssid[0])
++			continue;
++
 +		if (ssid && ssid[0] && strcmp(si->ssid, ssid))
 +			continue;
 +
  		strcpy(e->ssid, si->ssid);
  		memcpy(e->mac, si->bssid, 6);
  
-@@ -314,6 +320,11 @@ static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
+@@ -314,6 +322,11 @@ static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
  	return 0;
  }
  
@@ -378,7 +388,7 @@ index 96a92beeb1..df632aee5e 100644
  static int mtk_get_freqlist(const char *ifname, char *buf, int *len)
  {
  	return wext_ops.freqlist(ifname, buf, len);
-@@ -467,6 +478,7 @@ const struct iwinfo_ops mtk_ops = {
+@@ -467,6 +480,7 @@ const struct iwinfo_ops mtk_ops = {
  	.assoclist        = mtk_get_assoclist,
  	.txpwrlist        = mtk_get_txpwrlist,
  	.scanlist         = mtk_get_scanlist,
