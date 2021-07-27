@@ -1,0 +1,31 @@
+From b4b5009063617ac070f281ee8c09782710be2943 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Tue, 27 Jul 2021 14:59:21 +0800
+Subject: [PATCH] fix: u-boot compile error
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ .../tools/mkimage/patches/211-u64_redefine_fix.patch          | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 openwrt-18.06/tools/mkimage/patches/211-u64_redefine_fix.patch
+
+diff --git a/openwrt-18.06/tools/mkimage/patches/211-u64_redefine_fix.patch b/openwrt-18.06/tools/mkimage/patches/211-u64_redefine_fix.patch
+new file mode 100644
+index 0000000..d2850b6
+--- /dev/null
++++ b/openwrt-18.06/tools/mkimage/patches/211-u64_redefine_fix.patch
+@@ -0,0 +1,11 @@
++--- a/include/compiler.h
+++++ b/include/compiler.h
++@@ -66,7 +66,7 @@ typedef uint8_t __u8;
++ typedef uint16_t __u16;
++ typedef uint32_t __u32;
++ typedef unsigned int uint;
++-typedef uint64_t __u64;
+++/* typedef uint64_t __u64; */
++ #ifndef linux
++ typedef int __kernel_daddr_t;
++ typedef unsigned int __kernel_ino_t;
+-- 
+2.7.4
+
