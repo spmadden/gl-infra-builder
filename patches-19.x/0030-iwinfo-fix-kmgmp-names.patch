@@ -1,0 +1,31 @@
+From 051ee082f64b8e5a2a58a47785d6e77dcd55017a Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Fri, 30 Jul 2021 17:36:12 +0800
+Subject: [PATCH] iwinfo: fix kmgmp names
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../utils/iwinfo/patches/005-fix-kmgmp-names.patch    | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 package/network/utils/iwinfo/patches/005-fix-kmgmp-names.patch
+
+diff --git a/package/network/utils/iwinfo/patches/005-fix-kmgmp-names.patch b/package/network/utils/iwinfo/patches/005-fix-kmgmp-names.patch
+new file mode 100644
+index 0000000000..c47f605136
+--- /dev/null
++++ b/package/network/utils/iwinfo/patches/005-fix-kmgmp-names.patch
+@@ -0,0 +1,11 @@
++--- a/iwinfo_lib.c
+++++ b/iwinfo_lib.c
++@@ -37,6 +37,8 @@ const char *IWINFO_KMGMT_NAMES[] = {
++ 	"NONE",
++ 	"802.1X",
++ 	"PSK",
+++	"SAE",
+++	"OWE",
++ };
++ 
++ const char *IWINFO_AUTH_NAMES[] = {
+-- 
+2.17.1
+
