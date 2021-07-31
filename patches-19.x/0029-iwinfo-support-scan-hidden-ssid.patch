@@ -1,4 +1,4 @@
-From 6e08816f26cdd9ae54a55b68d3d4e0ea6f9ccb6e Mon Sep 17 00:00:00 2001
+From a3f055f3e9875a9ee0ef8a7d1144d69dfdfe0b91 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 19 Jul 2021 16:10:29 +0800
 Subject: [PATCH] iwinfo: support scan hidden ssid
@@ -12,7 +12,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 
 diff --git a/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch b/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch
 new file mode 100644
-index 0000000000..23c1cafea3
+index 0000000000..d4685eb20d
 --- /dev/null
 +++ b/package/network/utils/iwinfo/patches/004-support-scan-hidden.patch
 @@ -0,0 +1,318 @@
@@ -47,7 +47,7 @@ index 0000000000..23c1cafea3
 +-	memset(rv, 0, sizeof(rv));
 +-
 +-	if (!(*func)(ifname, rv, &len))
-++	for (i = 0, x = 1; i < len; i += sizeof(struct iwinfo_scanlist_entry), x++)
+++	for (i = 0, x = 1; i < len; i += sizeof(struct iwinfo_scanlist_entry))
 + 	{
 +-		for (i = 0, x = 1; i < len; i += sizeof(struct iwinfo_scanlist_entry), x++)
 +-		{
@@ -152,7 +152,7 @@ index 0000000000..23c1cafea3
 ++			lua_setfield(L, -2, "htmodelist");
 + 		}
 ++
-++		lua_rawseti(L, -2, x);
+++		lua_rawseti(L, -2, x++);
 + 	}
 ++}
 ++
