@@ -67,7 +67,8 @@ packages:
   - gl-sdk4-dlna
   - gl-sdk4-samba
   - gl-sdk4-mqtt
-
+  - gl-sdk4-cloud
+  - gl-sdk4-cloud-batch-manage
 
 diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
