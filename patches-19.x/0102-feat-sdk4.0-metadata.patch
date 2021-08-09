@@ -1,0 +1,141 @@
+From f068fa47cd9dd27c7beb0262e1d134674937ca4b Mon Sep 17 00:00:00 2001
+From: gl-tanqi <qi.tan@gl-inet.com>
+Date: Mon, 9 Aug 2021 17:22:55 +0800
+Subject: [PATCH] feat:sdk4.0 metadata
+
+---
+ gl_metadata.mk            | 17 ++++++++++
+ gl_release_note           |  7 ++++
+ include/image-commands.mk | 70 ++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 93 insertions(+), 1 deletion(-)
+ create mode 100644 gl_metadata.mk
+ create mode 100644 gl_release_note
+
+diff --git a/gl_metadata.mk b/gl_metadata.mk
+new file mode 100644
+index 0000000000..9ee4460cd8
+--- /dev/null
++++ b/gl_metadata.mk
+@@ -0,0 +1,17 @@
++gl_not_keep_config_version := 4.003
++gl_not_keep_config_description := xxx
++gl_supported_version := 4.001
++
++gl_user := general
++
++gl_config_ssids := solve the ssids problem
++gl_config_wireless := solve the wireless problem
++gl_config_ddns := solve the ddns problem
++#gl_config_dhcp := solve the xxx problem
++#gl_config_firewall := solve the xxx problem
++#gl_config_openvpn := solve the xxx problem
++#gl_config_rtty := solve the xxx problem
++#gl_config_glconfig := solve the xxx problem
++#gl_config_system := solve the xxx problem
++#gl_config_mwan3 := solve the xxx problem
++#gl_config_network := solve the xxx problem
+\ No newline at end of file
+diff --git a/gl_release_note b/gl_release_note
+new file mode 100644
+index 0000000000..58d951bed0
+--- /dev/null
++++ b/gl_release_note
+@@ -0,0 +1,7 @@
++Security fix:
++mac80211: backport upstream fixes for FragAttacks(CVE-2020-24586,CVE-2020-24587,CVE-2020-24588,CVE-2020-26139,CVE-2020-26140,CVE-2020-26141,CVE-2020-26142,CVE-2020-26143,CVE-2020-26144,CVE-2020-26145,CVE-2020-26146,CVE-2020-26147)
++
++Important bugfix:
++1. Fixed a BUG where the OpenVPN connection status was displayed incorrectly on the E750 LCD
++2. Fixed XE300 modem manual settings always being overwritten
++3. Fixed DNS leakage BUG when using CloudFlare after connecting to OpenVPN
+diff --git a/include/image-commands.mk b/include/image-commands.mk
+index 32865b9a7d..d2637b178b 100644
+--- a/include/image-commands.mk
++++ b/include/image-commands.mk
+@@ -384,6 +384,52 @@ define Build/append-metadata
+ 	}
+ endef
+ 
++include $(TOPDIR)/gl_metadata.mk
++
++ifdef gl_config_ssids
++	CONFIG_GL_SSIDS={"path":"/etc/config/ssids","description":"$(gl_config_ssids)"},
++endif
++
++ifdef gl_config_wireless
++	CONFIG_GL_WIRELESS={"path":"/etc/config/wireless","description":"$(gl_config_wireless)"},
++endif
++
++ifdef gl_config_ddns
++	CONFIG_GL_DDNS={"path":"/etc/config/ddns","description":"$(gl_config_ddns)"},
++endif
++
++ifdef gl_config_dhcp
++	CONFIG_GL_DHCP={"path":"/etc/config/dhcp","description":"$(gl_config_dhcp)"},
++endif
++
++ifdef gl_config_firewall
++	CONFIG_GL_FIREWALL={"path":"/etc/config/firewall","description":"$(gl_config_firewall)"},
++endif
++
++ifdef gl_config_openvpn
++	CONFIG_GL_OPENVPN={"path":"/etc/config/openvpn","description":"$(gl_config_openvpn)"},
++endif
++
++ifdef gl_config_rtty
++	CONFIG_GL_RTTY={"path":"/etc/config/rtty","description":"$(gl_config_rtty)"},
++endif
++
++ifdef gl_config_glconfig
++	CONFIG_GL_GLCONFIG={"path":"/etc/config/glconfig","description":"$(gl_config_glconfig)"},
++endif
++
++ifdef gl_config_system
++	CONFIG_GL_SYSTEM={"path":"/etc/config/system","description":"$(gl_config_system)"},
++endif
++
++ifdef gl_config_mwan3
++	CONFIG_GL_MWAN3={"path":"/etc/config/mwan3","description":"$(gl_config_mwan3)"},
++endif
++
++ifdef gl_config_network
++	CONFIG_GL_NETWORK={"path":"/etc/config/network","description":"$(gl_config_network)"},
++endif
++
+ metadata_gl_json = \
+ 	'{ $(if $(IMAGE_METADATA),$(IMAGE_METADATA)$(comma)) \
+ 		"metadata_version": "1.0", \
+@@ -396,7 +442,29 @@ metadata_gl_json = \
+ 			"revision": "$(call json_quote,$(REVISION))", \
+ 			"target": "$(call json_quote,$(TARGETID))", \
+ 			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
+-		} \
++		}, \
++		"upgrade_control":{ \
++			"not_keep_config":{ \
++				"version":"$(gl_not_keep_config_version)", \
++				"description":"$(gl_not_keep_config_description)" \
++			}, \
++			"supported_version":"$(gl_supported_version)", \
++			"not_keep_config_part":[ \
++				$(CONFIG_GL_SSIDS)\
++				$(CONFIG_GL_WIRELESS)\
++				$(CONFIG_GL_DDNS)\
++				$(CONFIG_GL_DHCP)\
++				$(CONFIG_GL_FIREWALL)\
++				$(CONFIG_GL_OPENVPN)\
++				$(CONFIG_GL_RTTY)\
++				$(CONFIG_GL_GLCONFIG)\
++				$(CONFIG_GL_SYSTEM)\
++				$(CONFIG_GL_MWAN3)\
++				$(CONFIG_GL_NETWORK)\
++			], \
++			"user":"$(gl_user)" \
++		}, \
++		"release_note":"$(shell cat $(TOPDIR)/gl_release_note)" \
+ 	}'
+ 
+ define Build/append-gl-metadata
+-- 
+2.17.1
+
