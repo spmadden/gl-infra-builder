@@ -1,22 +1,22 @@
-From 885b1f7aa796f654660068be9b92eb5642484ef0 Mon Sep 17 00:00:00 2001
-From: Yejiang Luo <luoyejiang@gl-inet.com>
-Date: Tue, 1 Jun 2021 09:53:29 +0800
+From 85c267ab472f356ef02645535f807c17513a85f2 Mon Sep 17 00:00:00 2001
+From: luoyejiang <luoyejiang@gl-inet.com>
+Date: Tue, 10 Aug 2021 17:42:43 +0800
 Subject: [PATCH] scripts: add gen_config.py
 
 This script is used to setup the tree based on the profiles/.
 
-Signed-off-by: Yejiang Luo <luoyejiang@gl-inet.com>
+Signed-off-by: luoyejiang <luoyejiang@gl-inet.com>
 ---
- scripts/gen_config.py | 202 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 202 insertions(+)
+ scripts/gen_config.py | 209 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 209 insertions(+)
  create mode 100755 scripts/gen_config.py
 
 diff --git a/scripts/gen_config.py b/scripts/gen_config.py
 new file mode 100755
-index 0000000..dc246fb
+index 0000000000..865dbc3ddc
 --- /dev/null
 +++ b/scripts/gen_config.py
-@@ -0,0 +1,202 @@
+@@ -0,0 +1,209 @@
 +#!/usr/bin/env python3
 +
 +from os import getenv
@@ -36,8 +36,15 @@ index 0000000..dc246fb
 +
 +    msg (str): Error message to print
 +    """
-+    print(msg)
++    print('\033[1;31m' + msg + '\033[0m')
 +    sys.exit(1)
++
++def warning(msg: str):
++    """Quit script with warning message
++
++    msg (str): Error message to print
++    """
++    print('\033[1;33m' + msg + '\033[0m')
 +
 +
 +def usage(code: int = 0):
@@ -130,7 +137,7 @@ index 0000000..dc246fb
 +        die(f"Error setting up feeds")
 +
 +    if run(["./scripts/feeds", "update"]).returncode:
-+        die(f"Error updating feeds")
++        warning(f"Error updating feeds")
 +
 +    for p in profile.get("feeds", []):
 +        f = profile["feeds"].get(p)
@@ -220,5 +227,5 @@ index 0000000..dc246fb
 +        if call("grep 'CONFIG_PACKAGE_%s=y' .config" % (package), shell=True) != 0:
 +            die(f"Error: the package '%s' is not found or is not configured!" % (package))
 -- 
-2.7.4
+2.17.1
 
