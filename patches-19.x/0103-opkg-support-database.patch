@@ -1,26 +1,14 @@
-From 94d3ba14ba13f555d96c5e43713b6ed1eee194be Mon Sep 17 00:00:00 2001
+From 1a4d42b90f03e5022ad8f55985b4be5be098ed8e Mon Sep 17 00:00:00 2001
 From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
-Date: Tue, 10 Aug 2021 17:44:29 +0800
+Date: Wed, 11 Aug 2021 09:31:00 +0800
 Subject: [PATCH] opkg support database
 
 ---
- feeds_dir                                     |  1 +
  package/system/opkg/Makefile                  |  2 +-
  .../system/opkg/patches/001-support-db.patch  | 76 +++++++++++++++++++
- profiles                                      |  1 +
- 4 files changed, 79 insertions(+), 1 deletion(-)
- create mode 120000 feeds_dir
+ 2 files changed, 77 insertions(+), 1 deletion(-)
  create mode 100644 package/system/opkg/patches/001-support-db.patch
- create mode 120000 profiles
 
-diff --git a/feeds_dir b/feeds_dir
-new file mode 120000
-index 0000000000..a873110414
---- /dev/null
-+++ b/feeds_dir
-@@ -0,0 +1 @@
-+/home/lincoln/work/github/gl-infra-builder/feeds
-\ No newline at end of file
 diff --git a/package/system/opkg/Makefile b/package/system/opkg/Makefile
 index c8fb12e93d..bade23b87e 100644
 --- a/package/system/opkg/Makefile
@@ -116,14 +104,6 @@ index 0000000000..e29587453c
 + 	return err;
 + }
 + 
-diff --git a/profiles b/profiles
-new file mode 120000
-index 0000000000..561c5e6577
---- /dev/null
-+++ b/profiles
-@@ -0,0 +1 @@
-+/home/lincoln/work/github/gl-infra-builder/profiles
-\ No newline at end of file
 -- 
 2.17.1
 
