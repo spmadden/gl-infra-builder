@@ -11,6 +11,8 @@ packages:
   - dnsmasq-full
   - iwinfo
   - curl
+  - tc
+  - rtty-openssl
   - libusbmuxd
   - libimobiledevice
   - usbmuxd
