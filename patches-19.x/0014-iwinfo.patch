@@ -1,4 +1,4 @@
-From 2b768695cb36f9b83115b01ec5a82d79e8d88d7b Mon Sep 17 00:00:00 2001
+From e48f72cfb31af2b2ae0cdd2517bb22c424395297 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 2 Aug 2021 18:07:26 +0800
 Subject: [PATCH] iwinfo: add some patchs
@@ -1024,7 +1024,7 @@ index 0000000000..82a5ed7fce
 +#endif // __MTK_H__
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..cd44830247
+index 0000000000..f0713e659e
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 @@ -0,0 +1,494 @@
@@ -1268,10 +1268,10 @@ index 0000000000..cd44830247
 +	struct iwinfo_txpwrlist_entry entry;
 +	int i;
 +
-+	for (i = 0; i < 100; i++)
++	for (i = 0; i < 21; i++)
 +	{
-+		entry.dbm = iwinfo_mw2dbm(i);
-+		entry.mw  = i;
++		entry.dbm = i;
++		entry.mw  = iwinfo_dbm2mw(i);
 +
 +		memcpy(&buf[i * sizeof(entry)], &entry, sizeof(entry));
 +	}
