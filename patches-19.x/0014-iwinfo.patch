@@ -1,4 +1,4 @@
-From 3fb559754cf0802367c26fcdfc94c8785a7cbc9b Mon Sep 17 00:00:00 2001
+From 2b768695cb36f9b83115b01ec5a82d79e8d88d7b Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 2 Aug 2021 18:07:26 +0800
 Subject: [PATCH] iwinfo: add some patchs
@@ -1024,7 +1024,7 @@ index 0000000000..82a5ed7fce
 +#endif // __MTK_H__
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..355f473e61
+index 0000000000..cd44830247
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 @@ -0,0 +1,494 @@
@@ -1144,7 +1144,7 @@ index 0000000000..355f473e61
 +
 +static int mtk_get_frequency(const char *ifname, int *buf)
 +{
-+	return -1;
++	return wext_ops.frequency(ifname, buf);
 +}
 +
 +static int mtk_get_txpower(const char *ifname, int *buf)
@@ -1361,7 +1361,7 @@ index 0000000000..355f473e61
 +
 +static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
 +{
-+	return mtk_get_scanlist_ssid(ifname, buf, len, NULL);
++	return mtk_get_scanlist_ssid(ifname, buf, len, NULL, 0);
 +}
 +
 +static int mtk_get_freqlist(const char *ifname, char *buf, int *len)
