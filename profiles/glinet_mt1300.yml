@@ -5,9 +5,10 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
-  - kmod-mt7628
+  - kmod-mt7615
   - gl-sdk4-mtk-wifi-script
 
 diffconfig: |
   CONFIG_PACKAGE_kmod-mt7603=n
+  CONFIG_PACKAGE_kmod-mt76x2=n
 
