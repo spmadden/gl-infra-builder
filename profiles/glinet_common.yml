@@ -1,4 +1,6 @@
 ---
+metadata:
+  version: 4.0-0
 description: Add the glinet dependencies
 feeds:
   - name: glinet
@@ -36,6 +38,9 @@ packages:
   - kmod-usb-net-rndis
   - kmod-usb-net-qmi-wwan
   - kmod-usb-net-ipheth
+  - kmod-sched-cake
+  - kmod-sched-mqprio
+  - kmod-ifb
   - oui-httpd
   - oui-librpc
   - kmod-gl-sdk4-hw-info
@@ -78,3 +83,5 @@ packages:
 diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
   CONFIG_OUI_HTTPD_OPENSSL=y
+  CONFIG_BUSYBOX_CUSTOM=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y

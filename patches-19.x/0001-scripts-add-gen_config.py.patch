@@ -1,22 +1,19 @@
-From 85c267ab472f356ef02645535f807c17513a85f2 Mon Sep 17 00:00:00 2001
-From: luoyejiang <luoyejiang@gl-inet.com>
-Date: Tue, 10 Aug 2021 17:42:43 +0800
-Subject: [PATCH] scripts: add gen_config.py
+From 50ec0269da7e1592170ae16e8d879036e128178c Mon Sep 17 00:00:00 2001
+From: Luochongjun <luochongjun@gl-inet.com>
+Date: Mon, 16 Aug 2021 19:56:10 +0800
+Subject: [PATCH] improve gen_config script
 
-This script is used to setup the tree based on the profiles/.
-
-Signed-off-by: luoyejiang <luoyejiang@gl-inet.com>
 ---
- scripts/gen_config.py | 209 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 209 insertions(+)
+ scripts/gen_config.py | 218 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 218 insertions(+)
  create mode 100755 scripts/gen_config.py
 
 diff --git a/scripts/gen_config.py b/scripts/gen_config.py
 new file mode 100755
-index 0000000000..865dbc3ddc
+index 0000000..713aeb4
 --- /dev/null
 +++ b/scripts/gen_config.py
-@@ -0,0 +1,209 @@
+@@ -0,0 +1,218 @@
 +#!/usr/bin/env python3
 +
 +from os import getenv
@@ -80,6 +77,8 @@ index 0000000000..865dbc3ddc
 +            profile["packages"].extend(new.get(n))
 +        elif n in {"diffconfig"}:
 +            profile["diffconfig"] += new.get(n)
++        elif n in {"metadata"}:
++            profile["metadata"] = new.get(n)
 +        elif n in {"feeds"}:
 +            for f in new.get(n):
 +                if f.get("name", "") == "" or (f.get("uri", "") == "" and f.get("path", "") == ""):
@@ -101,7 +100,7 @@ index 0000000000..865dbc3ddc
 +
 +
 +def merge_profiles(profiles):
-+    profile = {"packages": [], "description": [], "diffconfig": "", "feeds": {}}
++    profile = {"packages": [], "description": [], "metadata":{}, "diffconfig": "", "feeds": {}}
 +
 +    for p in profiles:
 +        profile = load_yaml(p, profile)
@@ -182,6 +181,13 @@ index 0000000000..865dbc3ddc
 +
 +    compile_time = time.strftime('%Y-%m-%d %k:%M:%S', time.localtime(time.time()))
 +    call("echo %s > %s" % (compile_time, "files/etc/version.date"), shell=True)
++    try:
++      version = profile["metadata"]["version"]
++      call("echo %s > %s" % (version, "files/etc/glversion"), shell=True)
++      call("echo %s > %s" % (version, "release"), shell=True)
++      print("firmware version: " +version)
++    except:
++      pass
 +
 +
 +if __name__ == "__main__":
@@ -227,5 +233,5 @@ index 0000000000..865dbc3ddc
 +        if call("grep 'CONFIG_PACKAGE_%s=y' .config" % (package), shell=True) != 0:
 +            die(f"Error: the package '%s' is not found or is not configured!" % (package))
 -- 
-2.17.1
+2.7.4
 
