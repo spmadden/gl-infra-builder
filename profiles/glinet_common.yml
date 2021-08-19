@@ -24,6 +24,7 @@ packages:
   - comgt-ncm
   - uqmi
   - mwan3
+  - httping
   - kmod-usb-storage-uas
   - kmod-usb-storage
   - kmod-usb-uhci
