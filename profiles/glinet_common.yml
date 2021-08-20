@@ -78,6 +78,7 @@ packages:
   - gl-sdk4-mqtt
   - gl-sdk4-cloud
   - gl-sdk4-lan
+  - gl-sdk4-igmp
   - gl-sdk4-upgrade
   - gl-sdk4-cloud-batch-manage
 
