@@ -889,3 +889,6 @@ diffconfig: |
   CONFIG_PACKAGE_libimobiledevice=y
   CONFIG_PACKAGE_usbmuxd=y
   CONFIG_PACKAGE_libustream-openssl=y
+  CONFIG_PACKAGE_openssl-util=y
+  CONFIG_PACKAGE_blkid=y
+  CONFIG_PACKAGE_blockdev=y

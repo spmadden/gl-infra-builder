@@ -1,4 +1,4 @@
-From cd68c3315b317a309d8cdfb8fdf09ef5e732ea5c Mon Sep 17 00:00:00 2001
+From 1f143cd5e7c3dc40be4809de24642652c849b93b Mon Sep 17 00:00:00 2001
 From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
 Date: Wed, 2 Jun 2021 15:26:40 +0800
 Subject: [PATCH] add: support GL.iNET SFT1200 target
@@ -6,7 +6,7 @@ Subject: [PATCH] add: support GL.iNET SFT1200 target
 Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
 ---
  .../arch/mips/boot/dts/siflower/Makefile           |    1 +
- .../dts/siflower/sf19a28_fullmask_gl_sft1200.dts   |  146 +
+ .../dts/siflower/sf19a28_fullmask_gl_sft1200.dts   |  145 +
  .../linux-4.14.90/arch/mips/siflower/Kconfig       |    8 +
  .../bin/config_check.sh                            |    6 +
  .../base-files-SF19A28-GL-SFT1200/bin/sf_reset.sh  |    3 +
@@ -17,10 +17,10 @@ Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
  .../usr/bin/hnat_enable.sh                         |    2 +
  .../usr/bin/hnat_read.sh                           |   21 +
  .../usr/bin/hnat_update_interface.sh               |   78 +
- .../sf19a28-fullmask/config-4.14_gl_sft1200        |  601 ++
+ .../sf19a28-fullmask/config-4.14_gl_sft1200        |  604 ++
  .../profiles/sf19a28-gl-sft1200.mk                 |   28 +
  .../sf19a28_gl_sft1200_fullmask_def.config         | 5997 ++++++++++++++++++++
- 15 files changed, 6963 insertions(+)
+ 15 files changed, 6965 insertions(+)
  create mode 100644 linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts
  create mode 100755 openwrt-18.06/target/linux/siflower/sf19a28-fullmask/base-files-SF19A28-GL-SFT1200/bin/config_check.sh
  create mode 100755 openwrt-18.06/target/linux/siflower/sf19a28-fullmask/base-files-SF19A28-GL-SFT1200/bin/sf_reset.sh
@@ -49,10 +49,10 @@ index 24b1205..8606087 100755
  dtb-$(CONFIG_DT_SF19A28_FULLMASK_AC28S) += sf19a28_fullmask_ac28s.dtb
 diff --git a/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts b/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts
 new file mode 100644
-index 0000000..c7c4c89
+index 0000000..0eaa1ce
 --- /dev/null
 +++ b/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts
-@@ -0,0 +1,146 @@
+@@ -0,0 +1,145 @@
 +/dts-v1/;
 +
 +#include "sf19a28_fullmask.dtsi"
@@ -70,7 +70,8 @@ index 0000000..c7c4c89
 +
 +&gmac {
 +	status = "okay";
-+	delay = <0x24 0x21>;
++	delay = <0x17 0x17>;
++	esw-rst-gpio = <0>;
 +};
 +
 +&spi2 {
@@ -108,11 +109,13 @@ index 0000000..c7c4c89
 +		partition@80000 {
 +			label = "u-boot-env";
 +			reg = <0x80000 0x20000>; /* 128k */
++			read-only;
 +		};
 +
 +		factory:partition@a0000 {
 +			label = "factory";
 +			reg = <0xa0000 0x20000>; /* 128k */
++			read-only;
 +		};
 +
 +		partition@c0000 {
@@ -120,10 +123,6 @@ index 0000000..c7c4c89
 +			reg = <0xc0000 0x7f400000>; /* 768k-128M */
 +		};
 +
-+		//partition@4c0000 {
-+		//	label = "ubi";
-+		//	reg = <0x4c0000 0x7b40000>; /* 768k-128M */
-+		//};
 +	};
 +};
 +
@@ -456,10 +455,10 @@ index 0000000..8446a10
 +update_pppoe_wan
 diff --git a/openwrt-18.06/target/linux/siflower/sf19a28-fullmask/config-4.14_gl_sft1200 b/openwrt-18.06/target/linux/siflower/sf19a28-fullmask/config-4.14_gl_sft1200
 new file mode 100755
-index 0000000..ae79c32
+index 0000000..11eea48
 --- /dev/null
 +++ b/openwrt-18.06/target/linux/siflower/sf19a28-fullmask/config-4.14_gl_sft1200
-@@ -0,0 +1,601 @@
+@@ -0,0 +1,604 @@
 +# CONFIG_AIO is not set
 +CONFIG_ARCH_BINFMT_ELF_STATE=y
 +CONFIG_ARCH_CLOCKSOURCE_DATA=y
@@ -729,7 +728,8 @@ index 0000000..ae79c32
 +CONFIG_MDIO_BUS=y
 +CONFIG_MDIO_DEVICE=y
 +# CONFIG_MEMORY_OPTIMIZE is not set
-+# CONFIG_MFD_SFAX8 is not set
++CONFIG_MFD_CORE=y
++CONFIG_MFD_SFAX8=y
 +CONFIG_MFD_SYSCON=y
 +CONFIG_MIPS=y
 +CONFIG_MIPS_ASID_BITS=8
@@ -949,6 +949,7 @@ index 0000000..ae79c32
 +CONFIG_RD_LZMA=y
 +CONFIG_REALTEK_PHY=y
 +CONFIG_REGMAP=y
++CONFIG_REGMAP_I2C=y
 +CONFIG_REGMAP_MMIO=y
 +CONFIG_REGULATOR=y
 +CONFIG_RELAY=y
@@ -968,6 +969,7 @@ index 0000000..ae79c32
 +CONFIG_SERIO_SERPORT=y
 +CONFIG_SF19A28_FULLMASK=y
 +# CONFIG_SF19A28_MPW1 is not set
++CONFIG_SFAX8_RESET_BUTTON=y
 +CONFIG_SFAX8_THERMAL=y
 +CONFIG_SFAX8_TIMER=y
 +CONFIG_SFAX8_WDT=y
