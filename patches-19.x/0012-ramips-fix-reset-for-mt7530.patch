@@ -29,27 +29,18 @@ index 5216cb5c66..61dfa98e85 100644
  	return 0;
  }
  
-@@ -637,6 +640,26 @@ mt7530_apply_config(struct switch_dev *dev)
+@@ -637,6 +640,17 @@ mt7530_apply_config(struct switch_dev *dev)
  		mt7530_w32(priv, REG_ESW_PORT_PPBV1(i), val);
  	}
  
 +	if (priv->reset) {
 +		priv->reset = 0;
 +
-+		/* turn off all PHYs */
++		/* reset all PHYs */
 +		for (i = 0; i <= 4; i++) {
-+			u32 val = mdiobus_read(priv->bus, i, 0x0);
-+			val |= BIT(11);
-+			mdiobus_write(priv->bus, i, 0x0, val);
-+		}
-+
-+		usleep_range(10, 20);
-+
-+		/* turn on all PHYs */
-+		for (i = 0; i <= 4; i++) {
-+			u32 val = mdiobus_read(priv->bus, i, 0);
-+			val &= ~BIT(11);
-+			mdiobus_write(priv->bus, i, 0, val);
++			u32 val = mdiobus_read(priv->bus, i, MII_BMCR);
++			val |= BMCR_RESET;
++			mdiobus_write(priv->bus, i, MII_BMCR, val);
 +		}
 +	}
 +
