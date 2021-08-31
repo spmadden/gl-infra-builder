@@ -79,6 +79,7 @@ packages:
   - gl-sdk4-mqtt
   - gl-sdk4-cloud
   - gl-sdk4-lan
+  - gl-sdk4-ipv6
   - gl-sdk4-igmp
   - gl-sdk4-upgrade
   - gl-sdk4-cloud-batch-manage
@@ -88,3 +89,4 @@ diffconfig: |
   CONFIG_OUI_HTTPD_OPENSSL=y
   CONFIG_BUSYBOX_CUSTOM=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
+  CONFIG_PACKAGE_wpad-openssl=y
