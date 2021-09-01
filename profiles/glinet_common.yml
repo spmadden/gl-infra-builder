@@ -82,6 +82,7 @@ packages:
   - gl-sdk4-ipv6
   - gl-sdk4-igmp
   - gl-sdk4-upgrade
+  - gl-sdk4-vpn-policy
   - gl-sdk4-cloud-batch-manage
 
 diffconfig: |
