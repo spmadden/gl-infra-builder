@@ -3,3 +3,6 @@ profile: Generic
 target: x86
 subtarget: 64
 description: Build image for the x86_64
+
+packages:
+ - kmod-mac80211
