@@ -1,0 +1,24 @@
+From 19a1635a62945e3a02adecb83391c4836e2ddf82 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Mon, 30 Aug 2021 10:36:28 +0800
+Subject: [PATCH] fix: change system type to sf19a28
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/init.c b/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/init.c
+index 860665d..cd9ea49 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/init.c
++++ b/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/init.c
+@@ -70,5 +70,5 @@ void __init device_tree_init(void)
+ 
+ const char *get_system_type(void)
+ {
+-	return "MIPS sf16a18";
++	return "MIPS sf19a28";
+ }
+-- 
+2.7.4
+
