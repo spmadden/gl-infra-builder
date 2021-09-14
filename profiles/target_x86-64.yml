@@ -6,3 +6,6 @@ description: Build image for the x86_64
 
 packages:
  - kmod-mac80211
+
+diffconfig: |
+ CONFIG_TARGET_IMAGES_GZIP=n
