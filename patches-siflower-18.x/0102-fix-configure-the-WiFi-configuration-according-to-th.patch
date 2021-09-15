@@ -40,7 +40,7 @@ index 0000000..417bc13
 + 
 ++static int acs_radar_chan(const struct hostapd_channel_data *chan)
 ++{
-++	const int allowed[] = { 52, 56, 60, 64 };
+++	const int allowed[] = { 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144 };
 ++	unsigned int i;
 ++	for (i = 0; i < ARRAY_SIZE(allowed); i++)
 ++	if (chan->chan == allowed[i])
