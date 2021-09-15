@@ -1,0 +1,7 @@
+---
+description: Remove hostapd
+
+diffconfig: |
+  CONFIG_PACKAGE_wpad-openssl=n
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_hostapd-common=n
