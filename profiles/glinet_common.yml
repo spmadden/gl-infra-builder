@@ -7,24 +7,6 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
-  - ipset
-  - unzip
-  - ethtool
-  - dnsmasq-full
-  - iwinfo
-  - curl
-  - tc
-  - rtty-openssl
-  - libusbmuxd
-  - libimobiledevice
-  - usbmuxd
-  - comgt
-  - chat
-  - comgt-directip
-  - comgt-ncm
-  - uqmi
-  - mwan3
-  - httping
   - kmod-usb-storage-uas
   - kmod-usb-storage
   - kmod-usb-uhci
@@ -36,18 +18,14 @@ packages:
   - kmod-usb-serial-wwan
   - kmod-usb-serial-sierrawireless
   - kmod-usb-net-cdc-ether
-  - kmod-usb-net-rndis
   - kmod-usb-net-qmi-wwan
-  - kmod-usb-net-ipheth
-  - kmod-sched-cake
-  - kmod-sched-mqprio
-  - kmod-ifb
-  - oui-httpd
-  - oui-librpc
   - kmod-gl-sdk4-hw-info
   - kmod-gl-sdk4-tertf
-  - gl-sdk4-utils
-  - gl-sdk4-uci
+  - dnsmasq-full
+  - mwan3
+  - iwinfo
+  - rtty-openssl
+  - oui-httpd
   - gl-sdk4-cable
   - gl-sdk4-clients
   - gl-sdk4-modem
