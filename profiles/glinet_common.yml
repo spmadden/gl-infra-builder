@@ -35,9 +35,9 @@ packages:
   - gl-sdk4-base-files
   - gl-sdk4-tethering
   - gl-sdk4-upgrade
-  - gl-sdk4-vpn
+  - gl-sdk4-vpn-client
   - gl-sdk4-vpn-server
-  - gl-sdk4-wg
+  - gl-sdk4-wg-client
   - gl-sdk4-wg-server
   - gl-sdk4-nl80211-event
   - gl-sdk4-macclone
