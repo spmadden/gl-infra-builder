@@ -1,0 +1,133 @@
+From a3029292d9db45c6cec1fd2b2da4c740dd31f6e8 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Wed, 15 Sep 2021 11:04:35 +0800
+Subject: [PATCH] fix: opkg database synchronization update
+
+---
+ package/system/opkg/Makefile                  |  2 +-
+ .../system/opkg/patches/001-support-db.patch  | 68 +++++++------------
+ 2 files changed, 27 insertions(+), 43 deletions(-)
+
+diff --git a/package/system/opkg/Makefile b/package/system/opkg/Makefile
+index bade23b87e..f79a0a7cb8 100644
+--- a/package/system/opkg/Makefile
++++ b/package/system/opkg/Makefile
+@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
+ include $(INCLUDE_DIR)/kernel.mk
+ 
+ PKG_NAME:=opkg
+-PKG_RELEASE:=2
++PKG_RELEASE:=3
+ PKG_FLAGS:=essential
+ 
+ PKG_SOURCE_PROTO:=git
+diff --git a/package/system/opkg/patches/001-support-db.patch b/package/system/opkg/patches/001-support-db.patch
+index e29587453c..f5225e2520 100644
+--- a/package/system/opkg/patches/001-support-db.patch
++++ b/package/system/opkg/patches/001-support-db.patch
+@@ -1,76 +1,60 @@
+ Index: b/libopkg/opkg_cmd.c
+ ===================================================================
+---- a/libopkg/opkg_cmd.c	2021-08-10 17:26:51.439919016 +0800
+-+++ b/libopkg/opkg_cmd.c	2021-08-10 17:28:30.269461593 +0800
+-@@ -21,6 +21,8 @@
+- #include <fnmatch.h>
+- #include <signal.h>
+- #include <unistd.h>
+-+#include <sys/wait.h>
+-+#include <fcntl.h>
+- 
+- #include "opkg_conf.h"
+- #include "opkg_cmd.h"
+-@@ -41,6 +43,36 @@
++--- a/libopkg/opkg_cmd.c	2021-09-15 10:31:09.074170782 +0800
+++++ b/libopkg/opkg_cmd.c	2021-09-15 10:36:52.124646257 +0800
++@@ -41,6 +41,29 @@
+  #include "opkg_configure.h"
+  #include "xsystem.h"
+  
+-+int fork_exec(const char *command)
+++int exec_command(const char *command)
+ +{
+-+    pid_t fpid;
+-+    pid_t ffpid;
+-+    int fd;
+-+    int stat;
+-+    fpid = fork();
+-+    if (fpid < 0) {
+++    opkg_msg(NOTICE, "Updating database.\n");
+++    remove("/var/lock/opkg.lock");
+++
+++    FILE *fp;
+++
+++    fp = popen(command, "r");
+++    if (fp == NULL) {
+ +        return -1;
+-+    } else if (fpid == 0) {
+-+        ffpid = fork();
+-+        if (ffpid == 0) {
+-+            fd = open("/dev/null", O_RDWR);
+-+            if (fd > -1) {
+-+                dup2(fd, STDIN_FILENO);
+-+                dup2(fd, STDOUT_FILENO);
+-+                dup2(fd, STDERR_FILENO);
+-+                if (fd > STDERR_FILENO)
+-+                    close(fd);
+-+            }
+-+            execlp("/bin/sh", "sh", "-c", command, (char *)NULL);
+-+        } else {
+-+            exit(1);
+-+        }
+-+    } else {
+-+        waitpid(fpid, &stat, 0);
+ +    }
+++    pclose(fp);
+++
+++    fp = fopen("/var/lock/opkg.lock", "w+");
+++    if (fp != NULL) {
+++        fclose(fp);
+++    }
+++
+++    opkg_msg(NOTICE, "Database update completed.\n");
+++
+ +    return 0;
+ +}
+ +
+  static void print_pkg(pkg_t * pkg)
+  {
+  	char *version = pkg_version_str_alloc(pkg);
+-@@ -196,7 +228,7 @@ static int opkg_update_cmd(int argc, cha
++@@ -196,7 +219,7 @@ static int opkg_update_cmd(int argc, cha
+  	rmdir(tmp);
+  	free(tmp);
+  	free(lists_dir);
+ -
+-+    fork_exec("update_plugins_db update");
+++    exec_command("update_plugins_db update");
+  	return failures;
+  }
+  
+-@@ -482,7 +514,7 @@ static int opkg_install_cmd(int argc, ch
++@@ -482,7 +505,7 @@ static int opkg_install_cmd(int argc, ch
+  		err = -1;
+  
+  	write_status_files_if_changed();
+ -
+-+    fork_exec("update_plugins_db install");
+++    exec_command("update_plugins_db install");
+  	return err;
+  }
+  
+-@@ -900,6 +932,7 @@ static int opkg_remove_cmd(int argc, cha
++@@ -900,6 +923,7 @@ static int opkg_remove_cmd(int argc, cha
+  		opkg_msg(NOTICE, "No packages removed.\n");
+  
+  	write_status_files_if_changed();
+-+    fork_exec("update_plugins_db remove");
+++    exec_command("update_plugins_db remove");
+  	return err;
+  }
+  
+-- 
+2.17.1
+
