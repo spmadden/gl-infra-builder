@@ -14,6 +14,7 @@ packages:
   - kmod-usb-ohci
   - kmod-usb-acm
   - kmod-usb-net-huawei-cdc-ncm
+  - kmod-usb-serial
   - kmod-usb-serial-option
   - kmod-usb-serial-wwan
   - kmod-usb-serial-sierrawireless
