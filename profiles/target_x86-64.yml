@@ -4,7 +4,5 @@ target: x86
 subtarget: 64
 description: Build image for the x86_64
 
-packages:
-
 diffconfig: |
  CONFIG_TARGET_IMAGES_GZIP=n
