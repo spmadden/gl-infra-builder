@@ -1,0 +1,8 @@
+repo: https://github.com/openwrt/openwrt.git
+branch: v21.02.0
+git_clone_dir: openwrt-21.02/openwrt-21.02.0
+openwrt_root_dir: openwrt-21.02/openwrt-21.02.0
+revision: b2ae4233149dfd78f2ac00bb5327695bcacdc255
+
+patch_folders:
+  - patches-21.02.0/

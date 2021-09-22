@@ -1,0 +1,79 @@
+From 21020c2da30239e998d69c95c53bfbbc428f76a2 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Sat, 18 Sep 2021 15:52:56 +0800
+Subject: [PATCH 5/8] add spinand support
+
+---
+ .../499-mtd-spinand-add-support.patch         | 60 +++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+ create mode 100644 target/linux/ath79/patches-5.4/499-mtd-spinand-add-support.patch
+
+diff --git a/target/linux/ath79/patches-5.4/499-mtd-spinand-add-support.patch b/target/linux/ath79/patches-5.4/499-mtd-spinand-add-support.patch
+new file mode 100644
+index 0000000000..4a4b6e9bf0
+--- /dev/null
++++ b/target/linux/ath79/patches-5.4/499-mtd-spinand-add-support.patch
+@@ -0,0 +1,60 @@
++Index: b/drivers/mtd/nand/spi/gigadevice.c
++===================================================================
++--- a/drivers/mtd/nand/spi/gigadevice.c	2021-09-18 14:49:34.250500716 +0800
+++++ b/drivers/mtd/nand/spi/gigadevice.c	2021-09-18 14:55:06.091509000 +0800
++@@ -278,6 +278,15 @@ static const struct spinand_info gigadev
++ 		     SPINAND_HAS_QE_BIT,
++ 		     SPINAND_ECCINFO(&gd5fxgq4_variant2_ooblayout,
++ 				     gd5fxgq4uexxg_ecc_get_status)),
+++	SPINAND_INFO("GD5F1GQ5UExxG", 0x51,
+++		     NAND_MEMORG(1, 2048, 128, 64, 1024, 20, 1, 1, 1),
+++		     NAND_ECCREQ(8, 512),
+++		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
+++					      &write_cache_variants,
+++					      &update_cache_variants),
+++		     SPINAND_HAS_QE_BIT,
+++		     SPINAND_ECCINFO(&gd5fxgq4_variant2_ooblayout,
+++				     gd5fxgq4uexxg_ecc_get_status)),
++ 	SPINAND_INFO("GD5F1GQ4UFxxG", 0xb148,
++ 		     NAND_MEMORG(1, 2048, 128, 64, 1024, 20, 1, 1, 1),
++ 		     NAND_ECCREQ(8, 512),
++Index: b/drivers/mtd/nand/spi/macronix.c
++===================================================================
++--- a/drivers/mtd/nand/spi/macronix.c	2021-08-26 20:55:22.000000000 +0800
+++++ b/drivers/mtd/nand/spi/macronix.c	2021-09-18 15:06:07.031203336 +0800
++@@ -108,6 +108,15 @@ static const struct spinand_info macroni
++ 		     SPINAND_HAS_QE_BIT,
++ 		     SPINAND_ECCINFO(&mx35lfxge4ab_ooblayout,
++ 				     mx35lf1ge4ab_ecc_get_status)),
+++	SPINAND_INFO("MX35LF1G24AD", 0x14,
+++		     NAND_MEMORG(1, 2048, 64, 64, 1024, 20, 1, 1, 1),
+++		     NAND_ECCREQ(4, 512),
+++		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
+++					      &write_cache_variants,
+++					      &update_cache_variants),
+++		     SPINAND_HAS_QE_BIT,
+++		     SPINAND_ECCINFO(&mx35lfxge4ab_ooblayout,
+++				     mx35lf1ge4ab_ecc_get_status)),
++ 	SPINAND_INFO("MX35LF2GE4AB", 0x22,
++ 		     NAND_MEMORG(1, 2048, 64, 64, 2048, 40, 2, 1, 1),
++ 		     NAND_ECCREQ(4, 512),
++Index: b/drivers/mtd/nand/spi/paragon.c
++===================================================================
++--- a/drivers/mtd/nand/spi/paragon.c	2021-08-26 20:55:22.000000000 +0800
+++++ b/drivers/mtd/nand/spi/paragon.c	2021-09-18 15:01:02.476309144 +0800
++@@ -115,6 +115,15 @@ static const struct spinand_info paragon
++ 		     0,
++ 		     SPINAND_ECCINFO(&pn26g0xa_ooblayout,
++ 				     pn26g0xa_ecc_get_status)),
+++	SPINAND_INFO("XT26G01xxxx", 0xf1,
+++		     NAND_MEMORG(1, 2048, 128, 64, 1024, 21, 1, 1, 1),
+++		     NAND_ECCREQ(8, 512),
+++		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
+++					      &write_cache_variants,
+++					      &update_cache_variants),
+++		     0,
+++		     SPINAND_ECCINFO(&pn26g0xa_ooblayout,
+++				     pn26g0xa_ecc_get_status)),
++ };
++ 
++ static int paragon_spinand_detect(struct spinand_device *spinand)
+-- 
+2.17.1
+

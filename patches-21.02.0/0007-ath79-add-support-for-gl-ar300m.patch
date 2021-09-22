@@ -1,0 +1,240 @@
+From 35dfe90cd27e4070eb0dba1ee1d33618e2e8f4cb Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Sat, 18 Sep 2021 18:14:38 +0800
+Subject: [PATCH 7/8] ath79: add support for gl ar300m
+
+---
+ .../ath79/dts/qca9531_glinet_gl-ar300m.dtsi   | 42 +++++++++++++++----
+ .../generic/base-files/etc/board.d/01_leds    |  2 -
+ .../generic/base-files/etc/board.d/02_network |  1 -
+ target/linux/ath79/image/generic.mk           | 21 ----------
+ target/linux/ath79/image/nand.mk              | 26 ++++++------
+ .../ath79/nand/base-files/etc/board.d/01_leds |  2 +-
+ .../nand/base-files/etc/board.d/02_network    |  2 +
+ 7 files changed, 49 insertions(+), 47 deletions(-)
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
+index d0b0d88c48..2f747e5a30 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
+@@ -12,6 +12,26 @@
+ 		label-mac-device = &eth0;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "ar300m";
++		wan = "eth0";
++		lan = "eth1";
++		switch-button = "gpio-0";
++		reset-button = "gpio-3";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = <&art 0>;
++			device_ddns = <&art 0x10>;
++			device_sn_bak = <&art 0x20>;
++			device_sn = <&art 0x30>;
++			country_code = <&art 0x88>;
++		};
++	};
++
+ 	keys {
+ 		compatible = "gpio-keys";
+ 
+@@ -43,28 +63,31 @@
+ 		// Colors for non-Lite versions
+ 
+ 		led_status: status {
+-			label = "green:status";
++			label = "gl-ar300m:green:status";
+ 			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+ 		lan {
+-			label = "green:lan";
++			label = "gl-ar300m:green:lan";
+ 			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+ 		led_wlan: wlan {
+-			label = "red:wlan";
++			label = "gl-ar300m:green:wlan";
+ 			gpios = <&gpio 14 GPIO_ACTIVE_LOW>;
+ 			linux,default-trigger = "phy0tpt";
+ 		};
+ 	};
++	gpio-export {
++		compatible = "gpio-export";
+ 
+-	i2c: i2c {
+-		compatible = "i2c-gpio";
+-
+-		sda-gpios = <&gpio 17 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
+-		scl-gpios = <&gpio 16 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
++		gpio_usb_power {
++			gpio-export,name = "usb_power";
++			gpio-export,output = <1>;
++			gpios = <&gpio 2 GPIO_ACTIVE_HIGH>;
++		};
+ 	};
++
+ };
+ 
+ &pcie0 {
+@@ -147,14 +170,17 @@
+ 	phy-handle = <&swphy4>;
+ 
+ 	mtd-mac-address = <&art 0x0>;
++	ifname = "eth0";
+ };
+ 
+ &eth1 {
+ 	mtd-mac-address = <&art 0x0>;
+ 	mtd-mac-address-increment = <1>;
++	ifname = "eth1";
+ };
+ 
+ &wmac {
+ 	status = "okay";
+ 	mtd-cal-data = <&art 0x1000>;
++	mtd-mac-address = <&art 0x1002>;
+ };
+diff --git a/target/linux/ath79/generic/base-files/etc/board.d/01_leds b/target/linux/ath79/generic/base-files/etc/board.d/01_leds
+index 985adfc6a7..f3690897ee 100755
+--- a/target/linux/ath79/generic/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/generic/base-files/etc/board.d/01_leds
+@@ -16,8 +16,6 @@ alfa-network,ap121fe|\
+ avm,fritz450e|\
+ glinet,6408|\
+ glinet,6416|\
+-glinet,gl-ar300m-lite|\
+-glinet,gl-ar300m16|\
+ pcs,cap324|\
+ tplink,cpe610-v1|\
+ tplink,cpe610-v2)
+diff --git a/target/linux/ath79/generic/base-files/etc/board.d/02_network b/target/linux/ath79/generic/base-files/etc/board.d/02_network
+index c4d9d76941..f446ba28c2 100755
+--- a/target/linux/ath79/generic/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/generic/base-files/etc/board.d/02_network
+@@ -38,7 +38,6 @@ ath79_setup_interfaces()
+ 	engenius,ecb1750|\
+ 	engenius,ecb600|\
+ 	enterasys,ws-ap3705i|\
+-	glinet,gl-ar300m-lite|\
+ 	glinet,gl-usb150|\
+ 	hak5,wifi-pineapple-nano|\
+ 	meraki,mr16|\
+diff --git a/target/linux/ath79/image/generic.mk b/target/linux/ath79/image/generic.mk
+index 05ed698401..9fba9155df 100644
+--- a/target/linux/ath79/image/generic.mk
++++ b/target/linux/ath79/image/generic.mk
+@@ -1167,27 +1167,6 @@ define Device/glinet_gl-ar150
+ endef
+ TARGET_DEVICES += glinet_gl-ar150
+ 
+-define Device/glinet_gl-ar300m-common-nor
+-  SOC := qca9531
+-  DEVICE_VENDOR := GL.iNet
+-  DEVICE_PACKAGES := kmod-usb2
+-  IMAGE_SIZE := 16000k
+-  SUPPORTED_DEVICES += gl-ar300m
+-endef
+-
+-define Device/glinet_gl-ar300m-lite
+-  $(Device/glinet_gl-ar300m-common-nor)
+-  DEVICE_MODEL := GL-AR300M
+-  DEVICE_VARIANT := Lite
+-endef
+-TARGET_DEVICES += glinet_gl-ar300m-lite
+-
+-define Device/glinet_gl-ar300m16
+-  $(Device/glinet_gl-ar300m-common-nor)
+-  DEVICE_MODEL := GL-AR300M16
+-endef
+-TARGET_DEVICES += glinet_gl-ar300m16
+-
+ define Device/glinet_gl-ar750
+   SOC := qca9531
+   DEVICE_VENDOR := GL.iNet
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index 0c6dd699f5..8f5c27d0fd 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -77,33 +77,31 @@ define Device/domywifi_dw33d
+ endef
+ TARGET_DEVICES += domywifi_dw33d
+ 
+-define Device/glinet_gl-ar300m-common-nand
++define Device/glinet_gl-ar300m-common
+   SOC := qca9531
+   DEVICE_VENDOR := GL.iNet
+   DEVICE_MODEL := GL-AR300M
+-  DEVICE_PACKAGES := kmod-usb2
+-  KERNEL_SIZE := 4096k
+-  IMAGE_SIZE := 16000k
+-  PAGESIZE := 2048
+-  VID_HDR_OFFSET := 2048
++  DEVICE_PACKAGES := kmod-usb-core kmod-usb2 block-mount kmod-usb-storage kmod-usb-ledtrig-usbport
++  SUPPORTED_DEVICES += gl-ar300m glinet,gl-ar300m
+ endef
+ 
+ define Device/glinet_gl-ar300m-nand
+-  $(Device/glinet_gl-ar300m-common-nand)
++  $(Device/glinet_gl-ar300m-common)
+   DEVICE_VARIANT := NAND
++  KERNEL_SIZE := 4096k
+   BLOCKSIZE := 128k
+-  IMAGES += factory.img
+-  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
+-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+-  SUPPORTED_DEVICES += glinet,gl-ar300m-nor
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar-compat-1806 | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-ar300m-nand
+ 
+ define Device/glinet_gl-ar300m-nor
+-  $(Device/glinet_gl-ar300m-common-nand)
++  $(Device/glinet_gl-ar300m-common)
+   DEVICE_VARIANT := NOR
+-  BLOCKSIZE := 64k
+-  SUPPORTED_DEVICES += glinet,gl-ar300m-nand gl-ar300m
++  IMAGE_SIZE := 16000k
+ endef
+ TARGET_DEVICES += glinet_gl-ar300m-nor
+ 
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index 16545083fb..eb9e5817e6 100755
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -9,7 +9,7 @@ board=$(board_name)
+ case "$board" in
+ glinet,gl-ar300m-nand|\
+ glinet,gl-ar300m-nor)
+-	ucidef_set_led_netdev "lan" "LAN" "green:lan" "eth0"
++	ucidef_set_led_netdev "lan" "LAN" "gl-ar300m:green:lan" "eth1"
+ 	;;
+ glinet,gl-mifi)
+     ucidef_set_led_wlan "wlan" "WLAN" "gl-mifi:green:wlan" "phy0tpt"
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index 73e23e5eb9..bee36cac1b 100755
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -21,6 +21,8 @@ ath79_setup_interfaces()
+ 		ucidef_add_switch "switch0" \
+ 			"0@eth0" "2:lan:2" "3:lan:1" "1:wan"
+ 		;;
++	glinet,gl-ar300m-nor|\
++	glinet,gl-ar300m-nand|\
+ 	glinet,gl-mifi)
+ 		ucidef_set_interfaces_lan_wan "eth1" "eth0"
+ 		;;
+-- 
+2.17.1
+
