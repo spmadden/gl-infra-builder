@@ -1,0 +1,25 @@
+From e6588a4f0845d25f362c2d1930976e8efd18a380 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Fri, 24 Sep 2021 15:51:09 +0800
+Subject: [PATCH] ramips: mt300n-v2 i2c gpio reuse
+
+---
+ target/linux/ramips/dts/GL-MT300N-V2.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/linux/ramips/dts/GL-MT300N-V2.dts b/target/linux/ramips/dts/GL-MT300N-V2.dts
+index 7b33181..d442c97 100755
+--- a/target/linux/ramips/dts/GL-MT300N-V2.dts
++++ b/target/linux/ramips/dts/GL-MT300N-V2.dts
+@@ -96,7 +96,7 @@
+ &pinctrl {
+ 	state_default: pinctrl0 {
+ 		gpio {
+-			ralink,group = "wdt", "gpio", "wled_an", "p0led_an", "p1led_an", "i2s";
++			ralink,group = "wdt", "gpio", "wled_an", "p0led_an", "p1led_an", "i2s", "i2c";
+ 			ralink,function = "gpio";
+ 		};
+ 	};
+-- 
+2.7.4
+
