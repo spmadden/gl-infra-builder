@@ -1,4 +1,4 @@
-From ba20bcb82e06555892ec3c9207e166a117a37edf Mon Sep 17 00:00:00 2001
+From 160c7a5441a1ad5fc44e2caaa11b9d4ea3623b14 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Sun, 26 Sep 2021 14:37:26 +0800
 Subject: [PATCH] target/ramips: add et6326 led driver for GL-MT1300
