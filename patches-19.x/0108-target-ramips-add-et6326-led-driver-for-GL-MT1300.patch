@@ -1,4 +1,4 @@
-From c07063e3f5fe0131b426400db84902b3eaff7262 Mon Sep 17 00:00:00 2001
+From bf473d2658a98a63eef834100772080a348b69cb Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Sun, 26 Sep 2021 14:37:26 +0800
 Subject: [PATCH] target/ramips: add et6326 led driver for GL-MT1300
@@ -7,10 +7,10 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/kernel/leds-et6326/Makefile          |  40 ++
  package/kernel/leds-et6326/src/Makefile      |   1 +
- package/kernel/leds-et6326/src/leds-et6326.c | 478 +++++++++++++++++++
+ package/kernel/leds-et6326/src/leds-et6326.c | 477 +++++++++++++++++++
  target/linux/ramips/dts/GL-MT1300.dts        |  46 +-
  target/linux/ramips/image/mt7621.mk          |   2 +-
- 5 files changed, 546 insertions(+), 21 deletions(-)
+ 5 files changed, 545 insertions(+), 21 deletions(-)
  create mode 100644 package/kernel/leds-et6326/Makefile
  create mode 100644 package/kernel/leds-et6326/src/Makefile
  create mode 100644 package/kernel/leds-et6326/src/leds-et6326.c
@@ -70,10 +70,10 @@ index 0000000000..4c707365e7
 +obj-m += leds-et6326.o
 diff --git a/package/kernel/leds-et6326/src/leds-et6326.c b/package/kernel/leds-et6326/src/leds-et6326.c
 new file mode 100644
-index 0000000000..f079c09937
+index 0000000000..32f1fe104e
 --- /dev/null
 +++ b/package/kernel/leds-et6326/src/leds-et6326.c
-@@ -0,0 +1,478 @@
+@@ -0,0 +1,477 @@
 +#include <linux/module.h>
 +#include <linux/leds.h>
 +#include <linux/slab.h>
@@ -104,6 +104,7 @@ index 0000000000..f079c09937
 +struct et6326_led {
 +	struct et6326_leds_priv *priv;
 +	struct led_classdev cdev;
++	int	mode;
 +	u8 mode_mask;
 +	u8 on_shift;
 +	u8 blink_shift;
@@ -112,7 +113,6 @@ index 0000000000..f079c09937
 +};
 +
 +struct et6326_leds_priv {
-+	int	mode;
 +	struct {
 +		u8 status;
 +		u8 mode;
@@ -169,7 +169,7 @@ index 0000000000..f079c09937
 +	if (val == priv->reg.mode)
 +		return;
 +
-+	priv->mode = mode;
++	led->mode = mode;
 +	priv->reg.mode = val;
 +	et6326_write_byte(priv->client, ET6326_REG_LED_WORK_MODE, val);
 +}
@@ -242,11 +242,10 @@ index 0000000000..f079c09937
 +{
 +	struct et6326_led *led = container_of(led_cdev, struct et6326_led, cdev);
 +	struct et6326_leds_priv *priv = led->priv;
-+	int mode = priv->mode;
 +
 +	if (value == LED_OFF)
 +		et6326_set_work_mode(led, MODE_ALWAYS_OFF);
-+	else if (mode == MODE_ALWAYS_OFF)
++	else if (led->mode == MODE_ALWAYS_OFF)
 +		et6326_set_work_mode(led, MODE_ALWAYS_ON);
 +	
 +	et6326_write_byte(priv->client, led->reg_iout, value);
