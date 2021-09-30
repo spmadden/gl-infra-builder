@@ -1,4 +1,4 @@
-From 160c7a5441a1ad5fc44e2caaa11b9d4ea3623b14 Mon Sep 17 00:00:00 2001
+From c07063e3f5fe0131b426400db84902b3eaff7262 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Sun, 26 Sep 2021 14:37:26 +0800
 Subject: [PATCH] target/ramips: add et6326 led driver for GL-MT1300
@@ -8,8 +8,9 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  package/kernel/leds-et6326/Makefile          |  40 ++
  package/kernel/leds-et6326/src/Makefile      |   1 +
  package/kernel/leds-et6326/src/leds-et6326.c | 478 +++++++++++++++++++
- target/linux/ramips/dts/GL-MT1300.dts        |  39 +-
- 4 files changed, 538 insertions(+), 20 deletions(-)
+ target/linux/ramips/dts/GL-MT1300.dts        |  46 +-
+ target/linux/ramips/image/mt7621.mk          |   2 +-
+ 5 files changed, 546 insertions(+), 21 deletions(-)
  create mode 100644 package/kernel/leds-et6326/Makefile
  create mode 100644 package/kernel/leds-et6326/src/Makefile
  create mode 100644 package/kernel/leds-et6326/src/leds-et6326.c
@@ -552,10 +553,24 @@ index 0000000000..f079c09937
 +MODULE_DESCRIPTION("ET6326 LED driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/target/linux/ramips/dts/GL-MT1300.dts b/target/linux/ramips/dts/GL-MT1300.dts
-index 07f9b6986e..edbf60cd41 100755
+index 07f9b6986e..491238a886 100755
 --- a/target/linux/ramips/dts/GL-MT1300.dts
 +++ b/target/linux/ramips/dts/GL-MT1300.dts
-@@ -33,12 +33,6 @@
+@@ -9,6 +9,13 @@
+ 	compatible = "glinet,gl-mt1300", "mediatek,mt7621-soc";
+ 	model = "GL-MT1300";
+ 
++	aliases {
++		led-boot = &led_run;
++		led-failsafe = &led_run;
++		led-running = &led_run;
++		led-upgrade = &led_run;
++	};
++
+ 	gl_hw {
+ 		compatible = "gl-hw-info";
+ 
+@@ -33,12 +40,6 @@
  		bootargs = "console=ttyS0,115200";
  	};
  
@@ -568,7 +583,7 @@ index 07f9b6986e..edbf60cd41 100755
  	keys {
  		compatible = "gpio-keys-polled";
  		poll-interval = <20>;
-@@ -55,20 +49,6 @@
+@@ -55,20 +56,6 @@
  			linux,code = <BTN_0>;
  		};
  	};
@@ -589,7 +604,7 @@ index 07f9b6986e..edbf60cd41 100755
  };
  
  &sdhci {
-@@ -151,3 +131,22 @@
+@@ -151,3 +138,22 @@
  		};
  	};
  };
@@ -601,7 +616,7 @@ index 07f9b6986e..edbf60cd41 100755
 +		compatible = "etek,et6326";
 +		reg = <0x30>;
 +
-+		led@0 {
++		led_run: led@0 {
 +			channel = <0>;
 +			label = "gl-mt1300:blue";
 +		};
@@ -612,6 +627,19 @@ index 07f9b6986e..edbf60cd41 100755
 +		};
 +	};
 +};
+diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7621.mk
+index 708a606b98..b9c819b17e 100644
+--- a/target/linux/ramips/image/mt7621.mk
++++ b/target/linux/ramips/image/mt7621.mk
+@@ -210,7 +210,7 @@ define Device/gl-mt1300
+   DEVICE_TITLE := GL-iNet GL-MT1300
+   DEVICE_PACKAGES := \
+ 	 kmod-ata-core kmod-ata-ahci kmod-mt76x2 kmod-mt7603 kmod-usb3 \
+-	 kmod-usb-ledtrig-usbport wpad-basic
++	 kmod-usb-ledtrig-usbport wpad-basic kmod-leds-et6326
+   IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
+ endef
+ TARGET_DEVICES += gl-mt1300
 -- 
 2.17.1
 
