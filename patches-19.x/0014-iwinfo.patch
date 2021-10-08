@@ -1,4 +1,4 @@
-From e48f72cfb31af2b2ae0cdd2517bb22c424395297 Mon Sep 17 00:00:00 2001
+From 8c956cc81d2a9e56675f4dacb790611c07524aa2 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 2 Aug 2021 18:07:26 +0800
 Subject: [PATCH] iwinfo: add some patchs
@@ -13,8 +13,8 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  .../iwinfo/patches/005-fix-kmgmp-names.patch  |  11 +
  .../utils/iwinfo/patches/006-async-scan.patch | 155 ++++++
  package/network/utils/iwinfo/src/api/mtk.h    |  71 +++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 494 ++++++++++++++++++
- 9 files changed, 1422 insertions(+), 3 deletions(-)
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 508 ++++++++++++++++++
+ 9 files changed, 1436 insertions(+), 3 deletions(-)
  create mode 100644 package/network/utils/iwinfo/patches/001-add-htmodelist-for-scan-results.patch
  create mode 100644 package/network/utils/iwinfo/patches/002-fix-station-mode-scan.patch
  create mode 100644 package/network/utils/iwinfo/patches/003-support-mtk-driver.patch
@@ -1024,10 +1024,10 @@ index 0000000000..82a5ed7fce
 +#endif // __MTK_H__
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..f0713e659e
+index 0000000000..ab9ccab05a
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,494 @@
+@@ -0,0 +1,508 @@
 +/*
 + * iwinfo - Wireless Information Library - Linux Wireless Extension Backend
 + *
@@ -1395,38 +1395,52 @@ index 0000000000..f0713e659e
 +
 +static int mtk_get_hwmodelist(const char *ifname, int *buf)
 +{
-+	if (mtk_isap(ifname)) {
-+		if (strlen(ifname) > 3 && !strncmp(ifname, "rai", 3)) {
-+			*buf = IWINFO_80211_N | IWINFO_80211_AC;
-+		} else {
-+			*buf = IWINFO_80211_B | IWINFO_80211_G | IWINFO_80211_N;
-+		}
-+	} else if (mtk_iscli(ifname)) {
-+		if (strlen(ifname) > 6 && !strncmp(ifname, "apclii", 6)) {
-+			*buf = IWINFO_80211_N | IWINFO_80211_AC;
-+		} else {
-+			*buf = IWINFO_80211_B | IWINFO_80211_G | IWINFO_80211_N;
-+		}
++	struct iwinfo_hardware_id id = {};
++	bool is_5g = false;
++
++	if (iwinfo_hardware_id_from_mtd(&id))
++		return -1;
++
++	switch (id.device_id) {
++	case 0x7615:
++		if (mtk_isap(ifname))
++			is_5g = strncmp(ifname, "rax", 3);
++		else if (mtk_iscli(ifname))
++			is_5g = strncmp(ifname, "apclix", 6);
++	default:
++		break;
 +	}
++
++	if (is_5g)
++		*buf = IWINFO_80211_N | IWINFO_80211_AC;
++	else
++		*buf = IWINFO_80211_B | IWINFO_80211_G | IWINFO_80211_N;
 +
 +	return 0;
 +}
 +
 +static int mtk_get_htmodelist(const char *ifname, int *buf)
 +{
-+	if (mtk_isap(ifname)) {
-+		if (strlen(ifname) > 3 && !strncmp(ifname, "rai", 3)) {
-+			*buf = IWINFO_HTMODE_VHT20 | IWINFO_HTMODE_VHT40 | IWINFO_HTMODE_VHT80;
-+		} else {
-+			*buf = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40;
-+		}
-+	} else if (mtk_iscli(ifname)) {
-+		if (strlen(ifname) > 6 && !strncmp(ifname, "apclii", 6)) {
-+			*buf = IWINFO_HTMODE_VHT20 | IWINFO_HTMODE_VHT40 | IWINFO_HTMODE_VHT80;
-+		} else {
-+			*buf = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40;
-+		}
++	struct iwinfo_hardware_id id = {};
++	bool is_5g = false;
++
++	if (iwinfo_hardware_id_from_mtd(&id))
++		return -1;
++
++	switch (id.device_id) {
++	case 0x7615:
++		if (mtk_isap(ifname))
++			is_5g = strncmp(ifname, "rax", 3);
++		else if (mtk_iscli(ifname))
++			is_5g = strncmp(ifname, "apclix", 6);
++	default:
++		break;
 +	}
++
++	*buf = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40;
++
++	if (is_5g)
++		*buf = IWINFO_HTMODE_VHT20 | IWINFO_HTMODE_VHT40 | IWINFO_HTMODE_VHT80;
 +
 +	return 0;
 +}
