@@ -62,6 +62,8 @@ packages:
   - gl-sdk4-upgrade
   - gl-sdk4-vpn-policy
   - gl-sdk4-cloud-batch-manage
+  - gl-base-files-wbf
+
 
 diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
