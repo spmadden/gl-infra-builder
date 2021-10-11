@@ -7,6 +7,7 @@ feeds:
 packages:
   - kmod-mt7615
   - gl-sdk4-mtk-wifi
+  - gl-sdk4-mtk-apcli
 
 diffconfig: |
   CONFIG_PACKAGE_kmod-mt7603=n
