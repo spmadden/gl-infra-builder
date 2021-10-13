@@ -6,6 +6,7 @@ feeds:
 
 packages:
   - kmod-mt7615
+  - 8021xd 
   - gl-sdk4-mtk-wifi
   - gl-sdk4-mtk-apcli
 
