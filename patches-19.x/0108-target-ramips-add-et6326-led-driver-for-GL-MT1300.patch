@@ -1,4 +1,4 @@
-From bf473d2658a98a63eef834100772080a348b69cb Mon Sep 17 00:00:00 2001
+From 6da4720a492f25d75255baa08cd807cd1147bf90 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Sun, 26 Sep 2021 14:37:26 +0800
 Subject: [PATCH] target/ramips: add et6326 led driver for GL-MT1300
@@ -7,10 +7,10 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/kernel/leds-et6326/Makefile          |  40 ++
  package/kernel/leds-et6326/src/Makefile      |   1 +
- package/kernel/leds-et6326/src/leds-et6326.c | 477 +++++++++++++++++++
- target/linux/ramips/dts/GL-MT1300.dts        |  46 +-
+ package/kernel/leds-et6326/src/leds-et6326.c | 503 +++++++++++++++++++
+ target/linux/ramips/dts/GL-MT1300.dts        |  45 +-
  target/linux/ramips/image/mt7621.mk          |   2 +-
- 5 files changed, 545 insertions(+), 21 deletions(-)
+ 5 files changed, 573 insertions(+), 18 deletions(-)
  create mode 100644 package/kernel/leds-et6326/Makefile
  create mode 100644 package/kernel/leds-et6326/src/Makefile
  create mode 100644 package/kernel/leds-et6326/src/leds-et6326.c
@@ -70,11 +70,12 @@ index 0000000000..4c707365e7
 +obj-m += leds-et6326.o
 diff --git a/package/kernel/leds-et6326/src/leds-et6326.c b/package/kernel/leds-et6326/src/leds-et6326.c
 new file mode 100644
-index 0000000000..32f1fe104e
+index 0000000000..1d653a6f27
 --- /dev/null
 +++ b/package/kernel/leds-et6326/src/leds-et6326.c
-@@ -0,0 +1,477 @@
+@@ -0,0 +1,503 @@
 +#include <linux/module.h>
++#include <linux/delay.h>
 +#include <linux/leds.h>
 +#include <linux/slab.h>
 +#include <linux/i2c.h>
@@ -113,27 +114,56 @@ index 0000000000..32f1fe104e
 +};
 +
 +struct et6326_leds_priv {
-+	struct {
-+		u8 status;
-+		u8 mode;
-+		u8	period;
-+		u8 	ton1;
-+		u8	ramp;
-+	} reg;
 +	struct i2c_client *client;
 +	struct et6326_led *leds[ET6326_MAX_LED_NUM];
 +};
 +
 +static int et6326_write_byte(struct i2c_client *client, u8 reg, u8 val)
 +{
-+	int ret = i2c_smbus_write_byte_data(client, reg, val);
++	uint8_t buf[2] = { reg, val };
++	struct i2c_msg msg = {
++		.addr = client->addr,
++		.len = 2,
++		.buf = buf
++	};
++	int ret;
++
++	ret = i2c_transfer(client->adapter, &msg, 1);
 +	if (ret < 0) {
 +		dev_err(&client->dev, "%s: reg 0x%x, val 0x%x, err %d\n",
 +						__func__, reg, val, ret);
 +		return ret;
 +	}
-+
 +	return 0;
++}
++
++static int et6326_read_byte(struct i2c_client *client, u8 reg)
++{
++	uint8_t buf[] = {reg};
++	int ret;
++
++	struct i2c_msg msgs[] = {
++		{
++			.addr = client->addr,
++			.flags = I2C_M_REV_DIR_ADDR,
++			.len = 1,
++			.buf = buf
++		}, {
++			.addr = client->addr,
++			.flags = I2C_M_RD | I2C_M_NOSTART,
++			.len = 1,
++			.buf = buf
++		}
++	};
++
++	ret = i2c_transfer(client->adapter, msgs, 2);
++	if (ret < 0) {
++		dev_err(&client->dev, "%s: reg 0x%x, err %d\n",
++						__func__, reg, ret);
++		return ret;
++	}
++
++	return buf[0];
 +}
 +
 +static unsigned long et6326_set_period(struct et6326_leds_priv *priv, unsigned long period)
@@ -146,10 +176,8 @@ index 0000000000..32f1fe104e
 +	if (val > 127)
 +		val = 127;
 +
-+	if (val != priv->reg.period) {
-+		priv->reg.period = val;
++	if (val != et6326_read_byte(priv->client, ET6326_REG_FLASH_PERIOD))
 +		et6326_write_byte(priv->client, ET6326_REG_FLASH_PERIOD, val);
-+	}
 +
 +	return (val + 1) * 128;
 +}
@@ -157,7 +185,7 @@ index 0000000000..32f1fe104e
 +static void et6326_set_work_mode(struct et6326_led *led, int mode)
 +{
 +	struct et6326_leds_priv *priv = led->priv;
-+	u8 val = priv->reg.mode;
++	u8 val = et6326_read_byte(priv->client, ET6326_REG_LED_WORK_MODE);
 +
 +	val &= ~led->mode_mask;
 +
@@ -166,11 +194,10 @@ index 0000000000..32f1fe104e
 +	else if (mode == MODE_THREAD)
 +		val |= 1 << led->blink_shift;
 +
-+	if (val == priv->reg.mode)
++	if (val == et6326_read_byte(priv->client, ET6326_REG_LED_WORK_MODE))
 +		return;
 +
 +	led->mode = mode;
-+	priv->reg.mode = val;
 +	et6326_write_byte(priv->client, ET6326_REG_LED_WORK_MODE, val);
 +}
 +
@@ -181,10 +208,9 @@ index 0000000000..32f1fe104e
 +
 +	val = 255 * val / 100;
 +
-+	if (val == priv->reg.ton1)
++	if (val == et6326_read_byte(priv->client, ET6326_REG_FLASH_TON1))
 +		return;
 +
-+	priv->reg.ton1 = val;
 +	et6326_write_byte(priv->client, ET6326_REG_FLASH_TON1, val);
 +}
 +
@@ -209,12 +235,10 @@ index 0000000000..32f1fe104e
 +
 +	reg |= reg << 4;
 +
-+	if (reg != priv->reg.ramp) {
-+		priv->reg.ramp = reg;
++	if (reg != et6326_read_byte(priv->client, ET6326_REG_RAMP_RATE))
 +		et6326_write_byte(priv->client, ET6326_REG_RAMP_RATE, reg);
-+	}
 +
-+	reg = priv->reg.status & ~(0x3 << 5);
++	reg = et6326_read_byte(priv->client, ET6326_REG_STATUS) & ~(0x3 << 5);
 +	switch (scaling) {
 +	case 2:
 +		reg |= 1 << 5;
@@ -229,10 +253,8 @@ index 0000000000..32f1fe104e
 +		break;
 +	}
 +
-+	if (reg != priv->reg.status) {
-+		priv->reg.status = reg;
++	if (reg != et6326_read_byte(priv->client, ET6326_REG_STATUS))
 +		et6326_write_byte(priv->client, ET6326_REG_STATUS, reg);
-+	}
 +
 +	return val;
 +}
@@ -257,10 +279,11 @@ index 0000000000..32f1fe104e
 +{
 +	struct et6326_led *led = container_of(led_cdev, struct et6326_led, cdev);
 +	struct et6326_leds_priv *priv = led->priv;
++	u8 reg_period = et6326_read_byte(priv->client, ET6326_REG_FLASH_PERIOD);
 +	unsigned long t = 0;
 +
 +	if (on)
-+		t = (priv->reg.period + 1) * 128;
++		t = (reg_period + 1) * 128;
 +
 +	et6326_set_ramp(priv, t);
 +}
@@ -423,7 +446,6 @@ index 0000000000..32f1fe104e
 +			  const char *buf, size_t len)
 +{
 +	struct et6326_leds_priv *priv = i2c_get_clientdata(to_i2c_client(dev));
-+	struct et6326_led *led;
 +	u32 channel;
 +	int ret;
 +
@@ -465,12 +487,16 @@ index 0000000000..32f1fe104e
 +static int et6326_probe(struct i2c_client *client, const struct i2c_device_id *id)
 +{
 +	struct device *dev = &client->dev;
-+	struct et6326_leds_priv *priv;
-+	
++	struct et6326_leds_priv *priv;	
 +	int ret;
 +
-+	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
-+		return -EIO;
++	if (!i2c_check_functionality(client->adapter,
++				     I2C_FUNC_NOSTART |
++				     I2C_FUNC_PROTOCOL_MANGLING)) {
++		dev_err(&client->dev,
++			"need i2c bus that supports protocol mangling\n");
++		return -ENODEV;
++	}
 +
 +	priv = devm_kzalloc(dev, sizeof(struct et6326_leds_priv), GFP_KERNEL);
 +	if (!priv)
@@ -552,7 +578,7 @@ index 0000000000..32f1fe104e
 +MODULE_DESCRIPTION("ET6326 LED driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/target/linux/ramips/dts/GL-MT1300.dts b/target/linux/ramips/dts/GL-MT1300.dts
-index 07f9b6986e..491238a886 100755
+index 07f9b6986e..18dbb44ace 100755
 --- a/target/linux/ramips/dts/GL-MT1300.dts
 +++ b/target/linux/ramips/dts/GL-MT1300.dts
 @@ -9,6 +9,13 @@
@@ -582,14 +608,20 @@ index 07f9b6986e..491238a886 100755
  	keys {
  		compatible = "gpio-keys-polled";
  		poll-interval = <20>;
-@@ -55,20 +56,6 @@
- 			linux,code = <BTN_0>;
+@@ -56,17 +57,27 @@
  		};
  	};
--
+ 
 -	leds {
 -		compatible = "gpio-leds";
--
++	i2c-gpio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		compatible = "i2c-gpio";
++		gpios = <&gpio0 3 GPIO_ACTIVE_HIGH &gpio0 4 GPIO_ACTIVE_HIGH>;
++		i2c-gpio,delay-us = <10>;
+ 
 -		led_run: blue {
 -			label = "gl-mt1300:blue";
 -			gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
@@ -598,36 +630,33 @@ index 07f9b6986e..491238a886 100755
 -		white {
 -			label = "gl-mt1300:white";
 -			gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
--		};
--	};
- };
- 
- &sdhci {
-@@ -151,3 +138,22 @@
++		leds@30 {
++			compatible = "etek,et6326";
++			reg = <0x30>;
++
++			led_run: led@0 {
++				channel = <0>;
++				label = "gl-mt1300:blue";
++			};
++
++			led@1 {
++				channel = <1>;
++				label = "gl-mt1300:white";
++			};
  		};
  	};
  };
-+
-+&i2c {
-+	status = "okay";
-+
-+	leds@30 {
-+		compatible = "etek,et6326";
-+		reg = <0x30>;
-+
-+		led_run: led@0 {
-+			channel = <0>;
-+			label = "gl-mt1300:blue";
-+		};
-+
-+		led@1 {
-+			channel = <1>;
-+			label = "gl-mt1300:white";
-+		};
-+	};
-+};
+@@ -146,7 +157,7 @@
+ &pinctrl {
+ 	state_default: pinctrl0 {
+ 		gpio {
+-			ralink,group = "wdt", "rgmii2", "jtag", "mdio";
++			ralink,group = "wdt", "rgmii2", "jtag", "mdio", "i2c";
+ 			ralink,function = "gpio";
+ 		};
+ 	};
 diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7621.mk
-index 708a606b98..b9c819b17e 100644
+index 708a606b98..dfadd69f93 100644
 --- a/target/linux/ramips/image/mt7621.mk
 +++ b/target/linux/ramips/image/mt7621.mk
 @@ -210,7 +210,7 @@ define Device/gl-mt1300
@@ -635,7 +664,7 @@ index 708a606b98..b9c819b17e 100644
    DEVICE_PACKAGES := \
  	 kmod-ata-core kmod-ata-ahci kmod-mt76x2 kmod-mt7603 kmod-usb3 \
 -	 kmod-usb-ledtrig-usbport wpad-basic
-+	 kmod-usb-ledtrig-usbport wpad-basic kmod-leds-et6326
++	 kmod-usb-ledtrig-usbport wpad-basic kmod-i2c-gpio kmod-leds-et6326
    IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
  endef
  TARGET_DEVICES += gl-mt1300
