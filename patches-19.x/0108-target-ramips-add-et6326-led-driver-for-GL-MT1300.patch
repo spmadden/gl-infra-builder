@@ -1,4 +1,4 @@
-From 6da4720a492f25d75255baa08cd807cd1147bf90 Mon Sep 17 00:00:00 2001
+From 73671e18eda8b4ad8db0c42341c1318c18e2fee6 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Sun, 26 Sep 2021 14:37:26 +0800
 Subject: [PATCH] target/ramips: add et6326 led driver for GL-MT1300
@@ -7,10 +7,10 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/kernel/leds-et6326/Makefile          |  40 ++
  package/kernel/leds-et6326/src/Makefile      |   1 +
- package/kernel/leds-et6326/src/leds-et6326.c | 503 +++++++++++++++++++
+ package/kernel/leds-et6326/src/leds-et6326.c | 501 +++++++++++++++++++
  target/linux/ramips/dts/GL-MT1300.dts        |  45 +-
  target/linux/ramips/image/mt7621.mk          |   2 +-
- 5 files changed, 573 insertions(+), 18 deletions(-)
+ 5 files changed, 571 insertions(+), 18 deletions(-)
  create mode 100644 package/kernel/leds-et6326/Makefile
  create mode 100644 package/kernel/leds-et6326/src/Makefile
  create mode 100644 package/kernel/leds-et6326/src/leds-et6326.c
@@ -70,10 +70,10 @@ index 0000000000..4c707365e7
 +obj-m += leds-et6326.o
 diff --git a/package/kernel/leds-et6326/src/leds-et6326.c b/package/kernel/leds-et6326/src/leds-et6326.c
 new file mode 100644
-index 0000000000..1d653a6f27
+index 0000000000..1326e20994
 --- /dev/null
 +++ b/package/kernel/leds-et6326/src/leds-et6326.c
-@@ -0,0 +1,503 @@
+@@ -0,0 +1,501 @@
 +#include <linux/module.h>
 +#include <linux/delay.h>
 +#include <linux/leds.h>
@@ -490,9 +490,7 @@ index 0000000000..1d653a6f27
 +	struct et6326_leds_priv *priv;	
 +	int ret;
 +
-+	if (!i2c_check_functionality(client->adapter,
-+				     I2C_FUNC_NOSTART |
-+				     I2C_FUNC_PROTOCOL_MANGLING)) {
++	if (!i2c_check_functionality(client->adapter, I2C_FUNC_NOSTART)) {
 +		dev_err(&client->dev,
 +			"need i2c bus that supports protocol mangling\n");
 +		return -ENODEV;
