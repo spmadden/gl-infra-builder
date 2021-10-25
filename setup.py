@@ -117,6 +117,20 @@ def setup_tree():
     finally:
         os.chdir(base_dir)
 
+def remove_feeds():
+    try:
+        print("### Remove feeds")
+        os.chdir(openwrt)
+        if Path("feeds").exists():
+            os.system('rm feeds -fr')
+        if Path("package/feeds").exists():
+            os.system('rm package/feeds -fr')
+        print("### Remove feeds done")
+    except:
+        print("### Remove feeds failed")
+        sys.exit(1)
+    finally:
+        os.chdir(base_dir)
 
 base_dir = Path.cwd().absolute()
 config = "config-19.x.yml"
@@ -157,3 +171,6 @@ clone_tree()
 # pull_tree()
 reset_tree()
 setup_tree()
+
+if git_clone_dir == "openwrt-18.06/siflower":
+    remove_feeds()

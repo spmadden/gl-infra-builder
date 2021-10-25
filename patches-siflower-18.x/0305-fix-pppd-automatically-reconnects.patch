@@ -1,0 +1,25 @@
+From 46b06cd25022e7329479f60a580bf1ec913fca04 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Sat, 16 Oct 2021 09:35:43 +0800
+Subject: [PATCH] fix: pppd automatically reconnects
+
+---
+ openwrt-18.06/package/network/services/ppp/files/ppp.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/openwrt-18.06/package/network/services/ppp/files/ppp.sh b/openwrt-18.06/package/network/services/ppp/files/ppp.sh
+index 3606fd3..2e18a54 100755
+--- a/openwrt-18.06/package/network/services/ppp/files/ppp.sh
++++ b/openwrt-18.06/package/network/services/ppp/files/ppp.sh
+@@ -111,6 +111,8 @@ ppp_generic_setup() {
+ 		}
+ 	}
+ 
++	[ -n "$keepalive" ] || keepalive="5 1"
++
+ 	local lcp_failure="${keepalive%%[, ]*}"
+ 	local lcp_interval="${keepalive##*[, ]}"
+ 	local lcp_adaptive="lcp-echo-adaptive"
+-- 
+2.7.4
+
