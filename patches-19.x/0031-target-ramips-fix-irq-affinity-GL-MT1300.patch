@@ -1,0 +1,25 @@
+From be2555b2c8be0f014789bfa5666d7063e6853f3d Mon Sep 17 00:00:00 2001
+From: gl-zhaojianhui <jianhui.zhao@gl-inet.com>
+Date: Mon, 8 Nov 2021 18:38:39 +0800
+Subject: [PATCH] target/ramips: fix irq affinity GL-MT1300
+
+Signed-off-by: gl-zhaojianhui <jianhui.zhao@gl-inet.com>
+---
+ target/linux/ramips/base-files/etc/init.d/set-irq-affinity | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/target/linux/ramips/base-files/etc/init.d/set-irq-affinity b/target/linux/ramips/base-files/etc/init.d/set-irq-affinity
+index 9a3afefa5a..e31dd6e6d8 100755
+--- a/target/linux/ramips/base-files/etc/init.d/set-irq-affinity
++++ b/target/linux/ramips/base-files/etc/init.d/set-irq-affinity
+@@ -26,6 +26,5 @@ start() {
+ 		return
+ 	fi
+ 
+-	set_irq_affinity mt76x2e $mask1
+-	set_irq_affinity mt7603e $mask2
++	set_irq_affinity ra0 $mask1
+ }
+-- 
+2.25.1
+
