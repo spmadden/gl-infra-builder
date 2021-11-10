@@ -2,7 +2,7 @@ repo: https://github.com/Siflower/1806_SDK.git
 branch: release
 git_clone_dir: openwrt-18.06/siflower
 openwrt_root_dir: openwrt-18.06/siflower/openwrt-18.06
-revision: e78c95bd11d8c5e7b48ba25b6c5a62f764151260
+revision: 3279b2bb4b4d9cb6a5f1755103d724d6bd5ba8f9
 
 patch_folders:
   - patches-siflower-18.x/

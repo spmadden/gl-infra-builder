@@ -1,0 +1,166 @@
+From 8e6dcc12e7ad1af0d267bf9bba826eb501b25d7d Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Fri, 5 Nov 2021 10:43:57 +0800
+Subject: [PATCH] fix: delete usb statistics debug
+
+---
+ .../linux-4.14.90/drivers/usb/dwc2/debug.h         | 11 ----
+ .../linux-4.14.90/drivers/usb/dwc2/debugfs.c       | 65 ----------------------
+ .../linux-4.14.90/drivers/usb/dwc2/hcd.c           |  9 ---
+ 3 files changed, 85 deletions(-)
+
+diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debug.h b/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debug.h
+index 962fe48..8222783 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debug.h
++++ b/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debug.h
+@@ -16,23 +16,12 @@
+ 
+ #include "core.h"
+ 
+-struct dwc2_data_statistic {
+-        spinlock_t lock;
+-        u64 total_data;
+-};
+-
+ #ifdef CONFIG_DEBUG_FS
+ int dwc2_debugfs_init(struct dwc2_hsotg *hsotg);
+ void dwc2_debugfs_exit(struct dwc2_hsotg *hsotg);
+-extern void dwc2_statistic_add(u32);
+-extern void dwc2_statistic_decrease(u32);
+-extern void dwc2_statistic_clear(void);
+ #else
+ static inline int dwc2_debugfs_init(struct dwc2_hsotg *hsotg)
+ {  return 0;  }
+ static inline void dwc2_debugfs_exit(struct dwc2_hsotg *hsotg)
+ {  }
+-static void dwc2_statistic_add(u32) {}
+-static void dwc2_statistic_decrease(u32) {}
+-static void dwc2_statistic_clear(void) {}
+ #endif
+diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debugfs.c b/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debugfs.c
+index aef58f9..794b959 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debugfs.c
++++ b/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/debugfs.c
+@@ -389,45 +389,6 @@ static void dwc2_hsotg_create_debug(struct dwc2_hsotg *hsotg)
+ static inline void dwc2_hsotg_create_debug(struct dwc2_hsotg *hsotg) {}
+ #endif
+ 
+-static int statistic_show(struct seq_file *seq, void *v)
+-{
+-	struct dwc2_data_statistic *statistic = seq->private;
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&statistic->lock, flags);
+-	seq_printf(seq, "%lld\n", statistic->total_data);
+-	spin_unlock_irqrestore(&statistic->lock, flags);
+-
+-	return 0;
+-}
+-
+-static int statistic_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, statistic_show, inode->i_private);
+-}
+-
+-static const struct file_operations statistic_fops = {
+-    .owner = THIS_MODULE,
+-    .open = statistic_open,
+-    .read = seq_read,
+-    .llseek = seq_lseek,
+-    .release = single_release,
+-};
+-
+-static void dwc2_hsotg_create_statistic(struct dwc2_hsotg *hsotg, struct dwc2_data_statistic *statistic)
+-{
+-	struct dentry *root;
+-	struct dentry *file;
+-
+-	spin_lock_init(&statistic->lock);
+-	dwc2_statistic_clear();
+-
+-	root = hsotg->debug_root;
+-	file = debugfs_create_file("statistic", S_IRUGO, root, statistic, &statistic_fops);
+-	if (IS_ERR(file))
+-		dev_err(hsotg->dev, "%s: failed to create statistic\n", __func__);
+-}
+-
+ /* dwc2_hsotg_delete_debug is removed as cleanup in done in dwc2_debugfs_exit */
+ 
+ #define dump_register(nm)	\
+@@ -764,29 +725,6 @@ static const struct debugfs_reg32 dwc2_regs[] = {
+ 	dump_register(HCDMAB(15)),
+ };
+ 
+-static struct dwc2_data_statistic transfer_statistic;
+-
+-void dwc2_statistic_add(u32 length)
+-{
+-	spin_lock(&transfer_statistic.lock);
+-	transfer_statistic.total_data += (u64)length;
+-	spin_unlock(&transfer_statistic.lock);
+-}
+-
+-void dwc2_statistic_decrease(u32 length)
+-{
+-	spin_lock(&transfer_statistic.lock);
+-	transfer_statistic.total_data -= (u64)length;
+-	spin_unlock(&transfer_statistic.lock);
+-}
+-
+-void dwc2_statistic_clear()
+-{
+-	spin_lock(&transfer_statistic.lock);
+-	transfer_statistic.total_data = 0;
+-	spin_unlock(&transfer_statistic.lock);
+-}
+-
+ #define print_param(_seq, _ptr, _param) \
+ seq_printf((_seq), "%-30s: %d\n", #_param, (_ptr)->_param)
+ 
+@@ -957,9 +895,6 @@ int dwc2_debugfs_init(struct dwc2_hsotg *hsotg)
+ 	/* Add gadget debugfs nodes */
+ 	dwc2_hsotg_create_debug(hsotg);
+ 
+-	/* Add transfer length node */
+-	dwc2_hsotg_create_statistic(hsotg, &transfer_statistic);
+-
+ 	hsotg->regset = devm_kzalloc(hsotg->dev, sizeof(*hsotg->regset),
+ 								GFP_KERNEL);
+ 	if (!hsotg->regset) {
+diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/hcd.c b/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/hcd.c
+index 0683614..3c4658b 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/hcd.c
++++ b/linux-4.14.90-dev/linux-4.14.90/drivers/usb/dwc2/hcd.c
+@@ -54,7 +54,6 @@
+ 
+ #include "core.h"
+ #include "hcd.h"
+-#include "debug.h"
+ 
+ static void dwc2_port_resume(struct dwc2_hsotg *hsotg);
+ 
+@@ -4819,10 +4818,6 @@ static int _dwc2_hcd_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
+ 	dwc2_urb->interval = urb->interval;
+ 	dwc2_urb->status = -EINPROGRESS;
+ 
+-	#ifdef CONFIG_DEBUG_FS
+-	dwc2_statistic_add(urb->transfer_buffer_length);
+-	#endif
+-
+ 	for (i = 0; i < urb->number_of_packets; ++i)
+ 		dwc2_hcd_urb_set_iso_desc_params(dwc2_urb, i,
+ 						 urb->iso_frame_desc[i].offset,
+@@ -4920,10 +4915,6 @@ static int _dwc2_hcd_urb_dequeue(struct usb_hcd *hcd, struct urb *urb,
+ 
+ 	rc = dwc2_hcd_urb_dequeue(hsotg, urb->hcpriv);
+ 
+-	#ifdef CONFIG_DEBUG_FS
+-	dwc2_statistic_decrease(urb->transfer_buffer_length);
+-	#endif
+-
+ 	usb_hcd_unlink_urb_from_ep(hcd, urb);
+ 
+ 	kfree(urb->hcpriv);
+-- 
+2.7.4
+

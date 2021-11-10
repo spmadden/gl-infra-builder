@@ -1,4 +1,4 @@
-From 31c32163d2742b0c79ce88e96576c93927a46efd Mon Sep 17 00:00:00 2001
+From 54605062af0db1c1d75736e2cb1da6a8ee04992e Mon Sep 17 00:00:00 2001
 From: Lancer <luoyejiang0701@gmail.com>
 Date: Mon, 26 Apr 2021 17:36:39 +0800
 Subject: [PATCH] add support GL.iNET SF1200 target
@@ -47,17 +47,17 @@ Signed-off-by: Lancer <luoyejiang0701@gmail.com>
  create mode 100644 openwrt-18.06/target/linux/siflower/sf19a28_gl_sf1200_fullmask_rel.config
 
 diff --git a/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/Makefile b/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/Makefile
-index 3c4e4f7..24b1205 100755
+index d6bdab9..4644b6f 100755
 --- a/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/Makefile
 +++ b/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/Makefile
-@@ -3,6 +3,7 @@ dtb-$(CONFIG_DT_SF16A18_FULLMASK_EVB_V5)	+= sf16a18_fullmask_evb_v5.dtb
- 
+@@ -13,6 +13,7 @@ dtb-$(CONFIG_DT_SF19A28_MPW1_AC22)	+= sf19a28_mpw1_ac22.dtb
  dtb-$(CONFIG_DT_SF19A28_FULLMASK_FPGA)	+= sf19a28_fullmask_fpga.dtb
  dtb-$(CONFIG_DT_SF19A28_FULLMASK_EVB)	+= sf19a28_fullmask_evb.dtb
+ dtb-$(CONFIG_DT_SF19A28_FULLMASK_NF)	+= sf19a28_fullmask_nf.dtb
 +dtb-$(CONFIG_DT_SF19A28_FULLMASK_GL_SF1200)	+= sf19a28_fullmask_gl_sf1200.dtb
  dtb-$(CONFIG_DT_SF19A28_FULLMASK_AC28)	+= sf19a28_fullmask_ac28.dtb
+ dtb-$(CONFIG_DT_SF19A28_FULLMASK_A28_HWA)	+= sf19a28_fullmask_a28-hwa.dtb
  dtb-$(CONFIG_DT_SF19A28_FULLMASK_REP)	+= sf19a28_fullmask_rep.dtb
- dtb-$(CONFIG_DT_SF19A28_FULLMASK_AC28S) += sf19a28_fullmask_ac28s.dtb
 diff --git a/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sf1200.dts b/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sf1200.dts
 new file mode 100644
 index 0000000..3a4cbb7
@@ -211,12 +211,12 @@ index 0000000..3a4cbb7
 +	smp-affinity = <3>;
 +};
 diff --git a/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/Kconfig b/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/Kconfig
-index 6e20394..7b9af46 100755
+index 7362cec..3c7ddb9 100755
 --- a/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/Kconfig
 +++ b/linux-4.14.90-dev/linux-4.14.90/arch/mips/siflower/Kconfig
-@@ -76,6 +76,14 @@ config DT_SF19A28_FULLMASK_EVB
+@@ -125,6 +125,14 @@ config DT_SF19A28_FULLMASK_NF
  	  The corresponding DTS file is at
- 	  arch/mips/boot/dts/sf19a28_fullmask_evb.dts
+ 	  arch/mips/boot/dts/sf19a28_fullmask_nf.dts
  
 +config DT_SF19A28_FULLMASK_GL_SF1200
 +	bool "Built-in device tree for sf19a28 fullmask gl.inet sf1200"
@@ -230,7 +230,7 @@ index 6e20394..7b9af46 100755
  	bool "Built-in device tree for sf19a28 fullmask ac28"
  	default n
 diff --git a/openwrt-18.06/make.sh b/openwrt-18.06/make.sh
-index 27b21f8..b5d766e 100755
+index 55e481f..f9f9d33 100755
 --- a/openwrt-18.06/make.sh
 +++ b/openwrt-18.06/make.sh
 @@ -59,6 +59,9 @@ case ${board} in

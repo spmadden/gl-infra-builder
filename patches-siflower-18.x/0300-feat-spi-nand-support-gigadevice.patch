@@ -1,28 +1,15 @@
-From 5bbb177ca9946a485b12001a81a2ed75d6a96c1f Mon Sep 17 00:00:00 2001
+From 62897b60de364737a39ac402302e9aa0c256aeaf Mon Sep 17 00:00:00 2001
 From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
-Date: Mon, 19 Jul 2021 15:27:56 +0800
-Subject: [PATCH] feat: spi-nand support gigadevice
+Date: Fri, 5 Nov 2021 09:49:17 +0800
+Subject: [PATCH] feat: spi nand support gigadevice
 
-Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
 ---
- .../linux-4.14.90/drivers/mtd/nand/spi/Makefile    |   2 +-
  .../linux-4.14.90/drivers/mtd/nand/spi/esmt.c      |   4 +-
- .../drivers/mtd/nand/spi/gigadevice.c              | 371 +++++++++++++++++++++
- .../drivers/mtd/nand/spi/spi_nand_core.c           |   1 +
- .../linux-4.14.90/include/linux/mtd/spinand.h      |  19 ++
- 5 files changed, 395 insertions(+), 2 deletions(-)
+ .../drivers/mtd/nand/spi/gigadevice.c              | 381 +++++++++++++++++++++
+ .../linux-4.14.90/include/linux/mtd/spinand.h      |  18 +
+ 3 files changed, 402 insertions(+), 1 deletion(-)
  create mode 100644 linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/gigadevice.c
 
-diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/Makefile b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/Makefile
-index e87b281..900234e 100644
---- a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/Makefile
-+++ b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_MTD_NAND_SPI) += spinand.o
- 
--spinand-objs := bbt.o nand_core.o spi_nand_core.o macronix.o micron.o winbond.o icmax.o esmt.o toshiba.o
-+spinand-objs := bbt.o nand_core.o spi_nand_core.o macronix.o micron.o winbond.o icmax.o esmt.o toshiba.o gigadevice.o
 diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/esmt.c b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/esmt.c
 index e8bf521..9bdd89a 100644
 --- a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/esmt.c
@@ -41,10 +28,10 @@ index e8bf521..9bdd89a 100644
  }
 diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/gigadevice.c b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/gigadevice.c
 new file mode 100644
-index 0000000..2006b75
+index 0000000..79b26f5
 --- /dev/null
 +++ b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/gigadevice.c
-@@ -0,0 +1,371 @@
+@@ -0,0 +1,381 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Author:
@@ -384,6 +371,15 @@ index 0000000..2006b75
 +		     SPINAND_HAS_QE_BIT,
 +		     SPINAND_ECCINFO(&gd5fxgqx_variant2_ooblayout,
 +				     gd5fxgq5xexxg_ecc_get_status)),
++	SPINAND_INFO("GD5F2GQ5UExxG", 0x52,
++		     NAND_MEMORG(1, 2048, 128, 64, 2048, 1, 1, 1),
++		     NAND_ECCREQ(4, 512),
++		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
++					      &write_cache_variants,
++					      &update_cache_variants),
++		     SPINAND_HAS_QE_BIT,
++		     SPINAND_ECCINFO(&gd5fxgqx_variant2_ooblayout,
++				     gd5fxgq5xexxg_ecc_get_status)),
 +};
 +
 +static int gigadevice_spinand_detect(struct spinand_device *spinand)
@@ -416,21 +412,9 @@ index 0000000..2006b75
 +	.name = "GigaDevice",
 +	.ops = &gigadevice_spinand_manuf_ops,
 +};
-\ No newline at end of file
-diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c
-index 83b8136..7086b71 100644
---- a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c
-+++ b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c
-@@ -803,6 +803,7 @@ static const struct spinand_manufacturer *spinand_manufacturers[] = {
- 	&micron_spinand_manufacturer,
- 	&winbond_spinand_manufacturer,
- 	&toshiba_spinand_manufacturer,
-+	&gigadevice_spinand_manufacturer,
- };
- 
- static int spinand_manufacturer_detect(struct spinand_device *spinand)
++
 diff --git a/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h b/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h
-index d5f7b29..b7ef388 100644
+index 67438cf..5e15c12 100644
 --- a/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h
 +++ b/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h
 @@ -68,18 +68,36 @@
@@ -470,14 +454,6 @@ index d5f7b29..b7ef388 100644
  #define SPINAND_PAGE_READ_FROM_CACHE_DUALIO_OP(addr, ndummy, buf, len)	\
  	SPI_MEM_OP(SPI_MEM_OP_CMD(0xbb, 1),				\
  		   SPI_MEM_OP_ADDR(2, addr, 2),				\
-@@ -200,6 +218,7 @@ extern const struct spinand_manufacturer macronix_spinand_manufacturer;
- extern const struct spinand_manufacturer micron_spinand_manufacturer;
- extern const struct spinand_manufacturer winbond_spinand_manufacturer;
- extern const struct spinand_manufacturer toshiba_spinand_manufacturer;
-+extern const struct spinand_manufacturer gigadevice_spinand_manufacturer;
- 
- /**
-  * struct spinand_op_variants - SPI NAND operation variants
 -- 
 2.7.4
 
