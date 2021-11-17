@@ -1,0 +1,191 @@
+From c148f4c9e6cf0e5fe3ed61147bea28a23d637920 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Po.Yang" <po.yang@gl-inet.com>
+Date: Tue, 16 Nov 2021 02:15:05 -0800
+Subject: [PATCH] fit crash_log for ar750 ar750s xe300 x750 e750 x1200
+ mt300n-v2 mt1300
+
+---
+ target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts   |  6 +++++-
+ .../ath79/dts/qca9531_glinet_gl-e750-nor-nand.dts    |  4 ++++
+ .../linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts   |  6 +++++-
+ .../ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts   |  6 +++++-
+ .../ath79/dts/qca9563_glinet_gl-ar750s-nor-nand.dts  |  4 ++++
+ .../ath79/dts/qca9563_glinet_gl-x1200-nor-nand.dts   |  4 ++++
+ .../linux/ath79/patches-4.14/320-spi_nor_write.patch | 12 ++++++++++++
+ target/linux/ramips/dts/GL-MT1300.dts                |  7 ++++++-
+ target/linux/ramips/dts/GL-MT300N-V2.dts             |  7 ++++++-
+ .../ramips/patches-4.14/320-add_spi_nor_write.patch  | 12 ++++++++++++
+ 10 files changed, 63 insertions(+), 5 deletions(-)
+ create mode 100644 target/linux/ath79/patches-4.14/320-spi_nor_write.patch
+ create mode 100644 target/linux/ramips/patches-4.14/320-add_spi_nor_write.patch
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
+index 6e09c3a709..b19213fa23 100755
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
+@@ -131,7 +131,11 @@
+ 			partition@60000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x060000 0xfa0000>;
++				reg = <0x060000 0xf80000>;
++			};
++            partition@fe0000 {
++				label = "log";
++				reg = <0xfe0000 0x020000>;
+ 			};
+ 		};
+ 	};
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-e750-nor-nand.dts
+index 4af6c273f0..a8c016c8e6 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-e750-nor-nand.dts
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750-nor-nand.dts
+@@ -18,6 +18,10 @@
+ 		label = "nor_reserved";
+ 		reg = <0x260000 0xbc0000>;
+ 	};
++    parition@e20000 {
++		label = "log";
++		reg = <0xe20000 0x020000>;
++	};
+ };
+ 
+ &nand_ubi {
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+index 14be3e13a5..22c5313e78 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+@@ -13,6 +13,10 @@
+ 	partition@60000 {
+ 		compatible = "denx,uimage";
+ 		label = "firmware";
+-		reg = <0x060000 0xfa0000>;
++		reg = <0x060000 0xf80000>;
++	};
++    partition@fe0000 {
++		label = "log";
++		reg = <0xfe0000 0x020000>;
+ 	};
+ };
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+index 4e92f309e5..b58b58ce44 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+@@ -16,7 +16,11 @@
+ 	};
+ 	parition@260000 {
+ 		label = "nor_reserved";
+-		reg = <0x460000 0xba0000>;
++		reg = <0x460000 0xb80000>;
++	};
++    parition@fe0000 {
++		label = "log";
++		reg = <0xfe0000 0x020000>;
+ 	};
+ };
+ 
+diff --git a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s-nor-nand.dts b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s-nor-nand.dts
+index fab54fb51b..3b0422a2d3 100644
+--- a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s-nor-nand.dts
++++ b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s-nor-nand.dts
+@@ -18,6 +18,10 @@
+ 		label = "nor_reserved";
+ 		reg = <0x260000 0xbc0000>;
+ 	};
++    parition@e20000 {
++		label = "log";
++		reg = <0xe20000 0x020000>;
++	};
+ };
+ 
+ &nand_ubi {
+diff --git a/target/linux/ath79/dts/qca9563_glinet_gl-x1200-nor-nand.dts b/target/linux/ath79/dts/qca9563_glinet_gl-x1200-nor-nand.dts
+index c8a99de877..4b3825da59 100644
+--- a/target/linux/ath79/dts/qca9563_glinet_gl-x1200-nor-nand.dts
++++ b/target/linux/ath79/dts/qca9563_glinet_gl-x1200-nor-nand.dts
+@@ -18,6 +18,10 @@
+ 		label = "nor_reserved";
+ 		reg = <0x260000 0xbc0000>;
+ 	};
++    parition@e20000 {
++		label = "log";
++		reg = <0xe20000 0x020000>;
++	};
+ };
+ 
+ &nand_ubi {
+diff --git a/target/linux/ath79/patches-4.14/320-spi_nor_write.patch b/target/linux/ath79/patches-4.14/320-spi_nor_write.patch
+new file mode 100644
+index 0000000000..b92dc385e3
+--- /dev/null
++++ b/target/linux/ath79/patches-4.14/320-spi_nor_write.patch
+@@ -0,0 +1,12 @@
++Index: linux-4.14.221/drivers/mtd/spi-nor/spi-nor.c
++===================================================================
++--- linux-4.14.221.orig/drivers/mtd/spi-nor/spi-nor.c
+++++ linux-4.14.221/drivers/mtd/spi-nor/spi-nor.c
++@@ -2792,6 +2792,7 @@ int spi_nor_scan(struct spi_nor *nor, co
++ 		mtd->_write = sst_write;
++ 	else
++ 		mtd->_write = spi_nor_write;
+++	mtd->_panic_write = spi_nor_write;
++ 
++ 	if (info->flags & USE_FSR)
++ 		nor->flags |= SNOR_F_USE_FSR;
+diff --git a/target/linux/ramips/dts/GL-MT1300.dts b/target/linux/ramips/dts/GL-MT1300.dts
+index 491238a886..d651e2e01e 100755
+--- a/target/linux/ramips/dts/GL-MT1300.dts
++++ b/target/linux/ramips/dts/GL-MT1300.dts
+@@ -96,7 +96,12 @@
+ 			partition@50000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x50000 0x1fb0000>;
++				reg = <0x50000 0x1f90000>;
++			};
++
++            partition@1fe0000 {
++				label = "log";
++				reg = <0x1fe0000 0x020000>;
+ 			};
+ 		};
+ 	};
+diff --git a/target/linux/ramips/dts/GL-MT300N-V2.dts b/target/linux/ramips/dts/GL-MT300N-V2.dts
+index d442c97450..eea1c90a54 100755
+--- a/target/linux/ramips/dts/GL-MT300N-V2.dts
++++ b/target/linux/ramips/dts/GL-MT300N-V2.dts
+@@ -145,7 +145,12 @@
+ 			partition@50000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x50000 0xfb0000>;
++				reg = <0x50000 0xf90000>;
++			};
++
++            partition@fe0000 {
++				label = "log";
++				reg = <0xfe0000 0x020000>;
+ 			};
+ 		};
+ 	};
+diff --git a/target/linux/ramips/patches-4.14/320-add_spi_nor_write.patch b/target/linux/ramips/patches-4.14/320-add_spi_nor_write.patch
+new file mode 100644
+index 0000000000..b6a649da92
+--- /dev/null
++++ b/target/linux/ramips/patches-4.14/320-add_spi_nor_write.patch
+@@ -0,0 +1,12 @@
++Index: linux-4.14.221/drivers/mtd/spi-nor/spi-nor.c
++===================================================================
++--- linux-4.14.221.orig/drivers/mtd/spi-nor/spi-nor.c
+++++ linux-4.14.221/drivers/mtd/spi-nor/spi-nor.c
++@@ -2886,6 +2886,7 @@ int spi_nor_scan(struct spi_nor *nor, co
++ 		mtd->_write = sst_write;
++ 	else
++ 		mtd->_write = spi_nor_write;
+++	mtd->_panic_write = spi_nor_write;	
++ 
++ 	if (info->flags & USE_FSR)
++ 		nor->flags |= SNOR_F_USE_FSR;
+-- 
+2.17.1
+
