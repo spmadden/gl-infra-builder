@@ -1,12 +1,15 @@
 ---
 metadata:
-  version: 4.0-0
+  version: 4.0.0
 description: Add the glinet dependencies
 feeds:
   - name: glinet
     path: ../feeds_dir/glinet
 
 packages:
+  - luci
+  - luci-base
+  - luci-mod-rpc
   - kmod-usb-storage-uas
   - kmod-usb-storage
   - kmod-usb-uhci
@@ -51,13 +54,9 @@ packages:
   - gl-sdk4-acl
   - gl-sdk4-mqtt
   - select-sdk4-ui-all
-  - gl-sdk4-dlna
-  - gl-sdk4-samba
-  - gl-sdk4-mqtt
   - gl-sdk4-cloud
   - gl-sdk4-lan
   - gl-sdk4-ipv6
-  - gl-sdk4-igmp
   - gl-sdk4-upgrade
   - gl-sdk4-vpn-policy
   - gl-sdk4-logread
@@ -67,6 +66,7 @@ packages:
 diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
   CONFIG_OUI_HTTPD_OPENSSL=y
+  CONFIG_PACKAGE_uhttpd=n
   CONFIG_BUSYBOX_CUSTOM=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
   CONFIG_PACKAGE_wpad-openssl=y

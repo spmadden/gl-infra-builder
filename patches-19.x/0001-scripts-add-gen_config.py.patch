@@ -1,19 +1,19 @@
-From 50ec0269da7e1592170ae16e8d879036e128178c Mon Sep 17 00:00:00 2001
+From 67a1f7f1ab80fc45ce5094151ea13613c5083631 Mon Sep 17 00:00:00 2001
 From: Luochongjun <luochongjun@gl-inet.com>
-Date: Mon, 16 Aug 2021 19:56:10 +0800
-Subject: [PATCH] improve gen_config script
+Date: Fri, 26 Nov 2021 14:48:57 +0800
+Subject: [PATCH] improv scripts/gen_config.py
 
 ---
- scripts/gen_config.py | 218 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 218 insertions(+)
+ scripts/gen_config.py | 221 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 221 insertions(+)
  create mode 100755 scripts/gen_config.py
 
 diff --git a/scripts/gen_config.py b/scripts/gen_config.py
 new file mode 100755
-index 0000000..713aeb4
+index 0000000..fc7ee0b
 --- /dev/null
 +++ b/scripts/gen_config.py
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,221 @@
 +#!/usr/bin/env python3
 +
 +from os import getenv
@@ -138,10 +138,13 @@ index 0000000..713aeb4
 +    if run(["./scripts/feeds", "update"]).returncode:
 +        warning(f"Error updating feeds")
 +
-+    for p in profile.get("feeds", []):
-+        f = profile["feeds"].get(p)
-+        if run(["./scripts/feeds", "install", "-a", "-f", "-p", f.get("name")]).returncode:
-+            die(f"Error installing {feed}")
++    print("Install all feeds...")
++    if run(["./scripts/feeds", "install", "-a", "-f"]).returncode:
++        die(f"Error installing")
++    #for p in profile.get("feeds", []):
++    #    f = profile["feeds"].get(p)
++    #    if run(["./scripts/feeds", "install", "-a", "-f", "-p", f.get("name")]).returncode:
++    #        die(f"Error installing {feed}")
 +
 +    packages = ["./scripts/feeds", "install"]
 +    for package in profile.get("packages", []):
@@ -218,7 +221,7 @@ index 0000000..713aeb4
 +
 +    clean_tree()
 +    setup_feeds(profile)
-+    setup_all_feeds()
++    #setup_all_feeds()
 +    generate_config(profile)
 +    generate_files(profile)
 +
