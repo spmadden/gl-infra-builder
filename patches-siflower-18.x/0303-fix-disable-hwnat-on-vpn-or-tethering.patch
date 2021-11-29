@@ -1,28 +1,17 @@
-From 362fe4ea55bcbabca707a103c1a2ecb3a559dccf Mon Sep 17 00:00:00 2001
+From 97778894bc310687d1dfd4ccdb46bb3cbe77143c Mon Sep 17 00:00:00 2001
 From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
-Date: Mon, 23 Aug 2021 17:26:41 +0800
+Date: Mon, 15 Nov 2021 10:08:38 +0800
 Subject: [PATCH] fix: disable hwnat on vpn or tethering
 
-Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
 ---
  .../linux-4.14.90/net/netfilter/xt_FLOWOFFLOAD.c           | 14 ++++++++++++++
  1 file changed, 14 insertions(+)
 
 diff --git a/linux-4.14.90-dev/linux-4.14.90/net/netfilter/xt_FLOWOFFLOAD.c b/linux-4.14.90-dev/linux-4.14.90/net/netfilter/xt_FLOWOFFLOAD.c
-index e2a7fce..eab348e 100644
+index be92545..fced9a3 100644
 --- a/linux-4.14.90-dev/linux-4.14.90/net/netfilter/xt_FLOWOFFLOAD.c
 +++ b/linux-4.14.90-dev/linux-4.14.90/net/netfilter/xt_FLOWOFFLOAD.c
-@@ -203,6 +203,9 @@ xt_flowoffload_skip(struct sk_buff *skb, int family)
- 		  return true;
- 	}
- 
-+	if (family == NFPROTO_IPV6)
-+		return true;
-+
- 	return false;
- }
- 
-@@ -528,6 +531,11 @@ flowoffload_tg(struct sk_buff *skb, const struct xt_action_param *par)
+@@ -531,6 +531,14 @@ flowoffload_tg(struct sk_buff *skb, const struct xt_action_param *par)
  	if (xt_flowoffload_skip(skb, xt_family(par)))
  		return XT_CONTINUE;
  
@@ -31,10 +20,13 @@ index e2a7fce..eab348e 100644
 +
 +	if ((xt_in(par)->type == ARPHRD_NONE) || (xt_out(par)->type == ARPHRD_NONE))
 +		return XT_CONTINUE;
++
++	if (!strcmp(xt_in(par)->name,"3g-modem_1_1") || !strcmp(xt_out(par)->name,"3g-modem_1_1"))
++		return XT_CONTINUE;
  
  	ct = nf_ct_get(skb, &ctinfo);
  	if (ct == NULL)
-@@ -599,6 +607,12 @@ flowoffload_tg(struct sk_buff *skb, const struct xt_action_param *par)
+@@ -602,6 +610,12 @@ flowoffload_tg(struct sk_buff *skb, const struct xt_action_param *par)
  	if (flow_offload_add(&nf_flowtable, flow) < 0)
  		goto err_flow_add;
  
