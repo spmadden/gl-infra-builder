@@ -7,9 +7,6 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
-  - luci
-  - luci-base
-  - luci-mod-rpc
   - kmod-usb-storage-uas
   - kmod-usb-storage
   - kmod-usb-uhci
@@ -66,7 +63,6 @@ packages:
 diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
   CONFIG_OUI_HTTPD_OPENSSL=y
-  CONFIG_PACKAGE_uhttpd=n
   CONFIG_BUSYBOX_CUSTOM=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
   CONFIG_PACKAGE_wpad-openssl=y
