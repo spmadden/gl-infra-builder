@@ -1,0 +1,12 @@
+---
+description: enable GDB nad debug information
+
+packages:
+  - gdbserver
+
+diffconfig: |
+  CONFIG_DEBUG=y
+  CONFIG_NO_STRIP=y
+  CONFIG_DEVEL=y
+  CONFIG_TOOLCHAINOPTS=y
+  CONFIG_LIBC_USE_GLIBC=y
