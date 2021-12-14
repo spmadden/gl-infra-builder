@@ -1,0 +1,225 @@
+From faff1dff43622116599393cd348f6d39d374d7ea Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Tue, 14 Dec 2021 17:47:55 +0800
+Subject: [PATCH] add:support for b1300th
+
+---
+ .../ipq40xx/base-files/etc/board.d/02_network |  9 +++++--
+ .../arm/boot/dts/qcom-ipq4018-gl-b1300th.dts  | 22 ++++++++++++++--
+ .../arm/boot/dts/qcom-ipq4029-gl-b1300.dts    | 26 ++++++++++++++++---
+ target/linux/ipq40xx/image/Makefile           |  3 ++-
+ ...410-mtd-support-spinand-MX35LF4GE4AD.patch | 13 ++++++++++
+ ...411-mtd-support-spinand-MX35LF2GE4AD.patch | 13 ++++++++++
+ .../716-essedma-fix-eth-ifname.patch          | 14 ++++++++++
+ 7 files changed, 91 insertions(+), 9 deletions(-)
+ create mode 100644 target/linux/ipq40xx/patches-4.14/410-mtd-support-spinand-MX35LF4GE4AD.patch
+ create mode 100644 target/linux/ipq40xx/patches-4.14/411-mtd-support-spinand-MX35LF2GE4AD.patch
+ create mode 100644 target/linux/ipq40xx/patches-4.14/716-essedma-fix-eth-ifname.patch
+
+diff --git a/target/linux/ipq40xx/base-files/etc/board.d/02_network b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+index bb78f5403c..b1c86e9272 100755
+--- a/target/linux/ipq40xx/base-files/etc/board.d/02_network
++++ b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+@@ -53,9 +53,9 @@ ipq40xx_setup_interfaces()
+ 		;;
+ 	glinet,gl-b1300th |\
+ 	glinet,gl-b1300)
+-		ucidef_set_interfaces_lan_wan "eth0" "eth1"
++		ucidef_set_interfaces_lan_wan "eth1" "eth0"
+ 		ucidef_add_switch "switch0" \
+-			"0u@eth0" "3:lan" "4:lan"
++			"0u@eth1" "3:lan" "4:lan"
+ 		;;
+ 	qxwlan,e2600ac-c1 |\
+ 	qxwlan,e2600ac-c2)
+@@ -87,6 +87,11 @@ ipq40xx_setup_macs()
+ 		wan_mac=$(mtd_get_mac_ascii devinfo hw_mac_addr)
+ 		lan_mac=$(macaddr_add "$wan_mac" 1)
+ 		;;
++    glinet,gl-b1300th |\
++    glinet,gl-b1300)
++        wan_mac=$(mtd_get_mac_binary ART 0)
++        lan_mac=$(macaddr_add "$wan_mac" 1)
++        ;;
+ 	esac
+ 
+ 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
+diff --git a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+index 509bed031e..7f303a1052 100644
+--- a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
++++ b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+@@ -30,6 +30,24 @@
+ 		led-upgrade = &power;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "b1300";
++		wan = "eth0";
++		lan = "eth1";
++		reset-button = "gpio-63";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = <&art 0>;
++			device_ddns = <&art 0x10>;
++			device_sn_bak = <&art 0x20>;
++			device_sn = <&art 0x30>;
++		};
++ 	};
++
+ 	memory {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x10000000>;
+@@ -199,7 +217,7 @@
+ 				reg = <0x000f0000 0x00080000>;
+ 				read-only;
+ 			};
+-			partition5@170000 {
++            art: partition5@170000 {
+ 				label = "ART";
+ 				reg = <0x00170000 0x00010000>;
+ 				read-only;
+@@ -221,7 +239,7 @@
+ 
+ 			partition@0 {
+ 				label = "ubi";
+-				reg = <0x00000000 0x08000000>;
++				reg = <0x00000000 0x10000000>;
+ 			};
+ 		};
+ 	};
+diff --git a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
+index 81a290ec9e..b76e516542 100644
+--- a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
++++ b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
+@@ -30,6 +30,23 @@
+ 		led-upgrade = &power;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "b1300";
++		wan = "eth0";
++		lan = "eth1";
++		reset-button = "gpio-63";
++		factory_data {
++			device_mac = <&art 0>;
++			device_ddns = <&art 0x10>;
++			device_sn_bak = <&art 0x20>;
++			device_sn = <&art 0x30>;
++		};
++ 	};
++
+ 	memory {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x10000000>;
+@@ -86,15 +103,16 @@
+ 			status = "okay";
+ 		};
+ 
++		edma@c080000 {
++			status = "okay";
++		};
++
+ 		ess-switch@c000000 {
+ 			status = "okay";
+ 			switch_lan_bmp = <0x18>;
+ 			switch_wan_bmp = <0x20>;
+ 		};
+ 
+-		edma@c080000 {
+-			status = "okay";
+-		};
+ 	};
+ 
+ 	keys {
+@@ -202,7 +220,7 @@
+ 				read-only;
+ 			};
+ 
+-			ART@170000 {
++            art:ART@170000 {
+ 				label = "ART";
+ 				reg = <0x170000 0x10000>;
+ 				read-only;
+diff --git a/target/linux/ipq40xx/image/Makefile b/target/linux/ipq40xx/image/Makefile
+index 023c71e731..db9f20d5ad 100644
+--- a/target/linux/ipq40xx/image/Makefile
++++ b/target/linux/ipq40xx/image/Makefile
+@@ -219,7 +219,8 @@ define Device/glinet_gl-b1300th
+ 	PAGESIZE := 2048
+ 	DEVICE_TITLE := GL.iNet GL-B1300TH
+ 	DEVICE_DTS_CONFIG := config@ap.dk01.1-c2
+-	IMAGE_SIZE := 131072k
++	KERNEL_SIZE := 4096k
++	IMAGE_SIZE := 26624k
+ endef
+ TARGET_DEVICES += glinet_gl-b1300th
+ 
+diff --git a/target/linux/ipq40xx/patches-4.14/410-mtd-support-spinand-MX35LF4GE4AD.patch b/target/linux/ipq40xx/patches-4.14/410-mtd-support-spinand-MX35LF4GE4AD.patch
+new file mode 100644
+index 0000000000..7c1d42f82a
+--- /dev/null
++++ b/target/linux/ipq40xx/patches-4.14/410-mtd-support-spinand-MX35LF4GE4AD.patch
+@@ -0,0 +1,13 @@
++--- a/drivers/mtd/nand/spinand/mxic.c
+++++ b/drivers/mtd/nand/spinand/mxic.c
++@@ -46,6 +46,10 @@ static const struct mxic_spinand_info mx
++ 			     NAND_MEMORG(1, 2048, 128, 64, 1024, 1, 1, 1),
++ 			     NAND_ECCREQ(8, 512),
++ 			     SPINAND_RW_COMMON),
+++    MXIC_SPI_NAND_INFO("MX35LF4GE4AD",0x37,
+++                 NAND_MEMORG(1, 4096, 128, 64, 2048, 1, 1, 1),
+++                 NAND_ECCREQ(8, 512),
+++			     SPINAND_RW_COMMON),
++ };
++ 
++ static int mxic_spinand_get_dummy(struct spinand_device *spinand,
+diff --git a/target/linux/ipq40xx/patches-4.14/411-mtd-support-spinand-MX35LF2GE4AD.patch b/target/linux/ipq40xx/patches-4.14/411-mtd-support-spinand-MX35LF2GE4AD.patch
+new file mode 100644
+index 0000000000..b459c64826
+--- /dev/null
++++ b/target/linux/ipq40xx/patches-4.14/411-mtd-support-spinand-MX35LF2GE4AD.patch
+@@ -0,0 +1,13 @@
++--- a/drivers/mtd/nand/spinand/mxic.c
+++++ b/drivers/mtd/nand/spinand/mxic.c
++@@ -50,6 +50,10 @@ static const struct mxic_spinand_info mx
++                  NAND_MEMORG(1, 4096, 128, 64, 2048, 1, 1, 1),
++                  NAND_ECCREQ(8, 512),
++ 			     SPINAND_RW_COMMON),
+++    MXIC_SPI_NAND_INFO("MX35LF2GE4AD",0x26,
+++                 NAND_MEMORG(1, 2048, 64, 64, 2048, 1, 1, 1),
+++                 NAND_ECCREQ(8, 512),
+++			     SPINAND_RW_COMMON),
++ };
++ 
++ static int mxic_spinand_get_dummy(struct spinand_device *spinand,
+diff --git a/target/linux/ipq40xx/patches-4.14/716-essedma-fix-eth-ifname.patch b/target/linux/ipq40xx/patches-4.14/716-essedma-fix-eth-ifname.patch
+new file mode 100644
+index 0000000000..1bb5c465fa
+--- /dev/null
++++ b/target/linux/ipq40xx/patches-4.14/716-essedma-fix-eth-ifname.patch
+@@ -0,0 +1,14 @@
++Index: b/drivers/net/ethernet/qualcomm/essedma/edma_axi.c
++===================================================================
++--- a/drivers/net/ethernet/qualcomm/essedma/edma_axi.c	2021-12-01 18:24:07.591030789 +0800
+++++ b/drivers/net/ethernet/qualcomm/essedma/edma_axi.c	2021-12-01 18:24:07.591030789 +0800
++@@ -1003,6 +1003,9 @@ static int edma_axi_probe(struct platfor
++ 			*(edma_netdev[i]->dev_addr + 5));
++ 		}
++ 
+++        memcpy(edma_netdev[0]->name,"eth1",5);
+++        memcpy(edma_netdev[1]->name,"eth0",5);
+++
++ 		err = register_netdev(edma_netdev[i]);
++ 		if (err)
++ 			goto err_register;
+-- 
+2.17.1
+
