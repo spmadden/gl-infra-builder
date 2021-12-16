@@ -14,6 +14,9 @@ diffconfig: |
   CONFIG_PACKAGE_kmod-mt7603=n
   CONFIG_PACKAGE_kmod-mt76x2=n
   CONFIG_PACKAGE_kmod-mt7615e=n
+  CONFIG_PACKAGE_hostapd-common=n
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad-openssl=n
   CONFIG_MTK_FIRST_IF_NONE=n
   CONFIG_MTK_FIRST_IF_MT7615E=y
   CONFIG_MTK_MT_WIFI=y
