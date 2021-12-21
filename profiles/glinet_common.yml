@@ -1,6 +1,4 @@
 ---
-metadata:
-  version: 4.0.0
 description: Add the glinet dependencies
 feeds:
   - name: glinet
