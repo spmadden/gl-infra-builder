@@ -1,5 +1,7 @@
+from os import path
 from pathlib import Path
 from subprocess import run
+from subprocess import call
 import os
 import sys
 import yaml
@@ -68,6 +70,9 @@ def pull_tree():
 
 
 def setup_tree():
+    print("copy build scripts to " +openwrt + "/scripts")
+    call("cp ./scripts/* %s" % (path.join(openwrt,"scripts")), shell=True)
+
     try:
         print("### Applying patches")
 
