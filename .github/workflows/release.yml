@@ -13,8 +13,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+ 
+      - name: build
+        run: |
+          mkdir ./assets
+          echo 123 >  assets/123.txt
+          tar zcf  assets/123.txt.tar.gz assets/123.txt
+          rm  assets/123.txt
+          echo 456 >  assets/456.txt
+          tar zcf  assets/456.txt.tar.gz assets/456.txt
+          rm  assets/456.txt
         
-      - name: Create Release
+      - name: Create Release   
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -34,4 +44,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.create_release.outputs.id }}
-          assets_path: ./profiles
+          assets_path: ./assets
