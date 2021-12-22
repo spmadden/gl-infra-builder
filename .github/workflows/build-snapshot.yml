@@ -27,7 +27,7 @@ jobs:
       - name: build
         run: |
           echo "COMPILE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
-          cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR 
+          cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR snapshot
 
       - uses: actions/upload-artifact@v2
         with:

@@ -17,8 +17,7 @@ jobs:
       - name: build
         run: |
           echo "COMPILE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
-          echo "RELEASE="${{ github.ref }} >> ${GITHUB_ENV}
-          cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR
+          cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR release
 
       - name: Create Release   
         id: create_release
@@ -41,3 +40,8 @@ jobs:
         with:
           release_id: ${{ steps.create_release.outputs.id }}
           assets_path: ./assets
+
+      - name: notify
+        run: |
+          echo "send notify"
+          cd ~/work/runner-script/util && ./send_resease_notify $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR release
