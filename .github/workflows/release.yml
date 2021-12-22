@@ -16,14 +16,10 @@ jobs:
  
       - name: build
         run: |
-          mkdir ./assets
-          echo 123 >  assets/123.txt
-          tar zcf  assets/123.txt.tar.gz assets/123.txt
-          rm  assets/123.txt
-          echo 456 >  assets/456.txt
-          tar zcf  assets/456.txt.tar.gz assets/456.txt
-          rm  assets/456.txt
-        
+          echo "COMPILE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
+          echo "RELEASE="${{ github.ref }} >> ${GITHUB_ENV}
+          cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR
+
       - name: Create Release   
         id: create_release
         uses: actions/create-release@v1
@@ -33,7 +29,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body_path: |
-            ./README.md
+            ./gl_release_note
           draft: false
           prerelease: true
           
