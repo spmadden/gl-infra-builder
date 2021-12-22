@@ -44,4 +44,4 @@ jobs:
       - name: notify
         run: |
           echo "send notify"
-          cd ~/work/runner-script/util && ./send_resease_notify $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR release
+          cd ~/work/runner-script/util && ./send_resease_notify $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF_NAME $GITHUB_RUN_ID $GITHUB_ACTOR release
