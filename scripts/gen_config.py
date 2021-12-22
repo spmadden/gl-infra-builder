@@ -43,8 +43,8 @@ def usage(code: int = 0):
     sys.exit(code)
 
 def load_metadata():
-    with open("gl_metadata.yaml", "r") as stream:
-      try:
+    try:
+      with open("gl_metadata.yaml", "r") as stream:
         metadata=yaml.safe_load(stream)
         version = metadata["version"]
         call("echo %s > %s" % (version, "files/etc/glversion"), shell=True)
@@ -53,8 +53,9 @@ def load_metadata():
         call("echo %s > %s" % (version_type, "files/etc/version.type"), shell=True)
         print("firmware version: " +version)
         print("firmware type: " +version_type)
-      except yaml.YAMLError as exc:
-        print("load gl metadata failed")
+    except:
+      pass
+        #print("load gl metadata failed")
     
 
 def load_yaml(fname: str, profile: dict):
