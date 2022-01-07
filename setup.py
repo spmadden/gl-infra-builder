@@ -42,7 +42,7 @@ def reset_tree():
             ["git", "reset", "--hard", config.get("revision", config["branch"])],
             check=True,
         )
-        run(["rm", "-r", "profiles"], )
+        run(["rm", "-rf", "profiles"], )
         print("### Reset done")
     except:
         print("### Resetting tree failed")
