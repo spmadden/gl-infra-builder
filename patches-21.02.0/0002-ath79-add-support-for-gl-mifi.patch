@@ -282,11 +282,11 @@ index 7d6e7bd4af..863275b712 100644
 +        reset-button = "gpio-11";
 +        usb-port = "1-1.3";
 +        factory_data {
-+            device_mac = <&art 0>;
-+            device_ddns = <&art 0x10>;
-+            device_sn_bak = <&art 0x20>;
-+            device_sn = <&art 0x30>;
-+            country_code = <&art 0x88>;
++            device_mac = "art";
++            device_ddns = "art", "0x10";
++            device_sn_bak = "art", "0x20";
++            device_sn = "art", "0x30";
++            country_code = "art", "0x88";
 +        };
 +    };
 +

@@ -63,10 +63,10 @@ index 509bed031e..7f303a1052 100644
 +		reset-button = "gpio-63";
 +		usb-port = "1-1";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
 +		};
 + 	};
 +
@@ -109,10 +109,10 @@ index 81a290ec9e..b76e516542 100644
 +		lan = "eth1";
 +		reset-button = "gpio-63";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
 +		};
 + 	};
 +

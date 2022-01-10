@@ -46,11 +46,11 @@ index 0000000..72848a5
 +		lan = "eth0";
 +		reset-button = "gpio-11";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +

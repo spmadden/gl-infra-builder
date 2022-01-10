@@ -99,11 +99,11 @@ index 0000000000..728b40dceb
 +		build-in-modem = "1-1";
 +		reset-button = "gpio-3";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +

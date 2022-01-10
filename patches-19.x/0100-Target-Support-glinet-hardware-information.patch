@@ -59,11 +59,11 @@ index 2b15feeb03..42edf5ae89
 +		reset-button = "gpio-11";
 +		usb-port = "1-1";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +
@@ -93,11 +93,11 @@ index b68614afe6..235dbf2f8c
 +		usb-port = "1-1.3";
 +        microsd = "1-1.1";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +
@@ -129,11 +129,11 @@ index 51610fefa3..b80f8961fc
 +		lan = "eth0";
 +		reset-button = "gpio-11";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
  	};
  
@@ -161,11 +161,11 @@ index 3471d34eac..1a4f73af86
 +		reset-button = "gpio-3";
 +		usb-port = "1-1";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
  	keys {
@@ -194,11 +194,11 @@ index 8a7e60823a..9c6b0150cb
 +		usb-port = "1-1.2";
 +        microsd = "1-1.1";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +
@@ -229,11 +229,11 @@ index 8aa0c05082..3468b188f2 100755
 +        mcu;
 +		nand;
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +
@@ -261,11 +261,11 @@ index e3d27835df..1c8dca6d97
 +		build-in-modem = "1-1";
 +		reset-button = "gpio-3";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +
@@ -293,13 +293,13 @@ index 1517c7ce3c..b7ef24fdea
 +		build-in-modem = "1-1.2";
 +		reset-button = "gpio-3";
 +		usb-port = "1-1.3";
-+        microsd = "1-1.1";
++               microsd = "1-1.1";
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +
@@ -327,15 +327,15 @@ index 9c8f7e0a51..e452cab26c
 +		build-in-modem = "1-1.2";
 +		reset-button = "gpio-3";
 +		usb-port = "1-1.3";
-+        microsd = "1-1.1";
-+        mcu;
++               microsd = "1-1.1";
++               mcu;
 +		nand;
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 +	};
 +
@@ -363,14 +363,14 @@ index 2ccfed59ab..d17fd3d300
 +		switch-button = "gpio-8";
 +		reset-button = "gpio-2";
 +		usb-port = "1-1";
-+        microsd = "2-1";
++               microsd = "2-1";
 +		nand;
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
 + 	};
 +
@@ -403,14 +403,14 @@ index a5efbf1957..1f1736fccc
 +		build-in-modem = "1-1.2,2-1.2";
 +		reset-button = "gpio-2";
 +		usb-port = "1-1.4";
-+        microsd = "2-1.1";
++               microsd = "2-1.1";
 +		nand;
 +		factory_data {
-+			device_mac = <&art 0>;
-+			device_ddns = <&art 0x10>;
-+			device_sn_bak = <&art 0x20>;
-+			device_sn = <&art 0x30>;
-+			country_code = <&art 0x88>;
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
 +		};
  	};
  
@@ -438,11 +438,11 @@ index 6a0adc7ba1..edd4c225dc
 +		reset-button = "gpio-50";
 +		usb-port = "1-1.3";
 +		factory_data {
-+			device_mac = <&factory 0x4000>;
-+			device_ddns = <&factory 0x4010>;
-+			device_sn_bak = <&factory 0x4020>;
-+			device_sn = <&factory 0x4030>;
-+			country_code = <&factory 0x4088>;
++			device_mac = "factory", "0x4000";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
 +		};
  	};
  
@@ -467,11 +467,11 @@ index 2cea9d9beb..2cfc2604ea
 +		lan = "eth0.1";
 +		usb;
 +		factory_data {
-+			device_mac = <&factory 0x4>;
-+			device_ddns = <&factory 0x4010>;
-+			device_sn_bak = <&factory 0x4020>;
-+			device_sn = <&factory 0x4030>;
-+			country_code = <&factory 0x4088>;
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
 +		};
 +	};
  
@@ -504,11 +504,11 @@ index 8992664dec..7fb3e1c735
 +		reset-button = "gpio-38";
 +		usb-port = "1-1";
 +		factory_data {
-+			device_mac = <&factory 0x4>;
-+			device_ddns = <&factory 0x4010>;
-+			device_sn_bak = <&factory 0x4020>;
-+			device_sn = <&factory 0x4030>;
-+			country_code = <&factory 0x4088>;
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
 +		};
  	};
  
@@ -532,11 +532,11 @@ index a30792cace..f6e04ae764
 +		lan = "eth0.1";
 +		usb;
 +		factory_data {
-+			device_mac = <&factory 0x4>;
-+			device_ddns = <&factory 0x4010>;
-+			device_sn_bak = <&factory 0x4020>;
-+			device_sn = <&factory 0x4030>;
-+			country_code = <&factory 0x4088>;
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
 +		};
 +	};
 +
@@ -562,11 +562,11 @@ index 74e4b46bfa..600c805705
 +		wan = "eth0.2";
 +		reset-button = "gpio-38";
 +		factory_data {
-+			device_mac = <&factory 0x4>;
-+			device_ddns = <&factory 0x4010>;
-+			device_sn_bak = <&factory 0x4020>;
-+			device_sn = <&factory 0x4030>;
-+			country_code = <&factory 0x4088>;
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
 +		};
 +	};
 +
