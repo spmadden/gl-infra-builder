@@ -33,16 +33,33 @@ def clone_tree():
 def reset_tree():
     try:
         print("### Resetting tree")
-        os.chdir(openwrt)
-        run(
-            ["git", "checkout", config["branch"]],
-            check=True,
-        )
-        run(
-            ["git", "reset", "--hard", config.get("revision", config["branch"])],
-            check=True,
-        )
-        run(["rm", "-rf", "profiles"], )
+
+        if config["qsdk"]:
+            os.chdir(git_clone_dir)
+
+            if not Path("qca-networking-spf").exists():
+                run(["git", "clone", config["qca_spf_repo"], "-b", config["qca_spf_branch"]], check=True)
+                os.chdir("qca-networking-spf")
+                os.system("rm -rf BOOT.AK.1.0 BOOT.BF.3.* IPQ8064.ILQ* IPQ4019.ILQ* IPQ8074.ILQ* RPM.AK.1.0 TZ.AK.1.0 TZ.BF.2.7 TZ.BF.4.0.8 WIGIG.TLN* BOOT.BF.3.3.1.1 TZ.WNS.4.0 IPQ5018.ILQ.11.* BTFW.MAPLE.* WIGIG.TLN.7.5")
+                os.system("cp -rf */* .")
+                os.chdir(git_clone_dir)
+
+            if not Path(".repo").exists():
+                print("Uncompress qsdk repo...")
+                run(["tar", "Jxvf", config["qsdk_repo"]], check=True)
+
+            run(["rm", "-rf", path.join(base_dir, openwrt)], check=True)
+
+            print("sync qsdk repo...")
+            run(["repo", "sync", "-j8", "--no-tags", "-c"], check=True)
+
+            print("Gen qsdk framework...")
+            run([path.join(".", config["gen_script"])], check=True)
+        else:
+            os.chdir(openwrt)
+            run(["git", "checkout", config["branch"]], check=True)
+            run(["git", "reset", "--hard", config.get("revision", config["branch"])], check=True)
+            run(["rm", "-rf", "profiles"], )
         print("### Reset done")
     except:
         print("### Resetting tree failed")
@@ -176,6 +193,14 @@ clone_tree()
 # pull_tree()
 reset_tree()
 setup_tree()
+
+if config["qsdk"]:
+    os.chdir(openwrt)
+    os.system("cp -r ../files-qsdk/* .")
+    os.system("cp -r ../patches-qsdk patches")
+    os.system("quilt import patches/*")
+    os.system("quilt push -a")
+    os.chdir(base_dir)
 
 if git_clone_dir == "openwrt-18.06/siflower":
     remove_feeds()

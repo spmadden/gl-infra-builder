@@ -1,0 +1,30 @@
+---
+profile: gl-ax1800
+target: ipq
+subtarget: ipq60xx_64
+description: Build image for the GL.iNET AX1800
+
+diffconfig: |
+  CONFIG_TARGET_ROOTFS_UBIFS=y
+  CONFIG_COLLECT_KERNEL_DEBUG=y
+  CONFIG_KERNEL_DYNAMIC_DEBUG=y
+  CONFIG_PKG_CC_STACKPROTECTOR_REGULAR=y
+  CONFIG_KERNEL_CC_STACKPROTECTOR_REGULAR=y
+  CONFIG_PKG_FORTIFY_SOURCE_2=y
+  CONFIG_PKG_RELRO_FULL=y
+  CONFIG_DEVEL=y
+  CONFIG_LOCALMIRROR="https://www.codeaurora.org/mirrored_source/quic/qsdk/"
+  CONFIG_GIT_MIRROR="https://source.codeaurora.org/quic/qsdk/"
+  CONFIG_TOOLCHAINOPTS=y
+  CONFIG_GCC_USE_VERSION_5=y
+  CONFIG_LIBC_USE_MUSL=y
+  CONFIG_PACKAGE_kmod-crypto-qce=y
+  CONFIG_PACKAGE_kmod-qca-ovsmgr=n
+  CONFIG_PACKAGE_kmod-qca-psdk=m
+  CONFIG_PACKAGE_kmod-bootconfig=n
+  CONFIG_PACKAGE_kmod-usb-f-qdss=n
+  CONFIG_PACKAGE_uclibcxx=y
+  CONFIG_WIFI_TARGET_WIFI_2_0=n
+  CONFIG_WIFI_LOG_UTILS=y
+  CONFIG_PACKAGE_qca-lowi=n
+  CONFIG_PACKAGE_qca-wifi-cyp-fw-hw1-11.0-asic=y

@@ -1,0 +1,12 @@
+repo: https://gitlab.com/gl.sdk4.0/gl.router/gl-axt1800.git
+branch: master
+git_clone_dir: gl-axt1800
+qsdk_repo: /home/glinet/work/qsdk-11.5-repo.tar.xz
+openwrt_root_dir: gl-axt1800/qsdk
+qca_spf_repo: https://gitlab.com/gl.sdk4.0/gl.router/qca-networking-spf.git
+qca_spf_branch: r11.5_00002.1
+gen_script: gen-qsdk11.5.sh
+qsdk: true
+
+patch_folders:
+  - patches-qsdk11/

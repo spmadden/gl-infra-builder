@@ -165,6 +165,7 @@ def generate_config(profile):
     config_output = f"""CONFIG_TARGET_{profile["target"]}=y
 CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}=y
 CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}_DEVICE_{profile["profile"]}=y
+CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}_{profile["profile"]}=y
 """
 
     config_output += f"{profile.get('diffconfig', '')}"
@@ -223,7 +224,8 @@ if __name__ == "__main__":
         die(f"Error running make defconfig")
 
     if call("grep 'CONFIG_TARGET_PROFILE' .config|grep %s" % (profile['profile']), shell=True) != 0:
-        die(f"Error: Cant not find the profile '%s'! Please check again!" % (profile['profile']))
+        if call("grep 'CONFIG_TARGET_%s_%s_%s' .config" % (profile['target'], profile['subtarget'], profile['profile']), shell=True) != 0:
+            die(f"Error: Cant not find the profile '%s'! Please check again!" % (profile['profile']))
 
     for package in profile['packages']:
         if call("grep 'CONFIG_PACKAGE_%s=y' .config" % (package), shell=True) != 0:
