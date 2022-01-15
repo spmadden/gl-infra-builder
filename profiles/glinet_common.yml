@@ -5,7 +5,6 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
-  - kmod-usb-storage-uas
   - kmod-usb-storage
   - kmod-usb-uhci
   - kmod-usb2
