@@ -42,7 +42,7 @@ def reset_tree():
                 os.chdir("qca-networking-spf")
                 os.system("rm -rf BOOT.AK.1.0 BOOT.BF.3.* IPQ8064.ILQ* IPQ4019.ILQ* IPQ8074.ILQ* RPM.AK.1.0 TZ.AK.1.0 TZ.BF.2.7 TZ.BF.4.0.8 WIGIG.TLN* BOOT.BF.3.3.1.1 TZ.WNS.4.0 IPQ5018.ILQ.11.* BTFW.MAPLE.* WIGIG.TLN.7.5")
                 os.system("cp -rf */* .")
-                os.chdir(git_clone_dir)
+                os.chdir(path.join(base_dir, git_clone_dir))
 
             if not Path(".repo").exists():
                 print("Uncompress qsdk repo...")

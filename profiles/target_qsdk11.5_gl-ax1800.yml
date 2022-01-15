@@ -28,3 +28,5 @@ diffconfig: |
   CONFIG_WIFI_LOG_UTILS=y
   CONFIG_PACKAGE_qca-lowi=n
   CONFIG_PACKAGE_qca-wifi-cyp-fw-hw1-11.0-asic=y
+  CONFIG_PACKAGE_dnsmasq-dhcpv6=n
+  CONFIG_PACKAGE_dnsmasq_full_dnssec=n
