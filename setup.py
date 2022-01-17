@@ -34,7 +34,7 @@ def reset_tree():
     try:
         print("### Resetting tree")
 
-        if config["qsdk"]:
+        if config.get("qsdk"):
             os.chdir(git_clone_dir)
 
             if not Path("qca-networking-spf").exists():
@@ -194,7 +194,7 @@ clone_tree()
 reset_tree()
 setup_tree()
 
-if config["qsdk"]:
+if config.get("qsdk"):
     os.chdir(openwrt)
     os.system("cp -r ../files-qsdk/* .")
     os.system("cp -r ../patches-qsdk patches")
