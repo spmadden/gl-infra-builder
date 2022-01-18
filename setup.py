@@ -194,13 +194,5 @@ clone_tree()
 reset_tree()
 setup_tree()
 
-if config.get("qsdk"):
-    os.chdir(openwrt)
-    os.system("cp -r ../files-qsdk/* .")
-    os.system("cp -r ../patches-qsdk patches")
-    os.system("quilt import patches/*")
-    os.system("quilt push -a")
-    os.chdir(base_dir)
-
 if git_clone_dir == "openwrt-18.06/siflower":
     remove_feeds()
