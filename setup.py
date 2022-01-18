@@ -9,44 +9,55 @@ import getopt
 
 git_am = "am"
 
+def copy_local_file(src,dest):
+    try:
+        call("cp  -r %s %s" % (src,dest), shell=True)
+        return 0
+    except:
+        print("### copy "+src+" to "+ dest +" failed")
+        return 1
 
 def clone_tree():
-    try:
+    #try:
         makefile = openwrt + "/Makefile"
         if Path(makefile).is_file():
             print("### OpenWrt checkout is already present.")
             return 1
 
-        print("### Cloning tree")
+        print("### Cloning or copy tree")
         Path(git_clone_dir).mkdir(exist_ok=True, parents=True)
+
+        if not  config["repo"].startswith("https:") and not  config["repo"].startswith("git@"):
+            print("### copy local tree")
+            return copy_local_file(config["repo"]+"/.",git_clone_dir)
+
         if git_ref != "":
             run(["git", "clone", "--reference", git_ref, config["repo"], git_clone_dir], check=True)
         else:
             run(["git", "clone", "--recursive", config["repo"], git_clone_dir], check=True)
         print("### Clone done")
         return 0
-    except:
+    #except:
         print("### Cloning the tree failed")
         return 1
 
 
-def reset_tree():
-    try:
-        print("### Resetting tree")
+def qsdk_reset_tree():
+        os.chdir(git_clone_dir)
 
-        if config.get("qsdk"):
-            os.chdir(git_clone_dir)
-
-            if not Path("qca-networking-spf").exists():
+        if not Path("qca-networking-spf").exists():
+            if not  config["qca_spf_repo"].startswith("https:") and not  config["qca_spf_repo"].startswith("git@"):
+                copy_local_file(config["qca_spf_repo"]+"/.","qca-networking-spf")
+            else:
                 run(["git", "clone", config["qca_spf_repo"], "-b", config["qca_spf_branch"]], check=True)
-                os.chdir("qca-networking-spf")
-                os.system("rm -rf BOOT.AK.1.0 BOOT.BF.3.* IPQ8064.ILQ* IPQ4019.ILQ* IPQ8074.ILQ* RPM.AK.1.0 TZ.AK.1.0 TZ.BF.2.7 TZ.BF.4.0.8 WIGIG.TLN* BOOT.BF.3.3.1.1 TZ.WNS.4.0 IPQ5018.ILQ.11.* BTFW.MAPLE.* WIGIG.TLN.7.5")
-                os.system("cp -rf */* .")
-                os.chdir(path.join(base_dir, git_clone_dir))
+            os.chdir("qca-networking-spf")
+            os.system("rm -rf BOOT.AK.1.0 BOOT.BF.3.* IPQ8064.ILQ* IPQ4019.ILQ* IPQ8074.ILQ* RPM.AK.1.0 TZ.AK.1.0 TZ.BF.2.7 TZ.BF.4.0.8 WIGIG.TLN* BOOT.BF.3.3.1.1 TZ.WNS.4.0 IPQ5018.ILQ.11.* BTFW.MAPLE.* WIGIG.TLN.7.5")
+            os.system("cp -rf */* .")
+            os.chdir(path.join(base_dir, git_clone_dir))
 
-            if not Path(".repo").exists():
-                print("Uncompress qsdk repo...")
-                run(["tar", "Jxvf", config["qsdk_repo"]], check=True)
+        if not Path(".repo").exists():
+            print("Uncompress qsdk repo...")
+            run(["tar", "Jxvf", config["qsdk_repo"]], check=True)
 
             run(["rm", "-rf", path.join(base_dir, openwrt)], check=True)
 
@@ -55,6 +66,13 @@ def reset_tree():
 
             print("Gen qsdk framework...")
             run([path.join(".", config["gen_script"])], check=True)
+
+def reset_tree():
+    try:
+        print("### Resetting tree")
+
+        if config.get("qsdk"):
+            qsdk_reset_tree()
         else:
             os.chdir(openwrt)
             run(["git", "checkout", config["branch"]], check=True)
