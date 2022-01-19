@@ -4,6 +4,9 @@ target: ipq
 subtarget: ipq60xx_64
 description: Build image for the GL.iNET AXT1800
 
+packages:
+- libunbound-light
+
 diffconfig: |
   CONFIG_TARGET_ROOTFS_UBIFS=y
   CONFIG_COLLECT_KERNEL_DEBUG=y

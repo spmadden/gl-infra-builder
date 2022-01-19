@@ -138,6 +138,8 @@ def setup_feeds(profile):
         warning(f"Error updating feeds")
 
     print("Install all feeds...")
+    #lte_data_oss这个feeds与我们自己的ui包有冲突，先注释掉，后续有问题可以打开
+    call("sed -i 's/^src-link lte_data_oss/#src-link lte_data_oss/' ./feeds.conf.default",shell=True)
     if run(["./scripts/feeds", "install", "-a", "-f"]).returncode:
         die(f"Error installing")
     #for p in profile.get("feeds", []):
