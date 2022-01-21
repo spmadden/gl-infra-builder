@@ -1,0 +1,51 @@
+From 11163887a70eb3a5e5a4ece4bbec1a63d1ea4107 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 20 Jan 2022 17:56:32 +0800
+Subject: [PATCH] bdf: add bdf for gl-axt1800
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ feeds/wifi-ax/ath11k-wifi/Makefile | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/feeds/wifi-ax/ath11k-wifi/Makefile b/feeds/wifi-ax/ath11k-wifi/Makefile
+index b2e0f0e3..55f46672 100644
+--- a/feeds/wifi-ax/ath11k-wifi/Makefile
++++ b/feeds/wifi-ax/ath11k-wifi/Makefile
+@@ -35,7 +35,8 @@ ALLWIFIBOARDS:= \
+ 	wallys-dr6018 \
+ 	wallys-dr6018-v4 \
+ 	tplink-ex227 \
+-	tplink-ex447
++	tplink-ex447 \
++	gl-axt1800
+ 
+ ALLWIFIPACKAGES:=$(foreach BOARD,$(ALLWIFIBOARDS),ath11k-wifi-$(BOARD))
+ 
+@@ -72,6 +73,11 @@ $(call Package/ath11k-wifi-default)
+     TITLE:=cig-wf196 6G bdf
+ endef
+ 
++define Package/ath11k-wifi-gl-axt1800
++$(call Package/ath11k-wifi-default)
++    TITLE:=gl-axt1800 bdf
++endef
++
+ define ath11k-wifi-install-one-to
+   $(INSTALL_DIR)  $(2)/lib/firmware/$(3)/
+   $(INSTALL_DATA) $(1) $(2)/lib/firmware/$(3)/board.bin
+@@ -140,6 +146,11 @@ define Package/ath11k-wifi-cig-wf196_6g/install
+ 	$(INSTALL_DATA) ./board-cig-wf196_6g.bin.QCN9074 $(1)/lib/firmware/ath11k/QCN9074/hw1.0/board.bin
+ endef
+ 
++define Package/ath11k-wifi-gl-axt1800/install
++	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/
++	$(INSTALL_DATA) ./board-gl-axt1800.bin.IPQ6018 $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/board-2.bin
++endef
++
+ $(eval $(call generate-ath11k-wifi-package,cig-wf188,Cigtech WF188))
+ $(eval $(call generate-ath11k-wifi-package,cig-wf188n,Cigtech WF188n))
+ $(eval $(call generate-ath11k-wifi-package,cig-wf194c,Cigtech WF194c))
+-- 
+2.25.1
+

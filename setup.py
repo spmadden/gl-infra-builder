@@ -67,12 +67,21 @@ def qsdk_reset_tree():
             print("Gen qsdk framework...")
             run([path.join(".", config["gen_script"])], check=True)
 
+def wlan_ap_reset_tree():
+    os.chdir(git_clone_dir)
+    run(["rm", "-rf", "openwrt"])
+    run(["git", "checkout", config["branch"]], check=True)
+    run(["git", "reset", "--hard", config.get("revision", config["branch"])], check=True)
+    run(["./setup.py", "--setup"])
+
 def reset_tree():
     try:
         print("### Resetting tree")
 
         if config.get("qsdk"):
             qsdk_reset_tree()
+        elif config.get("wlan_ap"):
+            wlan_ap_reset_tree()
         else:
             os.chdir(openwrt)
             run(["git", "checkout", config["branch"]], check=True)
@@ -109,9 +118,21 @@ def setup_tree():
     call("cp ./scripts/* %s" % (path.join(openwrt,"scripts")), shell=True)
 
     try:
+        print("### Copying files")
+        for folder in config.get("files_folders", []):
+            file_folder = base_dir / folder
+            if not file_folder.is_dir():
+                print(f"File folder {file_folder} not found")
+                sys.exit(-1)
+
+            print(f"Coping files from {file_folder}")
+            call("cp -r %s/* %s" % (base_dir / file_folder, git_clone_dir), shell=True)
+
         print("### Applying patches")
 
         patches = []
+        patches_openwrt = []
+
         for folder in config.get("patch_folders", []):
             patch_folder = base_dir / folder
             if not patch_folder.is_dir():
@@ -120,18 +141,33 @@ def setup_tree():
 
             print(f"Adding patches from {patch_folder}")
 
-            patches.extend(sorted(list((base_dir / folder).glob("*.patch")), key=os.path.basename))
+            if patch_folder / "openwrt":
+                patches_openwrt.extend(sorted(list((base_dir / folder / "openwrt").glob("*.patch")), key=os.path.basename))
+                patches.extend(sorted(list((base_dir / folder).glob("*.patch")), key=os.path.basename))
+            else:
+                patches_openwrt.extend(sorted(list((base_dir / folder).glob("*.patch")), key=os.path.basename))
 
-        print(f"Found {len(patches)} patches")
+        print(f"Found {len(patches) + len(patches_openwrt)} patches")
 
-        os.chdir(openwrt)
+        os.chdir(git_clone_dir)
 
         for patch in patches:
-            run(["git", git_am, "-3", str(base_dir / patch)], check=True)
-        run(
-            ["ln", "-s", profiles, "profiles"],
-            check=True,
-        )
+            run(["git", git_am, "-3", str(patch)], check=True)
+
+        os.chdir(base_dir / openwrt)
+
+        for patch in patches_openwrt:
+            run(["git", git_am, "-3", str(patch)], check=True)
+
+        if not Path("profiles").exists():
+            os.mkdir("profiles")
+
+        os.chdir("profiles")
+
+        for profile in os.listdir(profiles):
+            run(["ln", "-fs", path.join(profiles, profile), profile], check=True)
+
+        os.chdir(base_dir / openwrt)
 
         feeds_dir = str(base_dir) + "/feeds"
 
