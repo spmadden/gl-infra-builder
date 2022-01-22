@@ -1,6 +1,7 @@
-openwrt*
+/openwrt*
 allpkg
 gl-axt1800
 qsdk*
+wlan-ap
 feeds/dl
 feeds/glinet

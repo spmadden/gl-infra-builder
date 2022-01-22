@@ -1,0 +1,27 @@
+From c689638ced025d1356661bff142fddd054494584 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Fri, 21 Jan 2022 18:16:03 +0800
+Subject: [PATCH 4/4] kernel: fix missing symbol
+
+CONFIG_IP6_NF_TARGET_MASQUERADE
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ target/linux/generic/config-4.4 | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/target/linux/generic/config-4.4 b/target/linux/generic/config-4.4
+index 4e7602f236..a7d2bd9bcb 100644
+--- a/target/linux/generic/config-4.4
++++ b/target/linux/generic/config-4.4
+@@ -1643,6 +1643,7 @@ CONFIG_IOSCHED_NOOP=y
+ # CONFIG_IP6_NF_NAT is not set
+ # CONFIG_IP6_NF_RAW is not set
+ # CONFIG_IP6_NF_TARGET_HL is not set
++# CONFIG_IP6_NF_TARGET_MASQUERADE is not set
+ # CONFIG_IP6_NF_TARGET_REJECT is not set
+ # CONFIG_IP6_NF_TARGET_SYNPROXY is not set
+ # CONFIG_IPACK_BUS is not set
+-- 
+2.25.1
+
