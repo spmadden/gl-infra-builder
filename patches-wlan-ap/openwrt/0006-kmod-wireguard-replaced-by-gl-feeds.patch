@@ -1,0 +1,388 @@
+From 0656fe636aa1bbafb60e6651e28675b4f7954299 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Sat, 22 Jan 2022 15:18:43 +0800
+Subject: [PATCH] kmod-wireguard: replaced by gl-feeds
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/linux/modules/netsupport.mk    |  27 ---
+ .../network/utils/wireguard-tools/Makefile    |  65 ------
+ .../utils/wireguard-tools/files/wireguard.sh  | 191 ------------------
+ .../wireguard-tools/files/wireguard_watchdog  |  60 ------
+ 4 files changed, 343 deletions(-)
+ delete mode 100644 package/network/utils/wireguard-tools/Makefile
+ delete mode 100644 package/network/utils/wireguard-tools/files/wireguard.sh
+ delete mode 100644 package/network/utils/wireguard-tools/files/wireguard_watchdog
+
+diff --git a/package/kernel/linux/modules/netsupport.mk b/package/kernel/linux/modules/netsupport.mk
+index 4343e850e9..3a4fcc0376 100644
+--- a/package/kernel/linux/modules/netsupport.mk
++++ b/package/kernel/linux/modules/netsupport.mk
+@@ -1258,30 +1258,3 @@ endef
+ 
+ $(eval $(call KernelPackage,netlink-diag))
+ 
+-
+-define KernelPackage/wireguard
+-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
+-  TITLE:=WireGuard secure network tunnel
+-  DEPENDS:= \
+-	  +kmod-crypto-lib-blake2s \
+-	  +kmod-crypto-lib-chacha20poly1305 \
+-	  +kmod-crypto-lib-curve25519 \
+-	  +kmod-udptunnel4 \
+-	  +IPV6:kmod-udptunnel6
+-  KCONFIG:= \
+-	  CONFIG_WIREGUARD \
+-	  CONFIG_WIREGUARD_DEBUG=n
+-  FILES:=$(LINUX_DIR)/drivers/net/wireguard/wireguard.ko
+-  AUTOLOAD:=$(call AutoProbe,wireguard)
+-endef
+-
+-define KernelPackage/wireguard/description
+-  WireGuard is a novel VPN that runs inside the Linux Kernel and utilizes
+-  state-of-the-art cryptography. It aims to be faster, simpler, leaner, and
+-  more useful than IPSec, while avoiding the massive headache. It intends to
+-  be considerably more performant than OpenVPN.  WireGuard is designed as a
+-  general purpose VPN for running on embedded interfaces and super computers
+-  alike, fit for many different circumstances. It uses UDP.
+-endef
+-
+-$(eval $(call KernelPackage,wireguard))
+diff --git a/package/network/utils/wireguard-tools/Makefile b/package/network/utils/wireguard-tools/Makefile
+deleted file mode 100644
+index 5f8da147c1..0000000000
+--- a/package/network/utils/wireguard-tools/Makefile
++++ /dev/null
+@@ -1,65 +0,0 @@
+-#
+-# Copyright (C) 2016-2019 Jason A. Donenfeld <Jason@zx2c4.com>
+-# Copyright (C) 2016 Baptiste Jonglez <openwrt@bitsofnetworks.org>
+-# Copyright (C) 2016-2017 Dan Luedtke <mail@danrl.com>
+-#
+-# This is free software, licensed under the GNU General Public License v2.
+-# See /LICENSE for more information.
+-
+-include $(TOPDIR)/rules.mk
+-include $(INCLUDE_DIR)/kernel.mk
+-
+-PKG_NAME:=wireguard-tools
+-
+-PKG_VERSION:=1.0.20210223
+-PKG_RELEASE:=2
+-
+-PKG_SOURCE:=wireguard-tools-$(PKG_VERSION).tar.xz
+-PKG_SOURCE_URL:=https://git.zx2c4.com/wireguard-tools/snapshot/
+-PKG_HASH:=1f72da217044622d79e0bab57779e136a3df795e3761a3fc1dc0941a9055877c
+-
+-PKG_LICENSE:=GPL-2.0
+-PKG_LICENSE_FILES:=COPYING
+-
+-PKG_BUILD_PARALLEL:=1
+-
+-include $(INCLUDE_DIR)/package.mk
+-include $(INCLUDE_DIR)/package-defaults.mk
+-
+-MAKE_PATH:=src
+-MAKE_VARS += PLATFORM=linux
+-
+-define Package/wireguard-tools
+-  SECTION:=net
+-  CATEGORY:=Network
+-  SUBMENU:=VPN
+-  URL:=https://www.wireguard.com
+-  MAINTAINER:=Jason A. Donenfeld <Jason@zx2c4.com>
+-  TITLE:=WireGuard userspace control program (wg)
+-  DEPENDS:= \
+-	  +@BUSYBOX_CONFIG_IP \
+-	  +@BUSYBOX_CONFIG_FEATURE_IP_LINK \
+-	  +kmod-wireguard
+-endef
+-
+-define Package/wireguard-tools/description
+-  WireGuard is a novel VPN that runs inside the Linux Kernel and utilizes
+-  state-of-the-art cryptography. It aims to be faster, simpler, leaner, and
+-  more useful than IPSec, while avoiding the massive headache. It intends to
+-  be considerably more performant than OpenVPN.  WireGuard is designed as a
+-  general purpose VPN for running on embedded interfaces and super computers
+-  alike, fit for many different circumstances. It uses UDP.
+-
+-  This package provides the userspace control program for WireGuard,
+-  `wg(8)`, a netifd protocol helper, and a re-resolve watchdog script.
+-endef
+-
+-define Package/wireguard-tools/install
+-	$(INSTALL_DIR) $(1)/usr/bin/
+-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/wg $(1)/usr/bin/
+-	$(INSTALL_BIN) ./files/wireguard_watchdog $(1)/usr/bin/
+-	$(INSTALL_DIR) $(1)/lib/netifd/proto/
+-	$(INSTALL_BIN) ./files/wireguard.sh $(1)/lib/netifd/proto/
+-endef
+-
+-$(eval $(call BuildPackage,wireguard-tools))
+diff --git a/package/network/utils/wireguard-tools/files/wireguard.sh b/package/network/utils/wireguard-tools/files/wireguard.sh
+deleted file mode 100644
+index 63261aea71..0000000000
+--- a/package/network/utils/wireguard-tools/files/wireguard.sh
++++ /dev/null
+@@ -1,191 +0,0 @@
+-#!/bin/sh
+-# Copyright 2016-2017 Dan Luedtke <mail@danrl.com>
+-# Licensed to the public under the Apache License 2.0.
+-
+-WG=/usr/bin/wg
+-if [ ! -x $WG ]; then
+-	logger -t "wireguard" "error: missing wireguard-tools (${WG})"
+-	exit 0
+-fi
+-
+-[ -n "$INCLUDE_ONLY" ] || {
+-	. /lib/functions.sh
+-	. ../netifd-proto.sh
+-	init_proto "$@"
+-}
+-
+-proto_wireguard_init_config() {
+-	proto_config_add_string "private_key"
+-	proto_config_add_int "listen_port"
+-	proto_config_add_int "mtu"
+-	proto_config_add_string "fwmark"
+-	available=1
+-	no_proto_task=1
+-}
+-
+-proto_wireguard_setup_peer() {
+-	local peer_config="$1"
+-
+-	local public_key
+-	local preshared_key
+-	local allowed_ips
+-	local route_allowed_ips
+-	local endpoint_host
+-	local endpoint_port
+-	local persistent_keepalive
+-
+-	config_get public_key "${peer_config}" "public_key"
+-	config_get preshared_key "${peer_config}" "preshared_key"
+-	config_get allowed_ips "${peer_config}" "allowed_ips"
+-	config_get_bool route_allowed_ips "${peer_config}" "route_allowed_ips" 0
+-	config_get endpoint_host "${peer_config}" "endpoint_host"
+-	config_get endpoint_port "${peer_config}" "endpoint_port"
+-	config_get persistent_keepalive "${peer_config}" "persistent_keepalive"
+-
+-	if [ -z "$public_key" ]; then
+-		echo "Skipping peer config $peer_config because public key is not defined."
+-		return 0
+-	fi
+-
+-	echo "[Peer]" >> "${wg_cfg}"
+-	echo "PublicKey=${public_key}" >> "${wg_cfg}"
+-	if [ "${preshared_key}" ]; then
+-		echo "PresharedKey=${preshared_key}" >> "${wg_cfg}"
+-	fi
+-	for allowed_ip in $allowed_ips; do
+-		echo "AllowedIPs=${allowed_ip}" >> "${wg_cfg}"
+-	done
+-	if [ "${endpoint_host}" ]; then
+-		case "${endpoint_host}" in
+-			*:*)
+-				endpoint="[${endpoint_host}]"
+-				;;
+-			*)
+-				endpoint="${endpoint_host}"
+-				;;
+-		esac
+-		if [ "${endpoint_port}" ]; then
+-			endpoint="${endpoint}:${endpoint_port}"
+-		else
+-			endpoint="${endpoint}:51820"
+-		fi
+-		echo "Endpoint=${endpoint}" >> "${wg_cfg}"
+-	fi
+-	if [ "${persistent_keepalive}" ]; then
+-		echo "PersistentKeepalive=${persistent_keepalive}" >> "${wg_cfg}"
+-	fi
+-
+-	if [ ${route_allowed_ips} -ne 0 ]; then
+-		for allowed_ip in ${allowed_ips}; do
+-			case "${allowed_ip}" in
+-				*:*/*)
+-					proto_add_ipv6_route "${allowed_ip%%/*}" "${allowed_ip##*/}"
+-					;;
+-				*.*/*)
+-					proto_add_ipv4_route "${allowed_ip%%/*}" "${allowed_ip##*/}"
+-					;;
+-				*:*)
+-					proto_add_ipv6_route "${allowed_ip%%/*}" "128"
+-					;;
+-				*.*)
+-					proto_add_ipv4_route "${allowed_ip%%/*}" "32"
+-					;;
+-			esac
+-		done
+-	fi
+-}
+-
+-proto_wireguard_setup() {
+-	local config="$1"
+-	local wg_dir="/tmp/wireguard"
+-	local wg_cfg="${wg_dir}/${config}"
+-
+-	local private_key
+-	local listen_port
+-	local mtu
+-
+-	config_load network
+-	config_get private_key "${config}" "private_key"
+-	config_get listen_port "${config}" "listen_port"
+-	config_get addresses "${config}" "addresses"
+-	config_get mtu "${config}" "mtu"
+-	config_get fwmark "${config}" "fwmark"
+-	config_get ip6prefix "${config}" "ip6prefix"
+-	config_get nohostroute "${config}" "nohostroute"
+-	config_get tunlink "${config}" "tunlink"
+-
+-	ip link del dev "${config}" 2>/dev/null
+-	ip link add dev "${config}" type wireguard
+-
+-	if [ "${mtu}" ]; then
+-		ip link set mtu "${mtu}" dev "${config}"
+-	fi
+-
+-	proto_init_update "${config}" 1
+-
+-	umask 077
+-	mkdir -p "${wg_dir}"
+-	echo "[Interface]" > "${wg_cfg}"
+-	echo "PrivateKey=${private_key}" >> "${wg_cfg}"
+-	if [ "${listen_port}" ]; then
+-		echo "ListenPort=${listen_port}" >> "${wg_cfg}"
+-	fi
+-	if [ "${fwmark}" ]; then
+-		echo "FwMark=${fwmark}" >> "${wg_cfg}"
+-	fi
+-	config_foreach proto_wireguard_setup_peer "wireguard_${config}"
+-
+-	# apply configuration file
+-	${WG} setconf ${config} "${wg_cfg}"
+-	WG_RETURN=$?
+-
+-	rm -f "${wg_cfg}"
+-
+-	if [ ${WG_RETURN} -ne 0 ]; then
+-		sleep 5
+-		proto_setup_failed "${config}"
+-		exit 1
+-	fi
+-
+-	for address in ${addresses}; do
+-		case "${address}" in
+-			*:*/*)
+-				proto_add_ipv6_address "${address%%/*}" "${address##*/}"
+-				;;
+-			*.*/*)
+-				proto_add_ipv4_address "${address%%/*}" "${address##*/}"
+-				;;
+-			*:*)
+-				proto_add_ipv6_address "${address%%/*}" "128"
+-				;;
+-			*.*)
+-				proto_add_ipv4_address "${address%%/*}" "32"
+-				;;
+-		esac
+-	done
+-
+-	for prefix in ${ip6prefix}; do
+-		proto_add_ipv6_prefix "$prefix"
+-	done
+-
+-	# endpoint dependency
+-	if [ "${nohostroute}" != "1" ]; then
+-		wg show "${config}" endpoints | \
+-		sed -E 's/\[?([0-9.:a-f]+)\]?:([0-9]+)/\1 \2/' | \
+-		while IFS=$'\t ' read -r key address port; do
+-			[ -n "${port}" ] || continue
+-			proto_add_host_dependency "${config}" "${address}" "${tunlink}"
+-		done
+-	fi
+-
+-	proto_send_update "${config}"
+-}
+-
+-proto_wireguard_teardown() {
+-	local config="$1"
+-	ip link del dev "${config}" >/dev/null 2>&1
+-}
+-
+-[ -n "$INCLUDE_ONLY" ] || {
+-	add_protocol wireguard
+-}
+diff --git a/package/network/utils/wireguard-tools/files/wireguard_watchdog b/package/network/utils/wireguard-tools/files/wireguard_watchdog
+deleted file mode 100644
+index c0a5a0aa33..0000000000
+--- a/package/network/utils/wireguard-tools/files/wireguard_watchdog
++++ /dev/null
+@@ -1,60 +0,0 @@
+-#!/bin/sh
+-# SPDX-License-Identifier: GPL-2.0
+-#
+-# Copyright (C) 2018 Aleksandr V. Piskunov <aleksandr.v.piskunov@gmail.com>.
+-# Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+-#
+-# This watchdog script tries to re-resolve hostnames for inactive WireGuard peers.
+-# Use it for peers with a frequently changing dynamic IP.
+-# persistent_keepalive must be set, recommended value is 25 seconds.
+-#
+-# Run this script from cron every minute:
+-# echo '* * * * * /usr/bin/wireguard_watchdog' >> /etc/crontabs/root
+-
+-
+-. /lib/functions.sh
+-
+-check_peer_activity() {
+-  local cfg=$1
+-  local iface=$2
+-  local public_key
+-  local endpoint_host
+-  local endpoint_port
+-  local persistent_keepalive
+-  local last_handshake
+-  local idle_seconds
+-
+-  config_get public_key "${cfg}" "public_key"
+-  config_get endpoint_host "${cfg}" "endpoint_host"
+-  config_get endpoint_port "${cfg}" "endpoint_port"
+-  persistent_keepalive=$(wg show ${iface} persistent-keepalive | grep ${public_key} | awk '{print $2}')
+-
+-  # only process peers with endpoints and keepalive set
+-  [ -z ${endpoint_host} ] && return 0;
+-  [ -z ${persistent_keepalive} -o ${persistent_keepalive} = "off" ] && return 0;
+-
+-  # skip IP addresses
+-  # check taken from packages/net/ddns-scripts/files/dynamic_dns_functions.sh
+-  local IPV4_REGEX="[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}"
+-  local IPV6_REGEX="\(\([0-9A-Fa-f]\{1,4\}:\)\{1,\}\)\(\([0-9A-Fa-f]\{1,4\}\)\{0,1\}\)\(\(:[0-9A-Fa-f]\{1,4\}\)\{1,\}\)"
+-  local IPV4=$(echo ${endpoint_host} | grep -m 1 -o "$IPV4_REGEX$")    # do not detect ip in 0.0.0.0.example.com
+-  local IPV6=$(echo ${endpoint_host} | grep -m 1 -o "$IPV6_REGEX")
+-  [ -n "${IPV4}" -o -n "${IPV6}" ] && return 0;
+-
+-  # re-resolve endpoint hostname if not responding for too long
+-  last_handshake=$(wg show ${iface} latest-handshakes | grep ${public_key} | awk '{print $2}')
+-  [ -z ${last_handshake} ] && return 0;
+-  idle_seconds=$(($(date +%s)-${last_handshake}))
+-  [ ${idle_seconds} -lt 150 ] && return 0;
+-  logger -t "wireguard_monitor" "${iface} endpoint ${endpoint_host}:${endpoint_port} is not responding for ${idle_seconds} seconds, trying to re-resolve hostname"
+-  wg set ${iface} peer ${public_key} endpoint "${endpoint_host}:${endpoint_port}"
+-}
+-
+-# query ubus for all active wireguard interfaces
+-wg_ifaces=$(ubus -S call network.interface dump | jsonfilter -e '@.interface[@.up=true]' | jsonfilter -a -e '@[@.proto="wireguard"].interface' | tr "\n" " ")
+-
+-# check every peer in every active wireguard interface
+-config_load network
+-for iface in $wg_ifaces; do
+-  config_foreach check_peer_activity "wireguard_${iface}" "${iface}"
+-done
+-- 
+2.25.1
+
