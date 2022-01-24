@@ -33,6 +33,13 @@
 		ethernet0 = "/soc/dp1";
 		ethernet1 = "/soc/dp2";
 		ethernet2 = "/soc/dp3";
+
+		led-boot = &led_run;
+		led-failsafe = &led_run;
+		led-running = &led_run;
+		led-upgrade = &led_run;
+
+		sdhc = &sdhc_1;
 	};
 
 	chosen {
@@ -190,7 +197,7 @@
 	};
 
 	leds_pins: leds_pins {
-		white {
+		led_run: white {
 			pins = "gpio35";
 			function = "gpio";
 			drive-strength = <8>;
@@ -202,14 +209,33 @@
 			drive-strength = <8>;
 			bias-pull-down;
 		};
-	};
-
-	usb_pwr_pins: usb_pwr_pins {
-		mux {
+		usb_pwr {
 			pins = "gpio0";
 			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-down;
+			bias-pull-up;
+		};
+		pwm_pwr {
+			pins = "gpio29";
+			function = "gpio";
+			bias-pull-up;
+		};
+		sd_pwr {
+			pins = "gpio66";
+			function = "gpio";
+			bias-pull-up;
+		};
+	};
+
+	sd_pins: sd_pins {
+		mux_0 {
+			pins = "gpio62";
+			function = "sd_card";
+			bias-pull-up;
+		};
+		mux_1 {
+			pins = "gpio63";
+			function = "sd_write";
+			bias-pull-up;
 		};
 	};
 
@@ -222,12 +248,6 @@
 	};
 
 	fan_pins: fan_pins {
-		pwr {
-			pins = "gpio29";
-			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
 		speed {
 			pins = "gpio31";
 			function = "gpio";
@@ -337,6 +357,12 @@
 			default-state = "on";
 		};
 
+		sd_pwr {
+			label = "sd-pwr";
+			gpios = <&tlmm 66 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+
 		fan_pwr {
 			label = "fan-pwr";
 			gpios = <&tlmm 29 GPIO_ACTIVE_HIGH>;
@@ -409,7 +435,16 @@
 };
 
 &usb3 {
-	pinctrl-0 = <&usb_pwr_pins>;
+	status = "ok";
+};
+
+&sdhc_1 {
+	pinctrl-0 = <&sd_pins>;
+	pinctrl-names = "default";
+	status = "ok";
+};
+
+&sdhc_2 {
 	status = "ok";
 };
 
