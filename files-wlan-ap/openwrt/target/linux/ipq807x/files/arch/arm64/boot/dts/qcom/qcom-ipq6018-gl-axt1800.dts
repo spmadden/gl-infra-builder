@@ -23,12 +23,12 @@
 	aliases {
 		sdhc = &sdhc_1;
 	};
+};
 
-	gl_hw {
-		model = "axt1800";
-		lan = "eth1 eth2";
-		usb-port = "1-1";
-	};
+&gl_hw {
+	model = "axt1800";
+	lan = "eth1 eth2";
+	usb-port = "1-1";
 };
 
 &leds_pins {

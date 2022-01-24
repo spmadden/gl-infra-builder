@@ -1,6 +1,5 @@
-/dts-v1/;
 /*
- * Copyright (c) 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2018-2020, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,11 +16,11 @@
 
 #include "qcom-ipq6018.dtsi"
 #include <dt-bindings/input/input.h>
+
 / {
-	#address-cells = <0x2>;
+    #address-cells = <0x2>;
 	#size-cells = <0x2>;
 	model = "Qualcomm Technologies, Inc. IPQ6018/AP-CP03-C1";
-	compatible = "glinet,axt1800", "qcom,ipq6018-cp03", "qcom,ipq6018";
 	interrupt-parent = <&intc>;
 	qcom,msm-id = <0x1A5 0x0>;
 
@@ -34,16 +33,14 @@
 		led-failsafe = &led_run;
 		led-running = &led_run;
 		led-upgrade = &led_run;
-
-		sdhc = &sdhc_1;
 	};
 
-	chosen {
+    chosen {
 		bootargs = "console=ttyMSM0,115200,n8 rw init=/init";
 		bootargs-append = " swiotlb=1 coherent_pool=2M console=ttyMSM0,115200,n8";
 	};
 
-	gl_hw {
+	gl_hw: gl_hw {
 		compatible = "gl-hw-info";
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -60,36 +57,10 @@
 			country_code = "0:ART", "0x98";
 		};
 	};
-
-	/*
-	 * +=========+==============+========================+
-	 * |        |              |                         |
-	 * | Region | Start Offset |          Size           |
-	 * |        |              |                         |
-	 * +--------+--------------+-------------------------+
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * | Linux  |  0x41000000  |         139MB           |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * +--------+--------------+-------------------------+
-	 * | TZ App |  0x49B00000  |           6MB           |
-	 * +--------+--------------+-------------------------+
-	 *
-	 * From the available 145 MB for Linux in the first 256 MB,
-	 * we are reserving 6 MB for TZAPP.
-	 *
-	 * Refer arch/arm64/boot/dts/qcom/qcom-ipq6018-memory.dtsi
-	 * for memory layout.
-	 */
-
 };
 
 &tlmm {
-	uart_pins: uart_pins {
+    uart_pins: uart_pins {
 		mux {
 			pins = "gpio44", "gpio45";
 			function = "blsp2_uart";
@@ -213,7 +184,7 @@
 };
 
 &soc {
-	mdio0: mdio@90000 {
+    mdio0: mdio@90000 {
 		pinctrl-0 = <&mdio_pins>;
 		pinctrl-names = "default";
 		phy-reset-gpio = <&tlmm 74 0>;
@@ -229,7 +200,7 @@
 		};
 	};
 
-	ess0: ess-switch@3a000000 {
+    ess0: ess-switch@3a000000 {
 		switch_cpu_bmp = <0x1>;  /* cpu port bitmap */
 		switch_lan_bmp = <0x0c>; /* lan port bitmap */
 		switch_wan_bmp = <0x02>; /* wan port bitmap */
@@ -253,7 +224,7 @@
 		};
 	};
 
-	dp1 {
+    dp1 {
 		device_type = "network";
 		compatible = "qcom,nss-dp";
 		qcom,id = <1>;
@@ -289,7 +260,7 @@
 		phy-mode = "sgmii";
 	};
 
-	leds: leds {
+    leds: leds {
 		compatible = "gpio-leds";
 		pinctrl-0 = <&leds_pins>;
 		pinctrl-names = "default";
