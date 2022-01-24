@@ -72,6 +72,8 @@ def wlan_ap_reset_tree():
     run(["rm", "-rf", "openwrt"])
     run(["git", "checkout", config["branch"]], check=True)
     run(["git", "reset", "--hard", config.get("revision", config["branch"])], check=True)
+    run(["rm", "backports/0021-build-create-APK-files-parrallel-to-IPK.patch"], check=True)
+    run(["rm", "backports/0025-apk-backport-package.patch"], check=True)
     run(["./setup.py", "--setup"])
 
 def reset_tree():
@@ -114,8 +116,9 @@ def pull_tree():
 
 
 def setup_tree():
-    print("copy build scripts to " +openwrt + "/scripts")
-    call("cp ./scripts/* %s" % (path.join(openwrt,"scripts")), shell=True)
+    if not config.get("wlan_ap"):
+        print("copy build scripts to " +openwrt + "/scripts")
+        call("cp ./scripts/* %s" % (path.join(openwrt,"scripts")), shell=True)
 
     try:
         print("### Copying files")
