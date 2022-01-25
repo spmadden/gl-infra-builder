@@ -21,7 +21,7 @@
 	compatible = "glinet,axt1800", "qcom,ipq6018-cp03", "qcom,ipq6018";
 
 	aliases {
-		sdhc = &sdhc_1;
+		sdhc0 = &sdhc_2;
 	};
 };
 
@@ -37,11 +37,6 @@
 		function = "gpio";
 		bias-pull-up;
 	};
-	sd_pwr {
-		pins = "gpio66";
-		function = "gpio";
-		bias-pull-up;
-	};
 };
 
 &tlmm {
@@ -52,8 +47,8 @@
 			bias-pull-up;
 		};
 		mux_1 {
-			pins = "gpio63";
-			function = "sd_write";
+			pins = "gpio66";
+			function = "gpio";
 			bias-pull-up;
 		};
 	};
@@ -77,12 +72,6 @@
 };
 
 &leds {
-	sd_pwr {
-		label = "sd-pwr";
-		gpios = <&tlmm 66 GPIO_ACTIVE_HIGH>;
-		default-state = "on";
-	};
-
 	fan_pwr {
 		label = "fan-pwr";
 		gpios = <&tlmm 29 GPIO_ACTIVE_HIGH>;
@@ -110,8 +99,10 @@
 	};
 };
 
-&sdhc_1 {
+&sdhc_2 {
 	pinctrl-0 = <&sd_pins>;
 	pinctrl-names = "default";
+	cd-gpios = <&tlmm 62 1>;
+	sd-ldo-gpios = <&tlmm 66 1>;
 	status = "ok";
 };
