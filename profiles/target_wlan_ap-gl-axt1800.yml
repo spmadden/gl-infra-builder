@@ -18,3 +18,4 @@ feeds:
 
 packages:
   - wireless-regdb
+  - gl-sdk4-fan
