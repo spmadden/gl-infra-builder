@@ -72,7 +72,7 @@ index 7f3ccf23d3..61b99a2157 100644
 +  DEVICE_DTS := qcom-ipq6018-gl-ax1800
 +  SUPPORTED_DEVICES := glinet,ax1800
 +  DEVICE_DTS_CONFIG := config@cp03-c1
-+  DEVICE_PACKAGES := ath11k-wifi-gl-axt1800 -kmod-usb-dwc3-of-simple kmod-usb-dwc3-qcom kmod-usb3
++  DEVICE_PACKAGES := ath11k-wifi-gl-axt1800 -kmod-usb-dwc3-of-simple kmod-usb-dwc3-qcom kmod-usb3 kmod-qca-nss-drv-pppoe
 +endef
 +TARGET_DEVICES += glinet_ax1800
 +
