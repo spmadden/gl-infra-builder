@@ -23,19 +23,19 @@
 	aliases {
 		sdhc0 = &sdhc_2;
 	};
+
+	gl_fan {
+		compatible = "gl-fan";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		fan_speed_gpio = <31>;
+	};
 };
 
 &gl_hw {
 	model = "axt1800";
 	lan = "eth1 eth2";
 	usb-port = "1-1";
-};
-
-&gl_fan {
-	compatible = "gl-fan";
-	#address-cells = <1>;
-	#size-cells = <0>;
-	fan_speed_gpio = <31>;
 };
 
 
