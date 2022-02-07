@@ -1,0 +1,26 @@
+From cec8c0b4406586f901d81a0821ba1e2c58b849ff Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 7 Feb 2022 14:13:06 +0800
+Subject: [PATCH] gpio-button-hotplug: notify with label
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+index 9575c6245b..db50ddf198 100644
+--- a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
++++ b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+@@ -286,7 +286,7 @@ static void gpio_keys_handle_button(struct gpio_keys_button_data *bdata)
+ 	if (bdata->seen == 0)
+ 		bdata->seen = seen;
+ 
+-	button_hotplug_create_event(button_map[bdata->map_entry].name, type,
++	button_hotplug_create_event(bdata->b->desc ? bdata->b->desc : button_map[bdata->map_entry].name, type,
+ 				    (seen - bdata->seen) / HZ, state);
+ 	bdata->seen = seen;
+ 
+-- 
+2.25.1
+
