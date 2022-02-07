@@ -128,7 +128,7 @@
 	};
 
 	button_pins: button_pins {
-		wps_button {
+		switch_button {
 			pins = "gpio9";
 			function = "gpio";
 			drive-strength = <8>;
@@ -289,8 +289,8 @@
 		pinctrl-0 = <&button_pins>;
 		pinctrl-names = "default";
 
-		wps {
-			label = "wps";
+		switch {
+			label = "switch";
 			linux,code = <KEY_WPS_BUTTON>;
 			gpios = <&tlmm 9 GPIO_ACTIVE_LOW>;
 			linux,input-type = <1>;
