@@ -18,3 +18,9 @@ feeds:
 
 packages:
   - wireless-regdb
+  - wpad-openssl
+
+diffconfig: |
+  CONFIG_PACKAGE_dnsmasq=n
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad=n
