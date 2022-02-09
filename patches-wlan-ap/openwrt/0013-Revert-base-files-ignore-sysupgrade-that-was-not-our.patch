@@ -1,0 +1,27 @@
+From 0db2a8654d3392fc1209b3212866515ec2f29a02 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 9 Feb 2022 18:22:37 +0800
+Subject: [PATCH] Revert "base-files: ignore sysupgrade that was not ours"
+
+This reverts commit 6234f49137870506fd764ab5e9c5725c8e2eacb5.
+---
+ package/base-files/files/lib/preinit/80_mount_root | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/package/base-files/files/lib/preinit/80_mount_root b/package/base-files/files/lib/preinit/80_mount_root
+index 7cf16e68e0..3f75411a43 100644
+--- a/package/base-files/files/lib/preinit/80_mount_root
++++ b/package/base-files/files/lib/preinit/80_mount_root
+@@ -17,8 +17,7 @@ missing_lines() {
+ do_mount_root() {
+ 	mount_root
+ 	boot_run_hook preinit_mount_root
+-	(tar tf /sysupgrade.tgz | grep ucentral) 2> /dev/null
+-	[ $? -eq 0 ] && {
++	[ -f /sysupgrade.tgz ] && {
+ 		echo "- config restore -"
+ 		cp /etc/passwd /etc/group /etc/shadow /tmp
+ 		cd /
+-- 
+2.25.1
+
