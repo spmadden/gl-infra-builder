@@ -1,0 +1,9 @@
+---
+description: Add the LUCI dependencies
+
+packages:
+  - luci
+  - luci-base
+  - luci-mod-rpc
+
+diffconfig: |
