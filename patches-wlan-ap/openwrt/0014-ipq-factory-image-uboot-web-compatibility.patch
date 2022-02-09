@@ -1,0 +1,26 @@
+From 15429c752e2e68cc633936a2f08dc8881fcae991 Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Wed, 9 Feb 2022 20:50:24 +0800
+Subject: [PATCH] ipq: factory image uboot web compatibility
+
+Signed-off-by: Dongming Han <handongming@gl-inet.com>
+---
+ scripts/mkits-qsdk-ipq-image.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/mkits-qsdk-ipq-image.sh b/scripts/mkits-qsdk-ipq-image.sh
+index 87890cc43c..959200d0ae 100755
+--- a/scripts/mkits-qsdk-ipq-image.sh
++++ b/scripts/mkits-qsdk-ipq-image.sh
+@@ -30,7 +30,7 @@ echo "\
+ /dts-v1/;
+ 
+ / {
+-	description = \"OpenWrt factory image\";
++	description = \"Flashing factory image\";
+ 	#address-cells = <1>;
+ 
+ 	images {" > ${OUTPUT}
+-- 
+2.17.1
+
