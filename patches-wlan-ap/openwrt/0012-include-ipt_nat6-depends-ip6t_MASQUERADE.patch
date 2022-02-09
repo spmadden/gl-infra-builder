@@ -1,0 +1,24 @@
+From 1eeb537d7140593ebdb3046338d596a9a87eea80 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Wed, 9 Feb 2022 14:27:13 +0800
+Subject: [PATCH] include: ipt_nat6 depends ip6t_MASQUERADE
+
+---
+ include/netfilter.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/netfilter.mk b/include/netfilter.mk
+index 9a3cdbb..6207d9a 100644
+--- a/include/netfilter.mk
++++ b/include/netfilter.mk
+@@ -191,6 +191,7 @@ $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT_MASQUERADE_IPV4, $(P_V
+ $(eval $(if $(NF_KMOD),$(call nf_add,IPT_NAT,CONFIG_NETFILTER_XT_NAT, $(P_XT)xt_nat),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,IPT_NAT,CONFIG_IP_NF_NAT, $(P_V4)iptable_nat),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,IPT_NAT6,CONFIG_IP6_NF_NAT, $(P_V6)ip6table_nat),))
++$(eval $(if $(NF_KMOD),$(call nf_add,IPT_NAT6,CONFIG_IP6_NF_TARGET_MASQUERADE, $(P_V6)ip6t_MASQUERADE),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,IPT_NAT6,CONFIG_IP6_NF_TARGET_NPT, $(P_V6)ip6t_NPT),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT6,CONFIG_NF_NAT_MASQUERADE_IPV6, $(P_V6)nf_nat_masquerade_ipv6, lt 4.18),))
+ 
+-- 
+2.7.4
+
