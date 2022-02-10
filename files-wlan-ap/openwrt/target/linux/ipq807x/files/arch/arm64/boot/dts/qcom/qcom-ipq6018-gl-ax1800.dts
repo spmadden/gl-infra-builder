@@ -18,6 +18,7 @@
 #include "qcom-ipq6018-gl-ax1800.dtsi"
 
 / {
+	model = "GL Technologies, Inc. AX1800";
 	compatible = "glinet,ax1800", "qcom,ipq6018-cp03", "qcom,ipq6018";
 
 	aliases {

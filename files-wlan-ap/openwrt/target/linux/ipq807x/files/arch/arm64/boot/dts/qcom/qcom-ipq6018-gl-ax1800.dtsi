@@ -18,9 +18,8 @@
 #include <dt-bindings/input/input.h>
 
 / {
-    #address-cells = <0x2>;
+	#address-cells = <0x2>;
 	#size-cells = <0x2>;
-	model = "Qualcomm Technologies, Inc. IPQ6018/AP-CP03-C1";
 	interrupt-parent = <&intc>;
 	qcom,msm-id = <0x1A5 0x0>;
 
@@ -35,9 +34,9 @@
 		led-upgrade = &led_run;
 	};
 
-    chosen {
+	chosen {
 		bootargs = "console=ttyMSM0,115200,n8 rw init=/init";
-		bootargs-append = " swiotlb=1 coherent_pool=2M console=ttyMSM0,115200,n8";
+		bootargs-append = " swiotlb=1 coherent_pool=2M";
 	};
 
 	gl_hw: gl_hw {
@@ -60,7 +59,7 @@
 };
 
 &tlmm {
-    uart_pins: uart_pins {
+	uart_pins: uart_pins {
 		mux {
 			pins = "gpio44", "gpio45";
 			function = "blsp2_uart";
@@ -120,7 +119,7 @@
 		};
 		qpic_pad {
 			pins = "gpio1", "gpio3", "gpio4",
-			       "gpio10", "gpio11", "gpio17";
+				   "gpio10", "gpio11", "gpio17";
 			function = "qpic_pad";
 			drive-strength = <8>;
 			bias-pull-down;
@@ -163,7 +162,7 @@
 	};
 
 	leds_pins: leds_pins {
-		led_run: white {
+		white {
 			pins = "gpio35";
 			function = "gpio";
 			drive-strength = <8>;
@@ -184,10 +183,10 @@
 };
 
 &soc {
-    mdio0: mdio@90000 {
+	mdio0: mdio@90000 {
 		pinctrl-0 = <&mdio_pins>;
 		pinctrl-names = "default";
-		phy-reset-gpio = <&tlmm 74 0>;
+		phy-reset-gpio = <&tlmm 74 GPIO_ACTIVE_HIGH>;
 		status = "ok";
 		phy0: ethernet-phy@0 {
 			reg = <0>;
@@ -200,7 +199,7 @@
 		};
 	};
 
-    ess0: ess-switch@3a000000 {
+	ess0: ess-switch@3a000000 {
 		switch_cpu_bmp = <0x1>;  /* cpu port bitmap */
 		switch_lan_bmp = <0x0c>; /* lan port bitmap */
 		switch_wan_bmp = <0x02>; /* wan port bitmap */
@@ -224,7 +223,7 @@
 		};
 	};
 
-    dp1 {
+	dp1 {
 		device_type = "network";
 		compatible = "qcom,nss-dp";
 		qcom,id = <1>;
@@ -260,12 +259,12 @@
 		phy-mode = "sgmii";
 	};
 
-    leds: leds {
+	leds: leds {
 		compatible = "gpio-leds";
 		pinctrl-0 = <&leds_pins>;
 		pinctrl-names = "default";
 
-		white {
+		led_run: white {
 			label = "white_led";
 			gpios = <&tlmm 35 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
@@ -380,8 +379,4 @@
 		1200000  1100000
 	>;
 	clock-latency = <200000>;
-};
-
-&nss0 {
-	//qcom,max-frequency = <1689600000>;
 };
