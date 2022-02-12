@@ -1,0 +1,67 @@
+From 3f74fb618703eca0ec38eb406275f07ac7d1786d Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Sat, 12 Feb 2022 14:10:41 +0800
+Subject: [PATCH] target: use gl metadata
+
+---
+ include/image-commands.mk             | 30 ++++++++++++++++++++++++++++++
+ target/linux/ipq807x/image/ipq60xx.mk |  2 +-
+ 2 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/include/image-commands.mk b/include/image-commands.mk
+index aa574d2..b29b868 100644
+--- a/include/image-commands.mk
++++ b/include/image-commands.mk
+@@ -64,6 +64,36 @@ define Build/append-metadata
+ 	}
+ endef
+ 
++metadata_gl_json = \
++	'{ $(if $(IMAGE_METADATA),$(IMAGE_METADATA)$(comma)) \
++		"metadata_version": "1.1", \
++		"compat_version": "$(call json_quote,$(compat_version))", \
++		$(if $(DEVICE_COMPAT_MESSAGE),"compat_message": "$(call json_quote,$(DEVICE_COMPAT_MESSAGE))"$(comma)) \
++		$(if $(filter-out 1.0,$(compat_version)),"new_supported_devices": \
++			[$(call metadata_devices,$(SUPPORTED_DEVICES))]$(comma) \
++			"supported_devices": ["$(call json_quote,$(legacy_supported_message))"]$(comma)) \
++		$(if $(filter 1.0,$(compat_version)),"supported_devices":[$(call metadata_devices,$(SUPPORTED_DEVICES))]$(comma)) \
++		"version": { \
++			"release": "$(shell cat $(TOPDIR)/release)", \
++			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
++			"dist": "$(call json_quote,$(VERSION_DIST))", \
++			"version": "$(call json_quote,$(VERSION_NUMBER))", \
++			"revision": "$(call json_quote,$(REVISION))", \
++			"target": "$(call json_quote,$(TARGETID))", \
++			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
++		}, \
++		"upgrade_control":"$(shell python3 $(TOPDIR)/make_gl_metadata.py)", \
++		"release_note":"$(shell sed ':a;N;s/\n/\\n/g;s/\r/\\r/g;ta' $(TOPDIR)/gl_release_note)" \
++	}'
++
++define Build/append-gl-metadata
++	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
++	[ ! -s "$(BUILD_KEY)" -o ! -s "$@" ] || { \
++		usign -S -m "$@" -s "$(BUILD_KEY)" -x "$@.sig" ;\
++		fwtool -S "$@.sig" "$@" ;\
++	}
++endef
++
+ define Build/append-rootfs
+ 	dd if=$(IMAGE_ROOTFS) >> $@
+ endef
+diff --git a/target/linux/ipq807x/image/ipq60xx.mk b/target/linux/ipq807x/image/ipq60xx.mk
+index d95e393..5367b95 100644
+--- a/target/linux/ipq807x/image/ipq60xx.mk
++++ b/target/linux/ipq807x/image/ipq60xx.mk
+@@ -6,7 +6,7 @@ define Device/cig_wf188
+   DEVICE_DTS_CONFIG := config@cp03-c1
+   SUPPORTED_DEVICES := cig,wf188
+   IMAGES := sysupgrade.tar
+-  IMAGE/sysupgrade.tar/squashfs := append-rootfs | pad-rootfs | sysupgrade-tar rootfs=$$$$@ | append-metadata
++  IMAGE/sysupgrade.tar/squashfs := append-rootfs | pad-rootfs | sysupgrade-tar rootfs=$$$$@ | append-gl-metadata
+   DEVICE_PACKAGES := ath11k-wifi-cig-wf188 uboot-env
+ endef
+ TARGET_DEVICES += cig_wf188
+-- 
+2.7.4
+
