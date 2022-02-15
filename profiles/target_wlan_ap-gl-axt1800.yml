@@ -18,5 +18,5 @@ feeds:
 
 packages:
   - wireless-regdb
-  - gl-sdk4-fan
+  - kmod-gl-sdk4-fan
   - kmod-hwmon-pwmfan
