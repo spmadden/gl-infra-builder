@@ -1,0 +1,61 @@
+From 2cc8787c704a278a6e454dca91c572e7249b757e Mon Sep 17 00:00:00 2001
+From: gl-luochongjun <luochongjun@gl-inet.com>
+Date: Thu, 17 Feb 2022 19:25:49 +0800
+Subject: [PATCH] scripts gen_config add version info
+
+---
+ scripts/gen_config.py | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/scripts/gen_config.py b/scripts/gen_config.py
+index 071e00bb4d..b45e0399df 100755
+--- a/scripts/gen_config.py
++++ b/scripts/gen_config.py
+@@ -4,6 +4,8 @@ from os import getenv
+ from pathlib import Path
+ from shutil import rmtree, which
+ from subprocess import run
++from subprocess import call
++import time
+ import sys
+ import yaml
+ 
+@@ -61,6 +63,27 @@ def process_host_dependency(dependecy: dict, profile: dict):
+         else:
+             die("Can't continue without dependency and no `fallback_diffconfig` set")
+ 
++def load_metadata():
++    try:
++      with open("gl_metadata.yaml", "r") as stream:
++        metadata=yaml.safe_load(stream)
++        version = metadata["version"]
++        call("echo %s > %s" % (version, "files/etc/glversion"), shell=True)
++        call("echo %s > %s" % (version, "release"), shell=True)
++        version_type = metadata["type"]
++        call("echo %s > %s" % (version_type, "files/etc/version.type"), shell=True)
++        print("firmware version: " +version)
++        print("firmware type: " +version_type)
++    except:
++      pass
++
++def generate_files(profile):
++    if run(["mkdir", "-p", "files/etc"]).returncode:
++        die(f"Error create files")
++
++    compile_time = time.strftime('%Y-%m-%d %k:%M:%S', time.localtime(time.time()))
++    call("echo %s > %s" % (compile_time, "files/etc/version.date"), shell=True)
++    load_metadata()
+ 
+ def load_yaml(fname: str, profile: dict, include=True):
+     profile_file = (profile_folder / fname).with_suffix(".yml")
+@@ -221,6 +244,7 @@ if __name__ == "__main__":
+     clean_tree()
+     setup_feeds(profile)
+     generate_config(profile)
++    generate_files(profile)
+     if profile["image"]:
+         Path("tmp/image-file").write_text(profile["image"])
+     print("Running make defconfig")
+-- 
+2.25.1
+
