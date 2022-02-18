@@ -14,9 +14,9 @@ packages:
   - dnsmasq-full
   - mwan3
   - iwinfo
-  - rtty-openssl
   - oui-httpd
   - gl-sdk4-luci
+  - gl-sdk4-rtty
   - gl-sdk4-cable
   - gl-sdk4-clients
   - gl-sdk4-modem
