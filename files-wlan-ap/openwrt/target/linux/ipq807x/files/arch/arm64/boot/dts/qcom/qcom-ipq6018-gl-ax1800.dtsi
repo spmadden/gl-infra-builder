@@ -28,10 +28,10 @@
 		ethernet1 = "/soc/dp2";
 		ethernet2 = "/soc/dp3";
 
-		led-boot = &led_run;
-		led-failsafe = &led_run;
-		led-running = &led_run;
-		led-upgrade = &led_run;
+		//led-boot = &led_run;
+		//led-failsafe = &led_run;
+		//led-running = &led_run;
+		//led-upgrade = &led_run;
 	};
 
 	chosen {
