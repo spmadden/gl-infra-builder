@@ -174,10 +174,14 @@
 			drive-strength = <8>;
 			bias-pull-down;
 		};
+	};
+
+	usb_pins: usb_pins {
 		usb_pwr {
 			pins = "gpio0";
 			function = "gpio";
 			bias-pull-up;
+			output-high;
 		};
 	};
 };
@@ -275,12 +279,6 @@
 			gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 		};
-
-		usb_pwr {
-			label = "usb-pwr";
-			gpios = <&tlmm 0 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
-		};
 	};
 
 	gpio_keys {
@@ -330,6 +328,8 @@
 };
 
 &usb3 {
+	pinctrl-0 = <&usb_pins>;
+	pinctrl-names = "default";
 	status = "ok";
 };
 
