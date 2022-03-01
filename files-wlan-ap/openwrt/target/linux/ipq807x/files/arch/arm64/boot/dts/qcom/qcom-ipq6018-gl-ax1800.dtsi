@@ -263,7 +263,7 @@
 		phy-mode = "sgmii";
 	};
 
-	leds: leds {
+	leds {
 		compatible = "gpio-leds";
 		pinctrl-0 = <&leds_pins>;
 		pinctrl-names = "default";

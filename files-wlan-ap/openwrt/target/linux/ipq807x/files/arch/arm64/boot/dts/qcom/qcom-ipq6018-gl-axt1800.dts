@@ -39,15 +39,6 @@
 	usb-port = "1-1";
 };
 
-
-&leds_pins {
-	pwm_pwr {
-		pins = "gpio29";
-		function = "gpio";
-		bias-pull-up;
-	};
-};
-
 &tlmm {
 	sd_pins: sd_pins {
 		mux_0 {
@@ -71,20 +62,18 @@
 	};
 
 	fan_pins: fan_pins {
+		pwr {
+			pins = "gpio29";
+			function = "gpio";
+			bias-pull-up;
+			output-high;
+		};
 		speed {
 			pins = "gpio31";
 			function = "gpio";
 			drive-strength = <8>;
 			bias-pull-down;
 		};
-	};
-};
-
-&leds {
-	fan_pwr {
-		label = "fan-pwr";
-		gpios = <&tlmm 29 GPIO_ACTIVE_HIGH>;
-		default-state = "on";
 	};
 };
 
