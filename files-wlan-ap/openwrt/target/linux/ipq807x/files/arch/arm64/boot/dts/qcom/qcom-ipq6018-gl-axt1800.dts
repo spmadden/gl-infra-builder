@@ -89,6 +89,7 @@
 	fan0: pwm-fan {
 		compatible = "pwm-fan";
 		pinctrl-0 = <&fan_pins>;
+		pinctrl-names = "default";
 		cooling-min-state = <0>;
 		cooling-max-state = <255>;
 		#cooling-cells = <2>;
