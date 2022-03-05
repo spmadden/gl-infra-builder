@@ -1,0 +1,15 @@
+Index: netifd-2021-10-20-c61a1d43/scripts/netifd-wireless.sh
+===================================================================
+--- netifd-2021-10-20-c61a1d43.orig/scripts/netifd-wireless.sh
++++ netifd-2021-10-20-c61a1d43/scripts/netifd-wireless.sh
+@@ -69,8 +69,8 @@ _wdev_prepare_channel() {
+ 	esac
+ 
+ 	case "$band" in
+-		2g) hwmode=g;;
+-		5g|6g|60g) hwmode=a;;
++		2g);;
++		5g|6g|60g);;
+ 		*)
+ 			case "$hwmode" in
+ 				*a) band=5g;;
