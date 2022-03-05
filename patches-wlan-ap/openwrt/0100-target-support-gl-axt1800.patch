@@ -1,18 +1,18 @@
-From f2553bc41901acc9e4038de34a8c2f0436ed8e34 Mon Sep 17 00:00:00 2001
+From f05fbc295d299e2e32cb568f55438b7d92c0dcf5 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 20 Jan 2022 17:53:37 +0800
 Subject: [PATCH] target: support gl-axt1800
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../ipq807x/base-files/etc/board.d/02_network     |  3 ++-
- .../etc/hotplug.d/firmware/10-ath11k-caldata      | 15 ++++++++++++++-
- .../ipq807x/base-files/lib/upgrade/platform.sh    |  2 ++
- target/linux/ipq807x/image/ipq60xx.mk             | 10 ++++++++++
- 4 files changed, 28 insertions(+), 2 deletions(-)
+ .../ipq807x/base-files/etc/board.d/02_network   |  3 ++-
+ .../etc/hotplug.d/firmware/10-ath11k-caldata    | 17 ++++++++++++++++-
+ .../ipq807x/base-files/lib/upgrade/platform.sh  |  2 ++
+ target/linux/ipq807x/image/ipq60xx.mk           | 10 ++++++++++
+ 4 files changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/target/linux/ipq807x/base-files/etc/board.d/02_network b/target/linux/ipq807x/base-files/etc/board.d/02_network
-index e9d5ca941f..f23392f0ab 100755
+index 7afc7de2e9..5ef107a2cb 100755
 --- a/target/linux/ipq807x/base-files/etc/board.d/02_network
 +++ b/target/linux/ipq807x/base-files/etc/board.d/02_network
 @@ -36,7 +36,8 @@ qcom_setup_interfaces()
@@ -26,26 +26,28 @@ index e9d5ca941f..f23392f0ab 100755
  		ucidef_set_interface_wan "eth0"
  		;;
 diff --git a/target/linux/ipq807x/base-files/etc/hotplug.d/firmware/10-ath11k-caldata b/target/linux/ipq807x/base-files/etc/hotplug.d/firmware/10-ath11k-caldata
-index c8b4341aa1..e3633b2b58 100755
+index c8b4341aa1..7c1b216291 100755
 --- a/target/linux/ipq807x/base-files/etc/hotplug.d/firmware/10-ath11k-caldata
 +++ b/target/linux/ipq807x/base-files/etc/hotplug.d/firmware/10-ath11k-caldata
-@@ -28,6 +28,15 @@ ath11k_generate_macs_wf194() {
+@@ -28,6 +28,17 @@ ath11k_generate_macs_wf194() {
  	echo -ne \\x${mac3//:/\\x} >> /lib/firmware/ath11k-macs
  }
  
 +ath11k_generate_macs_gl_axt1800() {
-+        touch /lib/firmware/ath11k-macs
-+        eth=$(cat /proc/gl-hw-info/device_mac)
-+        mac1=$(macaddr_add $eth 2)
-+        mac2=$(macaddr_add $eth 3)
-+        echo -ne \\x${mac2//:/\\x} >> /lib/firmware/ath11k-macs
-+        echo -ne \\x${mac1//:/\\x} >> /lib/firmware/ath11k-macs
++	mac=$(cat /proc/gl-hw-info/device_mac)
++	[ -z "$mac" ] && ath11k_generate_macs || {
++		touch /lib/firmware/ath11k-macs
++		mac1=$(macaddr_add $mac 2)
++		mac2=$(macaddr_add $mac 3)
++		echo -ne \\x${mac2//:/\\x} >> /lib/firmware/ath11k-macs
++		echo -ne \\x${mac1//:/\\x} >> /lib/firmware/ath11k-macs
++	}
 +}
 +
  caldata_die() {
          echo "caldata: " "$*"
          exit 1
-@@ -74,7 +83,8 @@ case "$FIRMWARE" in
+@@ -74,7 +85,8 @@ case "$FIRMWARE" in
  	wallys,dr6018|\
  	wallys,dr6018-v4|\
  	qcom,ipq6018-cp01|\
@@ -55,7 +57,7 @@ index c8b4341aa1..e3633b2b58 100755
                  caldata_extract "0:ART" 0x1000 0x20000  
  		;;
  	esac
-@@ -106,6 +116,9 @@ ath11k-macs)
+@@ -106,6 +118,9 @@ ath11k-macs)
  	cig,wf194c)
  		ath11k_generate_macs_wf194
  		;;
@@ -86,7 +88,7 @@ index 1cd40b29f5..b0191a6bfe 100755
  	hfcl,ion4xe|\
  	qcom,ipq6018-cp01|\
 diff --git a/target/linux/ipq807x/image/ipq60xx.mk b/target/linux/ipq807x/image/ipq60xx.mk
-index 4c779435f5..7f3ccf23d3 100644
+index ed13cf02f0..96bc5f5ec1 100644
 --- a/target/linux/ipq807x/image/ipq60xx.mk
 +++ b/target/linux/ipq807x/image/ipq60xx.mk
 @@ -81,3 +81,13 @@ define Device/xiaomi_ax1800
