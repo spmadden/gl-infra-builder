@@ -1,0 +1,5 @@
+---
+profile: glinet_gl-x300b-nor
+target: ath79
+subtarget: nand
+description: Build image for the GL.iNET X300B

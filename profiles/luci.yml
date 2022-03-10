@@ -7,3 +7,4 @@ packages:
   - luci-mod-rpc
 
 diffconfig: |
+  CONFIG_LUCI_LANG_zh_Hans=y
