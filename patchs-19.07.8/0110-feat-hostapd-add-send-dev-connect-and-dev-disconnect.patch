@@ -1,0 +1,88 @@
+From 6f5a458dcacab4ebd3984b91347023ee86f19aa9 Mon Sep 17 00:00:00 2001
+From: gl-tanqi <qi.tan@gl-inet.com>
+Date: Wed, 10 Nov 2021 18:49:23 +0800
+Subject: [PATCH] feat: hostapd add send (dev connect and dev disconnect)ubus
+ event
+
+---
+ .../patches/811-ap-sta-send-ubus-event.patch  | 68 +++++++++++++++++++
+ 1 file changed, 68 insertions(+)
+ create mode 100644 package/network/services/hostapd/patches/811-ap-sta-send-ubus-event.patch
+
+diff --git a/package/network/services/hostapd/patches/811-ap-sta-send-ubus-event.patch b/package/network/services/hostapd/patches/811-ap-sta-send-ubus-event.patch
+new file mode 100644
+index 0000000000..611306a1a9
+--- /dev/null
++++ b/package/network/services/hostapd/patches/811-ap-sta-send-ubus-event.patch
+@@ -0,0 +1,68 @@
++--- a/src/ap/sta_info.c
+++++ b/src/ap/sta_info.c
++@@ -1278,6 +1278,7 @@ void ap_sta_set_authorized(struct hostap
++ 
++ 		wpa_msg(hapd->msg_ctx, MSG_INFO, AP_STA_CONNECTED "%s%s%s",
++ 			buf, ip_addr, keyid_buf);
+++		hostapd_ubus_notify_station_event(hapd, "nl80211", sta->addr, 0);
++ 
++ 		if (hapd->msg_ctx_parent &&
++ 		    hapd->msg_ctx_parent != hapd->msg_ctx)
++@@ -1287,6 +1288,7 @@ void ap_sta_set_authorized(struct hostap
++ 	} else {
++ 		wpa_msg(hapd->msg_ctx, MSG_INFO, AP_STA_DISCONNECTED "%s", buf);
++ 		hostapd_ubus_notify(hapd, "disassoc", sta->addr);
+++		hostapd_ubus_notify_station_event(hapd, "nl80211", sta->addr, 1);
++ 
++ 		if (hapd->msg_ctx_parent &&
++ 		    hapd->msg_ctx_parent != hapd->msg_ctx)
++--- a/src/ap/ubus.c
+++++ b/src/ap/ubus.c
++@@ -1140,3 +1140,26 @@ void hostapd_ubus_notify(struct hostapd_
++ 
++ 	ubus_notify(ctx, &hapd->ubus.obj, type, b.head, -1);
++ }
+++
+++void hostapd_ubus_notify_station_event(struct hostapd_data *hapd, const char *type, const u8 *addr, int event)
+++{
+++	if (!addr)
+++		return;
+++
+++	blob_buf_init(&b, 0);
+++	blobmsg_add_string(&b, "ifname", hapd->conf->iface);
+++	blobmsg_add_macaddr(&b, "mac", addr);
+++	switch(event){
+++	case 0:
+++		blobmsg_add_string(&b, "event", "new_station");
+++		break;
+++	case 1:
+++		blobmsg_add_string(&b, "event", "del_station");
+++		break;
+++	default:
+++		break;
+++	}
+++	
+++	//send broadcast
+++	ubus_send_event(ctx, type, b.head);
+++}
++--- a/src/ap/ubus.h
+++++ b/src/ap/ubus.h
++@@ -44,6 +44,7 @@ void hostapd_ubus_free_bss(struct hostap
++ 
++ int hostapd_ubus_handle_event(struct hostapd_data *hapd, struct hostapd_ubus_request *req);
++ void hostapd_ubus_notify(struct hostapd_data *hapd, const char *type, const u8 *mac);
+++void hostapd_ubus_notify_station_event(struct hostapd_data *hapd, const char *type, const u8 *mac, int event);
++ 
++ #else
++ 
++@@ -73,6 +74,10 @@ static inline int hostapd_ubus_handle_ev
++ static inline void hostapd_ubus_notify(struct hostapd_data *hapd, const char *type, const u8 *mac)
++ {
++ }
+++
+++static inline void hostapd_ubus_notify_station_event(struct hostapd_data *hapd, const char *type, const u8 *mac, int event)
+++{
+++}
++ #endif
++ 
++ #endif
+-- 
+2.17.1
+

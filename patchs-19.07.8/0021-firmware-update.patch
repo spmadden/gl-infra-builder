@@ -1,0 +1,137 @@
+From 4abc5fc55cb9b5cb7e20575abfcb28257776ba82 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 19:42:39 +0800
+Subject: [PATCH 20/26] firmware: update
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/firmware/ath10k-ct-firmware/Makefile    |   2 ++
+ .../fwcfg-pci-0000:00:00.0.txt                  |  15 +++++++++++++++
+ package/firmware/ipq-wifi/Makefile              |   4 +++-
+ .../firmware/ipq-wifi/board-glinet_gl-s1300.bin | Bin 0 -> 24276 bytes
+ 4 files changed, 20 insertions(+), 1 deletion(-)
+ create mode 100644 package/firmware/ath10k-ct-firmware/fwcfg-pci-0000:00:00.0.txt
+ create mode 100644 package/firmware/ipq-wifi/board-glinet_gl-s1300.bin
+
+diff --git a/package/firmware/ath10k-ct-firmware/Makefile b/package/firmware/ath10k-ct-firmware/Makefile
+index 12fb031f8f..b27539a6d5 100644
+--- a/package/firmware/ath10k-ct-firmware/Makefile
++++ b/package/firmware/ath10k-ct-firmware/Makefile
+@@ -507,6 +507,8 @@ define Package/ath10k-firmware-qca9888-ct-htt/install
+ 	$(INSTALL_DATA) \
+ 		$(DL_DIR)/$(call CT_FIRMWARE_FILE_HTT,QCA9888) \
+ 		$(1)/lib/firmware/ath10k/QCA9888/hw2.0/ct-firmware-5.bin
++		$(INSTALL_DIR) $(1)/lib/firmware/ath10k
++	$(INSTALL_DATA) ./fwcfg-pci-0000:00:00.0.txt $(1)/lib/firmware/ath10k/fwcfg-pci-0000:00:00.0.txt
+ endef
+ 
+ 
+diff --git a/package/firmware/ath10k-ct-firmware/fwcfg-pci-0000:00:00.0.txt b/package/firmware/ath10k-ct-firmware/fwcfg-pci-0000:00:00.0.txt
+new file mode 100644
+index 0000000000..d9459f81b2
+--- /dev/null
++++ b/package/firmware/ath10k-ct-firmware/fwcfg-pci-0000:00:00.0.txt
+@@ -0,0 +1,15 @@
++vdevs = 4
++peers = 100
++active_peers = 100
++stations = 100
++rate_ctrl_objs = 7
++regdom = 840
++#fwname = firmware-5-htt-mgt-b.bin
++fwver = 5
++nohwcrypt = 0
++ct_sta_mode = 0
++tx_desc = 2200
++#max_nss = 3
++tids = 256
++skid_limit = 360
++max_amsdus = 3
+diff --git a/package/firmware/ipq-wifi/Makefile b/package/firmware/ipq-wifi/Makefile
+index eb7c2df1aa..c472b9ca03 100644
+--- a/package/firmware/ipq-wifi/Makefile
++++ b/package/firmware/ipq-wifi/Makefile
+@@ -33,7 +33,8 @@ ALLWIFIBOARDS:= \
+ 	engenius_ens620ext \
+ 	linksys_ea6350v3 \
+ 	linksys_ea8300 \
+-	qxwlan_e2600ac
++	qxwlan_e2600ac \
++	glinet_gl-s1300
+ 
+ ALLWIFIPACKAGES:=$(foreach BOARD,$(ALLWIFIBOARDS),ipq-wifi-$(BOARD))
+ 
+@@ -106,5 +107,6 @@ $(eval $(call generate-ipq-wifi-package,engenius_ens620ext,EnGenius ENS620EXT))
+ $(eval $(call generate-ipq-wifi-package,linksys_ea6350v3,Linksys EA6350v3))
+ $(eval $(call generate-ipq-wifi-package,linksys_ea8300,Linksys EA8300))
+ $(eval $(call generate-ipq-wifi-package,qxwlan_e2600ac,Qxwlan E2600AC))
++$(eval $(call generate-ipq-wifi-package,glinet_gl-s1300,GL.iNet GL-S1300))
+ 
+ $(foreach PACKAGE,$(ALLWIFIPACKAGES),$(eval $(call BuildPackage,$(PACKAGE))))
+diff --git a/package/firmware/ipq-wifi/board-glinet_gl-s1300.bin b/package/firmware/ipq-wifi/board-glinet_gl-s1300.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..b84e62f825e714ba579484c702c6d18d9fd33f01
+GIT binary patch
+literal 24276
+zcmeHPdr%We8t;T)Tt#6*Km;5@2qAGHKwvdOTmmA?BZA8c669FG7l|S-c^URZOOeHh
+zh%AB-h%6#6bBL5Du81q@xmQYgRadq57rS+jx+=Znw)F1Ss;k56Niv3zAc@2iVZNlN
+zzy7+v?yr9{naoW8l212<`-N|d4h)F%i%1Ahj08D3IRHwEKeh$H8>XzH!i|~PS-x30
+zQoo(q(mX%uu8jejQdVwe!7i*AxDNV}U|R<CWBBj(CXs;6VOnr9*2h{E+++Z-jOqXt
+z0N|Dx1oNfvWlFf*Agn6@f`Wqn`Ro}G(wBf2e>xq8CmXscui0%3K)OG@Rjqa;@Dj@O
+zx|z%Nuc{p2Y_JzDSd6%?&%;bce9eLpwS6tqWTOx507LiEkD=A*w5b-;;|^OeE;h5N
+z$q|;Z<gQCFvq+XNU%ApE2NR8%CT#D*lvmS-9X2{Kj9|R$a&@&#8j~6}e!01-Y*%Vr
+z%!XS%%_pi0q@TvDyVVP|LTO^mM=ziZT;uwHiJr^HtM^H_q>9FSn=8w*Q^hgDTisZ*
+z)R-6nbU0aE0&SsM2cNZIqT_OTSxRb1j4yOOR<<)W5;p5>u7<900?w_=&2?pYsfmIB
+zor8~Ie6y6wpv=<5u$pi%#KUxHA)sV>X788vu4>;Gv9f^e&S8D6g;nc!c_+EX4fo_X
+zMV;UjxMVc-?r7R@f>G$0In*L8kK5<9#aT4eo?983&6T)`?{}A-OE|$RT(k2=Z%NaZ
+zlYS-cd+xU8l}GJn#yEzIcH|z5&1EM!M_%fbHbz%}SmKsFbh)_A|FB1%W5)Z15)mzq
+zfGzcd<tywFN2gV*-PU;EXMBB*on!Tadl}^Lf(QT-iA*Mwu&s@at*z}6olv`KOEaP$
+z9No&Hvshm6?alP`^kRB4naPx;KzD^=&>K;Bs|eKA78h^ZCXNz-<;#~W(GDfxdV4XM
+z9<V^C{`<w`q!ZM%Hq5xjj!LFb{;O$90;c@6y}Z3`ULU+3f!*gFuIa-PHj=MS)<WTM
+z*eoW~iW-~6Vlp)S%~>;r3W6d?I2w)wqJc<W(V@e~zN~5Q(<x^gb;_kapf-}5M$&2|
+zG?d1pJ)|M7s4LG^?0`BTE@%WA!HakpfyAP*yjZaa6(P|mALaA-5BW$48o~<^2cQ9n
+z0DTq2lz0qO(1^#>*f^_tPT$tFs=^znRHjv<=~~|))JuakrDZm8L>(s_5jWJ0=O*5S
+zZkpJH#G!G#IB^gfG!cY^qM^J{F?MV;wrlqarYqYUE?&F{!+h=59FXAdn^mx5H}6Yj
+z-_+ziN6~+?nAS{vUf$HU5UxpyIheEe36uzwW<Y>AG-d$Cz`Q6?GC+VR5C{+m5C{+m
+z5C{+mEMf#!@mC=pv`_e-APKbf{Pjo}Z7D7wF{`e9V07wM|Mb8T&3KFtaIxALi+C3j
+zQ(q_un7cw?ZoBsk7jas)V(<|FFfUc81|Ln&;X`oj={K9r#5L9{ZQj_hXXx6f=A#Ay
+zWV2ab*m44<X(F9Bw)uXz)>9E63I;$yLrBh0YIS+NF6S&ofDi~NB7lJ3j&dsi2n1dT
+z<WWK54HNQt@Faxx2wU#s2rBn?Fk!hSIZzNlt*~Wu!TRyXPr&!zKhflvjwM1CE&?z6
+z?dW9kF1P{#SC`3@rRShrfP&BXI+VHC#3}IPsv7)mrrd|^&3czfyK<*ptJAK|iMMV`
+zNz2%kt*EVUY*BS|_4N;4AO7~<caJQu04$zHSh`$W!nT%ISaRVzOIwEZ1ZdVl#k4AX
+zB~-HpDvqeaS3x!FpJIL$z5;4Fh%<Uv6J5*qhZQ|$*<J5Vwd(>AbJmRGlhgOqG_-cA
+zuZ{d>CY|BSV=#1|`MK!UIsmM-d+3vN#2t0#xr^x_axxMTqhg*|90`IagApMr<O#*W
+zCho5pY&Il&Xty4i&Y8N^+Rd4%IkRx)J0mD9iXVl<)7J6VAs^FH&tos+{_*cQJbzzq
+zaV+H5^8*d|_04G{5+v7`)@s<^PAWM23;>*{6;OdW04p(m{Y=7@Ftspg`Sm1g@$2Du
+zSEr9TjbCr(?y(0)7~vp1lA__(o8s4_@cLLUVRR~$YD-;WV@t8Y1%PWWP15f5ZbsU&
+zSL4peuQ%{9&966TGFyR8rvohE0`Ct1mT<AKyaEdD`ldM(=qPVS9f;^E`eXWSCx-J@
+z=L+Y3eUwHmO&k8EmAj^EacfJ<*jS6o&d!kgg4bG}FUn<GV$$XuDDw~{bHcVx8>9+=
+z&)^BV$b}3p{hp*rl`yaTkpxOvWYE(`2E9L#!K3RoU_wX%_QMnqw$T<KPBykw>x4k`
+zLLfjOu;>s-NlA>?a_N8m`Po0Fa_KRC{ePbP`NtoA_yg4R{Q8%F|LY&0KK%={*~1@1
+z=>4BRpLnYE7Yc&|w0%xa{_7{L&6>ax{Cb>+Zp@rEqSv<){CZ=QUSpYZV{1)%eZy?@
+z`WADZl`K4dy*LGXs6G71@D4*?n(e$XJ}^?RES4ur{Ktnznw919bctZ(nzBKjFNqR(
+zj|`|g6mpqF;Ew$!?B;DB4uB44l|}L-32&@leMXThOOy!IgG!Z5CW#mLj{I6#C(n^Y
+z2pE{d@Eso?plK$PC(Dz^Zm3%nMY7K%>(w_D4YGphNC6)@oR#m#9d6z6;exT7>Q+TD
+z?DwOQe)ZRia+yRTRF5c{We1}-b6hkd?33-#hBR^qhBP*$ZdM*q<j6LUTv4|xtD$qe
+z`Wr=)tT;NF<2G_#`IROl4=kkHqZ}@PQ*Be9Ru(BTU`R^kaYepdqQ0VRljTH*3;f5v
+zQMW6~WZMO<S_dv0n?s%QkYbNK9#*z0N@ZIm{xFaxd66Vez#Y4$KCdW{B}B6@hi~t2
+zAxc+Anv{i#ba~|1by!&_Pm{&MFfTwXMFJGowkS(vo1#~19PYt6SR(WAQlALPoE=D@
+zM4&VS0t?~Lm|<#!dC?-!IB?)nSiN7BTk!?;FPbAy`;@OfaIhij7&qTF%P#76$L>=b
+z<z9PNNiGZ=ycBWPzsjv>pns1t_RNRBbjv-hO0Ee!#E{v?-|yaEC#vwyS)H!vPihmK
+z@hGRss=Cu#_?2i8E$ez$euL;Jw}6&3+9N$1R^heZCB3{isnxH_wRmM_Pk+hRq8d*5
+zs%%Ab{PDnpPTN;(9_r4j3pvc#=d|PQkh~|M+2@FJj`~VbduTPYnD%*fQ$l5Mv5Ukm
+z`fBgzUkQ$S<T#~ws-<m_rx`^^Mt5(aQh1!1?;sg$E2!C2?wjMB_~2KuCw<FS?{V1P
+z-M?2ARmVC+-_zK0pf#+TT}scq)FiF?xM=NO$GFa}-1DKwyb9>)=eskT!cTe@($ecY
+zrRRl}UWJZnr)su;5iDcwpos>03R~h&aY|fvFWLi#m^gvJ0zkmv-!}9&Wv?{s^8a-L
+z*8=ro0+0Tx41vRgFShbgZ*LZS!++XfczJp<J(J-dl9{<eX`)-gL?A#QFb4#l8_BfJ
+z%>8UyyWO-f7F&_v*S~dc{=DJR;|%|)T>trhyaxg{WJ0kai>3qqH7CmsCdh&jK|cJl
+z4sHdOV(;klj3o#llPSy6VD8`mNRg0tzjgyFfBw&th;TXr82_CD`R^%>UH9Gw|9$#+
+z)-KP)tH<r{l3S0BP4MgIM7AgR_4Dhe6I0e%|Np8v%;)!^jX7(^GjZyt+ULTlpXzI^
+YJ!viM=Rd#x&A-LWy|sGt5$5jsKXx{o)c^nh
+
+literal 0
+HcmV?d00001
+
+-- 
+2.17.1
+

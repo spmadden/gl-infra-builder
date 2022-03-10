@@ -1,0 +1,30 @@
+From 50cd6e2767af2258347a851d8af783a8b4ed8f97 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 15:44:42 +0800
+Subject: [PATCH 10/26] ramips: mmc: fix mount fail for some 32G Card.
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../linux/ramips/files-4.14/drivers/mmc/host/mtk-mmc/sd.c   | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/target/linux/ramips/files-4.14/drivers/mmc/host/mtk-mmc/sd.c b/target/linux/ramips/files-4.14/drivers/mmc/host/mtk-mmc/sd.c
+index 4ced4b6605..b2af486c5f 100644
+--- a/target/linux/ramips/files-4.14/drivers/mmc/host/mtk-mmc/sd.c
++++ b/target/linux/ramips/files-4.14/drivers/mmc/host/mtk-mmc/sd.c
+@@ -63,11 +63,7 @@
+ 
+ #define DRV_NAME            "mtk-sd"
+ 
+-#if defined(CONFIG_SOC_MT7620)
+-#define HOST_MAX_MCLK       (48000000) /* +/- by chhung */
+-#elif defined(CONFIG_SOC_MT7621)
+-#define HOST_MAX_MCLK       (50000000) /* +/- by chhung */
+-#endif
++#define HOST_MAX_MCLK       (40000000) /* +/- by chhung */
+ #define HOST_MIN_MCLK       (260000)
+ 
+ #define HOST_MAX_BLKSZ      (2048)
+-- 
+2.17.1
+

@@ -1,0 +1,27 @@
+From 6e848b8d14f7b2418fbca8ec4bb0ba8dbe22e4f3 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 29 Jun 2021 15:17:11 +0800
+Subject: [PATCH] boot: fix mtk wifi config
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/base-files/files/etc/init.d/boot | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/package/base-files/files/etc/init.d/boot b/package/base-files/files/etc/init.d/boot
+index 09b7f44c79..38c31d1958 100755
+--- a/package/base-files/files/etc/init.d/boot
++++ b/package/base-files/files/etc/init.d/boot
+@@ -43,6 +43,9 @@ boot() {
+ 		sleep 1
+ 	}
+ 
++	# for some private wifi driver
++	/sbin/wifi config
++
+ 	/bin/config_generate
+ 	uci_apply_defaults
+ 	
+-- 
+2.17.1
+

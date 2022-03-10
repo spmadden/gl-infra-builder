@@ -1,0 +1,31 @@
+From 1b3bc7cd5251a3a61ac4300761953a2f0d090f01 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 15:51:37 +0800
+Subject: [PATCH 12/26] package/wireless-tools: fix iwpriv segment fault
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../005-fix-iwpriv-ra0-e2p-segment-fault.patch        | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 package/network/utils/wireless-tools/patches/005-fix-iwpriv-ra0-e2p-segment-fault.patch
+
+diff --git a/package/network/utils/wireless-tools/patches/005-fix-iwpriv-ra0-e2p-segment-fault.patch b/package/network/utils/wireless-tools/patches/005-fix-iwpriv-ra0-e2p-segment-fault.patch
+new file mode 100644
+index 0000000000..310b1bfcf8
+--- /dev/null
++++ b/package/network/utils/wireless-tools/patches/005-fix-iwpriv-ra0-e2p-segment-fault.patch
+@@ -0,0 +1,11 @@
++--- a/iwpriv.c
+++++ b/iwpriv.c
++@@ -259,7 +259,7 @@ set_private_cmd(int		skfd,		/* Socket */
++ 		int		priv_num)	/* Number of descriptions */
++ {
++   struct iwreq	wrq;
++-  u_char	buffer[4096];	/* Only that big in v25 and later */
+++  u_char	buffer[20 * 1024];	/* Only that big in v25 and later */
++   int		i = 0;		/* Start with first command arg */
++   int		k;		/* Index in private description table */
++   int		temp;
+-- 
+2.17.1
+

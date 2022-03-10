@@ -1,0 +1,35 @@
+From fbae077d7f2ca93966ffc4d71d961c7b19f1d43d Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 15:54:51 +0800
+Subject: [PATCH 14/26] package/hostapd: close SMPS mode state switching
+ information
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../patches/802-block-SMPS-mode-information        | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 package/network/services/hostapd/patches/802-block-SMPS-mode-information
+
+diff --git a/package/network/services/hostapd/patches/802-block-SMPS-mode-information b/package/network/services/hostapd/patches/802-block-SMPS-mode-information
+new file mode 100644
+index 0000000000..91f898a2ee
+--- /dev/null
++++ b/package/network/services/hostapd/patches/802-block-SMPS-mode-information
+@@ -0,0 +1,14 @@
++Index: b/src/utils/wpa_debug.c
++===================================================================
++--- a/src/utils/wpa_debug.c	2019-08-07 21:25:25.000000000 +0800
+++++ b/src/utils/wpa_debug.c	2021-03-05 19:19:50.000000000 +0800
++@@ -666,7 +666,8 @@ void wpa_msg(void *ctx, int level, const
++ 	}
++ 	len = vsnprintf(buf, buflen, fmt, ap);
++ 	va_end(ap);
++-	wpa_printf(level, "%s%s", prefix, buf);
+++    if(!strstr(buf,"SMPS-MODE-CHANGED"))
+++        wpa_printf(level, "%s%s", prefix, buf);
++ 	if (wpa_msg_cb)
++ 		wpa_msg_cb(ctx, level, WPA_MSG_PER_INTERFACE, buf, len);
++ 	bin_clear_free(buf, buflen);
+-- 
+2.17.1
+

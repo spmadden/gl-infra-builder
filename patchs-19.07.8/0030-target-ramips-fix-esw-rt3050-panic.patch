@@ -1,0 +1,181 @@
+From cdb0acc648bd71ed9d1e44851776236ef3575342 Mon Sep 17 00:00:00 2001
+From: gl-zhaojianhui <jianhui.zhao@gl-inet.com>
+Date: Sat, 6 Nov 2021 18:16:06 +0800
+Subject: [PATCH] target/ramips: fix esw-rt3050 panic
+
+Signed-off-by: gl-zhaojianhui <jianhui.zhao@gl-inet.com>
+---
+ target/linux/ramips/dts/mt7628an.dtsi         |  8 ++--
+ .../net/ethernet/mediatek/esw_rt3050.c        | 47 ++++++++++++++++---
+ .../net/ethernet/mediatek/soc_rt3050.c        |  2 +-
+ 3 files changed, 45 insertions(+), 12 deletions(-)
+
+diff --git a/target/linux/ramips/dts/mt7628an.dtsi b/target/linux/ramips/dts/mt7628an.dtsi
+index 61016c8b40..ec4406a3ce 100644
+--- a/target/linux/ramips/dts/mt7628an.dtsi
++++ b/target/linux/ramips/dts/mt7628an.dtsi
+@@ -445,8 +445,8 @@
+ 		interrupt-parent = <&cpuintc>;
+ 		interrupts = <5>;
+ 
+-		resets = <&rstctrl 21 &rstctrl 23>;
+-		reset-names = "fe", "esw";
++		resets = <&rstctrl 21>;
++		reset-names = "fe";
+ 
+ 		mediatek,switch = <&esw>;
+ 	};
+@@ -455,8 +455,8 @@
+ 		compatible = "mediatek,mt7628-esw", "ralink,rt3050-esw";
+ 		reg = <0x10110000 0x8000>;
+ 
+-		resets = <&rstctrl 23>;
+-		reset-names = "esw";
++		resets = <&rstctrl 23 &rstctrl 24>;
++		reset-names = "esw", "ephy";
+ 
+ 		interrupt-parent = <&intc>;
+ 		interrupts = <17>;
+diff --git a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
+index 816c588dd7..8eea0ff437 100644
+--- a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
++++ b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
+@@ -18,7 +18,7 @@
+ #include <linux/platform_device.h>
+ #include <asm/mach-ralink/ralink_regs.h>
+ #include <linux/of_irq.h>
+-
++#include <linux/reset.h>
+ #include <linux/switch.h>
+ 
+ #include "mtk_eth_soc.h"
+@@ -172,7 +172,6 @@
+ 
+ #define RT5350_ESW_REG_PXTPC(_x)	(0x150 + (4 * _x))
+ #define RT5350_EWS_REG_LED_POLARITY	0x168
+-#define RT5350_RESET_EPHY		BIT(24)
+ 
+ enum {
+ 	/* Global attributes. */
+@@ -232,7 +231,8 @@ struct rt305x_esw {
+ 	int			led_frequency;
+ 	struct esw_vlan vlans[RT305X_ESW_NUM_VLANS];
+ 	struct esw_port ports[RT305X_ESW_NUM_PORTS];
+-
++	struct reset_control    *rst_esw;
++	struct reset_control	*rst_ephy;
+ };
+ 
+ static inline void esw_w32(struct rt305x_esw *esw, u32 val, unsigned reg)
+@@ -430,12 +430,37 @@ static void esw_set_gsc(struct rt305x_esw *esw)
+ 
+ static int esw_apply_config(struct switch_dev *dev);
+ 
++static void esw_reset(struct rt305x_esw *esw)
++{
++	if (!esw->rst_esw)
++		return;
++
++	reset_control_assert(esw->rst_esw);
++	usleep_range(60, 120);
++	reset_control_deassert(esw->rst_esw);
++	/* the esw takes long to reset otherwise the board hang */
++	msleep(10);
++}
++
++static void esw_reset_ephy(struct rt305x_esw *esw)
++{
++	if (!esw->rst_ephy)
++		return;
++
++	reset_control_assert(esw->rst_ephy);
++	usleep_range(60, 120);
++	reset_control_deassert(esw->rst_ephy);
++	usleep_range(60, 120);
++}
++
+ static void esw_hw_init(struct rt305x_esw *esw)
+ {
+ 	int i;
+ 	u8 port_disable = 0;
+ 	u8 port_map = RT305X_ESW_PMAP_LLLLLL;
+ 
++	esw_reset(esw);
++
+ 	/* vodoo from original driver */
+ 	esw_w32(esw, 0xC8A07850, RT305X_ESW_REG_FCT0);
+ 	esw_w32(esw, 0x00000000, RT305X_ESW_REG_SGC2);
+@@ -506,7 +531,7 @@ static void esw_hw_init(struct rt305x_esw *esw)
+ 
+ 	if (ralink_soc == RT305X_SOC_RT3352) {
+ 		/* reset EPHY */
+-		fe_reset(RT5350_RESET_EPHY);
++		esw_reset_ephy(esw);
+ 
+ 		rt305x_mii_write(esw, 0, 31, 0x8000);
+ 		for (i = 0; i < 5; i++) {
+@@ -557,7 +582,7 @@ static void esw_hw_init(struct rt305x_esw *esw)
+ 		rt305x_mii_write(esw, 0, 31, 0x8000);
+ 	} else if (ralink_soc == RT305X_SOC_RT5350) {
+ 		/* reset EPHY */
+-		fe_reset(RT5350_RESET_EPHY);
++		esw_reset_ephy(esw);
+ 
+ 		/* set the led polarity */
+ 		esw_w32(esw, esw->reg_led_polarity & 0x1F,
+@@ -615,7 +640,7 @@ static void esw_hw_init(struct rt305x_esw *esw)
+ 		int i;
+ 
+ 		/* reset EPHY */
+-		fe_reset(RT5350_RESET_EPHY);
++		esw_reset_ephy(esw);
+ 
+ 		rt305x_mii_write(esw, 0, 31, 0x2000); /* change G2 page */
+ 		rt305x_mii_write(esw, 0, 26, 0x0020);
+@@ -791,6 +816,8 @@ static int esw_apply_config(struct switch_dev *dev)
+ 		esw_set_vmsc(esw, 0, RT305X_ESW_PORTS_ALL);
+ 	}
+ 
++	esw_reset_ephy(esw);
++
+ 	return 0;
+ }
+ 
+@@ -801,7 +828,6 @@ static int esw_reset_switch(struct switch_dev *dev)
+ 	esw->global_vlan_enable = 0;
+ 	memset(esw->ports, 0, sizeof(esw->ports));
+ 	memset(esw->vlans, 0, sizeof(esw->vlans));
+-	esw_hw_init(esw);
+ 
+ 	return 0;
+ }
+@@ -1396,6 +1422,13 @@ static int esw_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	esw->rst_esw = devm_reset_control_get(&pdev->dev, "esw");
++	if (IS_ERR(esw->rst_esw))
++		esw->rst_esw = NULL;
++	esw->rst_ephy = devm_reset_control_get(&pdev->dev, "ephy");
++	if (IS_ERR(esw->rst_ephy))
++		esw->rst_ephy = NULL;
++
+ 	platform_set_drvdata(pdev, esw);
+ 
+ 	spin_lock_init(&esw->reg_rw_lock);
+diff --git a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/soc_rt3050.c b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/soc_rt3050.c
+index 914b81410e..6291259fe0 100644
+--- a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/soc_rt3050.c
++++ b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/soc_rt3050.c
+@@ -122,7 +122,7 @@ static void rt5350_tx_dma(struct fe_tx_dma *txd)
+ 
+ static void rt5350_fe_reset(void)
+ {
+-	fe_reset(RT305X_RESET_FE | RT305X_RESET_ESW);
++	fe_reset(RT305X_RESET_FE);
+ }
+ 
+ static struct fe_soc_data rt3050_data = {
+-- 
+2.25.1
+

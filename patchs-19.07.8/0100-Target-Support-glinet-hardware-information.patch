@@ -1,0 +1,578 @@
+From d3719e6e27cfe04636ee93b55bd604b0b32560ac Mon Sep 17 00:00:00 2001
+From: gl-yangpo <po.yang@gl-inet.com>
+Date: Tue, 23 Nov 2021 00:15:34 -0800
+Subject: [PATCH] Target: Support glinet hardware information
+
+---
+ .../ath79/dts/ar9330_glinet_gl-ar150.dts      | 20 +++++++++++++++
+ .../linux/ath79/dts/ar9330_glinet_gl-mifi.dts | 21 ++++++++++++++++
+ .../ath79/dts/ar9330_glinet_gl-usb150.dts     | 21 +++++++++++++---
+ .../ath79/dts/qca9531_glinet_gl-ar300m.dtsi   | 20 ++++++++++++++-
+ .../ath79/dts/qca9531_glinet_gl-ar750.dts     | 22 ++++++++++++++++
+ .../ath79/dts/qca9531_glinet_gl-e750.dtsi     | 23 +++++++++++++++++
+ .../ath79/dts/qca9531_glinet_gl-x300b.dtsi    | 19 ++++++++++++++
+ .../ath79/dts/qca9531_glinet_gl-x750.dtsi     | 21 ++++++++++++++++
+ .../ath79/dts/qca9531_glinet_gl-xe300.dtsi    | 23 +++++++++++++++++
+ .../ath79/dts/qca9563_glinet_gl-ar750s.dtsi   | 22 ++++++++++++++++
+ .../ath79/dts/qca9563_glinet_gl-x1200.dtsi    | 25 +++++++++++++++----
+ target/linux/ramips/dts/GL-MT1300.dts         | 19 +++++++++++++-
+ target/linux/ramips/dts/GL-MT300A.dts         | 17 +++++++++++++
+ target/linux/ramips/dts/GL-MT300N-V2.dts      | 23 +++++++++++++----
+ target/linux/ramips/dts/GL-MT300N.dts         | 17 +++++++++++++
+ target/linux/ramips/dts/microuter-N300.dts    | 17 +++++++++++++
+ 16 files changed, 314 insertions(+), 16 deletions(-)
+ mode change 100644 => 100755 target/linux/ath79/dts/ar9330_glinet_gl-ar150.dts
+ mode change 100644 => 100755 target/linux/ath79/dts/ar9330_glinet_gl-mifi.dts
+ mode change 100644 => 100755 target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts
+ mode change 100644 => 100755 target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
+ mode change 100644 => 100755 target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
+ mode change 100644 => 100755 target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
+ mode change 100644 => 100755 target/linux/ath79/dts/qca9531_glinet_gl-x750.dtsi
+ mode change 100644 => 100755 target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi
+ mode change 100644 => 100755 target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
+ mode change 100644 => 100755 target/linux/ath79/dts/qca9563_glinet_gl-x1200.dtsi
+ mode change 100644 => 100755 target/linux/ramips/dts/GL-MT1300.dts
+ mode change 100644 => 100755 target/linux/ramips/dts/GL-MT300A.dts
+ mode change 100644 => 100755 target/linux/ramips/dts/GL-MT300N-V2.dts
+ mode change 100644 => 100755 target/linux/ramips/dts/GL-MT300N.dts
+ mode change 100644 => 100755 target/linux/ramips/dts/microuter-N300.dts
+
+diff --git a/target/linux/ath79/dts/ar9330_glinet_gl-ar150.dts b/target/linux/ath79/dts/ar9330_glinet_gl-ar150.dts
+old mode 100644
+new mode 100755
+index 2b15feeb03..42edf5ae89
+--- a/target/linux/ath79/dts/ar9330_glinet_gl-ar150.dts
++++ b/target/linux/ath79/dts/ar9330_glinet_gl-ar150.dts
+@@ -14,6 +14,26 @@
+ 		serial0 = &uart;
+        };
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "ar150";
++		wan = "eth0";
++		lan = "eth1";
++		switch-button = "gpio-8";
++		reset-button = "gpio-11";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
+ 	leds {
+ 		compatible = "gpio-leds";
+ 
+diff --git a/target/linux/ath79/dts/ar9330_glinet_gl-mifi.dts b/target/linux/ath79/dts/ar9330_glinet_gl-mifi.dts
+old mode 100644
+new mode 100755
+index b68614afe6..235dbf2f8c
+--- a/target/linux/ath79/dts/ar9330_glinet_gl-mifi.dts
++++ b/target/linux/ath79/dts/ar9330_glinet_gl-mifi.dts
+@@ -14,6 +14,27 @@
+ 		serial0 = &uart;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "mifi";
++		wan = "eth0";
++		lan = "eth1";
++		build-in-modem = "1-1.2";
++		reset-button = "gpio-11";
++		usb-port = "1-1.3";
++        microsd = "1-1.1";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
+ 	leds {
+ 		compatible = "gpio-leds";
+ 
+diff --git a/target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts b/target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts
+old mode 100644
+new mode 100755
+index 51610fefa3..b80f8961fc
+--- a/target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts
++++ b/target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts
+@@ -12,10 +12,23 @@
+ 
+ 	aliases {
+ 		serial0 = &uart;
+-		led-boot = &led_power;
+-		led-failsafe = &led_power;
+-		led-running = &led_power;
+-		led-upgrade = &led_power;
++	};
++
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "usb150";
++		lan = "eth0";
++		reset-button = "gpio-11";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
+ 	};
+ 
+ 	leds {
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
+old mode 100644
+new mode 100755
+index 3471d34eac..1a4f73af86
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
+@@ -6,7 +6,25 @@
+ #include "qca953x.dtsi"
+ 
+ / {
+-
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "ar300m";
++		wan = "eth0";
++		lan = "eth1";
++		switch-button = "gpio-0";
++		reset-button = "gpio-3";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
+ 	keys {
+ 		compatible = "gpio-keys-polled";
+ 		poll-interval = <20>;
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
+old mode 100644
+new mode 100755
+index 8a7e60823a..9c6b0150cb
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
+@@ -10,6 +10,28 @@
+ 	compatible = "glinet,gl-ar750", "qca,qca9531";
+ 	model = "GL.iNet GL-AR750";
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "ar750";
++		wan = "eth0";
++		lan = "eth1.1";
++		switch-button = "gpio-0";
++		reset-button = "gpio-3";
++		usb-port = "1-1.2";
++        microsd = "1-1.1";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
++
+ 	keys {
+ 		compatible = "gpio-keys-polled";
+ 		poll-interval = <20>;
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi
+index 8aa0c05082..3468b188f2 100755
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi
+@@ -14,6 +14,29 @@
+ 		label-mac-device = &eth0;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "e750";
++		lan = "eth0";
++		build-in-modem = "1-1.2";
++		switch-button = "gpio-1";
++		reset-button = "gpio-3";
++		usb-port = "1-1.3";
++        microsd = "1-1.1";
++        mcu;
++		nand;
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
+ 	keys {
+ 		compatible = "gpio-keys";
+ 
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
+old mode 100644
+new mode 100755
+index e3d27835df..1c8dca6d97
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
+@@ -10,6 +10,25 @@
+ 	compatible = "glinet,gl-x300b", "qca,qca9531";
+ 	model = "GL.iNet GL-X300B";
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "x300b";
++		wan = "eth0";
++		lan = "eth1";
++		build-in-modem = "1-1";
++		reset-button = "gpio-3";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
+ 	keys {
+ 		compatible = "gpio-keys-polled";
+ 
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x750.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-x750.dtsi
+old mode 100644
+new mode 100755
+index 1517c7ce3c..b7ef24fdea
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-x750.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x750.dtsi
+@@ -10,6 +10,27 @@
+ 	compatible = "glinet,gl-x750", "qca,qca9531";
+ 	model = "GL.iNet GL-X750";
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "x750";
++		wan = "eth0";
++		lan = "eth1.1";
++		build-in-modem = "1-1.2";
++		reset-button = "gpio-3";
++		usb-port = "1-1.3";
++               microsd = "1-1.1";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
+ 	keys {
+ 		compatible = "gpio-keys-polled";
+ 
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi
+old mode 100644
+new mode 100755
+index 9c8f7e0a51..e452cab26c
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300.dtsi
+@@ -10,6 +10,29 @@
+ 	compatible = "glinet,gl-xe300", "qca,qca9531";
+ 	model = "GL.iNet GL-XE300";
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "xe300";
++		wan = "eth1";
++		lan = "eth0";
++		build-in-modem = "1-1.2";
++		reset-button = "gpio-3";
++		usb-port = "1-1.3";
++               microsd = "1-1.1";
++               mcu;
++		nand;
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
+ 	keys {
+ 		compatible = "gpio-keys-polled";
+ 
+diff --git a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
+old mode 100644
+new mode 100755
+index 2ccfed59ab..d17fd3d300
+--- a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
++++ b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
+@@ -10,6 +10,28 @@
+ 	compatible = "glinet,gl-ar750s", "qca,qca9563";
+ 	model = "GL.iNet GL-AR750S";
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "ar750s";
++		wan = "eth0.2";
++		lan = "eth0.1";
++		switch-button = "gpio-8";
++		reset-button = "gpio-2";
++		usb-port = "1-1";
++               microsd = "2-1";
++		nand;
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++ 	};
++
+ 	keys {
+ 		compatible = "gpio-keys-polled";
+ 		poll-interval = <20>;
+diff --git a/target/linux/ath79/dts/qca9563_glinet_gl-x1200.dtsi b/target/linux/ath79/dts/qca9563_glinet_gl-x1200.dtsi
+old mode 100644
+new mode 100755
+index a5efbf1957..1f1736fccc
+--- a/target/linux/ath79/dts/qca9563_glinet_gl-x1200.dtsi
++++ b/target/linux/ath79/dts/qca9563_glinet_gl-x1200.dtsi
+@@ -10,11 +10,26 @@
+ 	compatible = "glinet,gl-x1200", "qca,qca9563";
+ 	model = "GL.iNet GL-X1200";
+ 
+-	aliases {
+-		led-boot = &power;
+-		led-failsafe = &power;
+-		led-running = &power;
+-		led-upgrade = &power;
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "x1200";
++		wan = "eth0.2";
++		lan = "eth0.1";
++		build-in-modem = "1-1.2,2-1.2";
++		reset-button = "gpio-2";
++		usb-port = "1-1.4";
++               microsd = "2-1.1";
++		nand;
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
+ 	};
+ 
+ 	keys {
+diff --git a/target/linux/ramips/dts/GL-MT1300.dts b/target/linux/ramips/dts/GL-MT1300.dts
+old mode 100644
+new mode 100755
+index 6a0adc7ba1..edd4c225dc
+--- a/target/linux/ramips/dts/GL-MT1300.dts
++++ b/target/linux/ramips/dts/GL-MT1300.dts
+@@ -9,7 +9,24 @@
+ 	compatible = "glinet,gl-mt1300", "mediatek,mt7621-soc";
+ 	model = "GL-MT1300";
+ 
+-	aliases {
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "mt1300";
++		wan = "eth0.2";
++		lan = "eth0.1";
++		switch-button = "gpio-16";
++		reset-button = "gpio-50";
++		usb-port = "1-1.3";
++		factory_data {
++			device_mac = "factory", "0x4000";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
++		};
+ 	};
+ 
+ 	chosen {
+diff --git a/target/linux/ramips/dts/GL-MT300A.dts b/target/linux/ramips/dts/GL-MT300A.dts
+old mode 100644
+new mode 100755
+index 2cea9d9beb..2cfc2604ea
+--- a/target/linux/ramips/dts/GL-MT300A.dts
++++ b/target/linux/ramips/dts/GL-MT300A.dts
+@@ -8,6 +8,23 @@
+ / {
+ 	compatible = "glinet,gl-mt300a", "ralink,mt7620a-soc";
+ 	model = "GL-MT300A";
++	
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		wan = "eth0.2";
++		lan = "eth0.1";
++		usb;
++		factory_data {
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
++		};
++	};
+ 
+ 	chosen {
+ 		bootargs = "console=ttyS0,115200";
+diff --git a/target/linux/ramips/dts/GL-MT300N-V2.dts b/target/linux/ramips/dts/GL-MT300N-V2.dts
+old mode 100644
+new mode 100755
+index 8992664dec..7fb3e1c735
+--- a/target/linux/ramips/dts/GL-MT300N-V2.dts
++++ b/target/linux/ramips/dts/GL-MT300N-V2.dts
+@@ -9,11 +9,24 @@
+ 	compatible = "glinet,gl-mt300n-v2", "mediatek,mt7628an-soc";
+ 	model = "GL-MT300N-V2";
+ 
+-	aliases {
+-		led-boot = &led_power;
+-		led-failsafe = &led_power;
+-		led-running = &led_power;
+-		led-upgrade = &led_power;
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "mt300n-v2";
++		wan = "eth0.2";
++		lan = "eth0.1";
++		switch-button = "gpio-0";
++		reset-button = "gpio-38";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
++		};
+ 	};
+ 
+ 	chosen {
+diff --git a/target/linux/ramips/dts/GL-MT300N.dts b/target/linux/ramips/dts/GL-MT300N.dts
+old mode 100644
+new mode 100755
+index a30792cace..f6e04ae764
+--- a/target/linux/ramips/dts/GL-MT300N.dts
++++ b/target/linux/ramips/dts/GL-MT300N.dts
+@@ -9,6 +9,23 @@
+ 	compatible = "glinet,gl-mt300n", "ralink,mt7620a-soc";
+ 	model = "GL-MT300N";
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		wan = "eth0.2";
++		lan = "eth0.1";
++		usb;
++		factory_data {
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
++		};
++	};
++
+ 	chosen {
+ 		bootargs = "console=ttyS0,115200";
+ 	};
+diff --git a/target/linux/ramips/dts/microuter-N300.dts b/target/linux/ramips/dts/microuter-N300.dts
+old mode 100644
+new mode 100755
+index 74e4b46bfa..600c805705
+--- a/target/linux/ramips/dts/microuter-N300.dts
++++ b/target/linux/ramips/dts/microuter-N300.dts
+@@ -9,6 +9,23 @@
+ 	compatible = "glinet,microuter-n300", "mediatek,mt7628an-soc";
+ 	model = "microuter-N300";
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "n300";
++		wan = "eth0.2";
++		reset-button = "gpio-38";
++		factory_data {
++			device_mac = "factory", "0x4";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4088";
++		};
++	};
++
+ 	chosen {
+ 		bootargs = "console=ttyS0,115200";
+ 	};
+-- 
+2.17.1
+

@@ -1,0 +1,33 @@
+From 9dcbe56bfc96632400998487f21873f38b75951f Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 19:37:55 +0800
+Subject: [PATCH 18/26] upgrade: compatable 1806
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/base-files/files/lib/upgrade/fwtool.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/package/base-files/files/lib/upgrade/fwtool.sh b/package/base-files/files/lib/upgrade/fwtool.sh
+index a0b3fb0a04..f39ad51dd6 100644
+--- a/package/base-files/files/lib/upgrade/fwtool.sh
++++ b/package/base-files/files/lib/upgrade/fwtool.sh
+@@ -44,13 +44,14 @@ fwtool_check_image() {
+ 	}
+ 
+ 	device="$(cat /tmp/sysinfo/board_name)"
++	device_old=`awk -F': ' '/machine/ {print tolower($NF)}' /proc/cpuinfo |cut -d  ' ' -f2`
+ 
+ 	json_select supported_devices || return 1
+ 
+ 	json_get_keys dev_keys
+ 	for k in $dev_keys; do
+ 		json_get_var dev "$k"
+-		[ "$dev" = "$device" ] && return 0
++		[ "$dev" = "$device" -o "$dev" = "$device_old" -o "$dev" = glinet,"$device_old" ] && return 0
+ 	done
+ 
+ 	echo "Device $device not supported by this image"
+-- 
+2.17.1
+

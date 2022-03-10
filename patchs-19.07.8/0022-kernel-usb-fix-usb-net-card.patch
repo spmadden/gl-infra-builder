@@ -1,0 +1,26 @@
+From 6fd318236bf0ecf108393d93c67713915ef2374c Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 26 Apr 2021 19:43:54 +0800
+Subject: [PATCH 21/26] kernel: usb: fix usb net card
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/linux/modules/usb.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/usb.mk b/package/kernel/linux/modules/usb.mk
+index 4778f07aee..04b9756fe9 100644
+--- a/package/kernel/linux/modules/usb.mk
++++ b/package/kernel/linux/modules/usb.mk
+@@ -188,7 +188,7 @@ define KernelPackage/usb-gadget-eth
+ 	$(LINUX_DIR)/drivers/usb/gadget/function/usb_f_ecm_subset.ko \
+ 	$(LINUX_DIR)/drivers/usb/gadget/function/usb_f_rndis.ko \
+ 	$(LINUX_DIR)/drivers/usb/gadget/legacy/g_ether.ko
+-  AUTOLOAD:=$(call AutoLoad,52,usb_f_ecm)
++  AUTOLOAD:=$(call AutoLoad,52,usb_f_ecm g_ether)
+   $(call AddDepends/usb)
+ endef
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,297 @@
+From 14f024b8964c902b11db696737c3f6eb9662d6f9 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 20 May 2021 12:01:36 +0800
+Subject: [PATCH] gpio-button: support see current state
+
+Report event by label
+
+```
+root@GL-AR750S:~# cat /proc/gpio-keys/switch
+pressed=1 seen=2598
+```
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../src/gpio-button-hotplug.c                 | 49 +++++++++++++++++--
+ .../ath79/dts/qca9531_glinet_gl-ar300m.dtsi   |  8 +--
+ .../ath79/dts/qca9531_glinet_gl-ar750.dts     |  4 +-
+ .../ath79/dts/qca9531_glinet_gl-e750.dtsi     |  2 +-
+ .../ath79/dts/qca9563_glinet_gl-ar750s.dtsi   |  4 +-
+ target/linux/ramips/dts/GL-MT1300.dts         |  4 +-
+ target/linux/ramips/dts/GL-MT300A.dts         |  4 +-
+ target/linux/ramips/dts/GL-MT300N-V2.dts      |  4 +-
+ target/linux/ramips/dts/GL-MT300N.dts         |  4 +-
+ target/linux/ramips/dts/GL-MT750.dts          |  4 +-
+ 10 files changed, 65 insertions(+), 22 deletions(-)
+ mode change 100755 => 100644 target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi
+
+diff --git a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+index 3e8e0ea268..93085a8b6f 100644
+--- a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
++++ b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+@@ -29,6 +29,7 @@
+ #include <linux/of_irq.h>
+ #include <linux/gpio_keys.h>
+ #include <linux/gpio/consumer.h>
++#include <linux/proc_fs.h>
+ 
+ #define BH_SKB_SIZE	2048
+ 
+@@ -62,6 +63,7 @@ struct gpio_keys_button_data {
+ 	unsigned int software_debounce;
+ 	struct gpio_desc *gpiod;
+ 	const struct gpio_keys_button *b;
++	struct proc_dir_entry *proc;
+ };
+ 
+ extern u64 uevent_next_seqnum(void);
+@@ -102,6 +104,8 @@ static struct bh_map button_map[] = {
+ 	BH_MAP(KEY_WPS_BUTTON,		"wps"),
+ };
+ 
++static struct proc_dir_entry *proc_root;
++
+ /* -------------------------------------------------------------------------*/
+ 
+ static __printf(3, 4)
+@@ -286,7 +290,7 @@ static void gpio_keys_handle_button(struct gpio_keys_button_data *bdata)
+ 	if (bdata->seen == 0)
+ 		bdata->seen = seen;
+ 
+-	button_hotplug_create_event(button_map[bdata->map_entry].name, type,
++	button_hotplug_create_event(bdata->b->desc, type,
+ 				    (seen - bdata->seen) / HZ, state);
+ 	bdata->seen = seen;
+ 
+@@ -304,6 +308,30 @@ struct gpio_keys_button_dev {
+ 	struct gpio_keys_button_data data[0];
+ };
+ 
++static int proc_show(struct seq_file *s, void *v)
++{
++	struct gpio_keys_button_data *bdata = s->private;
++	int state = gpio_button_get_value(bdata);
++	unsigned long seen = (jiffies - bdata->seen) / HZ;
++
++	seq_printf(s, "pressed=%d seen=%lu\n", state, seen);
++
++    return 0;
++}
++
++static int proc_single_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, proc_show, PDE_DATA(inode));
++}
++
++const static struct file_operations proc_ops = {
++    .owner      = THIS_MODULE,
++    .open       = proc_single_open,
++    .read       = seq_read,
++    .llseek     = seq_lseek,
++    .release    = single_release
++};
++
+ static void gpio_keys_polled_queue_work(struct gpio_keys_button_dev *bdev)
+ {
+ 	struct gpio_keys_platform_data *pdata = bdev->pdata;
+@@ -577,6 +605,9 @@ static int gpio_keys_button_probe(struct platform_device *pdev,
+ 		}
+ 
+ 		bdata->b = &pdata->buttons[i];
++
++		if (!proc_create_data(button->desc, 0644, proc_root, &proc_ops, bdata))
++			dev_err(&pdev->dev, "failed to create proc for gpio:%s\n", button->desc);
+ 	}
+ 
+ 	bdev->dev = &pdev->dev;
+@@ -716,18 +747,29 @@ static struct platform_driver gpio_keys_polled_driver = {
+ 	},
+ };
+ 
++
+ static int __init gpio_button_init(void)
+ {
+ 	int ret;
+ 
++	proc_root = proc_mkdir("gpio-keys", NULL);
++    if (!proc_root)
++        return -ENODEV;;
++
+ 	ret = platform_driver_register(&gpio_keys_driver);
+ 	if (ret)
+-		return ret;
++		goto err2;
+ 
+ 	ret = platform_driver_register(&gpio_keys_polled_driver);
+ 	if (ret)
+-		platform_driver_unregister(&gpio_keys_driver);
++		goto err1;
++
++	return ret;
+ 
++err1:
++	platform_driver_unregister(&gpio_keys_driver);
++err2:
++	remove_proc_subtree("gpio-keys", NULL);
+ 	return ret;
+ }
+ 
+@@ -735,6 +777,7 @@ static void __exit gpio_button_exit(void)
+ {
+ 	platform_driver_unregister(&gpio_keys_driver);
+ 	platform_driver_unregister(&gpio_keys_polled_driver);
++	remove_proc_subtree("gpio-keys", NULL);
+ }
+ 
+ module_init(gpio_button_init);
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
+index 3471d34eac..a95fbd2f82 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-ar300m.dtsi
+@@ -13,19 +13,19 @@
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&jtag_disable_pins>;
+ 
+-		button0 {
++		reset {
+ 			label = "reset";
+ 			linux,code = <KEY_RESTART>;
+ 			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+-		button1 {
+-			label = "left";
++		switch {
++			label = "switch";
+ 			linux,code = <BTN_0>;
+ 			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
+ 		};
+ 
+-		button3 {
++		right {
+ 			label = "right";
+ 			linux,code = <BTN_1>;
+ 			gpios = <&gpio 1 GPIO_ACTIVE_HIGH>;
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
+index 8a7e60823a..4cfff1469b 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-ar750.dts
+@@ -22,8 +22,8 @@
+ 			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+-		mode {
+-			label = "sw1";
++		switch {
++			label = "switch";
+ 			linux,code = <BTN_0>;
+ 			linux,input-type = <EV_SW>;
+ 			gpios = <&gpio 0 GPIO_ACTIVE_LOW>;
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi
+old mode 100755
+new mode 100644
+index 8aa0c05082..a60ac953dd
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dtsi
+@@ -27,7 +27,7 @@
+ 		};
+ 
+ 		switch {
+-			label = "right";
++			label = "switch";
+ 			linux,code = <BTN_0>;
+ 			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
+ 		};
+diff --git a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
+index 2ccfed59ab..47af809f60 100644
+--- a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
++++ b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
+@@ -22,8 +22,8 @@
+ 			gpios = <&gpio 2 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+-		mode {
+-			label = "right";
++		switch {
++			label = "switch";
+ 			linux,code = <BTN_0>;
+ 			linux,input-type = <EV_SW>;
+ 			gpios = <&gpio 8 GPIO_ACTIVE_LOW>;
+diff --git a/target/linux/ramips/dts/GL-MT1300.dts b/target/linux/ramips/dts/GL-MT1300.dts
+index 6a0adc7ba1..02cbc58f5a 100644
+--- a/target/linux/ramips/dts/GL-MT1300.dts
++++ b/target/linux/ramips/dts/GL-MT1300.dts
+@@ -32,8 +32,8 @@
+ 			linux,code = <KEY_RESTART>;
+ 		};
+ 
+-		BTN_0 {
+-			label = "BTN_0";
++		switch {
++			label = "switch";
+ 			gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;
+ 			linux,code = <BTN_0>;
+ 		};
+diff --git a/target/linux/ramips/dts/GL-MT300A.dts b/target/linux/ramips/dts/GL-MT300A.dts
+index 2cea9d9beb..59be6f84fc 100644
+--- a/target/linux/ramips/dts/GL-MT300A.dts
++++ b/target/linux/ramips/dts/GL-MT300A.dts
+@@ -46,8 +46,8 @@
+ 			linux,code = <KEY_RESTART>;
+ 		};
+ 
+-		BTN_0 {
+-			label = "BTN_0";
++		switch {
++			label = "switch";
+ 			gpios = <&gpio0 1 GPIO_ACTIVE_LOW>;
+ 			linux,code = <BTN_0>;
+ 		};
+diff --git a/target/linux/ramips/dts/GL-MT300N-V2.dts b/target/linux/ramips/dts/GL-MT300N-V2.dts
+index e4220736d2..d8a3558c6b 100644
+--- a/target/linux/ramips/dts/GL-MT300N-V2.dts
++++ b/target/linux/ramips/dts/GL-MT300N-V2.dts
+@@ -55,8 +55,8 @@
+ 			linux,code = <KEY_RESTART>;
+ 		};
+ 
+-		BTN_0 {
+-			label = "BTN_0";
++		switch {
++			label = "switch";
+ 			gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+ 			linux,code = <BTN_0>;
+ 		};
+diff --git a/target/linux/ramips/dts/GL-MT300N.dts b/target/linux/ramips/dts/GL-MT300N.dts
+index a30792cace..57ea4fa9d6 100644
+--- a/target/linux/ramips/dts/GL-MT300N.dts
++++ b/target/linux/ramips/dts/GL-MT300N.dts
+@@ -41,8 +41,8 @@
+ 			linux,code = <KEY_RESTART>;
+ 		};
+ 
+-		BTN_0 {
+-			label = "BTN_0";
++		switch {
++			label = "switch";
+ 			gpios = <&gpio2 2 GPIO_ACTIVE_LOW>;
+ 			linux,code = <BTN_0>;
+ 		};
+diff --git a/target/linux/ramips/dts/GL-MT750.dts b/target/linux/ramips/dts/GL-MT750.dts
+index 11133a126a..dc433715e9 100644
+--- a/target/linux/ramips/dts/GL-MT750.dts
++++ b/target/linux/ramips/dts/GL-MT750.dts
+@@ -41,8 +41,8 @@
+ 			linux,code = <KEY_RESTART>;
+ 		};
+ 
+-		BTN_0 {
+-			label = "BTN_0";
++		switch {
++			label = "switch";
+ 			gpios = <&gpio2 2 GPIO_ACTIVE_LOW>;
+ 			linux,code = <BTN_0>;
+ 		};
+-- 
+2.17.1
+

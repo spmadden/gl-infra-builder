@@ -1,0 +1,59 @@
+From a9ec1704b91edaf7b10ce30b9337d56625ba3588 Mon Sep 17 00:00:00 2001
+From: Luochongjun <luochongjun@gl-inet.com>
+Date: Tue, 21 Dec 2021 17:34:08 +0800
+Subject: [PATCH] support gl metadata
+
+---
+ include/image-commands.mk | 10 +++++-----
+ make_gl_metadata.py       | 13 +++++++++++++
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+ create mode 100755 make_gl_metadata.py
+
+diff --git a/include/image-commands.mk b/include/image-commands.mk
+index 32865b9..a6ee31b 100644
+--- a/include/image-commands.mk
++++ b/include/image-commands.mk
+@@ -396,16 +396,16 @@ metadata_gl_json = \
+ 			"revision": "$(call json_quote,$(REVISION))", \
+ 			"target": "$(call json_quote,$(TARGETID))", \
+ 			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
+-		} \
++		}, \
++		"upgrade_control":$(shell python3 $(TOPDIR)/make_gl_metadata.py), \
++		"release_note":"$(shell sed ':a;N;s/\n/\\n/g;s/\r/\\r/g;ta' $(TOPDIR)/gl_release_note)" \
+ 	}'
+ 
+ define Build/append-gl-metadata
+ 	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
+-	[ ! -s "$(BUILD_KEY)" -o ! -s "$(BUILD_KEY).ucert" -o ! -s "$@" ] || { \
+-		cp "$(BUILD_KEY).ucert" "$@.ucert" ;\
++	[ ! -s "$(BUILD_KEY)" -o ! -s "$@" ] || { \
+ 		usign -S -m "$@" -s "$(BUILD_KEY)" -x "$@.sig" ;\
+-		ucert -A -c "$@.ucert" -x "$@.sig" ;\
+-		fwtool -S "$@.ucert" "$@" ;\
++		fwtool -S "$@.sig" "$@" ;\
+ 	}
+ endef
+ 
+diff --git a/make_gl_metadata.py b/make_gl_metadata.py
+new file mode 100755
+index 0000000..a7f2946
+--- /dev/null
++++ b/make_gl_metadata.py
+@@ -0,0 +1,13 @@
++import sys
++import os
++import yaml
++import json
++
++pyfilePath = os.path.split(os.path.realpath(__file__))[0]
++yamlPath = os.path.join(pyfilePath, 'gl_metadata.yaml')
++
++f = open(yamlPath, 'r', encoding='utf-8')
++cont = f.read()
++x = yaml.load(cont)
++
++print(json.dumps(x))
+-- 
+2.7.4
+
