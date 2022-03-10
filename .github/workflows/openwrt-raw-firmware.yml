@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   schedule:
-    - cron: '0 21 * * *'
+    - cron: '0 16 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -27,7 +27,7 @@ jobs:
       - name: build
         run: |
           echo "COMPILE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
-          cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR snapshot
+          cd ~/work/runner-script/sdk4_script && ./build_openwrt_raw_firmware $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR snapshot
 
       - uses: actions/upload-artifact@v2
         with:
