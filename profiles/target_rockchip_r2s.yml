@@ -1,0 +1,5 @@
+---
+profile: friendlyarm_nanopi-r2s
+target: rockchip
+subtarget: rockchip_armv8
+description: Build image for the R2S model
