@@ -1,5 +1,0 @@
----
-profile: gl-ar750s
-target: ar71xx
-subtarget: generic
-description: Build image for the GL.iNET AR750S 16M Nor Flash

@@ -1,5 +1,0 @@
----
-profile: gl-usb150
-target: ar71xx
-subtarget: generic
-description: Build image for the GL.iNET USB150

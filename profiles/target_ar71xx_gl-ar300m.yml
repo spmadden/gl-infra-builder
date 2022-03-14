@@ -1,5 +1,0 @@
----
-profile: gl-ar300m
-target: ar71xx
-subtarget: generic
-description: Build image for the GL.iNET AR300M 16M Nor Flash
