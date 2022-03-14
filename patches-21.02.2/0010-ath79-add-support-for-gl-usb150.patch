@@ -1,0 +1,366 @@
+From 21ee3befaa14358ee3587eb459c150c04f56cd78 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Thu, 23 Sep 2021 18:22:18 +0800
+Subject: [PATCH 2/2] ath79: add support for gl usb150
+
+---
+ target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts | 136 +++++++++++++++++++++
+ target/linux/ath79/dts/ar9331_glinet_gl-usb150.dts | 119 ------------------
+ .../generic/base-files/etc/board.d/02_network      |   1 -
+ target/linux/ath79/image/generic.mk                |   9 --
+ target/linux/ath79/image/nand.mk                   |   9 ++
+ .../ath79/nand/base-files/etc/board.d/01_leds      |   4 +
+ .../ath79/nand/base-files/etc/board.d/02_network   |   1 +
+ 7 files changed, 150 insertions(+), 129 deletions(-)
+ create mode 100755 target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts
+ delete mode 100644 target/linux/ath79/dts/ar9331_glinet_gl-usb150.dts
+
+diff --git a/target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts b/target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts
+new file mode 100755
+index 0000000..72848a5
+--- /dev/null
++++ b/target/linux/ath79/dts/ar9330_glinet_gl-usb150.dts
+@@ -0,0 +1,136 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/dts-v1/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++#include "ar9330_glinet.dtsi"
++
++/ {
++	model = "GL.iNet GL-USB150";
++	compatible = "glinet,gl-usb150", "qca,ar9330";
++
++	aliases {
++		serial0 = &uart;
++	};
++
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "usb150";
++		lan = "eth0";
++		reset-button = "gpio-11";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		wlan {
++			label = "gl-usb150:orange:wlan";
++			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "phy0tpt";
++		};
++
++		led_power: power {
++			label = "gl-usb150:green:power";
++			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys-polled";
++		poll-interval = <100>;
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
++		};
++	};
++    gpio-export {
++        compatible = "gpio-export";
++        gpio_usb_power {
++            gpio-export,name = "gpio7";
++            gpio-export,output = <0>;
++            gpios = <&gpio 7 GPIO_ACTIVE_LOW>;
++        };
++    };
++};
++
++&uart {
++	status = "okay";
++};
++
++&spi {
++	num-chipselects = <1>;
++	status = "okay";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		spi-max-frequency = <104000000>;
++		reg = <0>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x000000 0x040000>;
++				read-only;
++			};
++
++			partition@1 {
++				label = "u-boot-env";
++				reg = <0x040000 0x010000>;
++			};
++
++			partition@2 {
++				compatible = "denx,uimage";
++				label = "firmware";
++				reg = <0x050000 0xfa0000>;
++			};
++
++			art: partition@3 {
++				label = "art";
++				reg = <0xff0000 0x010000>;
++				read-only;
++			};
++		};
++	};
++};
++
++&eth0 {
++	status = "okay";
++
++	mtd-mac-address = <&art 0x0>;
++
++	gmac-config {
++		device = <&gmac>;
++
++		switch-phy-addr-swap = <0>;
++		switch-phy-swap = <0>;
++	};
++};
++
++&eth1 {
++	status = "okay";
++	compatible = "syscon", "simple-mfd";
++};
++
++&wmac {
++	status = "okay";
++	mtd-cal-data = <&art 0x1000>;
++	mtd-mac-address = <&art 0x0>;
++};
+diff --git a/target/linux/ath79/dts/ar9331_glinet_gl-usb150.dts b/target/linux/ath79/dts/ar9331_glinet_gl-usb150.dts
+deleted file mode 100644
+index d1c2654..0000000
+--- a/target/linux/ath79/dts/ar9331_glinet_gl-usb150.dts
++++ /dev/null
+@@ -1,119 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+-
+-#include "ar9331.dtsi"
+-
+-#include <dt-bindings/gpio/gpio.h>
+-#include <dt-bindings/input/input.h>
+-
+-/ {
+-	compatible = "glinet,gl-usb150", "qca,ar9331";
+-	model = "GL.iNet GL-USB150";
+-
+-	aliases {
+-		led-boot = &led_power;
+-		led-failsafe = &led_power;
+-		led-running = &led_power;
+-		led-upgrade = &led_power;
+-		label-mac-device = &eth0;
+-	};
+-
+-	leds {
+-		compatible = "gpio-leds";
+-
+-		wlan {
+-			label = "green:wlan";
+-			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
+-			linux,default-trigger = "phy0tpt";
+-		};
+-
+-		led_power: power {
+-			label = "green:power";
+-			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
+-			default-state = "on";
+-		};
+-	};
+-
+-	keys {
+-		compatible = "gpio-keys";
+-
+-		reset {
+-			label = "reset";
+-			linux,code = <KEY_RESTART>;
+-			gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
+-			debounce-interval = <60>;
+-		};
+-	};
+-
+-	gpio-export {
+-		compatible = "gpio-export";
+-
+-		gpio_lan_reset {
+-			gpio-export,name = "lan:reset";
+-			gpio-export,output = <0>;
+-			gpios = <&gpio 7 GPIO_ACTIVE_LOW>;
+-		};
+-	};
+-};
+-
+-&eth0 {
+-	status = "okay";
+-
+-	mtd-mac-address = <&art 0x0>;
+-
+-	gmac-config {
+-		device = <&gmac>;
+-		switch-phy-addr-swap = <0>;
+-		switch-phy-swap = <0>;
+-	};
+-};
+-
+-&eth1 {
+-	status = "okay";
+-
+-	compatible = "syscon", "simple-mfd";
+-};
+-
+-&spi {
+-	status = "okay";
+-
+-	flash@0 {
+-		compatible = "jedec,spi-nor";
+-		spi-max-frequency = <33000000>;
+-		reg = <0>;
+-
+-		partitions {
+-			compatible = "fixed-partitions";
+-			#address-cells = <1>;
+-			#size-cells = <1>;
+-
+-			partition@0 {
+-				label = "u-boot";
+-				reg = <0x000000 0x040000>;
+-				read-only;
+-			};
+-
+-			partition@40000 {
+-				label = "u-boot-env";
+-				reg = <0x040000 0x010000>;
+-			};
+-
+-			partition@50000 {
+-				compatible = "denx,uimage";
+-				label = "firmware";
+-				reg = <0x050000 0xfa0000>;
+-			};
+-
+-			art: partition@ff0000 {
+-				label = "art";
+-				reg = <0xff0000 0x010000>;
+-				read-only;
+-			};
+-		};
+-	};
+-};
+-
+-&wmac {
+-	status = "okay";
+-
+-	mtd-cal-data = <&art 0x1000>;
+-};
+diff --git a/target/linux/ath79/generic/base-files/etc/board.d/02_network b/target/linux/ath79/generic/base-files/etc/board.d/02_network
+index f446ba2..dedc9fc 100755
+--- a/target/linux/ath79/generic/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/generic/base-files/etc/board.d/02_network
+@@ -38,7 +38,6 @@ ath79_setup_interfaces()
+ 	engenius,ecb1750|\
+ 	engenius,ecb600|\
+ 	enterasys,ws-ap3705i|\
+-	glinet,gl-usb150|\
+ 	hak5,wifi-pineapple-nano|\
+ 	meraki,mr16|\
+ 	netgear,ex6400|\
+diff --git a/target/linux/ath79/image/generic.mk b/target/linux/ath79/image/generic.mk
+index 0799ae7..cf3fce3 100644
+--- a/target/linux/ath79/image/generic.mk
++++ b/target/linux/ath79/image/generic.mk
+@@ -1167,15 +1167,6 @@ define Device/glinet_gl-ar750
+ endef
+ TARGET_DEVICES += glinet_gl-ar750
+ 
+-define Device/glinet_gl-usb150
+-  SOC := ar9331
+-  DEVICE_VENDOR := GL.iNET
+-  DEVICE_MODEL := GL-USB150
+-  IMAGE_SIZE := 16000k
+-  SUPPORTED_DEVICES += gl-usb150
+-endef
+-TARGET_DEVICES += glinet_gl-usb150
+-
+ define Device/glinet_gl-x750
+   SOC := qca9531
+   DEVICE_VENDOR := GL.iNet
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index f45877e..83ca331 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -86,6 +86,15 @@ define Device/glinet_gl-ar150
+ endef
+ TARGET_DEVICES += glinet_gl-ar150
+ 
++define Device/glinet_gl-usb150
++  SOC := ar9330
++  DEVICE_TITLE := GL.iNet GL-USB150
++  DEVICE_PACKAGES := kmod-usb2  block-mount
++  IMAGE_SIZE := 16000k
++  SUPPORTED_DEVICES += gl-usb150 glinet,gl-usb150
++endef
++TARGET_DEVICES += glinet_gl-usb150
++
+ define Device/glinet_gl-x300b-common
+   SOC := qca9531
+   DEVICE_VENDOR := GL.iNet
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index 27f8ee2..24f03a0 100755
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -10,6 +10,10 @@ case "$board" in
+ glinet,gl-ar150)
+ 	ucidef_set_led_wlan "wlan" "WLAN" "gl-ar150:orange:wlan" "phy0tpt"
+ 	;;
++glinet,gl-usb150)
++	ucidef_set_led_wlan "wlan" "WLAN" "gl-usb150:green:wlan" "phy0tpt"
++	ucidef_set_led_default "power" "POWER" "gl-usb150:green:power" "1"
++    ;;
+ glinet,gl-ar300m-nand|\
+ glinet,gl-ar300m-nor)
+ 	ucidef_set_led_netdev "lan" "LAN" "gl-ar300m:green:lan" "eth1"
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index 9be5bef..06b664e 100755
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -9,6 +9,7 @@ ath79_setup_interfaces()
+ 
+ 	case "$board" in
+ 	aerohive,hiveap-121|\
++	glinet,gl-usb150|\
+ 	glinet,gl-e750)
+ 		ucidef_set_interface_lan "eth0"
+ 		;;
+-- 
+2.7.4
+
