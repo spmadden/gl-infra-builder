@@ -14,6 +14,13 @@ packages:
   - dnsmasq-full
   - mwan3
   - iwinfo
+  - blkid
+  - ntfs-3g
+  - ntfs-3g-utils
+  - kmod-fs-ext4
+  - kmod-fs-ntfs
+  - kmod-fs-vfat
+  - kmod-fs-exfat
   - oui-httpd
   - gl-sdk4-luci
   - gl-sdk4-rtty
