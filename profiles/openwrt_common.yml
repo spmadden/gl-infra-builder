@@ -1,5 +1,8 @@
 ---
 description: Add the LUCI dependencies
+feeds:
+  - name: glinet
+    path: ../feeds_dir/glinet
 
 packages:
   - luci
