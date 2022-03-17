@@ -1,0 +1,539 @@
+From d7e9d445bbe168d7d6c3d36e22b981f8429add55 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Thu, 17 Mar 2022 19:53:15 +0800
+Subject: [PATCH] fix b1300th dts and sysupgrade
+
+---
+ .../base-files/lib/upgrade/platform.sh        |  12 ++
+ .../arm/boot/dts/qcom-ipq4018-gl-b1300th.dts  | 120 +++++++++----
+ target/linux/ipq40xx/image/Makefile           |   8 +-
+ .../0036-GPIO-add-named-gpio-exports.patch    | 165 ++++++++++++++++++
+ .../patches-4.14/717-fix-ubi-name.patch       |  99 +++++++++++
+ 5 files changed, 371 insertions(+), 33 deletions(-)
+ create mode 100644 target/linux/ipq40xx/patches-4.14/0036-GPIO-add-named-gpio-exports.patch
+ create mode 100644 target/linux/ipq40xx/patches-4.14/717-fix-ubi-name.patch
+
+diff --git a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
+index 90e25ee0c4..160dae0393 100644
+--- a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
+@@ -105,5 +105,17 @@ platform_nand_pre_upgrade() {
+ 	meraki,mr33)
+ 		CI_KERNPART="part.safe"
+ 		;;
++    glinet,gl-b1300th)
++        current_fw=`fw_printenv -n fw_current`
++        if [ "$current_fw" == "a"  ];then
++            fw_setenv fw_a_version $version 
++            CI_UBIPART="ubi1"
++            fw_setenv fw_current  b || exit 1
++        elif [ "$current_fw" == "b"  ];then
++            fw_setenv fw_b_version $version
++            CI_UBIPART="ubi0"
++            fw_setenv fw_current  a || exit 1
++        fi
++        ;;
+ 	esac
+ }
+diff --git a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+index 0cf07a5b2a..d655a0b456 100644
+--- a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
++++ b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+@@ -23,28 +23,20 @@
+ 	model = "GL.iNet GL-B1300TH";
+ 	compatible = "glinet,gl-b1300th", "qcom,ipq4019";
+ 
+-	aliases {
+-		led-boot = &power;
+-		led-failsafe = &power;
+-		led-running = &power;
+-		led-upgrade = &power;
+-	};
+-
+ 	gl_hw {
+ 		compatible = "gl-hw-info";
+ 
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+-		model = "b1300";
++		model = "b1300th";
+ 		wan = "eth0";
+ 		lan = "eth1";
+ 		reset-button = "gpio-63";
+-		usb-port = "1-1";
+ 		factory_data {
+-			device_mac = "art";
+-			device_ddns = "art", "0x10";
+-			device_sn_bak = "art", "0x20";
+-			device_sn = "art", "0x30";
++			device_mac = "ART", "0";
++			device_ddns = "ART", "0x10";
++			device_sn_bak = "ART", "0x20";
++			device_sn = "ART", "0x30";
+ 		};
+  	};
+ 
+@@ -137,23 +129,32 @@
+ 
+ 	leds {
+ 		compatible = "gpio-leds";
++	};
++    gpio-export {
++		compatible = "gpio-export";
+ 
+-		power: power {
+-			label = "gl-b1300th:green:power";
+-			gpios = <&tlmm 4 GPIO_ACTIVE_HIGH>;
+-			default-state = "on";
++		gpio_0 {
++			gpio-export,name = "gpio0";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 0 GPIO_ACTIVE_HIGH>;
+ 		};
+-
+-		mesh {
+-			label = "gl-b1300th:green:mesh";
+-			gpios = <&tlmm 3 GPIO_ACTIVE_HIGH>;
++		gpio_1 {
++			gpio-export,name = "gpio1";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 1 GPIO_ACTIVE_HIGH>;
+ 		};
+-
+-		wlan {
+-			label = "gl-b1300th:green:wlan";
++		gpio_2 {
++			gpio-export,name = "gpio2";
++			gpio-export,output = <0>;
+ 			gpios = <&tlmm 2 GPIO_ACTIVE_HIGH>;
+ 		};
+-	};
++		gpio_3 {
++			gpio-export,name = "gpio3";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 3 GPIO_ACTIVE_HIGH>;
++		};
++    };
++
+ };
+ 
+ &blsp_dma {
+@@ -167,7 +168,7 @@
+ &blsp1_spi1 {
+ 	pinctrl-0 = <&spi_0_pins>;
+ 	pinctrl-names = "default";
+-	cs-gpios = <&tlmm 54 GPIO_ACTIVE_HIGH>, <&tlmm 59 GPIO_ACTIVE_HIGH>;
++	cs-gpios = <&tlmm 54 GPIO_ACTIVE_HIGH>, <&tlmm 4 GPIO_ACTIVE_HIGH>;
+ 	status = "okay";
+ 
+ 	m25p80@0 {
+@@ -210,7 +211,6 @@
+ 			partition5@e0000 {
+ 				label = "APPSBLENV"; /* uboot env*/
+ 				reg = <0x000e0000 0x00010000>;
+-				read-only;
+ 			};
+ 			partition5@f0000 {
+ 				label = "APPSBL"; /* uboot */
+@@ -238,8 +238,16 @@
+ 			#size-cells = <1>;
+ 
+ 			partition@0 {
+-				label = "ubi";
+-				reg = <0x00000000 0x10000000>;
++				label = "ubi0";
++				reg = <0x00000000 0x08000000>;
++			};
++			partition@08000000 {
++				label = "ubi1";
++				reg = <0x08000000 0x08000000>;
++			};
++			partition@10000000 {
++				label = "data";
++				reg = <0x10000000 0x10000000>;
+ 			};
+ 		};
+ 	};
+@@ -249,6 +257,8 @@
+ 	pinctrl-0 = <&serial_pins>;
+ 	pinctrl-names = "default";
+ 	status = "okay";
++    rs485_pin=<2>;
++    rs485_dev="ttyUSB1";
+ };
+ 
+ &tlmm {
+@@ -260,6 +270,45 @@
+ 		};
+ 	};
+ 
++	i2c_0_pins: i2c_0_pinmux {
++		pinmux {
++			function = "blsp_i2c0";
++			pins = "gpio58", "gpio59";
++		};
++		pinconf {
++			pins = "gpio58", "gpio59";
++			drive-strength = <16>;
++			bias-pull-up;
++		};
++    };
++
++    gpios:gpio{
++            thd_res {
++                pins = "gpio0";
++                function = "gpio";
++                bias-disable;
++                output-high;
++            };
++            thd_dfu {
++                pins = "gpio1";
++                function = "gpio";
++                bias-disable;
++                output-high;
++            };
++            rs485_ctl {
++                pins = "gpio2";
++                function = "gpio";
++                bias-disable;
++                output-low;
++            };
++            led_en {
++                pins = "gpio3";
++                function = "gpio";
++                bias-disable;
++                output-high;
++            };
++    };
++
+ 	spi_0_pins: spi_0_pinmux {
+ 		pin {
+ 			function = "blsp_spi0";
+@@ -269,7 +318,7 @@
+ 		};
+ 		pin_cs {
+ 			function = "gpio";
+-			pins = "gpio54", "gpio59";
++			pins = "gpio54", "gpio4";
+ 			drive-strength = <2>;
+ 			bias-disable;
+ 			output-high;
+@@ -277,6 +326,17 @@
+ 	};
+ };
+ 
++&blsp1_i2c3 {
++	status = "okay";
++    pinctrl-0 = <&i2c_0_pins>;
++    pinctrl-names = "default";
++
++    rtc@32 {
++            compatible = "sd2068";
++            reg = <0x32>;
++    };
++};
++
+ &usb2_hs_phy {
+ 	status = "okay";
+ };
+diff --git a/target/linux/ipq40xx/image/Makefile b/target/linux/ipq40xx/image/Makefile
+index db9f20d5ad..28cdc15034 100644
+--- a/target/linux/ipq40xx/image/Makefile
++++ b/target/linux/ipq40xx/image/Makefile
+@@ -215,12 +215,14 @@ define Device/glinet_gl-b1300th
+ 	$(call Device/FitImage)
+ 	$(call Device/UbiFit)
+ 	DEVICE_DTS := qcom-ipq4018-gl-b1300th
+-	BLOCKSIZE := 128k
+-	PAGESIZE := 2048
++	BLOCKSIZE := 256k
++	PAGESIZE := 4096
+ 	DEVICE_TITLE := GL.iNet GL-B1300TH
+ 	DEVICE_DTS_CONFIG := config@ap.dk01.1-c2
+ 	KERNEL_SIZE := 4096k
+-	IMAGE_SIZE := 26624k
++	IMAGE_SIZE := 122880k
++	IMAGES += sysupgrade.tar
++	IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-b1300th
+ 
+diff --git a/target/linux/ipq40xx/patches-4.14/0036-GPIO-add-named-gpio-exports.patch b/target/linux/ipq40xx/patches-4.14/0036-GPIO-add-named-gpio-exports.patch
+new file mode 100644
+index 0000000000..61ed9ea784
+--- /dev/null
++++ b/target/linux/ipq40xx/patches-4.14/0036-GPIO-add-named-gpio-exports.patch
+@@ -0,0 +1,165 @@
++From 4267880319bc1a2270d352e0ded6d6386242a7ef Mon Sep 17 00:00:00 2001
++From: John Crispin <blogic@openwrt.org>
++Date: Tue, 12 Aug 2014 20:49:27 +0200
++Subject: [PATCH 24/53] GPIO: add named gpio exports
++
++Signed-off-by: John Crispin <blogic@openwrt.org>
++---
++ drivers/gpio/gpiolib-of.c     |   68 +++++++++++++++++++++++++++++++++++++++++
++ drivers/gpio/gpiolib-sysfs.c  |   10 +++++-
++ include/asm-generic/gpio.h    |    6 ++++
++ include/linux/gpio/consumer.h |    8 +++++
++ 4 files changed, 91 insertions(+), 1 deletion(-)
++
++--- a/drivers/gpio/gpiolib-of.c
+++++ b/drivers/gpio/gpiolib-of.c
++@@ -23,6 +23,8 @@
++ #include <linux/pinctrl/pinctrl.h>
++ #include <linux/slab.h>
++ #include <linux/gpio/machine.h>
+++#include <linux/init.h>
+++#include <linux/platform_device.h>
++ 
++ #include "gpiolib.h"
++ 
++@@ -513,3 +515,68 @@ void of_gpiochip_remove(struct gpio_chip
++ 	gpiochip_remove_pin_ranges(chip);
++ 	of_node_put(chip->of_node);
++ }
+++
+++static struct of_device_id gpio_export_ids[] = {
+++	{ .compatible = "gpio-export" },
+++	{ /* sentinel */ }
+++};
+++
+++static int of_gpio_export_probe(struct platform_device *pdev)
+++{
+++	struct device_node *np = pdev->dev.of_node;
+++	struct device_node *cnp;
+++	u32 val;
+++	int nb = 0;
+++
+++	for_each_child_of_node(np, cnp) {
+++		const char *name = NULL;
+++		int gpio;
+++		bool dmc;
+++		int max_gpio = 1;
+++		int i;
+++
+++		of_property_read_string(cnp, "gpio-export,name", &name);
+++
+++		if (!name)
+++			max_gpio = of_gpio_count(cnp);
+++
+++		for (i = 0; i < max_gpio; i++) {
+++			unsigned flags = 0;
+++			enum of_gpio_flags of_flags;
+++
+++			gpio = of_get_gpio_flags(cnp, i, &of_flags);
+++			if (!gpio_is_valid(gpio))
+++				return gpio;
+++
+++			if (of_flags == OF_GPIO_ACTIVE_LOW)
+++				flags |= GPIOF_ACTIVE_LOW;
+++
+++			if (!of_property_read_u32(cnp, "gpio-export,output", &val))
+++				flags |= val ? GPIOF_OUT_INIT_HIGH : GPIOF_OUT_INIT_LOW;
+++			else
+++				flags |= GPIOF_IN;
+++
+++			if (devm_gpio_request_one(&pdev->dev, gpio, flags, name ? name : of_node_full_name(np)))
+++				continue;
+++
+++			dmc = of_property_read_bool(cnp, "gpio-export,direction_may_change");
+++			gpio_export_with_name(gpio, dmc, name);
+++			nb++;
+++		}
+++	}
+++
+++	dev_info(&pdev->dev, "%d gpio(s) exported\n", nb);
+++
+++	return 0;
+++}
+++
+++static struct platform_driver gpio_export_driver = {
+++	.driver		= {
+++		.name		= "gpio-export",
+++		.owner	= THIS_MODULE,
+++		.of_match_table	= of_match_ptr(gpio_export_ids),
+++	},
+++	.probe		= of_gpio_export_probe,
+++};
+++
+++module_platform_driver(gpio_export_driver);
++--- a/drivers/gpio/gpiolib-sysfs.c
+++++ b/drivers/gpio/gpiolib-sysfs.c
++@@ -553,7 +553,7 @@ static struct class gpio_class = {
++  *
++  * Returns zero on success, else an error.
++  */
++-int gpiod_export(struct gpio_desc *desc, bool direction_may_change)
+++int __gpiod_export(struct gpio_desc *desc, bool direction_may_change, const char *name)
++ {
++ 	struct gpio_chip	*chip;
++ 	struct gpio_device	*gdev;
++@@ -615,6 +615,8 @@ int gpiod_export(struct gpio_desc *desc,
++ 	offset = gpio_chip_hwgpio(desc);
++ 	if (chip->names && chip->names[offset])
++ 		ioname = chip->names[offset];
+++	if (name)
+++		ioname = name;
++ 
++ 	dev = device_create_with_groups(&gpio_class, &gdev->dev,
++ 					MKDEV(0, 0), data, gpio_groups,
++@@ -636,6 +638,12 @@ err_unlock:
++ 	gpiod_dbg(desc, "%s: status %d\n", __func__, status);
++ 	return status;
++ }
+++EXPORT_SYMBOL_GPL(__gpiod_export);
+++
+++int gpiod_export(struct gpio_desc *desc, bool direction_may_change)
+++{
+++	return __gpiod_export(desc, direction_may_change, NULL);
+++}
++ EXPORT_SYMBOL_GPL(gpiod_export);
++ 
++ static int match_export(struct device *dev, const void *desc)
++--- a/include/asm-generic/gpio.h
+++++ b/include/asm-generic/gpio.h
++@@ -127,6 +127,12 @@ static inline int gpio_export(unsigned g
++ 	return gpiod_export(gpio_to_desc(gpio), direction_may_change);
++ }
++ 
+++int __gpiod_export(struct gpio_desc *desc, bool direction_may_change, const char *name);
+++static inline int gpio_export_with_name(unsigned gpio, bool direction_may_change, const char *name)
+++{
+++	return __gpiod_export(gpio_to_desc(gpio), direction_may_change, name);
+++}
+++
++ static inline int gpio_export_link(struct device *dev, const char *name,
++ 				   unsigned gpio)
++ {
++--- a/include/linux/gpio/consumer.h
+++++ b/include/linux/gpio/consumer.h
++@@ -451,6 +451,7 @@ struct gpio_desc *devm_fwnode_get_gpiod_
++ 
++ #if IS_ENABLED(CONFIG_GPIOLIB) && IS_ENABLED(CONFIG_GPIO_SYSFS)
++ 
+++int _gpiod_export(struct gpio_desc *desc, bool direction_may_change, const char *name);
++ int gpiod_export(struct gpio_desc *desc, bool direction_may_change);
++ int gpiod_export_link(struct device *dev, const char *name,
++ 		      struct gpio_desc *desc);
++@@ -458,6 +459,13 @@ void gpiod_unexport(struct gpio_desc *de
++ 
++ #else  /* CONFIG_GPIOLIB && CONFIG_GPIO_SYSFS */
++ 
+++static inline int _gpiod_export(struct gpio_desc *desc,
+++			       bool direction_may_change,
+++			       const char *name)
+++{
+++	return -ENOSYS;
+++}
+++
++ static inline int gpiod_export(struct gpio_desc *desc,
++ 			       bool direction_may_change)
++ {
+diff --git a/target/linux/ipq40xx/patches-4.14/717-fix-ubi-name.patch b/target/linux/ipq40xx/patches-4.14/717-fix-ubi-name.patch
+new file mode 100644
+index 0000000000..765b0690ee
+--- /dev/null
++++ b/target/linux/ipq40xx/patches-4.14/717-fix-ubi-name.patch
+@@ -0,0 +1,99 @@
++Index: b/drivers/mtd/ubi/build.c
++===================================================================
++--- a/drivers/mtd/ubi/build.c	2021-12-29 12:16:10.527804496 +0800
+++++ b/drivers/mtd/ubi/build.c	2021-12-29 12:16:56.132707767 +0800
++@@ -1171,7 +1171,71 @@ static struct mtd_info * __init open_mtd
++ 
++ 	return mtd;
++ }
+++/*
+++ * This function tries attaching mtd partitions by name
+++ * during boot.
+++ */
+++
+++static void __init ubi_auto_attach_by_name(char *mtd_name)
+++{
+++	int err;
+++	struct mtd_info *mtd;
+++	loff_t offset = 0;
+++	size_t len;
+++	char magic[4];
+++
+++	/* try attaching mtd device named "ubi" or "data" */
+++	mtd = open_mtd_device(mtd_name);
+++
+++	if (IS_ERR(mtd))
+++		return;
+++
+++	/* get the first not bad block */
+++	if (mtd_can_have_bb(mtd))
+++		while (mtd_block_isbad(mtd, offset)) {
+++			offset += mtd->erasesize;
+++
+++			if (offset > mtd->size) {
+++				pr_err("UBI error: Failed to find a non-bad "
+++				       "block on mtd%d\n", mtd->index);
+++				goto cleanup;
+++			}
+++		}
++ 
+++	/* check if the read from flash was successful */
+++	err = mtd_read(mtd, offset, 4, &len, (void *) magic);
+++	if ((err && !mtd_is_bitflip(err)) || len != 4) {
+++		pr_err("UBI error: unable to read from mtd%d\n", mtd->index);
+++		goto cleanup;
+++	}
+++
+++	/* check for a valid ubi magic */
+++	if (strncmp(magic, "UBI#", 4)) {
+++		pr_err("UBI error: no valid UBI magic found inside mtd%d\n", mtd->index);
+++		goto cleanup;
+++	}
+++
+++	/* don't auto-add media types where UBI doesn't makes sense */
+++	if (mtd->type != MTD_NANDFLASH &&
+++	    mtd->type != MTD_NORFLASH &&
+++	    mtd->type != MTD_DATAFLASH &&
+++	    mtd->type != MTD_MLCNANDFLASH)
+++		goto cleanup;
+++
+++	mutex_lock(&ubi_devices_mutex);
+++	pr_notice("UBI: auto-attach mtd%d\n", mtd->index);
+++	err = ubi_attach_mtd_dev(mtd, UBI_DEV_NUM_AUTO, 0, 0);
+++	mutex_unlock(&ubi_devices_mutex);
+++	if (err < 0) {
+++		pr_err("UBI error: cannot attach mtd%d\n", mtd->index);
+++		goto cleanup;
+++	}
+++
+++	return;
+++
+++cleanup:
+++	put_mtd_device(mtd);
+++}
++ /*
++  * This function tries attaching mtd partitions named either "ubi" or "data"
++  * during boot.
++@@ -1238,7 +1302,7 @@ static void __init ubi_auto_attach(void)
++ cleanup:
++ 	put_mtd_device(mtd);
++ }
++-
+++extern char *saved_command_line;
++ static int __init ubi_init(void)
++ {
++ 	int err, i, k;
++@@ -1324,6 +1388,13 @@ static int __init ubi_init(void)
++ 
++ 	/* auto-attach mtd devices only if built-in to the kernel and no ubi.mtd
++ 	 * parameter was given */
+++        if(saved_command_line){
+++            if(strstr(saved_command_line,"mountdata")){
+++                pr_notice("UBI: mount data\n");
+++                ubi_auto_attach_by_name("data");
+++            }
+++        }
+++
++ 	if (IS_ENABLED(CONFIG_MTD_ROOTFS_ROOT_DEV) &&
++ 	    !ubi_is_module() && !mtd_devs)
++ 		ubi_auto_attach();
+-- 
+2.17.1
+
