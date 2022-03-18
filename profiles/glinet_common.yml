@@ -58,6 +58,7 @@ packages:
   - gl-sdk4-qos
   - gl-sdk4-cloud-batch-manage
   - gl-sdk4-network-diag
+  - gl-sdk4-carrier-monitor
 
 
 diffconfig: |
