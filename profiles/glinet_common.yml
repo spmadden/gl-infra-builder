@@ -59,6 +59,7 @@ packages:
   - gl-sdk4-cloud-batch-manage
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
+  - gl-sdk4-init-portal
 
 
 diffconfig: |
