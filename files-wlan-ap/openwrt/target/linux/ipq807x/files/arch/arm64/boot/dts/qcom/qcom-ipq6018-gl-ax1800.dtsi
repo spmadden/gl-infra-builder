@@ -301,6 +301,18 @@
 			debounce-interval = <60>;
 		};
 	};
+
+	gpio-export {
+		compatible = "gpio-export";
+		pinctrl-0 = <&usb_pins>;
+		pinctrl-names = "default";
+
+		usb_power {
+			gpio-export,name = "usb_power";
+			gpio-export,output = <1>;
+			gpios = <&tlmm 0 GPIO_ACTIVE_HIGH>;
+		};
+	};
 };
 
 &blsp1_uart3 {
