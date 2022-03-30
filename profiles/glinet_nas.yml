@@ -3,7 +3,25 @@ description: GL nas utils
 
 packages:
   - gl-sdk4-nas-utils
+  - gl-sdk4-exfat-utils
+  - gl-sdk4-webdav
+  - samba4-server
+  - samba4-libs
+  - samba4-utils
+  - blkid
+  - kmod-fs-ext4
+  - kmod-fs-ntfs
+  - kmod-fs-vfat
+  - kmod-fs-exfat
+  - ntfs-3g
+  - ntfs-3g-utils
+  - dosfstools
+  - e2fsprogs
+  - shadow-utils
+
+
 
 diffconfig: |
-
+  CONFIG_SAMBA4_SERVER_VFSX=y
+  CONFIG_SAMBA4_SERVER_AD_DC=y
 
