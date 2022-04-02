@@ -48,7 +48,7 @@
 		switch-button = "gpio-16";
 		reset-button = "gpio-50";
 		usb-port = "1-1";
-		flash_sie = <128>;
+		flash_size = <128>;
 		factory_data {
 			device_mac = "0:ART", "0x0";
 			device_ddns = "0:ART", "0x20";
