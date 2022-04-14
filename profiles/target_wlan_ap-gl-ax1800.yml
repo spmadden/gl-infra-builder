@@ -11,7 +11,7 @@ feeds:
     path: ../../feeds/wifi-ax
   - name: gl_feeds
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: cc8a34a513556d7178b1ee1f7f151a7a92d84537
+    revision: b58482c508c384eee870f881106a662fbf0e2ebb
   - name: luci
     uri: https://github.com/openwrt/luci.git
     revision: 1c3b32dc1bec15e3076a447762b1c4f94eb75fb7
