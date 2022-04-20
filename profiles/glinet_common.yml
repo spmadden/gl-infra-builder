@@ -43,7 +43,7 @@ packages:
   - gl-sdk4-plugins
   - gl-sdk4-firewall
   - gl-sdk4-repeater
-  - gl-sdk4-custom-dns
+  - gl-sdk4-dns
   - gl-sdk4-system
   - gl-sdk4-network
   - gl-sdk4-acl
