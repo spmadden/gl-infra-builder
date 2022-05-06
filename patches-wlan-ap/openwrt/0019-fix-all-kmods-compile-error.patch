@@ -1,0 +1,348 @@
+From e66f984508225bb68aa4f26e840106a351b398bc Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Thu, 5 May 2022 19:54:32 +0800
+Subject: [PATCH] fix: all kmods compile error
+
+---
+ include/netfilter.mk                       |  2 +-
+ package/kernel/linux/modules/block.mk      |  1 +
+ package/kernel/linux/modules/can.mk        |  2 +-
+ package/kernel/linux/modules/crypto.mk     |  8 +--
+ package/kernel/linux/modules/iio.mk        |  4 +-
+ package/kernel/linux/modules/lib.mk        |  2 +-
+ package/kernel/linux/modules/netdevices.mk | 25 +-------
+ package/kernel/linux/modules/netfilter.mk  |  3 +-
+ package/kernel/linux/modules/other.mk      | 96 ++++++++++++++++++++++++++----
+ package/kernel/linux/modules/sound.mk      |  2 +-
+ package/kernel/linux/modules/video.mk      |  3 +-
+ package/kernel/linux/modules/wireless.mk   |  2 +-
+ 12 files changed, 102 insertions(+), 48 deletions(-)
+
+diff --git a/include/netfilter.mk b/include/netfilter.mk
+index 6207d9a..1e22ad7 100644
+--- a/include/netfilter.mk
++++ b/include/netfilter.mk
+@@ -357,7 +357,7 @@ $(eval $(if $(NF_KMOD),$(call nf_add,NFT_BRIDGE,CONFIG_NFT_BRIDGE_META, $(P_EBT)
+ $(eval $(if $(NF_KMOD),$(call nf_add,NFT_BRIDGE,CONFIG_NFT_BRIDGE_REJECT, $(P_EBT)nft_reject_bridge),))
+ 
+ $(eval $(if $(NF_KMOD),$(call nf_add,NFT_NAT,CONFIG_NFT_NAT, $(P_XT)nft_nat),))
+-$(eval $(if $(NF_KMOD),$(call nf_add,NFT_NAT,CONFIG_NFT_NAT, $(P_XT)nft_chain_nat),))
++#$(eval $(if $(NF_KMOD),$(call nf_add,NFT_NAT,CONFIG_NFT_NAT, $(P_XT)nft_chain_nat),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NFT_NAT,CONFIG_NFT_REDIR_IPV4, $(P_V4)nft_redir_ipv4),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NFT_NAT,CONFIG_NFT_MASQ, $(P_XT)nft_masq),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NFT_NAT,CONFIG_NFT_MASQ_IPV4, $(P_V4)nft_masq_ipv4),))
+diff --git a/package/kernel/linux/modules/block.mk b/package/kernel/linux/modules/block.mk
+index b7767b3..d1e1fc5 100644
+--- a/package/kernel/linux/modules/block.mk
++++ b/package/kernel/linux/modules/block.mk
+@@ -555,6 +555,7 @@ define KernelPackage/scsi-cdrom
+     CONFIG_BLK_DEV_SR \
+     CONFIG_BLK_DEV_SR_VENDOR=n
+   FILES:=$(LINUX_DIR)/drivers/scsi/sr_mod.ko
++  FILES+=$(LINUX_DIR)/drivers/cdrom/cdrom.ko
+   AUTOLOAD:=$(call AutoLoad,45,sr_mod)
+ endef
+ 
+diff --git a/package/kernel/linux/modules/can.mk b/package/kernel/linux/modules/can.mk
+index 5542c4f..3bf0359 100644
+--- a/package/kernel/linux/modules/can.mk
++++ b/package/kernel/linux/modules/can.mk
+@@ -28,7 +28,7 @@ define KernelPackage/can
+ 	CONFIG_CAN_SOFTING=n \
+ 	CONFIG_NET_EMATCH_CANID=n \
+ 	CONFIG_CAN_DEBUG_DEVICES=n
+-  FILES:=$(LINUX_DIR)/drivers/net/can/dev/can-dev.ko \
++  FILES:=$(LINUX_DIR)/drivers/net/can/can-dev.ko \
+ 	 $(LINUX_DIR)/net/can/can.ko
+   AUTOLOAD:=$(call AutoProbe,can can-dev)
+ endef
+diff --git a/package/kernel/linux/modules/crypto.mk b/package/kernel/linux/modules/crypto.mk
+index 8872b37..955ec7c 100644
+--- a/package/kernel/linux/modules/crypto.mk
++++ b/package/kernel/linux/modules/crypto.mk
+@@ -126,7 +126,7 @@ define KernelPackage/crypto-crc32
+   DEPENDS:=+kmod-crypto-hash
+   KCONFIG:=CONFIG_CRYPTO_CRC32
+   HIDDEN:=1
+-  FILES:=$(LINUX_DIR)/crypto/crc32_generic.ko
++  FILES:=$(LINUX_DIR)/crypto/crc32.ko
+   AUTOLOAD:=$(call AutoLoad,04,crc32_generic,1)
+   $(call AddDepends/crypto)
+ endef
+@@ -186,8 +186,7 @@ define KernelPackage/crypto-des
+   TITLE:=DES/3DES cipher CryptoAPI module
+   KCONFIG:=CONFIG_CRYPTO_DES
+   FILES:= \
+-	$(LINUX_DIR)/crypto/des_generic.ko \
+-	$(LINUX_DIR)/lib/crypto/libdes.ko
++	$(LINUX_DIR)/crypto/des_generic.ko
+   AUTOLOAD:=$(call AutoLoad,09,des_generic)
+   $(call AddDepends/crypto)
+ endef
+@@ -906,8 +905,7 @@ define KernelPackage/crypto-sha256
+ 	CONFIG_CRYPTO_SHA256_OCTEON \
+ 	CONFIG_CRYPTO_SHA256_SSSE3
+   FILES:= \
+-	$(LINUX_DIR)/crypto/sha256_generic.ko \
+-	$(LINUX_DIR)/lib/crypto/libsha256.ko
++	$(LINUX_DIR)/crypto/sha256_generic.ko
+   AUTOLOAD:=$(call AutoLoad,09,sha256_generic)
+   $(call AddDepends/crypto)
+ endef
+diff --git a/package/kernel/linux/modules/iio.mk b/package/kernel/linux/modules/iio.mk
+index 0ea7ba8..943718e 100644
+--- a/package/kernel/linux/modules/iio.mk
++++ b/package/kernel/linux/modules/iio.mk
+@@ -84,8 +84,8 @@ define KernelPackage/iio-hmc5843
+   TITLE:=Honeywell HMC58x3 Magnetometer
+   KCONFIG:= CONFIG_SENSORS_HMC5843_I2C
+   FILES:= \
+-      $(LINUX_DIR)/drivers/iio/magnetometer/hmc5843_i2c.ko \
+-      $(LINUX_DIR)/drivers/iio/magnetometer/hmc5843_core.ko
++      $(LINUX_DIR)/drivers/staging/iio/magnetometer/hmc5843_i2c.ko \
++      $(LINUX_DIR)/drivers/staging/iio/magnetometer/hmc5843_core.ko
+   AUTOLOAD:=$(call AutoLoad,56,hmc5843)
+ endef
+ 
+diff --git a/package/kernel/linux/modules/lib.mk b/package/kernel/linux/modules/lib.mk
+index 9a34193..5465e43 100644
+--- a/package/kernel/linux/modules/lib.mk
++++ b/package/kernel/linux/modules/lib.mk
+@@ -252,7 +252,7 @@ define KernelPackage/lib-cordic
+   SUBMENU:=$(LIB_MENU)
+   TITLE:=Cordic function support
+   KCONFIG:=CONFIG_CORDIC
+-  FILES:=$(LINUX_DIR)/lib/math/cordic.ko
++  FILES:=$(LINUX_DIR)/lib/cordic.ko
+   AUTOLOAD:=$(call AutoProbe,cordic)
+ endef
+ 
+diff --git a/package/kernel/linux/modules/netdevices.mk b/package/kernel/linux/modules/netdevices.mk
+index 0df00fe..34006bf 100644
+--- a/package/kernel/linux/modules/netdevices.mk
++++ b/package/kernel/linux/modules/netdevices.mk
+@@ -721,29 +721,6 @@ endef
+ 
+ $(eval $(call KernelPackage,i40e))
+ 
+-
+-define KernelPackage/iavf
+-  SUBMENU:=$(NETWORK_DEVICES_MENU)
+-  TITLE:=Intel(R) Ethernet Adaptive Virtual Function support
+-  DEPENDS:=@PCI_SUPPORT
+-  KCONFIG:= \
+-       CONFIG_I40EVF \
+-       CONFIG_IAVF
+-  FILES:= \
+-       $(LINUX_DIR)/drivers/net/ethernet/intel/iavf/iavf.ko
+-  AUTOLOAD:=$(call AutoProbe,i40evf iavf)
+-  AUTOLOAD:=$(call AutoProbe,iavf)
+-endef
+-
+-define KernelPackage/iavf/description
+- Kernel modules for Intel XL710,
+-	  X710, X722, XXV710, and all devices advertising support for
+-	  Intel Ethernet Adaptive Virtual Function devices.
+-endef
+-
+-$(eval $(call KernelPackage,iavf))
+-
+-
+ define KernelPackage/b44
+   TITLE:=Broadcom 44xx driver
+   KCONFIG:=CONFIG_B44
+@@ -1193,7 +1170,7 @@ $(eval $(call KernelPackage,igc))
+ define KernelPackage/sfc
+   SUBMENU:=$(NETWORK_DEVICES_MENU)
+   TITLE:=Solarflare SFC9000/SFC9100/EF100-family support
+-  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-lib-crc32c +kmod-ptp +kmod-hwmon-core
++  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-lib-crc32c +kmod-ptp +kmod-hwmon-core +kmod-i2c-algo-bit
+   KCONFIG:= \
+ 	CONFIG_SFC \
+ 	CONFIG_SFC_MTD=y \
+diff --git a/package/kernel/linux/modules/netfilter.mk b/package/kernel/linux/modules/netfilter.mk
+index 8ad9178..83b2237 100644
+--- a/package/kernel/linux/modules/netfilter.mk
++++ b/package/kernel/linux/modules/netfilter.mk
+@@ -541,8 +541,9 @@ define KernelPackage/nf-nathelper-extra
+   TITLE:=Extra Conntrack and NAT helpers
+   KCONFIG:=$(KCONFIG_NF_NATHELPER_EXTRA)
+   FILES:=$(foreach mod,$(NF_NATHELPER_EXTRA-m),$(LINUX_DIR)/net/$(mod).ko)
++  FILES+= $(LINUX_DIR)/net/netfilter/nf_conntrack_proto_gre.ko  $(LINUX_DIR)/net/ipv4/netfilter/nf_nat_proto_gre.ko
+   AUTOLOAD:=$(call AutoProbe,$(notdir $(NF_NATHELPER_EXTRA-m)))
+-  DEPENDS:=+kmod-nf-nat +kmod-lib-textsearch +kmod-ipt-raw +!LINUX_4_14:kmod-asn1-decoder
++  DEPENDS:=+kmod-nf-nat +kmod-lib-textsearch +kmod-ipt-raw +!LINUX_4_14:kmod-asn1-decoder kmod-pptp
+ endef
+ 
+ define KernelPackage/nf-nathelper-extra/description
+diff --git a/package/kernel/linux/modules/other.mk b/package/kernel/linux/modules/other.mk
+index bfcf001..cffcccf 100644
+--- a/package/kernel/linux/modules/other.mk
++++ b/package/kernel/linux/modules/other.mk
+@@ -126,11 +126,6 @@ define KernelPackage/dma-buf
+   TITLE:=DMA shared buffer support
+   HIDDEN:=1
+   KCONFIG:=CONFIG_DMA_SHARED_BUFFER
+-  ifeq ($(strip $(CONFIG_EXTERNAL_KERNEL_TREE)),"")
+-    ifeq ($(strip $(CONFIG_KERNEL_GIT_CLONE_URI)),"")
+-      FILES:=$(LINUX_DIR)/drivers/dma-buf/dma-shared-buffer.ko
+-    endif
+-  endif
+   AUTOLOAD:=$(call AutoLoad,20,dma-shared-buffer)
+ endef
+ $(eval $(call KernelPackage,dma-buf))
+@@ -221,8 +216,6 @@ define KernelPackage/gpio-mcp23s08
+   KCONFIG:= \
+ 	CONFIG_GPIO_MCP23S08 \
+ 	CONFIG_PINCTRL_MCP23S08
+-  FILES:= \
+-	$(LINUX_DIR)/drivers/pinctrl/pinctrl-mcp23s08.ko
+   AUTOLOAD:=$(call AutoLoad,40,pinctrl-mcp23s08)
+ endef
+ 
+@@ -526,7 +519,91 @@ define KernelPackage/rtc-ds1307
+   DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+   DEPENDS:=+kmod-i2c-core +kmod-regmap-i2c +kmod-hwmon-core
+   KCONFIG:=CONFIG_RTC_DRV_DS1307 \
+-	CONFIG_RTC_CLASS=y
++	CONFIG_RTC_CLASS=y \
++	CONFIG_NF_CT_NETLINK_HELPER=n \
++	CONFIG_NFT_CHAIN_NAT_IPV6=n \
++	CONFIG_ZRAM_LZ4_COMPRESS=n \
++	CONFIG_DM_REQ_CRYPT=n \
++	CONFIG_BNX2X_VXLAN=n \
++	CONFIG_BE2NET_VXLAN=n \
++	CONFIG_MLX4_EN_VXLAN=n \
++	CONFIG_TOUCHSCREEN_GSL1680=n \
++	CONFIG_TCG_TIS_I2C_NUVOTON=n \
++	CONFIG_TCG_ATMEL=n \
++	CONFIG_TCG_TIS_ST33ZP24=n \
++	CONFIG_SENSORS_PMBUS=n \
++	CONFIG_SENSORS_ADM1275=n \
++	CONFIG_SENSORS_LM25066=n \
++	CONFIG_SENSORS_LTC2978=n \
++	CONFIG_SENSORS_MAX16064=n \
++	CONFIG_SENSORS_MAX20751=n \
++	CONFIG_SENSORS_MAX34440=n \
++	CONFIG_SENSORS_MAX8688=n \
++	CONFIG_SENSORS_TPS40422=n \
++	CONFIG_SENSORS_UCD9000=n \
++	CONFIG_SENSORS_UCD9200=n \
++	CONFIG_DRM_FBDEV_EMULATION=n \
++	CONFIG_DRM_LOAD_EDID_FIRMWAR=n \
++	CONFIG_DRM_I2C_ADV7511=n \
++	CONFIG_DRM_I2C_CH7006=n \
++	CONFIG_DRM_I2C_SIL164=n \
++	CONFIG_DRM_I2C_NXP_TDA998X=n \
++	CONFIG_DRM_TDFX=n \
++	CONFIG_DRM_R128=n \
++	CONFIG_DRM_NOUVEAU=n \
++	CONFIG_DRM_MGA=n \
++	CONFIG_DRM_VIA=n \
++	CONFIG_DRM_SAVAGE=n \
++	CONFIG_DRM_VGEM=n \
++	CONFIG_DRM_EXYNOS=n \
++	CONFIG_DRM_UDL=n \
++	CONFIG_DRM_AST=n \
++	CONFIG_DRM_MGAG200=n \
++	CONFIG_DRM_CIRRUS_QEMU=n \
++	CONFIG_DRM_ARMADA=n \
++	CONFIG_DRM_TILCDC=n \
++	CONFIG_DRM_QXL=n \
++	CONFIG_DRM_BOCHS=n \
++	CONFIG_DRM_VIRTIO_GPU=n \
++	CONFIG_DRM_MSM=n \
++	CONFIG_DRM_FSL_DCU=n \
++	CONFIG_DRM_NXP_PTN3460=n \
++	CONFIG_DRM_PARADE_PS8622=n \
++	CONFIG_DRM_STI=n \
++	CONFIG_FB_TFT_AGM1264K_FL=n \
++	CONFIG_FB_TFT_BD663474=n \
++	CONFIG_FB_TFT_HX8340BN=n \
++	CONFIG_FB_TFT_HX8347D=n \
++	CONFIG_FB_TFT_HX8353D=n \
++	CONFIG_FB_TFT_HX8357D=n \
++	CONFIG_FB_TFT_ILI9163=n \
++	CONFIG_FB_TFT_ILI9320=n \
++	CONFIG_FB_TFT_ILI9325=n \
++	CONFIG_FB_TFT_ILI9340=n \
++	CONFIG_FB_TFT_ILI9341=n \
++	CONFIG_FB_TFT_ILI9481=n \
++	CONFIG_FB_TFT_PCD8544=n \
++	CONFIG_FB_TFT_RA8875=n \
++	CONFIG_FB_TFT_S6D02A1=n \
++	CONFIG_FB_TFT_S6D1121=n \
++	CONFIG_FB_TFT_SSD1289=n \
++	CONFIG_FB_TFT_SSD1306=n \
++	CONFIG_FB_TFT_SSD1331=n \
++	CONFIG_FB_TFT_SSD1351=n \
++	CONFIG_FB_TFT_ST7735R=n \
++	CONFIG_FB_TFT_ST7789V=n \
++	CONFIG_FB_TFT_TINYLCD=n \
++	CONFIG_FB_TFT_TLS8204=n \
++	CONFIG_FB_TFT_UC1611=n \
++	CONFIG_FB_TFT_UC1701=n \
++	CONFIG_FB_TFT_UPD161704=n \
++	CONFIG_FB_TFT_WATTEROTT=n \
++	CONFIG_FB_FLEX=n \
++	CONFIG_FB_TFT_FBTFT_DEVICE=n \
++	CONFIG_F2FS_STAT_FS=n \
++	CONFIG_F2FS_FS_XATTR=n \
++	CONFIG_F2FS_CHECK_FS=n \
++	CONFIG_NFSD_PNFS=n
+   FILES:=$(LINUX_DIR)/drivers/rtc/rtc-ds1307.ko
+   AUTOLOAD:=$(call AutoProbe,rtc-ds1307)
+ endef
+@@ -801,8 +878,7 @@ define KernelPackage/serial-8250
+   FILES:= \
+ 	$(LINUX_DIR)/drivers/tty/serial/8250/8250.ko \
+ 	$(LINUX_DIR)/drivers/tty/serial/8250/8250_base.ko \
+-	$(if $(CONFIG_PCI),$(LINUX_DIR)/drivers/tty/serial/8250/8250_pci.ko) \
+-	$(if $(CONFIG_GPIOLIB),$(LINUX_DIR)/drivers/tty/serial/serial_mctrl_gpio.ko)
++	$(if $(CONFIG_PCI),$(LINUX_DIR)/drivers/tty/serial/8250/8250_pci.ko)
+   AUTOLOAD:=$(call AutoProbe,8250 8250_base 8250_pci)
+ endef
+ 
+diff --git a/package/kernel/linux/modules/sound.mk b/package/kernel/linux/modules/sound.mk
+index 66194a5..84ad4ab 100644
+--- a/package/kernel/linux/modules/sound.mk
++++ b/package/kernel/linux/modules/sound.mk
+@@ -24,7 +24,7 @@ SOUNDCORE_FILES ?= \
+ 	$(LINUX_DIR)/sound/soundcore.ko \
+ 	$(LINUX_DIR)/sound/core/snd.ko \
+ 	$(LINUX_DIR)/sound/core/snd-hwdep.ko \
+-	$(LINUX_DIR)/sound/core/snd-seq-device.ko \
++	$(LINUX_DIR)/sound/core/seq/snd-seq-device.ko \
+ 	$(LINUX_DIR)/sound/core/snd-rawmidi.ko \
+ 	$(LINUX_DIR)/sound/core/snd-timer.ko \
+ 	$(LINUX_DIR)/sound/core/snd-pcm.ko \
+diff --git a/package/kernel/linux/modules/video.mk b/package/kernel/linux/modules/video.mk
+index a50fdad..92f0b29 100644
+--- a/package/kernel/linux/modules/video.mk
++++ b/package/kernel/linux/modules/video.mk
+@@ -406,7 +406,8 @@ define KernelPackage/video-core
+ 	CONFIG_V4L_PLATFORM_DRIVERS=y \
+ 	CONFIG_V4L_ISA_PARPORT_DRIVERS=y
+   FILES:= \
+-	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videodev.ko
++	$(LINUX_DIR)/drivers/media/v4l2-core/v4l2-common.ko \
++	$(LINUX_DIR)/drivers/media/v4l2-core/videodev.ko
+   AUTOLOAD:=$(call AutoLoad,60, videodev v4l2-common)
+ endef
+ 
+diff --git a/package/kernel/linux/modules/wireless.mk b/package/kernel/linux/modules/wireless.mk
+index f7a40ba..dd29385 100644
+--- a/package/kernel/linux/modules/wireless.mk
++++ b/package/kernel/linux/modules/wireless.mk
+@@ -13,7 +13,7 @@ define KernelPackage/net-prism54
+   DEPENDS:=@PCI_SUPPORT +@DRIVER_WEXT_SUPPORT +prism54-firmware
+   KCONFIG:=CONFIG_PRISM54
+   FILES:= \
+-	$(LINUX_DIR)/drivers/net/wireless/intersil/prism54/prism54.ko
++	$(LINUX_DIR)/drivers/net/wireless/prism54/prism54.ko
+   AUTOLOAD:=$(call AutoProbe,prism54)
+ endef
+ 
+-- 
+2.7.4
+

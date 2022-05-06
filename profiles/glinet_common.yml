@@ -64,6 +64,7 @@ packages:
 
 
 diffconfig: |
+  CONFIG_SIGNATURE_CHECK=n
   CONFIG_PACKAGE_dnsmasq=n
   CONFIG_PACKAGE_wpad-basic=n
   CONFIG_PACKAGE_wpad=n
