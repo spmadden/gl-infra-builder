@@ -5,6 +5,8 @@ feeds:
     path: ../feeds_dir/glinet
 
 diffconfig: |
+  CONFIG_IB=y
+  CONFIG_IB_STANDALONE=y
   CONFIG_PACKAGE_librt=m
   CONFIG_PACKAGE_ar3k-firmware=m
   CONFIG_PACKAGE_ath9k-htc-firmware=m
@@ -689,46 +691,6 @@ diffconfig: |
   CONFIG_PACKAGE_kmod-ieee802154-6lowpan=m
   CONFIG_PACKAGE_kmod-mac802154=m
   CONFIG_PACKAGE_kmod-mrf24j40=m
-  CONFIG_PACKAGE_kmod-ath10k=m
-  CONFIG_PACKAGE_kmod-ath10k-ct=m
-  CONFIG_PACKAGE_kmod-ath10k-ct-smallbuffers=m
-  CONFIG_PACKAGE_kmod-ath5k=m
-  CONFIG_PACKAGE_kmod-ath6kl=m
-  CONFIG_PACKAGE_kmod-ath6kl-sdio=m
-  CONFIG_PACKAGE_kmod-ath6kl-usb=m
-  CONFIG_PACKAGE_kmod-ath9k=m
-  CONFIG_PACKAGE_kmod-ath9k-common=m
-  CONFIG_PACKAGE_kmod-ath9k-htc=m
-  CONFIG_PACKAGE_kmod-carl9170=m
-  CONFIG_PACKAGE_kmod-lib80211=m
-  CONFIG_PACKAGE_kmod-mac80211-hwsim=m
-  CONFIG_PACKAGE_kmod-mt76=m
-  CONFIG_PACKAGE_kmod-mt76-connac=m
-  CONFIG_PACKAGE_kmod-mt76-core=m
-  CONFIG_PACKAGE_kmod-mt76-usb=m
-  CONFIG_PACKAGE_kmod-mt7603=m
-  CONFIG_PACKAGE_kmod-mt7615-common=m
-  CONFIG_PACKAGE_kmod-mt7615-firmware=m
-  CONFIG_PACKAGE_kmod-mt7615e=m
-  CONFIG_PACKAGE_kmod-mt7663-firmware-ap=m
-  CONFIG_PACKAGE_kmod-mt7663-firmware-sta=m
-  CONFIG_PACKAGE_kmod-mt7663-usb-sdio=m
-  CONFIG_PACKAGE_kmod-mt7663s=m
-  CONFIG_PACKAGE_kmod-mt7663u=m
-  CONFIG_PACKAGE_kmod-mt76x0-common=m
-  CONFIG_PACKAGE_kmod-mt76x02-common=m
-  CONFIG_PACKAGE_kmod-mt76x02-usb=m
-  CONFIG_PACKAGE_kmod-mt76x0e=m
-  CONFIG_PACKAGE_kmod-mt76x0u=m
-  CONFIG_PACKAGE_kmod-mt76x2=m
-  CONFIG_PACKAGE_kmod-mt76x2-common=m
-  CONFIG_PACKAGE_kmod-mt76x2u=m
-  CONFIG_PACKAGE_kmod-mt7915e=m
-  CONFIG_PACKAGE_kmod-mt7921e=m
-  CONFIG_PACKAGE_kmod-net-prism54=m
-  CONFIG_PACKAGE_kmod-net-rtl8192su=m
-  CONFIG_PACKAGE_kmod-owl-loader=m
-  CONFIG_PACKAGE_kmod-rtl8812au-ct=m
   CONFIG_PACKAGE_kmod-cdrom=m
   CONFIG_PACKAGE_libcurl=m
   CONFIG_PACKAGE_liblua=m
