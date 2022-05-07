@@ -5,7 +5,6 @@ packages:
   - gl-sdk4-nas-utils
   - gl-sdk4-exfat-utils
   - gl-sdk4-webdav
-  - gl-sdk4-nas-web
   - samba4-server
   - samba4-libs
   - samba4-utils
@@ -31,6 +30,7 @@ diffconfig: |
   CONFIG_BUSYBOX_CONFIG_DELUSER=y
   CONFIG_BUSYBOX_CONFIG_DELGROUP=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_DEL_USER_FROM_GROUP=y
+
 
 
 
