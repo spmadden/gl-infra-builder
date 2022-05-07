@@ -37,3 +37,15 @@ jobs:
             ./output/**/*squashfs-factory.img
             ./output/**/*nand-factory.img
             ./output/**/*squashfs-sysupgrade.tar
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: snapshot_imagebuilder_${{ env.COMPILE_DATE }}
+          path: |
+            ./output/*-imagebuilder-*
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: snapshot_ipk_${{ env.COMPILE_DATE }}
+          path: |
+            ./output/*ipk*
