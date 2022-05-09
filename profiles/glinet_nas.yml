@@ -9,6 +9,7 @@ packages:
   - samba4-server
   - samba4-libs
   - samba4-utils
+  - minidlna
   - blkid
   - kmod-fs-ext4
   - kmod-fs-ntfs
