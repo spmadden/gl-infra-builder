@@ -3,6 +3,7 @@ description: GL nas utils
 
 packages:
   - gl-sdk4-nas-utils
+  - gl-sdk4-nas-web
   - gl-sdk4-exfat-utils
   - gl-sdk4-webdav
   - samba4-server
