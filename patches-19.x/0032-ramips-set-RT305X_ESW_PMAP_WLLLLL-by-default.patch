@@ -1,0 +1,34 @@
+From 6fb7c8c0d5c1c11b4e05a85cc9d7f7a6dbee44c8 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Wed, 11 May 2022 20:16:42 +0800
+Subject: [PATCH] fix: mt7628 switch set RT305X_ESW_PMAP_WLLLLL by default
+
+---
+ .../ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c      | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
+index 8eea0ff..e1ca7cb 100644
+--- a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
++++ b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
+@@ -457,7 +457,7 @@ static void esw_hw_init(struct rt305x_esw *esw)
+ {
+ 	int i;
+ 	u8 port_disable = 0;
+-	u8 port_map = RT305X_ESW_PMAP_LLLLLL;
++	u8 port_map = RT305X_ESW_PMAP_WLLLLL;
+ 
+ 	esw_reset(esw);
+ 
+@@ -710,7 +710,7 @@ static void esw_hw_init(struct rt305x_esw *esw)
+ 	if (esw->port_map)
+ 		port_map = esw->port_map;
+ 	else
+-		port_map = RT305X_ESW_PMAP_LLLLLL;
++		port_map = RT305X_ESW_PMAP_WLLLLL;
+ 
+ 	/* Unused HW feature, but still nice to be consistent here...
+ 	 * This is also exported to userspace ('lan' attribute) so it's
+-- 
+2.7.4
+
