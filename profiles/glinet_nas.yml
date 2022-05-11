@@ -15,6 +15,7 @@ packages:
   - kmod-fs-ntfs
   - kmod-fs-vfat
   - kmod-fs-exfat
+  - kmod-usb-storage-uas
   - ntfs-3g
   - ntfs-3g-utils
   - dosfstools
