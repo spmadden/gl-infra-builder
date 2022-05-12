@@ -19,3 +19,4 @@ feeds:
 packages:
   - wireless-regdb
   - kmod-hwmon-pwmfan
+  - wget-ssl
