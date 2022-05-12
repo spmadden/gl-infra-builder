@@ -19,6 +19,7 @@ feeds:
 packages:
   - wireless-regdb
   - wpad-openssl
+  - wget-ssl
 
 diffconfig: |
   CONFIG_PACKAGE_wpad-basic=n

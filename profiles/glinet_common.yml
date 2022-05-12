@@ -11,7 +11,6 @@ packages:
   - kmod-usb-ohci
   - kmod-gl-sdk4-hw-info
   - kmod-gl-sdk4-tertf
-  - wget-ssl
   - dnsmasq-full
   - mwan3
   - iwinfo
