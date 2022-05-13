@@ -1,0 +1,91 @@
+From ac2d27c66e3a8529a4e1f0ea02f94bca5f39e39e Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Fri, 13 May 2022 10:41:24 +0800
+Subject: [PATCH] ramips: fix mt76x8 WAN-LAN leakage during router booting
+
+---
+ .../lib/preinit/07_set_preinit_iface_ramips        |  2 +-
+ .../drivers/net/ethernet/mediatek/esw_rt3050.c     | 33 ++++++++++++++++++++--
+ 2 files changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/target/linux/ramips/base-files/lib/preinit/07_set_preinit_iface_ramips b/target/linux/ramips/base-files/lib/preinit/07_set_preinit_iface_ramips
+index 5048dac..ed5684f 100644
+--- a/target/linux/ramips/base-files/lib/preinit/07_set_preinit_iface_ramips
++++ b/target/linux/ramips/base-files/lib/preinit/07_set_preinit_iface_ramips
+@@ -24,7 +24,7 @@ ramips_set_preinit_iface() {
+ 			;;
+ 		esac
+ 		swconfig dev $ralink_switchdev set reset 1
+-		swconfig dev $ralink_switchdev set enable_vlan 0
++		swconfig dev $ralink_switchdev set enable_vlan 1
+ 		swconfig dev $ralink_switchdev set apply 1
+ 	fi
+ 
+diff --git a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
+index 816c588..ef81200 100644
+--- a/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
++++ b/target/linux/ramips/files-4.14/drivers/net/ethernet/mediatek/esw_rt3050.c
+@@ -434,7 +434,7 @@ static void esw_hw_init(struct rt305x_esw *esw)
+ {
+ 	int i;
+ 	u8 port_disable = 0;
+-	u8 port_map = RT305X_ESW_PMAP_LLLLLL;
++	u8 port_map = RT305X_ESW_PMAP_WLLLLL;
+ 
+ 	/* vodoo from original driver */
+ 	esw_w32(esw, 0xC8A07850, RT305X_ESW_REG_FCT0);
+@@ -685,7 +685,7 @@ static void esw_hw_init(struct rt305x_esw *esw)
+ 	if (esw->port_map)
+ 		port_map = esw->port_map;
+ 	else
+-		port_map = RT305X_ESW_PMAP_LLLLLL;
++		port_map = RT305X_ESW_PMAP_WLLLLL;
+ 
+ 	/* Unused HW feature, but still nice to be consistent here...
+ 	 * This is also exported to userspace ('lan' attribute) so it's
+@@ -1197,6 +1197,34 @@ static int esw_set_vlan_ports(struct switch_dev *dev, struct switch_val *val)
+ 	return 0;
+ }
+ 
++static void esw_vlan_init(struct rt305x_esw *esw)
++{
++	esw_reset_switch(&esw->swdev);
++	struct switch_val val;
++	struct switch_port ports[7];
++	val.port_vlan = 1;
++	val.len = 2;
++	val.value.i = 1;
++	esw_set_vlan_enable(&esw->swdev, NULL, &val);
++	val.value.ports = ports;
++	ports[0].id = 1;
++	ports[0].flags = 0;
++	ports[1].id = 6;
++	ports[1].flags = 4;
++	esw_set_port_pvid(&esw->swdev, RT305X_ESW_PORT1, 1);
++	esw_set_vlan_ports(&esw->swdev, &val);
++	val.port_vlan = 2;
++	val.len = 2;
++	val.value.ports = ports;
++	ports[0].id = 0;
++	ports[0].flags = 0;
++	ports[1].id = 6;
++	ports[1].flags = 4;
++	esw_set_port_pvid(&esw->swdev, RT305X_ESW_PORT0, 2);
++	esw_set_vlan_ports(&esw->swdev, &val);
++	esw_apply_config(&esw->swdev);
++}
++
+ static const struct switch_attr esw_global[] = {
+ 	{
+ 		.type = SWITCH_TYPE_INT,
+@@ -1422,6 +1450,7 @@ static int esw_probe(struct platform_device *pdev)
+ 		esw_w32(esw, ~RT305X_ESW_PORT_ST_CHG, RT305X_ESW_REG_IMR);
+ 	}
+ 
++	esw_vlan_init(esw);
+ 	return ret;
+ }
+ 
+-- 
+2.7.4
+
