@@ -38,6 +38,7 @@
 	lan = "eth1 eth2";
 	usb-port = "1-1";
 	fan = "pwmchip0";
+	dfs;
 };
 
 &tlmm {
