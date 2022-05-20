@@ -1,0 +1,30 @@
+From b9c37f8a41102cb09bcc180b9df698e759666e68 Mon Sep 17 00:00:00 2001
+From: gl-yangweiping <weiping.yang@gl-inet.com>
+Date: Fri, 29 Apr 2022 04:42:06 -0400
+Subject: [PATCH] fix ath10k collapse
+
+---
+ .../ath79/patches-4.14/941-fix-ath10-crashes.patch    | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 target/linux/ath79/patches-4.14/941-fix-ath10-crashes.patch
+
+diff --git a/target/linux/ath79/patches-4.14/941-fix-ath10-crashes.patch b/target/linux/ath79/patches-4.14/941-fix-ath10-crashes.patch
+new file mode 100644
+index 0000000000..0a4cf1f8c8
+--- /dev/null
++++ b/target/linux/ath79/patches-4.14/941-fix-ath10-crashes.patch
+@@ -0,0 +1,11 @@
++--- a/drivers/net/wireless/ath/ath10k/pci.c
+++++ b/drivers/net/wireless/ath/ath10k/pci.c
++@@ -1940,8 +1940,6 @@ static int ath10k_pci_bmi_wait(struct at
++ 			ret = 0;
++ 			goto out;
++ 		}
++-
++-		schedule();
++ 	}
++ 
++ 	ret = -ETIMEDOUT;
+-- 
+2.17.1
+
