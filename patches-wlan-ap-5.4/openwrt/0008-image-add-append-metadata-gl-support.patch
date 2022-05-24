@@ -1,0 +1,56 @@
+From ede8f26f870da9813b1d12478644f4ae20324eaa Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 24 May 2022 15:24:54 +0800
+Subject: [PATCH] image: add append-metadata-gl support
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ include/image-commands.mk | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/include/image-commands.mk b/include/image-commands.mk
+index d4bce80e68..40e4662d44 100644
+--- a/include/image-commands.mk
++++ b/include/image-commands.mk
+@@ -64,6 +64,38 @@ define Build/append-metadata
+ 	}
+ endef
+ 
++metadata_json_gl = \
++	'{ $(if $(IMAGE_METADATA),$(IMAGE_METADATA)$(comma)) \
++		"metadata_version": "1.1", \
++		"compat_version": "$(call json_quote,$(compat_version))", \
++		$(if $(DEVICE_COMPAT_MESSAGE),"compat_message": "$(call json_quote,$(DEVICE_COMPAT_MESSAGE))"$(comma)) \
++		$(if $(filter-out 1.0,$(compat_version)),"new_supported_devices": \
++			[$(call metadata_devices,$(SUPPORTED_DEVICES))]$(comma) \
++			"supported_devices": ["$(call json_quote,$(legacy_supported_message))"]$(comma)) \
++		$(if $(filter 1.0,$(compat_version)),"supported_devices":[$(call metadata_devices,$(SUPPORTED_DEVICES))]$(comma)) \
++		"version": { \
++			"release": "$(shell cat $(TOPDIR)/release)", \
++			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
++			"dist": "$(call json_quote,$(VERSION_DIST))", \
++			"version": "$(call json_quote,$(VERSION_NUMBER))", \
++			"revision": "$(call json_quote,$(REVISION))", \
++			"target": "$(call json_quote,$(TARGETID))", \
++			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
++		}, \
++		"upgrade_control":"$(shell python3 $(TOPDIR)/make_gl_metadata.py)", \
++		"release_note":"$(shell sed ':a;N;s/\n/\\n/g;s/\r/\\r/g;ta' $(TOPDIR)/gl_release_note)" \
++	}'
++
++define Build/append-metadata-gl
++	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_json_gl) | fwtool -I - $@)
++	[ ! -s "$(BUILD_KEY)" -o ! -s "$(BUILD_KEY).ucert" -o ! -s "$@" ] || { \
++		cp "$(BUILD_KEY).ucert" "$@.ucert" ;\
++		usign -S -m "$@" -s "$(BUILD_KEY)" -x "$@.sig" ;\
++		ucert -A -c "$@.ucert" -x "$@.sig" ;\
++		fwtool -S "$@.ucert" "$@" ;\
++	}
++endef
++
+ define Build/append-rootfs
+ 	dd if=$(IMAGE_ROOTFS) >> $@
+ endef
+-- 
+2.25.1
+

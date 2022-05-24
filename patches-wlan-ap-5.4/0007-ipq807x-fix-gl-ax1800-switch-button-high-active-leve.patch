@@ -1,0 +1,31 @@
+From 1106a7e2eb083eccc65da1102652cdc733d5379b Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 24 May 2022 11:28:29 +0800
+Subject: [PATCH] ipq807x: fix gl-ax1800 switch button high active level
+
+The active status of the switch button in the DTS configuration
+is the opposite of that marked on the product housing.
+
+The switch button should be activated at high GPIO level.
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
+index f8d44187..3ec66b9b 100644
+--- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
++++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
+@@ -276,7 +276,7 @@
+ 		switch {
+ 			label = "switch";
+ 			linux,code = <KEY_WPS_BUTTON>;
+-			gpios = <&tlmm 9 GPIO_ACTIVE_LOW>;
++			gpios = <&tlmm 9 GPIO_ACTIVE_HIGH>;
+ 			linux,input-type = <1>;
+ 			debounce-interval = <60>;
+ 		};
+-- 
+2.25.1
+

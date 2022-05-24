@@ -72,8 +72,9 @@ def wlan_ap_reset_tree():
     run(["rm", "-rf", "openwrt"])
     run(["git", "checkout", config["branch"]], check=True)
     run(["git", "reset", "--hard", config.get("revision", config["branch"])], check=True)
-    run(["rm", "backports/0021-build-create-APK-files-parrallel-to-IPK.patch"], check=True)
-    run(["rm", "backports/0025-apk-backport-package.patch"], check=True)
+    if not config["next"]:
+        run(["rm", "backports/0021-build-create-APK-files-parrallel-to-IPK.patch"], check=True)
+        run(["rm", "backports/0025-apk-backport-package.patch"], check=True)
     run(["./setup.py", "--setup"])
 
 def reset_tree():
