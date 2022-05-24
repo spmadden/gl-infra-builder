@@ -1,0 +1,26 @@
+From 75535f2faf877838e412c4439311cf9971a16c98 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 23 May 2022 15:50:48 +0800
+Subject: [PATCH] wifi-ax: fix gen macaddr
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ feeds/wifi-ax/mac80211/files/lib/netifd/wireless/mac80211.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/feeds/wifi-ax/mac80211/files/lib/netifd/wireless/mac80211.sh b/feeds/wifi-ax/mac80211/files/lib/netifd/wireless/mac80211.sh
+index 87abe4ea..7632d4d5 100644
+--- a/feeds/wifi-ax/mac80211/files/lib/netifd/wireless/mac80211.sh
++++ b/feeds/wifi-ax/mac80211/files/lib/netifd/wireless/mac80211.sh
+@@ -558,7 +558,7 @@ mac80211_generate_mac() {
+ 	macidx=$(($id + 1))
+ 
+ 	local use_global=0
+-	[ "$id" -gt 0 -a "$macidx" -le "$num_global_macaddr" ] && use_global=1
++	[ "$id" -gt 0 -a "$id" -lt "$num_global_macaddr" ] && use_global=1
+ 
+ 	[ "$((0x$mask1))" -gt 0 -a "$use_global" -lt 1 ] && {
+ 		b1="0x$1"
+-- 
+2.25.1
+

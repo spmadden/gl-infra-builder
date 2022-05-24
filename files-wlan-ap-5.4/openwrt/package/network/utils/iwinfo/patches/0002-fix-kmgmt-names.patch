@@ -1,0 +1,13 @@
+Index: libiwinfo-2021-06-09-c0414642/iwinfo_lib.c
+===================================================================
+--- libiwinfo-2021-06-09-c0414642.orig/iwinfo_lib.c
++++ libiwinfo-2021-06-09-c0414642/iwinfo_lib.c
+@@ -37,6 +37,8 @@ const char *IWINFO_KMGMT_NAMES[] = {
+ 	"NONE",
+ 	"802.1X",
+ 	"PSK",
++	"SAE",
++	"OWE",
+ };
+ 
+ const char *IWINFO_AUTH_NAMES[] = {

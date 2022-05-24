@@ -1,0 +1,28 @@
+From e0e1d9be02a977a6dfbdc63236051dc99e2fcd61 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 24 May 2022 11:09:43 +0800
+Subject: [PATCH] wifi-ax: add kmod-hwmon-core dependent for ath11k
+
+If kmod-hwmon-core was selected, the kmod-ath11k depend kmod-hwmon-core.
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ feeds/wifi-ax/mac80211/ath.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/feeds/wifi-ax/mac80211/ath.mk b/feeds/wifi-ax/mac80211/ath.mk
+index 9b2b8270..13ce880e 100644
+--- a/feeds/wifi-ax/mac80211/ath.mk
++++ b/feeds/wifi-ax/mac80211/ath.mk
+@@ -284,7 +284,7 @@ define KernelPackage/ath11k
+   TITLE:=Atheros 802.11ax wireless cards support
+   URL:=https://wireless.wiki.kernel.org/en/users/drivers/ath11k
+   DEPENDS+= @TARGET_ipq807x +kmod-ath +@DRIVER_11N_SUPPORT +@DRIVER_11AC_SUPPORT +@DRIVER_11W_SUPPORT \
+-  	+@DRIVER_11AX_SUPPORT +kmod-qca-nss-drv
++  	+@DRIVER_11AX_SUPPORT +kmod-qca-nss-drv +kmod-hwmon-core
+   FILES:= \
+ 	$(PKG_BUILD_DIR)/drivers/net/wireless/ath/ath11k/ath11k.ko
+ endef
+-- 
+2.25.1
+

@@ -1,0 +1,22 @@
+--- a/libopkg/opkg_install.c
++++ b/libopkg/opkg_install.c
+@@ -1151,7 +1151,7 @@ static int resolve_conffiles(pkg_t * pkg
+ 					char *new_conffile;
+ 					sprintf_alloc(&new_conffile, "%s-opkg",
+ 						      root_filename);
+-					opkg_msg(ERROR,
++					opkg_msg(NOTICE,
+ 						 "Existing conffile %s "
+ 						 "is different from the conffile in the new package."
+ 						 " The new conffile will be placed at %s.\n",
+--- a/opkg-2021-06-13-1bf042dd/libopkg/pkg.c
++++ b/libopkg/pkg.c
+@@ -1409,7 +1409,7 @@ int pkg_run_script(pkg_t * pkg, const ch
+ 		return 0;
+ 	}
+ 
+-	sprintf_alloc(&cmd, "%s %s", path, args);
++	sprintf_alloc(&cmd, "%s %s 2>&1", path, args);
+ 	free(path);
+ 	{
+ 		const char *argv[] = { "/bin/sh", "-c", cmd, NULL };
