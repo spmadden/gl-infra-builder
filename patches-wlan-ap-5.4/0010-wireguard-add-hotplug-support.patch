@@ -1,0 +1,193 @@
+From 2fa793b9e4770a3e85fd2ed35d9417338d0efaf0 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 24 May 2022 18:22:25 +0800
+Subject: [PATCH] wireguard: add hotplug support
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../files/drivers/net/wireguard/Kbuild        |  2 +-
+ .../files/drivers/net/wireguard/hotplug.c     | 86 +++++++++++++++++++
+ .../files/drivers/net/wireguard/hotplug.h     | 13 +++
+ .../files/drivers/net/wireguard/noise.c       |  3 +
+ .../files/drivers/net/wireguard/timers.c      |  4 +
+ 5 files changed, 107 insertions(+), 1 deletion(-)
+ create mode 100644 feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.c
+ create mode 100644 feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.h
+
+diff --git a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/Kbuild b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/Kbuild
+index 2f7b634c..4ab36337 100644
+--- a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/Kbuild
++++ b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/Kbuild
+@@ -7,7 +7,7 @@ ccflags-y += -Wframe-larger-than=2048
+ ccflags-$(CONFIG_WIREGUARD_DEBUG) += -DDEBUG -g
+ ccflags-$(if $(WIREGUARD_VERSION),y,) += -D'WIREGUARD_VERSION="$(WIREGUARD_VERSION)"'
+ 
+-wireguard-y := main.o noise.o device.o peer.o timers.o queueing.o send.o receive.o socket.o peerlookup.o allowedips.o ratelimiter.o cookie.o netlink.o
++wireguard-y := main.o noise.o device.o peer.o timers.o queueing.o send.o receive.o socket.o peerlookup.o allowedips.o ratelimiter.o cookie.o netlink.o hotplug.o
+ 
+ include $(src)/crypto/Kbuild.include
+ include $(src)/compat/Kbuild.include
+diff --git a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.c b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.c
+new file mode 100644
+index 00000000..3e714399
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.c
+@@ -0,0 +1,86 @@
++#include <linux/workqueue.h>
++#include <linux/skbuff.h>
++#include <linux/netlink.h>
++#include <linux/kobject.h>
++
++#include <linux/workqueue.h>
++
++#define SUBSYSTEM_NAME	"wireguard"
++
++#define EVENT_BUF_SIZE	2048
++
++struct wg_event {
++	struct work_struct work;
++	char ifname[IFNAMSIZ];
++	const char *action;
++};
++
++
++/* -------------------------------------------------------------------------*/
++static int bh_event_add_var(struct sk_buff *skb, int argv,
++							const char *format, ...)
++{
++	static char buf[128];
++	char *s;
++	va_list args;
++	int len;
++
++	if (argv)
++		return 0;
++
++	va_start(args, format);
++	len = vsnprintf(buf, sizeof(buf), format, args);
++	va_end(args);
++
++	if (len >= sizeof(buf)) {
++		//WARN(1, "buffer size too small\n");
++		return -ENOMEM;
++	}
++
++	s = skb_put(skb, len + 1);
++	strcpy(s, buf);
++
++	return 0;
++}
++
++static void hotplug_work(struct work_struct *work)
++{
++	struct wg_event *event = container_of(work, struct wg_event, work);
++	struct sk_buff *skb;
++
++	skb = alloc_skb(EVENT_BUF_SIZE, GFP_KERNEL);
++	if (!skb)
++		goto out_free_event;
++
++	pr_info("wireguard-hotplug IFNAME=%s ACTION=%s\n", event->ifname, event->action);
++
++	bh_event_add_var(skb, 0, "SUBSYSTEM=%s", SUBSYSTEM_NAME);
++	bh_event_add_var(skb, 0, "ACTION=%s", event->action);
++	bh_event_add_var(skb, 0, "ifname=%s", event->ifname);
++
++	NETLINK_CB(skb).dst_group = 1;
++	broadcast_uevent(skb, 0, 1, GFP_KERNEL);
++
++	kfree_skb(skb);
++out_free_event:
++	kfree(event);
++}
++
++void wireguard_hotplug(const char *ifname, const char *action)
++{
++	struct wg_event *event;
++
++	if (!strcmp(ifname, "wgserver"))
++		return;
++
++	event = kzalloc(sizeof(struct wg_event), GFP_ATOMIC);
++	if (!event)
++		return;
++
++	memcpy(event->ifname, ifname, IFNAMSIZ);
++
++	event->action = action;
++
++	INIT_WORK(&event->work, hotplug_work);
++	schedule_work(&event->work);
++}
+diff --git a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.h b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.h
+new file mode 100644
+index 00000000..7fb54d9d
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/hotplug.h
+@@ -0,0 +1,13 @@
++#ifndef __HOTPLUG_H__
++#define __HOTPLUG_H__
++
++#define  REKEY_GIVEUP_EVENT "REKEY-GIVEUP"
++#define  REKEY_TIMEOUT_EVENT "REKEY-TIMEOUT"
++#define  KEYPAIR_CREATED_EVENT "KEYPAIR-CREATED"
++
++extern void wireguard_hotplug(const char *ifname, const char *action);
++extern void wg_hotplug_init(void);
++extern void wg_hotplug_free(void);
++
++#endif
++
+diff --git a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/noise.c b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/noise.c
+index baf455e2..330294c2 100644
+--- a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/noise.c
++++ b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/noise.c
+@@ -9,6 +9,7 @@
+ #include "messages.h"
+ #include "queueing.h"
+ #include "peerlookup.h"
++#include "hotplug.h"
+ 
+ #include <linux/rcupdate.h>
+ #include <linux/slab.h>
+@@ -819,6 +820,8 @@ bool wg_noise_handshake_begin_session(struct noise_handshake *handshake,
+ 		ret = wg_index_hashtable_replace(
+ 			handshake->entry.peer->device->index_hashtable,
+ 			&handshake->entry, &new_keypair->entry);
++
++		wireguard_hotplug(handshake->entry.peer->device->dev->name, KEYPAIR_CREATED_EVENT);
+ 	} else {
+ 		kfree_sensitive(new_keypair);
+ 	}
+diff --git a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/timers.c b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/timers.c
+index d54d32ac..3e1cf2b2 100644
+--- a/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/timers.c
++++ b/feeds/ipq807x/ipq807x/files/drivers/net/wireguard/timers.c
+@@ -8,6 +8,7 @@
+ #include "peer.h"
+ #include "queueing.h"
+ #include "socket.h"
++#include "hotplug.h"
+ 
+ /*
+  * - Timer for retransmitting the handshake if we don't hear back after
+@@ -60,6 +61,8 @@ static void wg_expired_retransmit_handshake(struct timer_list *timer)
+ 		if (!timer_pending(&peer->timer_zero_key_material))
+ 			mod_peer_timer(peer, &peer->timer_zero_key_material,
+ 				       jiffies + REJECT_AFTER_TIME * 3 * HZ);
++
++		wireguard_hotplug(peer->device->dev->name, REKEY_GIVEUP_EVENT);
+ 	} else {
+ 		++peer->timer_handshake_attempts;
+ 		pr_debug("%s: Handshake for peer %llu (%pISpfsc) did not complete after %d seconds, retrying (try %d)\n",
+@@ -73,6 +76,7 @@ static void wg_expired_retransmit_handshake(struct timer_list *timer)
+ 		wg_socket_clear_peer_endpoint_src(peer);
+ 
+ 		wg_packet_send_queued_handshake_initiation(peer, true);
++		wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
+ 	}
+ }
+ 
+-- 
+2.25.1
+
