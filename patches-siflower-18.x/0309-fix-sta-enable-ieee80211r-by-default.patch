@@ -1,0 +1,25 @@
+From cc7aa08b523c031864cee794a51b27d85e9b274f Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Tue, 19 Apr 2022 11:09:24 +0800
+Subject: [PATCH] fix: sta enable ieee80211r by default
+
+---
+ openwrt-18.06/package/network/services/hostapd/files/hostapd.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openwrt-18.06/package/network/services/hostapd/files/hostapd.sh b/openwrt-18.06/package/network/services/hostapd/files/hostapd.sh
+index 67c2d82..ff0c644 100644
+--- a/openwrt-18.06/package/network/services/hostapd/files/hostapd.sh
++++ b/openwrt-18.06/package/network/services/hostapd/files/hostapd.sh
+@@ -872,7 +872,7 @@ wpa_supplicant_add_network() {
+ 		;;
+ 	esac
+ 
+-	set_default ieee80211r 0
++	set_default ieee80211r 1
+ 	set_default multi_ap 0
+ 
+ 	local key_mgmt='NONE'
+-- 
+2.7.4
+

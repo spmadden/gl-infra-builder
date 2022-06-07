@@ -1,0 +1,25 @@
+From eacb29b49b7b8c35528dd5f47c4c977829c9fa8e Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Wed, 20 Apr 2022 10:37:16 +0800
+Subject: [PATCH] fix: avoid radar channel when auto
+
+---
+ .../services/hostapd/patches/772-disable-acs-select-radar-chan.patch    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openwrt-18.06/package/network/services/hostapd/patches/772-disable-acs-select-radar-chan.patch b/openwrt-18.06/package/network/services/hostapd/patches/772-disable-acs-select-radar-chan.patch
+index 9621ce5..342e0db 100644
+--- a/openwrt-18.06/package/network/services/hostapd/patches/772-disable-acs-select-radar-chan.patch
++++ b/openwrt-18.06/package/network/services/hostapd/patches/772-disable-acs-select-radar-chan.patch
+@@ -8,7 +8,7 @@ Index: hostapd-2019-08-08-ca8c2bd2/src/ap/acs.c
+  
+ +static int acs_radar_chan(const struct hostapd_channel_data *chan)
+ +{
+-+	const int allowed[] = { 52, 56, 60, 64 };
+++	const int allowed[] = { 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144 };
+ +	unsigned int i;
+ +	for (i = 0; i < ARRAY_SIZE(allowed); i++)
+ +		if (chan->chan == allowed[i])
+-- 
+2.7.4
+
