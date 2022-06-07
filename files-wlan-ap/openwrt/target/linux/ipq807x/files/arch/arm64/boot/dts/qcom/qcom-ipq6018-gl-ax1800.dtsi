@@ -45,7 +45,6 @@
 		#size-cells = <1>;
 		model = "axt1800";
 		wan = "eth0";
-		switch-button = "gpio-16";
 		reset-button = "gpio-50";
 		usb-port = "1-1";
 		flash_size = <128>;
