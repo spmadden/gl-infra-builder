@@ -9,6 +9,9 @@ packages:
   - luci
   - luci-base
   - luci-mod-rpc
+  - wpad-openssl
 
 diffconfig: |
   CONFIG_LUCI_LANG_zh_Hans=y
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad=n
