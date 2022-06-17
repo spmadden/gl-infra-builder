@@ -22,7 +22,7 @@ index 0000000000..af2bc3f166
 +
 +/ {
 +	model = "GL.iNet GL-AXT3000";
-+	compatible = "glinet,gl-axt3000", "mediatek,mt7981-spim-snand-rfb";
++	compatible = "glinet,axt3000-snand", "mediatek,mt7981";
 +
 +	chosen {
 +		bootargs = "console=ttyS0,115200n1 loglevel=8  \
@@ -218,7 +218,7 @@ index 0000000000..af2bc3f166
 +	i2c_pins: i2c-pins-g0 {
 +		mux {
 +			function = "i2c";
-+			groups = "i2c0_0";
++			groups = "i2c0_1";
 +		};
 +	};
 +
