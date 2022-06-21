@@ -10,7 +10,7 @@ feeds:
     revision: 4c6b600
   - name: gl_feed
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: cc5fd4d22e4796748711d13ad3fd6e09150b3bb8
+    revision: bbcfc7b10abb9a0140eeb56956c7d23ce6b05b67
   - name: gl_feed_mt7981
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: da09723846cf25c6b7e288cd1669c89ea4d6071e
@@ -18,6 +18,7 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
+  - kmod-leds-et6326
   - 8021xd
   - fwdd
   - mapd
