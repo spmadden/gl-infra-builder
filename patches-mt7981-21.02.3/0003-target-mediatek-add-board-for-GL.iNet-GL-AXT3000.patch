@@ -1,21 +1,21 @@
-From 5d436f63fec67dcf9877053033a4c94502cc8748 Mon Sep 17 00:00:00 2001
+From 1cffd187b393db0456b8c9ef7cad53625777e9a2 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 281 ++++++++++++++++++
- target/linux/mediatek/image/mt7981.mk         |  17 ++
- 2 files changed, 298 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 304 ++++++++++++++++++
+ target/linux/mediatek/image/mt7981.mk         |  18 ++
+ 2 files changed, 322 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 new file mode 100755
-index 0000000000..af2bc3f166
+index 0000000000..fc6c2200b0
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
-@@ -0,0 +1,281 @@
+@@ -0,0 +1,304 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -23,6 +23,14 @@ index 0000000000..af2bc3f166
 +/ {
 +	model = "GL.iNet GL-AXT3000";
 +	compatible = "glinet,axt3000-snand", "mediatek,mt7981";
++
++	aliases {
++		led-boot = &led_run;
++		led-failsafe = &led_run;
++		led-running = &led_run;
++		led-upgrade = &led_run;
++		label-mac-device = &wan;
++	};
 +
 +	chosen {
 +		bootargs = "console=ttyS0,115200n1 loglevel=8  \
@@ -102,6 +110,21 @@ index 0000000000..af2bc3f166
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&i2c_pins>;
 +	status = "okay";
++
++	leds@30 {
++		compatible = "etek,et6326";
++		reg = <0x30>;
++
++		led_run: led@0 {
++			channel = <0>;
++			label = "blue:run";
++		};
++
++		led@1 {
++			channel = <1>;
++			label = "white:system";
++		};
++	};
 +};
 +
 +&uart0 {
@@ -298,10 +321,10 @@ index 0000000000..af2bc3f166
 +	status = "okay";
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index ab3ed5b42f..86d70e0dc0 100755
+index ab3ed5b42f..46559dcfc3 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
-@@ -171,3 +171,20 @@ define Device/mt7981-fpga-sd
+@@ -171,3 +171,21 @@ define Device/mt7981-fpga-sd
    IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
  endef
  TARGET_DEVICES += mt7981-fpga-sd
@@ -312,6 +335,7 @@ index ab3ed5b42f..86d70e0dc0 100755
 +  DEVICE_DTS := mt7981-gl-axt3000
 +  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
 +  SUPPORTED_DEVICES := glinet,axt3000-snand
++  DEVICE_PACKAGES := kmod-leds-et6326
 +  UBINIZE_OPTS := -E 5
 +  BLOCKSIZE := 128k
 +  PAGESIZE := 2048

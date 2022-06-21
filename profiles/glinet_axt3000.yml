@@ -18,7 +18,7 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
-  - kmod-leds-et6326
+  - kmod-ledtrig-pattern
   - 8021xd
   - fwdd
   - mapd
@@ -36,6 +36,7 @@ packages:
   - kmod-mt_wifi
 
 diffconfig: |
+  CONFIG_PACKAGE_kmod-leds-gpio=n
   CONFIG_MAP_R2_SUPPORT=y
   CONFIG_MAP_R3_SUPPORT=y
   CONFIG_MTK_CONNINFRA_APSOC=y
