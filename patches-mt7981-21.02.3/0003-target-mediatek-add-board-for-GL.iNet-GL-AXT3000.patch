@@ -1,21 +1,21 @@
-From 459aa09429d79b82f59a20454dd48c9b670a32a6 Mon Sep 17 00:00:00 2001
+From 880670469851e4c6997a470d6cdcd569d26afefb Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 291 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 304 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 ++
- 2 files changed, 309 insertions(+)
+ 2 files changed, 322 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 new file mode 100755
-index 0000000000..17480546e9
+index 0000000000..da368a987f
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
-@@ -0,0 +1,291 @@
+@@ -0,0 +1,304 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -53,6 +53,19 @@ index 0000000000..17480546e9
 +			label = "wps";
 +			linux,code = <KEY_WPS_BUTTON>;
 +			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	gl-hw {
++		compatible = "gl-hw-info";
++		model = "axt3000";
++		wan = "eth1";
++		lan = "lan1 lan2 lan3 lan4";
++		usb-port = "1-1";
++		flash_size = <128>;
++		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
++		factory_data {
++			device_mac = "Factory", "0x4";
 +		};
 +	};
 +};
