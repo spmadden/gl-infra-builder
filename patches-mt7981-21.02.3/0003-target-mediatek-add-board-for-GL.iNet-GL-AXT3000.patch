@@ -1,21 +1,21 @@
-From 110d00e73a0c15aa53b9bc50b54d689a805a8d37 Mon Sep 17 00:00:00 2001
+From 459aa09429d79b82f59a20454dd48c9b670a32a6 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 303 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 291 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 ++
- 2 files changed, 321 insertions(+)
+ 2 files changed, 309 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 new file mode 100755
-index 0000000000..445dc3c8e4
+index 0000000000..17480546e9
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
-@@ -0,0 +1,303 @@
+@@ -0,0 +1,291 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -53,48 +53,6 @@ index 0000000000..445dc3c8e4
 +			label = "wps";
 +			linux,code = <KEY_WPS_BUTTON>;
 +			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
-+		};
-+	};
-+
-+	nmbm_spim_nand {
-+		compatible = "generic,nmbm";
-+
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+
-+		lower-mtd-device = <&spi_nand>;
-+		forced-create;
-+
-+		partitions {
-+			compatible = "fixed-partitions";
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+
-+			partition@0 {
-+				label = "BL2";
-+				reg = <0x00000 0x0100000>;
-+				read-only;
-+			};
-+
-+			partition@100000 {
-+				label = "u-boot-env";
-+				reg = <0x0100000 0x0080000>;
-+			};
-+
-+			partition@180000 {
-+				label = "Factory";
-+				reg = <0x180000 0x0200000>;
-+			};
-+
-+			partition@380000 {
-+				label = "FIP";
-+				reg = <0x380000 0x0200000>;
-+			};
-+
-+			partition@580000 {
-+				label = "ubi";
-+				reg = <0x580000 0>;
-+			};
 +		};
 +	};
 +};
@@ -225,7 +183,7 @@ index 0000000000..445dc3c8e4
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&spi0_flash_pins>;
 +	status = "okay";
-+	spi_nand: spi_nand@0 {
++	spi_nand@0 {
 +		#address-cells = <1>;
 +		#size-cells = <1>;
 +		compatible = "spi-nand";
@@ -233,6 +191,36 @@ index 0000000000..445dc3c8e4
 +		spi-max-frequency = <52000000>;
 +		spi-tx-buswidth = <4>;
 +		spi-rx-buswidth = <4>;
++
++		partitions {
++			compatible = "fixed-partitions";
++
++			partition@0 {
++				label = "BL2";
++				reg = <0x00000 0x0100000>;
++				read-only;
++			};
++
++			partition@100000 {
++				label = "u-boot-env";
++				reg = <0x0100000 0x0080000>;
++			};
++
++			partition@180000 {
++				label = "Factory";
++				reg = <0x180000 0x0200000>;
++			};
++
++			partition@380000 {
++				label = "FIP";
++				reg = <0x380000 0x0200000>;
++			};
++
++			partition@580000 {
++				label = "ubi";
++				reg = <0x580000 0>;
++			};
++		};
 +	};
 +};
 +
