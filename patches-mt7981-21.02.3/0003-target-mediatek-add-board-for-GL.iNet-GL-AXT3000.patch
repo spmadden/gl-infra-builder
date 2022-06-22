@@ -1,4 +1,4 @@
-From 880670469851e4c6997a470d6cdcd569d26afefb Mon Sep 17 00:00:00 2001
+From 4ab63238a26810c99b573c3813bae3d872734770 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
@@ -12,7 +12,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 new file mode 100755
-index 0000000000..da368a987f
+index 0000000000..2c7bda5b84
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 @@ -0,0 +1,304 @@
@@ -49,9 +49,9 @@ index 0000000000..da368a987f
 +			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
 +		};
 +
-+		wps {
-+			label = "wps";
-+			linux,code = <KEY_WPS_BUTTON>;
++		switch {
++			label = "switch";
++			linux,code = <KEY_SETUP>;
 +			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
 +		};
 +	};
