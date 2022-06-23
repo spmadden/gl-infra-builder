@@ -1,0 +1,30 @@
+From 163914d5809f02e38bf0c5fbfe89c69e1fab8421 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Thu, 23 Jun 2022 12:07:45 +0800
+Subject: [PATCH] ipq40xx: fix b1300th partition name
+
+---
+ .../files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts  | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+index d655a0b456..c39d4b30ef 100644
+--- a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
++++ b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+@@ -238,11 +238,11 @@
+ 			#size-cells = <1>;
+ 
+ 			partition@0 {
+-				label = "ubi0";
++				label = "fwa";
+ 				reg = <0x00000000 0x08000000>;
+ 			};
+ 			partition@08000000 {
+-				label = "ubi1";
++				label = "fwb";
+ 				reg = <0x08000000 0x08000000>;
+ 			};
+ 			partition@10000000 {
+-- 
+2.17.1
+
