@@ -1,21 +1,21 @@
-From fb90b9a8f05757740f4f5609774ab3619eed3c15 Mon Sep 17 00:00:00 2001
+From e7508dc3d5e2050e5982ed323a6cd9387213114d Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 315 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 316 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 +
- 2 files changed, 333 insertions(+)
+ 2 files changed, 334 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 new file mode 100755
-index 0000000000..d7b0cead1a
+index 0000000000..5ab5b7aad5
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
-@@ -0,0 +1,315 @@
+@@ -0,0 +1,316 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -105,6 +105,7 @@ index 0000000000..d7b0cead1a
 +		usb-port = "1-1";
 +		flash_size = <128>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
++		dfs;
 +		factory_data {
 +			device_mac = "Factory", "0x4";
 +		};
