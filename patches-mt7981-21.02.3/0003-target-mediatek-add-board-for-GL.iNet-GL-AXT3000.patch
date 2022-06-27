@@ -1,21 +1,21 @@
-From e7508dc3d5e2050e5982ed323a6cd9387213114d Mon Sep 17 00:00:00 2001
+From 8c4d3df342a070281e6f382a450290ff1cac24c9 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 316 ++++++++++++++++++
- target/linux/mediatek/image/mt7981.mk         |  18 +
- 2 files changed, 334 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 309 ++++++++++++++++++
+ target/linux/mediatek/image/mt7981.mk         |  17 +
+ 2 files changed, 326 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 new file mode 100755
-index 0000000000..5ab5b7aad5
+index 0000000000..c36c44c211
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
-@@ -0,0 +1,316 @@
+@@ -0,0 +1,309 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -52,7 +52,21 @@ index 0000000000..5ab5b7aad5
 +		switch {
 +			label = "switch";
 +			linux,code = <KEY_SETUP>;
-+			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
++			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led_run: led@0 {
++			label = "blue:run";
++			gpios = <&pio 30 GPIO_ACTIVE_LOW>;
++		};
++
++		led@1 {
++			label = "white:system";
++			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
 +		};
 +	};
 +
@@ -116,27 +130,6 @@ index 0000000000..5ab5b7aad5
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pcm_pins>;
 +	status = "okay";
-+};
-+
-+&i2c0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&i2c_pins>;
-+	status = "okay";
-+
-+	leds@30 {
-+		compatible = "etek,et6326";
-+		reg = <0x30>;
-+
-+		led_run: led@0 {
-+			channel = <0>;
-+			label = "blue:run";
-+		};
-+
-+		led@1 {
-+			channel = <1>;
-+			label = "white:system";
-+		};
-+	};
 +};
 +
 +&uart0 {
@@ -333,10 +326,10 @@ index 0000000000..5ab5b7aad5
 +	status = "okay";
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index ab3ed5b42f..46559dcfc3 100755
+index ab3ed5b42f..86d70e0dc0 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
-@@ -171,3 +171,21 @@ define Device/mt7981-fpga-sd
+@@ -171,3 +171,20 @@ define Device/mt7981-fpga-sd
    IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
  endef
  TARGET_DEVICES += mt7981-fpga-sd
@@ -347,7 +340,6 @@ index ab3ed5b42f..46559dcfc3 100755
 +  DEVICE_DTS := mt7981-gl-axt3000
 +  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
 +  SUPPORTED_DEVICES := glinet,axt3000-snand
-+  DEVICE_PACKAGES := kmod-leds-et6326
 +  UBINIZE_OPTS := -E 5
 +  BLOCKSIZE := 128k
 +  PAGESIZE := 2048

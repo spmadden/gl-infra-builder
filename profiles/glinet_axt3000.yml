@@ -21,7 +21,6 @@ feeds:
     path: ../feeds_dir/glinet
 
 packages:
-  - kmod-ledtrig-pattern
   - 8021xd
   - fwdd
   - mapd
