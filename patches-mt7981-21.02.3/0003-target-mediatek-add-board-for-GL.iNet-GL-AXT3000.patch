@@ -1,21 +1,21 @@
-From 8c4d3df342a070281e6f382a450290ff1cac24c9 Mon Sep 17 00:00:00 2001
+From 88c933b552b58760f480cd06dc343aba6192d068 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 309 ++++++++++++++++++
- target/linux/mediatek/image/mt7981.mk         |  17 +
- 2 files changed, 326 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 359 ++++++++++++++++++
+ target/linux/mediatek/image/mt7981.mk         |  18 +
+ 2 files changed, 377 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
 new file mode 100755
-index 0000000000..c36c44c211
+index 0000000000..ad5f1275c8
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
-@@ -0,0 +1,309 @@
+@@ -0,0 +1,359 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -117,11 +117,56 @@ index 0000000000..c36c44c211
 +		wan = "eth1";
 +		lan = "lan1 lan2 lan3 lan4";
 +		usb-port = "1-1";
++		fan = "pwmchip0";
 +		flash_size = <128>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
 +		dfs;
 +		factory_data {
 +			device_mac = "Factory", "0x4";
++		};
++	};
++
++	gl_fan {
++		compatible = "gl-fan";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		fan_speed_gpio = <29>;
++	};
++
++	pwm-fan {
++		compatible = "pwm-fan";
++		cooling-min-state = <0>;
++		cooling-max-state = <255>;
++		#cooling-cells = <2>;
++		pwms = <&pwm 1 40000 0>;
++		cooling-levels = <0 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36
++				36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 37 38 39
++				40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
++				60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
++				80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
++				100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119
++				120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
++				140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159
++				160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179
++				180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199
++				200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219
++				220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239
++				240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255>;
++	};
++
++	gpio-export {
++		compatible = "gpio-export";
++
++		usb_power {
++			gpio-export,name = "usb_power";
++			gpio-export,output = <1>;
++			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
++		};
++
++		fan_power {
++			gpio-export,name = "fan_power";
++			gpio-export,output = <1>;
++			gpios = <&pio 28 GPIO_ACTIVE_HIGH>;
 +		};
 +	};
 +};
@@ -325,11 +370,16 @@ index 0000000000..c36c44c211
 +		   <&u3port0 PHY_TYPE_USB3>;
 +	status = "okay";
 +};
++
++&pwm {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pwm0_pin>;
++};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index ab3ed5b42f..86d70e0dc0 100755
+index ab3ed5b42f..a216c20262 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
-@@ -171,3 +171,20 @@ define Device/mt7981-fpga-sd
+@@ -171,3 +171,21 @@ define Device/mt7981-fpga-sd
    IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
  endef
  TARGET_DEVICES += mt7981-fpga-sd
@@ -340,6 +390,7 @@ index ab3ed5b42f..86d70e0dc0 100755
 +  DEVICE_DTS := mt7981-gl-axt3000
 +  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
 +  SUPPORTED_DEVICES := glinet,axt3000-snand
++  DEVICE_PACKAGES := kmod-hwmon-pwmfan
 +  UBINIZE_OPTS := -E 5
 +  BLOCKSIZE := 128k
 +  PAGESIZE := 2048
