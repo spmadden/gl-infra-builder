@@ -30,6 +30,7 @@ packages:
   - mtk-base-files
   - mtk_factory_rw
   - ethtool
+  - luci-app-mtk
   - mtkhnat_util
   - wireless-tools
   - kmod-conninfra
