@@ -1,0 +1,117 @@
+---
+description: Add the glinet dependencies
+
+packages:
+  - kmod-usb-storage
+  - kmod-usb-uhci
+  - kmod-usb2
+  - kmod-usb-ohci
+  - kmod-gl-sdk4-hw-info
+  - kmod-gl-sdk4-tertf
+  - dnsmasq-full
+  - mwan3
+  - iwinfo
+  - block-mount
+  - blkid
+  - ntfs-3g
+  - ntfs-3g-utils
+  - kmod-fs-ext4
+  - kmod-fs-ntfs
+  - kmod-fs-vfat
+  - kmod-fs-exfat
+  - kmod-gl-sdk4-hw-info
+  - kmod-gl-sdk4-tertf
+  - kmod-gl-sdk4-fan
+  - liblua5.1.5
+  - libcurl
+  - ethtool
+  - lua
+  - libubox-lua
+  - libuci-lua
+  - libubus-lua
+  - libiwinfo-lua
+  - lua-cjson
+  - libiwinfo-lua
+  - jansson
+  - lsqlite3
+  - luabitop
+  - openssl-util
+  - fcgi
+  - nginx-ssl
+  - ddns-scripts
+  - stubby
+  - dnscrypt-proxy2
+  - kmod-ipt-nat6
+  - kmod-mtdoops
+  - smstools3
+  - comgt
+  - chat
+  - uqmi
+  - usb-modeswitch
+  - kmod-usb-acm
+  - kmod-usb-net-huawei-cdc-ncm
+  - kmod-usb-serial
+  - kmod-usb-serial-option
+  - kmod-usb-serial-wwan
+  - kmod-usb-net-cdc-ether
+  - kmod-usb-net-qmi-wwan
+  - mqtt
+  - dosfstools
+  - e2fsprogs
+  - relayd
+  - openvpn-openssl
+  - resolveip
+  - unzip
+  - kmod-sched-core
+  - tc-tiny
+  - resolveip
+  - kmod-ifb
+  - rtty-openssl
+  - wireguard-tools
+  - kmod-usb-net-ipheth
+  - usbmuxd
+  - kmod-usb-net-rndis
+  - iptables-mod-extra
+  - sudo
+  - curl
+  - ca-certificates
+  - ip-full
+
+
+
+diffconfig: |
+  CONFIG_SIGNATURE_CHECK=n
+  CONFIG_PACKAGE_dnsmasq=n
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad=n
+  CONFIG_BUSYBOX_CUSTOM=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
+  CONFIG_NGINX_HTTP_CHARSET=n
+  CONFIG_NGINX_HTTP_GZIP=n
+  CONFIG_NGINX_HTTP_SSI=n
+  CONFIG_NGINX_HTTP_USERID=n
+  CONFIG_NGINX_HTTP_ACCESS=n
+  CONFIG_NGINX_HTTP_AUTH_BASIC=n
+  CONFIG_NGINX_HTTP_AUTOINDEX=n
+  CONFIG_NGINX_HTTP_GEO=n
+  CONFIG_NGINX_HTTP_MAP=n
+  CONFIG_NGINX_HTTP_SPLIT_CLIENTS=n
+  CONFIG_NGINX_HTTP_REFERER=n
+  CONFIG_NGINX_HTTP_REWRITE=n
+  CONFIG_NGINX_HTTP_FASTCGI=n
+  CONFIG_NGINX_HTTP_SCGI=n
+  CONFIG_NGINX_HTTP_MEMCACHED=n
+  CONFIG_NGINX_HTTP_LIMIT_CONN=n
+  CONFIG_NGINX_HTTP_LIMIT_REQ=n
+  CONFIG_NGINX_HTTP_EMPTY_GIF=n
+  CONFIG_NGINX_HTTP_BROWSER=n
+  CONFIG_NGINX_HTTP_UPSTREAM_HASH=n
+  CONFIG_NGINX_HTTP_UPSTREAM_IP_HASH=n
+  CONFIG_NGINX_HTTP_UPSTREAM_LEAST_CONN=n
+  CONFIG_NGINX_HTTP_UPSTREAM_KEEPALIVE=n
+  CONFIG_NGINX_HTTP_CACHE=n
+  CONFIG_NGINX_NAXSI=n
+  CONFIG_NGINX_HEADERS_MORE=n
+  CONFIG_LIBCURL_MBEDTLS=n
+  CONFIG_LIBCURL_OPENSSL=y
+  CONFIG_OPENSSL_OPTIMIZE_SPEED=y
