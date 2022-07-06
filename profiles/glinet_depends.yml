@@ -76,6 +76,17 @@ packages:
   - curl
   - ca-certificates
   - ip-full
+  - luci-base
+  - luci-mod-rpc
+  - luci-mod-admin-full
+  - luci-theme-bootstrap
+  - luci-app-firewall
+  - luci-app-opkg
+  - luci-proto-ppp
+  - libiwinfo-lua
+  - luci-proto-ipv6
+  - rpcd-mod-rrdns
+  - wpad-openssl
 
 
 
@@ -97,8 +108,11 @@ diffconfig: |
   CONFIG_NGINX_HTTP_MAP=n
   CONFIG_NGINX_HTTP_SPLIT_CLIENTS=n
   CONFIG_NGINX_HTTP_REFERER=n
-  CONFIG_NGINX_HTTP_REWRITE=n
-  CONFIG_NGINX_HTTP_FASTCGI=n
+  CONFIG_NGINX_LUA=y
+  CONFIG_NGINX_HTTP_FASTCGI=y
+  CONFIG_NGINX_HTTP_REWRITE=y
+  CONFIG_NGINX_HTTP_PCRE=y
+  CONFIG_NGINX_HTTP_PROXY=y
   CONFIG_NGINX_HTTP_SCGI=n
   CONFIG_NGINX_HTTP_MEMCACHED=n
   CONFIG_NGINX_HTTP_LIMIT_CONN=n
@@ -115,3 +129,4 @@ diffconfig: |
   CONFIG_LIBCURL_MBEDTLS=n
   CONFIG_LIBCURL_OPENSSL=y
   CONFIG_OPENSSL_OPTIMIZE_SPEED=y
+  CONFIG_LUCI_LANG_zh_Hans=y
