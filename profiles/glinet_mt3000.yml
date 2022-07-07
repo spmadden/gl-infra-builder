@@ -1,8 +1,8 @@
 ---
-profile: glinet_gl-axt3000
+profile: glinet_gl-mt3000
 target: mediatek
 subtarget: mt7981
-description: Build image for the GL.iNET AXT3000
+description: Build image for the GL.iNET MT3000
 
 feeds:
   - name: mtk_openwrt_feed

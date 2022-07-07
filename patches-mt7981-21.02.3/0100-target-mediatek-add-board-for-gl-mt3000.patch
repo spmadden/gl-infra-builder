@@ -1,28 +1,28 @@
 From 88c933b552b58760f480cd06dc343aba6192d068 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
-Subject: [PATCH] target/mediatek: add board for GL.iNet GL-AXT3000
+Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-axt3000.dts   | 359 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts   | 359 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 +
  2 files changed, 377 insertions(+)
- create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
+ create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
-diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
+diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
 index 0000000000..ad5f1275c8
 --- /dev/null
-+++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-axt3000.dts
++++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 @@ -0,0 +1,359 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
 +
 +/ {
-+	model = "GL.iNet GL-AXT3000";
-+	compatible = "glinet,axt3000-snand", "mediatek,mt7981";
++	model = "GL.iNet GL-MT3000";
++	compatible = "glinet,mt3000-snand", "mediatek,mt7981";
 +
 +	aliases {
 +		led-boot = &led_run;
@@ -113,7 +113,7 @@ index 0000000000..ad5f1275c8
 +
 +	gl-hw {
 +		compatible = "gl-hw-info";
-+		model = "axt3000";
++		model = "mt3000";
 +		wan = "eth1";
 +		lan = "lan1 lan2 lan3 lan4";
 +		usb-port = "1-1";
@@ -384,12 +384,12 @@ index ab3ed5b42f..a216c20262 100755
  endef
  TARGET_DEVICES += mt7981-fpga-sd
 +
-+define Device/glinet_gl-axt3000
++define Device/glinet_gl-mt3000
 +  DEVICE_VENDOR := GL.iNet
-+  DEVICE_MODEL := GL-AXT3000
-+  DEVICE_DTS := mt7981-gl-axt3000
++  DEVICE_MODEL := GL-MT3000
++  DEVICE_DTS := mt7981-gl-mt3000
 +  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
-+  SUPPORTED_DEVICES := glinet,axt3000-snand
++  SUPPORTED_DEVICES := glinet,mt3000-snand
 +  DEVICE_PACKAGES := kmod-hwmon-pwmfan
 +  UBINIZE_OPTS := -E 5
 +  BLOCKSIZE := 128k
@@ -400,7 +400,7 @@ index ab3ed5b42f..a216c20262 100755
 +  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
 +  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 +endef
-+TARGET_DEVICES += glinet_gl-axt3000
++TARGET_DEVICES += glinet_gl-mt3000
 -- 
 2.25.1
 
