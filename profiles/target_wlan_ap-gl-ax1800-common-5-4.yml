@@ -6,10 +6,7 @@ feeds:
     path: ../../feeds/ipq807x
   - name: gl_feeds_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: d218adf36ff1d6e8a70583e88bc06ead8bce2d96
-  - name: gl_feeds
-    uri: https://github.com/gl-inet/gl-feeds.git
-    revision: c272de41d69a73a44ed9ddb6105a3b869a7bcf41
+    revision: 3b171fae6bf8e57fef60b77e166eb95473658bd5
   - name: luci
     uri: https://github.com/openwrt/luci.git
     revision: 1c3b32dc1bec15e3076a447762b1c4f94eb75fb7

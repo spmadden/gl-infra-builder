@@ -8,9 +8,12 @@ feeds:
   - name: mtk_openwrt_feed
     uri: https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git
     revision: 4c6b600
-  - name: gl_feed
+  - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: bbcfc7b10abb9a0140eeb56956c7d23ce6b05b67
+    revision: 3b171fae6bf8e57fef60b77e166eb95473658bd5
+  - name: gl_feed_21_02
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
   - name: gl_feed_mt7981
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: da09723846cf25c6b7e288cd1669c89ea4d6071e
