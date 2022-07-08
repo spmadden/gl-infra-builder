@@ -61,6 +61,7 @@ packages:
   - gl-sdk4-carrier-monitor
   - gl-sdk4-init-portal
   - gl-sdk4-s2s
+  - gl-sdk4-edgerouter
 
 
 diffconfig: |
