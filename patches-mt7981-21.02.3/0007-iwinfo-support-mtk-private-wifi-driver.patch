@@ -1,4 +1,4 @@
-From b8c31ea7a79397802eca863bbfda1a9cca176f60 Mon Sep 17 00:00:00 2001
+From 9e780b505183e3f754666adddd77b8084ca7b45b Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -6,9 +6,9 @@ Subject: [PATCH] iwinfo: support mtk private wifi driver
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/network/utils/iwinfo/Makefile         |   2 +-
- .../iwinfo/patches/0100-support-mtk.patch     |  42 +++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 294 ++++++++++++++++++
- 3 files changed, 337 insertions(+), 1 deletion(-)
+ .../iwinfo/patches/0100-support-mtk.patch     | 112 +++++++
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 299 ++++++++++++++++++
+ 3 files changed, 412 insertions(+), 1 deletion(-)
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
 
@@ -27,10 +27,10 @@ index 815c477988..4fa21e7dee 100644
  define Build/InstallDev
 diff --git a/package/network/utils/iwinfo/patches/0100-support-mtk.patch b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
 new file mode 100644
-index 0000000000..67e7a639d5
+index 0000000000..4c5ebc014c
 --- /dev/null
 +++ b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,112 @@
 +Index: libiwinfo-2021-04-30-c45f0b58/Makefile
 +===================================================================
 +--- libiwinfo-2021-04-30-c45f0b58.orig/Makefile
@@ -73,12 +73,82 @@ index 0000000000..67e7a639d5
 + 	&wext_ops,
 + };
 + 
++Index: libiwinfo-2021-04-30-c45f0b58/include/iwinfo/lua.h
++===================================================================
++--- libiwinfo-2021-04-30-c45f0b58.orig/include/iwinfo/lua.h
+++++ libiwinfo-2021-04-30-c45f0b58/include/iwinfo/lua.h
++@@ -41,6 +41,9 @@
++ #define IWINFO_NL80211_META	"iwinfo.nl80211"
++ #endif
++ 
+++#ifdef USE_MTK
+++#define IWINFO_MTK_META	"iwinfo.mtk"
+++#endif
++ 
++ #define LUA_REG(type,op) \
++ 	{ #op, iwinfo_L_##type##_##op }
++Index: libiwinfo-2021-04-30-c45f0b58/iwinfo_lua.c
++===================================================================
++--- libiwinfo-2021-04-30-c45f0b58.orig/iwinfo_lua.c
+++++ libiwinfo-2021-04-30-c45f0b58/iwinfo_lua.c
++@@ -769,6 +769,15 @@ LUA_WRAP_STRUCT_OP(nl80211,mbssid_suppor
++ LUA_WRAP_STRUCT_OP(nl80211,hardware_id)
++ #endif
++ 
+++#ifdef USE_MTK
+++LUA_WRAP_INT_OP(mtk,channel)
+++LUA_WRAP_STRING_OP(mtk,ssid)
+++LUA_WRAP_STRING_OP(mtk,bssid)
+++LUA_WRAP_STRING_OP(mtk,phyname)
+++LUA_WRAP_STRUCT_OP(mtk,mode)
+++LUA_WRAP_STRUCT_OP(mtk,assoclist)
+++#endif
+++
++ /* Wext */
++ LUA_WRAP_INT_OP(wext,channel)
++ LUA_WRAP_INT_OP(wext,frequency)
++@@ -896,6 +905,19 @@ static const luaL_reg R_nl80211[] = {
++ };
++ #endif
++ 
+++#ifdef USE_MTK
+++/* NL80211 table */
+++static const luaL_reg R_mtk[] = {
+++	LUA_REG(mtk,channel),
+++	LUA_REG(mtk,mode),
+++	LUA_REG(mtk,ssid),
+++	LUA_REG(mtk,bssid),
+++	LUA_REG(mtk,assoclist),
+++	LUA_REG(mtk,phyname),
+++	{ NULL, NULL }
+++};
+++#endif
+++
++ /* Wext table */
++ static const luaL_reg R_wext[] = {
++ 	LUA_REG(wext,channel),
++@@ -965,6 +987,15 @@ LUALIB_API int luaopen_iwinfo(lua_State
++ 	lua_setfield(L, -2, "nl80211");
++ #endif
++ 
+++#ifdef USE_MTK
+++	luaL_newmetatable(L, IWINFO_MTK_META);
+++	luaL_register(L, NULL, R_common);
+++	luaL_register(L, NULL, R_mtk);
+++	lua_pushvalue(L, -1);
+++	lua_setfield(L, -2, "__index");
+++	lua_setfield(L, -2, "mtk");
+++#endif
+++
++ 	luaL_newmetatable(L, IWINFO_WEXT_META);
++ 	luaL_register(L, NULL, R_common);
++ 	luaL_register(L, NULL, R_wext);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..5bc89f0c63
+index 0000000000..55f9d28e0c
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,294 @@
+@@ -0,0 +1,299 @@
 +#include "iwinfo.h"
 +#include "iwinfo_wext.h"
 +
@@ -304,8 +374,13 @@ index 0000000000..5bc89f0c63
 +
 +static int mtk_get_phyname(const char *ifname, char *buf)
 +{
-+	/* No suitable api in wext */
-+	strcpy(buf, ifname);
++	if (strstr(ifname, "ra"))
++		strcpy(buf, "ra0");
++	else if (strstr(ifname, "rax"))
++		strcpy(buf, "rax0");
++	else
++		return -1;
++
 +	return 0;
 +}
 +
