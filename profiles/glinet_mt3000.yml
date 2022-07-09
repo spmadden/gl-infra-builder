@@ -10,7 +10,7 @@ feeds:
     revision: 4c6b600
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: db2ff2799d020794109f7d15038c09015b6088ab
+    revision: f4362cf288d723bae1d854976ef940730dc74bdf
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
