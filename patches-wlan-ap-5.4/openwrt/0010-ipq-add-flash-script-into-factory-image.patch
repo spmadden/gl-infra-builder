@@ -1,0 +1,89 @@
+From be9723622caf1dfc733b677a852d1699a997261d Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 7 Feb 2022 11:38:09 +0800
+Subject: [PATCH] ipq: add flash script into factory image
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ include/image-commands.mk       |  5 +++--
+ scripts/mkits-qsdk-ipq-image.sh | 11 ++++++-----
+ scripts/qsdk-flash.scr          |  9 +++++++++
+ 3 files changed, 18 insertions(+), 7 deletions(-)
+ create mode 100644 scripts/qsdk-flash.scr
+
+diff --git a/include/image-commands.mk b/include/image-commands.mk
+index d4bce80e68..aa574d2d45 100644
+--- a/include/image-commands.mk
++++ b/include/image-commands.mk
+@@ -341,8 +341,9 @@ define Build/qemu-image
+ endef
+ 
+ define Build/qsdk-ipq-factory-nand
+-	$(TOPDIR)/scripts/mkits-qsdk-ipq-image.sh \
+-		$@.its ubi $@
++	$(TOPDIR)/scripts/mkits-qsdk-ipq-image.sh $@.its \
++		script script $(TOPDIR)/scripts/qsdk-flash.scr \
++		ubi firmware $@
+ 	PATH=$(LINUX_DIR)/scripts/dtc:$(PATH) mkimage -f $@.its $@.new
+ 	@mv $@.new $@
+ endef
+diff --git a/scripts/mkits-qsdk-ipq-image.sh b/scripts/mkits-qsdk-ipq-image.sh
+index 066e8df579..87890cc43c 100755
+--- a/scripts/mkits-qsdk-ipq-image.sh
++++ b/scripts/mkits-qsdk-ipq-image.sh
+@@ -15,12 +15,12 @@
+ #
+ 
+ usage() {
+-	echo "Usage: `basename $0` output img0_name img0_file [[img1_name img1_file] ...]"
++	echo "Usage: `basename $0` output img0_name img0_type img0_file [[img1_name img1_type img1_file] ...]"
+ 	exit 1
+ }
+ 
+ # We need at least 3 arguments
+-[ "$#" -lt 3 ] && usage
++[ "$#" -lt 4 ] && usage
+ 
+ # Target output file
+ OUTPUT="$1"; shift
+@@ -35,17 +35,18 @@ echo "\
+ 
+ 	images {" > ${OUTPUT}
+ 
+-while [ -n "$1" -a -n "$2" ]; do
+-	[ -f "$2" ] || usage
++while [ -n "$1" -a -n "$2" -a -n "$3" ]; do
++	[ -f "$3" ] || usage
+ 
+ 	name="$1"; shift
++	type="$1"; shift
+ 	file="$1"; shift
+ 
+ 	echo \
+ "		${name} {
+ 			description = \"${name}\";
+ 			data = /incbin/(\"${file}\");
+-			type = \"Firmware\";
++			type = \"${type}\";
+ 			arch = \"ARM\";
+ 			compression = \"none\";
+ 			hash@1 {
+diff --git a/scripts/qsdk-flash.scr b/scripts/qsdk-flash.scr
+new file mode 100644
+index 0000000000..44f1e00244
+--- /dev/null
++++ b/scripts/qsdk-flash.scr
+@@ -0,0 +1,9 @@
++echo '######################################## Flashing ubi: Started'
++setenv stdout nulldev
++smem
++imxtract $imgaddr ubi || setenv stdout serial && echo "invalid image" && exit 1
++setenv stdout serial
++nand erase.part fs
++nand write $fileaddr fs $filesize
++echo '######################################## Flashing ubi: Done'
++exit 0
+\ No newline at end of file
+-- 
+2.25.1
+
