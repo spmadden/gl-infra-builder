@@ -1,0 +1,25 @@
+From 00f5e19dc6cf4a1a05b6da5b13824ea74103ec3a Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 17:29:26 +0800
+Subject: [PATCH] kernel: fix dependency of kmod-nf-nat6
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ include/netfilter.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/netfilter.mk b/include/netfilter.mk
+index cee40ee008..9a3cdbbba8 100644
+--- a/include/netfilter.mk
++++ b/include/netfilter.mk
+@@ -185,6 +185,7 @@ $(eval $(call nf_add,IPT_IPV6_EXTRA,CONFIG_IP6_NF_MATCH_RT, $(P_V6)ip6t_rt))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT, $(P_XT)nf_nat),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT_REDIRECT, $(P_XT)nf_nat_redirect, lt 4.18),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT_IPV4, $(P_V4)nf_nat_ipv4, lt 4.18),))
++$(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT6,CONFIG_NF_NAT_IPV6, $(P_V6)nf_nat_ipv6, lt 4.18),))
+ $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT_MASQUERADE_IPV4, $(P_V4)nf_nat_masquerade_ipv4, lt 4.18),))
+ 
+ $(eval $(if $(NF_KMOD),$(call nf_add,IPT_NAT,CONFIG_NETFILTER_XT_NAT, $(P_XT)xt_nat),))
+-- 
+2.25.1
+

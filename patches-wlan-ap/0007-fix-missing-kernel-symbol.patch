@@ -1,0 +1,24 @@
+From ef9b7f1af3c56025407739347cb8419af37010b6 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 15:51:01 +0800
+Subject: [PATCH] ipq807x: fix missing kernel symbol
+
+CONFIG_IP6_NF_TARGET_MASQUERADE
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ feeds/ipq807x/ipq807x/config-4.4 | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/feeds/ipq807x/ipq807x/config-4.4 b/feeds/ipq807x/ipq807x/config-4.4
+index af9953ae..2f8d74a7 100644
+--- a/feeds/ipq807x/ipq807x/config-4.4
++++ b/feeds/ipq807x/ipq807x/config-4.4
+@@ -827,3 +827,4 @@ CONFIG_DIAG_CHAR=y
+ # CONFIG_CRYPTO_DEV_QCEDEV is not set
+ # CONFIG_CRYPTO_DEV_QCRYPTO is not set
+ # CONFIG_MHI_BUS_TEST is not set
++# CONFIG_IP6_NF_TARGET_MASQUERADE is not set
+-- 
+2.25.1
+

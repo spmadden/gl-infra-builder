@@ -1,0 +1,33 @@
+From 474233728e7d9b863424bc62a263fbf0e24895d0 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 12 Jul 2022 11:49:05 +0800
+Subject: [PATCH] ipq807x: show symbol udp-tunnel for wireguard
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../patches/113-show-symbol-udp-tunnel.patch        | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 feeds/ipq807x/ipq807x/patches/113-show-symbol-udp-tunnel.patch
+
+diff --git a/feeds/ipq807x/ipq807x/patches/113-show-symbol-udp-tunnel.patch b/feeds/ipq807x/ipq807x/patches/113-show-symbol-udp-tunnel.patch
+new file mode 100644
+index 00000000..b8e93e7d
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/patches/113-show-symbol-udp-tunnel.patch
+@@ -0,0 +1,13 @@
++Index: linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016/net/ipv4/Kconfig
++===================================================================
++--- linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016.orig/net/ipv4/Kconfig
+++++ linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016/net/ipv4/Kconfig
++@@ -308,7 +308,7 @@ config NET_IPVTI
++ 	  on top.
++ 
++ config NET_UDP_TUNNEL
++-	tristate
+++	tristate "udp tunnel"
++ 	select NET_IP_TUNNEL
++ 	default n
++ 
+-- 
+2.25.1
+

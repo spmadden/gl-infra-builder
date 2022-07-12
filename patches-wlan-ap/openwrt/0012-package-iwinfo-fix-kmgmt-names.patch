@@ -1,0 +1,33 @@
+From 07ed17e88fec1b00fb05275a33ce44aa7d86cec3 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 16:05:34 +0800
+Subject: [PATCH] package/iwinfo: fix kmgmt names
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../utils/iwinfo/patches/0002-fix-kmgmt-names.patch | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 package/network/utils/iwinfo/patches/0002-fix-kmgmt-names.patch
+
+diff --git a/package/network/utils/iwinfo/patches/0002-fix-kmgmt-names.patch b/package/network/utils/iwinfo/patches/0002-fix-kmgmt-names.patch
+new file mode 100644
+index 0000000000..c8ef0c5a5d
+--- /dev/null
++++ b/package/network/utils/iwinfo/patches/0002-fix-kmgmt-names.patch
+@@ -0,0 +1,13 @@
++Index: libiwinfo-2021-06-09-c0414642/iwinfo_lib.c
++===================================================================
++--- libiwinfo-2021-06-09-c0414642.orig/iwinfo_lib.c
+++++ libiwinfo-2021-06-09-c0414642/iwinfo_lib.c
++@@ -37,6 +37,8 @@ const char *IWINFO_KMGMT_NAMES[] = {
++ 	"NONE",
++ 	"802.1X",
++ 	"PSK",
+++	"SAE",
+++	"OWE",
++ };
++ 
++ const char *IWINFO_AUTH_NAMES[] = {
+-- 
+2.25.1
+

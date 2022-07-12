@@ -1,0 +1,33 @@
+From 7ec29795671f5629962106214e342fec4cb2ac5c Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 17:00:52 +0800
+Subject: [PATCH] package/exfat: fix build fail
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../kernel/exfat/patches/001-fix-build-fail.patch   | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 package/kernel/exfat/patches/001-fix-build-fail.patch
+
+diff --git a/package/kernel/exfat/patches/001-fix-build-fail.patch b/package/kernel/exfat/patches/001-fix-build-fail.patch
+new file mode 100644
+index 0000000000..9f72ff1bf0
+--- /dev/null
++++ b/package/kernel/exfat/patches/001-fix-build-fail.patch
+@@ -0,0 +1,13 @@
++Index: linux-exfat-oot-5.12.3/file.c
++===================================================================
++--- linux-exfat-oot-5.12.3.orig/file.c
+++++ linux-exfat-oot-5.12.3/file.c
++@@ -243,7 +243,7 @@ void exfat_truncate(struct inode *inode,
++ {
++ 	struct super_block *sb = inode->i_sb;
++ 	struct exfat_sb_info *sbi = EXFAT_SB(sb);
++-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
+++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++ 	unsigned int blocksize = i_blocksize(inode);
++ #else
++ 	unsigned int blocksize = 1 << inode->i_blkbits;
+-- 
+2.25.1
+

@@ -1,0 +1,33 @@
+From 3d91d9afabf88bd4cd830938282599de65f4db02 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 11:36:35 +0800
+Subject: [PATCH] ipq807x: use append-gl-metadata for gl-ax(t)1800
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ feeds/ipq807x/ipq807x/image/ipq60xx.mk | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/feeds/ipq807x/ipq807x/image/ipq60xx.mk b/feeds/ipq807x/ipq807x/image/ipq60xx.mk
+index 23057a99..efbd6f38 100644
+--- a/feeds/ipq807x/ipq807x/image/ipq60xx.mk
++++ b/feeds/ipq807x/ipq807x/image/ipq60xx.mk
+@@ -68,6 +68,7 @@ define Device/glinet_ax1800
+   SUPPORTED_DEVICES := glinet,ax1800
+   DEVICE_DTS_CONFIG := config@cp03-c1
+   DEVICE_PACKAGES := ath11k-wifi-gl-ax1800 -kmod-usb-dwc3-of-simple kmod-usb-dwc3-qcom kmod-usb3
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_ax1800
+ 
+@@ -77,6 +78,7 @@ define Device/glinet_axt1800
+   SUPPORTED_DEVICES := glinet,axt1800
+   DEVICE_DTS_CONFIG := config@cp03-c1
+   DEVICE_PACKAGES := ath11k-wifi-gl-axt1800 -kmod-usb-dwc3-of-simple kmod-usb-dwc3-qcom kmod-usb3
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_axt1800
+ 
+-- 
+2.25.1
+

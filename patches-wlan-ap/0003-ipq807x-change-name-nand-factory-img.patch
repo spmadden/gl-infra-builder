@@ -1,0 +1,29 @@
+From e041d883da5fdfc2bbea2056867dd94b20cfe928 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 11:58:12 +0800
+Subject: [PATCH] ipq807x: change name nand-factory.img
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ feeds/ipq807x/ipq807x/image/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/feeds/ipq807x/ipq807x/image/Makefile b/feeds/ipq807x/ipq807x/image/Makefile
+index 3a219e6d..49c6cc5a 100644
+--- a/feeds/ipq807x/ipq807x/image/Makefile
++++ b/feeds/ipq807x/ipq807x/image/Makefile
+@@ -13,9 +13,9 @@ define Device/Default
+   ROOTFSNAME_IN_UBI := ubi_rootfs
+   BLOCKSIZE := 128k
+   PAGESIZE := 2048
+-  IMAGES := sysupgrade.tar nand-factory.bin
++  IMAGES := sysupgrade.tar nand-factory.img
+   IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
+-  IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
++  IMAGE/nand-factory.img := append-ubi | qsdk-ipq-factory-nand
+   KERNEL_NAME := Image
+   KERNEL = kernel-bin | gzip | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+   KERNEL_INITRAMFS = kernel-bin | gzip | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+-- 
+2.25.1
+

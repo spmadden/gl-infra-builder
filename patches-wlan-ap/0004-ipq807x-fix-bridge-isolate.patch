@@ -1,0 +1,34 @@
+From 51c6862c8764ba91d42578a3056a9753414a0ac2 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 12:05:33 +0800
+Subject: [PATCH] ipq807x: fix bridge isolate
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../etc/uci-defaults/14_fix_bridge_isolate         | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_bridge_isolate
+
+diff --git a/feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_bridge_isolate b/feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_bridge_isolate
+new file mode 100644
+index 00000000..46c8e678
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_bridge_isolate
+@@ -0,0 +1,14 @@
++#!/bin/sh
++
++. /lib/functions.sh
++board=$(board_name)
++
++case "$board" in
++	glinet,axt1800|\
++	glinet,ax1800)
++		uci set network.@device[0].multicast_to_unicast='0'
++		uci commit network
++	;;
++esac
++
++
+-- 
+2.25.1
+

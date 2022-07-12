@@ -1,0 +1,26 @@
+From 1a11604d2efb7c6ff6ea7ccefdc60785e3611e97 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 15:59:30 +0800
+Subject: [PATCH] kernel: fix build br_netfilter fail
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/linux/modules/netfilter.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/netfilter.mk b/package/kernel/linux/modules/netfilter.mk
+index 1be05e182a..8ad91784f3 100644
+--- a/package/kernel/linux/modules/netfilter.mk
++++ b/package/kernel/linux/modules/netfilter.mk
+@@ -859,7 +859,7 @@ define KernelPackage/br-netfilter
+   TITLE:=Bridge netfilter support modules
+   DEPENDS:=+kmod-ipt-core
+   FILES:=$(LINUX_DIR)/net/bridge/br_netfilter.ko
+-  KCONFIG:=CONFIG_BRIDGE_NETFILTER
++  KCONFIG:=CONFIG_BRIDGE_NETFILTER=y
+   AUTOLOAD:=$(call AutoProbe,br_netfilter)
+ endef
+ 
+-- 
+2.25.1
+

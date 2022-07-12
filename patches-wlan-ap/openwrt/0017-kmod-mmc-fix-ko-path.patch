@@ -1,0 +1,26 @@
+From 98d63f7d8526ea4d1e5249a49c46d0e759037e65 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 11 Jul 2022 17:49:15 +0800
+Subject: [PATCH] kmod-mmc: fix ko path
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/linux/modules/other.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/other.mk b/package/kernel/linux/modules/other.mk
+index 8e3642ab9a..c297a1d004 100644
+--- a/package/kernel/linux/modules/other.mk
++++ b/package/kernel/linux/modules/other.mk
+@@ -380,7 +380,7 @@ define KernelPackage/mmc
+ 	CONFIG_SDIO_UART=n
+   FILES:= \
+ 	$(LINUX_DIR)/drivers/mmc/core/mmc_core.ko \
+-	$(LINUX_DIR)/drivers/mmc/core/mmc_block.ko
++	$(LINUX_DIR)/drivers/mmc/card/mmc_block.ko
+   AUTOLOAD:=$(call AutoProbe,mmc_core mmc_block,1)
+ endef
+ 
+-- 
+2.25.1
+
