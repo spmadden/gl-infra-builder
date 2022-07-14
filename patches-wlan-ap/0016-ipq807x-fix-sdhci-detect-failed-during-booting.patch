@@ -1,0 +1,54 @@
+From 3d49194ab22815afcaed282e272f0ed78d96c3c5 Mon Sep 17 00:00:00 2001
+From: gl-luochongjun <luochongjun@gl-inet.com>
+Date: Thu, 14 Jul 2022 11:45:07 +0800
+Subject: [PATCH] wlan-ap: fix: sdhci detect failed during booting
+
+---
+ ...x-sdhci-detect-failed-during-booting.patch | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 feeds/ipq807x/ipq807x/patches/301-fix-sdhci-detect-failed-during-booting.patch
+
+diff --git a/feeds/ipq807x/ipq807x/patches/301-fix-sdhci-detect-failed-during-booting.patch b/feeds/ipq807x/ipq807x/patches/301-fix-sdhci-detect-failed-during-booting.patch
+new file mode 100644
+index 00000000..1a8ddce2
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/patches/301-fix-sdhci-detect-failed-during-booting.patch
+@@ -0,0 +1,35 @@
++--- a/drivers/mmc/core/core.c
+++++ b/drivers/mmc/core/core.c
++@@ -2458,6 +2458,7 @@ EXPORT_SYMBOL(mmc_hw_reset);
++ 
++ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
++ {
+++	int do_power_cycle = 0;
++ 	host->f_init = freq;
++ 
++ #ifdef CONFIG_MMC_DEBUG
++@@ -2466,6 +2467,12 @@ static int mmc_rescan_try_freq(struct mm
++ #endif
++ 	mmc_power_up(host, host->ocr_avail);
++ 
+++need_power_cycle:
+++	if (do_power_cycle) {
+++		pr_info("%s: %s: reset power\n",
+++			mmc_hostname(host), __func__);
+++		mmc_power_cycle(host, host->ocr_avail);
+++	}
++ 	/*
++ 	 * Some eMMCs (with VCCQ always on) may not be reset after power up, so
++ 	 * do a hardware reset if possible.
++@@ -2487,6 +2494,11 @@ static int mmc_rescan_try_freq(struct mm
++ 		return 0;
++ 	if (!mmc_attach_sd(host))
++ 		return 0;
+++	else if (!do_power_cycle) {
+++	/* some model need to reset power */
+++		do_power_cycle = 1;
+++		goto need_power_cycle;
+++	}
++ 	if (!mmc_attach_mmc(host))
++ 		return 0;
++ 
+-- 
+2.25.1
+
