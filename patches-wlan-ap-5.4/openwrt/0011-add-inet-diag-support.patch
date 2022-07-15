@@ -1,0 +1,46 @@
+From f62e69bad6fc17c64cd59a71d4bd0458a20c287f Mon Sep 17 00:00:00 2001
+From: gl-luochongjun <luochongjun@gl-inet.com>
+Date: Fri, 15 Jul 2022 18:15:57 +0800
+Subject: [PATCH] add inet-diag support
+
+---
+ package/kernel/linux/modules/netsupport.mk | 23 ++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/package/kernel/linux/modules/netsupport.mk b/package/kernel/linux/modules/netsupport.mk
+index 4343e850e9..947f0a9753 100644
+--- a/package/kernel/linux/modules/netsupport.mk
++++ b/package/kernel/linux/modules/netsupport.mk
+@@ -1258,6 +1258,29 @@ endef
+ 
+ $(eval $(call KernelPackage,netlink-diag))
+ 
++define KernelPackage/inet-diag
++  SUBMENU:=$(NETWORK_SUPPORT_MENU)
++  TITLE:=INET diag support for ss utility
++  KCONFIG:= \
++	CONFIG_INET_DIAG \
++	CONFIG_INET_TCP_DIAG \
++	CONFIG_INET_UDP_DIAG \
++	CONFIG_INET_RAW_DIAG \
++	CONFIG_INET_DIAG_DESTROY=n
++  FILES:= \
++	$(LINUX_DIR)/net/ipv4/inet_diag.ko \
++	$(LINUX_DIR)/net/ipv4/tcp_diag.ko \
++	$(LINUX_DIR)/net/ipv4/udp_diag.ko \
++	$(LINUX_DIR)/net/ipv4/raw_diag.ko
++  AUTOLOAD:=$(call AutoLoad,31,inet_diag tcp_diag udp_diag raw_diag)
++endef
++
++define KernelPackage/inet-diag/description
++Support for INET (TCP, DCCP, etc) socket monitoring interface used by
++native Linux tools such as ss.
++endef
++
++$(eval $(call KernelPackage,inet-diag))
+ 
+ define KernelPackage/wireguard
+   SUBMENU:=$(NETWORK_SUPPORT_MENU)
+-- 
+2.25.1
+
