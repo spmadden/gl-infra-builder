@@ -398,7 +398,7 @@ index ab3ed5b42f..a216c20262 100755
 +  KERNEL_IN_UBI := 1
 +  IMAGES += factory.bin
 +  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
 +endef
 +TARGET_DEVICES += glinet_gl-mt3000
 -- 
