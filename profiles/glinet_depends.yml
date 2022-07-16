@@ -58,6 +58,7 @@ packages:
   - kmod-usb-serial-wwan
   - kmod-usb-net-cdc-ether
   - kmod-usb-net-qmi-wwan
+  - kmod-gl-sdk4-edgerouter-status
   - mqtt
   - dosfstools
   - e2fsprogs
