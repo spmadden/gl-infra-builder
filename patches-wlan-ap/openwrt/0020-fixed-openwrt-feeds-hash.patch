@@ -1,0 +1,24 @@
+From 8de5e839218a47b646fa69d36f2fc5c5997bfa6b Mon Sep 17 00:00:00 2001
+From: gl-luochongjun <luochongjun@gl-inet.com>
+Date: Mon, 18 Jul 2022 10:49:37 +0800
+Subject: [PATCH] fixed openwrt feeds hash
+
+---
+ feeds.conf.default | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/feeds.conf.default b/feeds.conf.default
+index 3d24cb7c27..7ca310050b 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,4 +1,4 @@
+-src-git packages https://git.openwrt.org/feed/packages.git;openwrt-21.02
+-src-git routing https://git.openwrt.org/feed/routing.git;openwrt-21.02
+-src-git telephony https://git.openwrt.org/feed/telephony.git;openwrt-21.02
++src-git packages https://git.openwrt.org/feed/packages.git^78bcd00c13587571b5c79ed2fc3363aa674aaef7
++src-git routing https://git.openwrt.org/feed/routing.git^a0d61bddb3ce4ca54bd76af86c28f58feb6cc044
++src-git telephony https://git.openwrt.org/feed/telephony.git^0183c1adda0e7581698b0ea4bff7c08379acf447
+ #src-link custom /usr/src/openwrt/custom-feed
+-- 
+2.25.1
+
