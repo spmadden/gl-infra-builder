@@ -22,6 +22,9 @@ packages:
   - kmod-gl-sdk4-hw-info
   - kmod-gl-sdk4-tertf
   - kmod-gl-sdk4-fan
+  - kmod-inet-diag
+  - iptables-mod-tproxy
+  - iptables-mod-filter
   - liblua5.1.5
   - libcurl
   - ethtool
@@ -55,6 +58,7 @@ packages:
   - kmod-usb-serial-wwan
   - kmod-usb-net-cdc-ether
   - kmod-usb-net-qmi-wwan
+  - kmod-gl-sdk4-edgerouter-status
   - mqtt
   - dosfstools
   - e2fsprogs
