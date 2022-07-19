@@ -40,7 +40,6 @@ packages:
   - kmod-mt_wifi
 
 diffconfig: |
-  CONFIG_PACKAGE_kmod-leds-gpio=n
   CONFIG_MAP_R2_SUPPORT=y
   CONFIG_MAP_R3_SUPPORT=y
   CONFIG_MTK_CONNINFRA_APSOC=y
