@@ -1,21 +1,21 @@
-From 1a324e81552caa58d15ee6873242efd92793bf7a Mon Sep 17 00:00:00 2001
+From 4621b0f228a9c3ddcbc61fcaa4053897edc8cfd4 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 355 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 321 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 +
- 2 files changed, 373 insertions(+)
+ 2 files changed, 339 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..7b79e9bce8
+index 0000000000..5acb6f14fc
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,355 @@
+@@ -0,0 +1,321 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -188,6 +188,7 @@ index 0000000000..7b79e9bce8
 +		compatible = "mediatek,eth-mac";
 +		reg = <0>;
 +		phy-mode = "2500base-x";
++		phy-handle = <&phy5>;
 +
 +		fixed-link {
 +			speed = <2500>;
@@ -207,7 +208,7 @@ index 0000000000..7b79e9bce8
 +		#address-cells = <1>;
 +		#size-cells = <0>;
 +
-+		phy0: ethernet-phy@0 {
++		phy0: phy@0 {
 +			compatible = "ethernet-phy-id03a2.9461";
 +			reg = <0>;
 +			phy-mode = "gmii";
@@ -215,55 +216,20 @@ index 0000000000..7b79e9bce8
 +			nvmem-cell-names = "phy-cal-data";
 +		};
 +
-+		switch@0 {
-+			compatible = "mediatek,mt7531";
-+			reg = <31>;
-+			reset-gpios = <&pio 39 0>;
-+
-+			ports {
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+
-+				port@0 {
-+					reg = <0>;
-+					label = "lan1";
-+				};
-+
-+				port@1 {
-+					reg = <1>;
-+					label = "lan2";
-+				};
-+
-+				port@2 {
-+					reg = <2>;
-+					label = "lan3";
-+				};
-+
-+				port@3 {
-+					reg = <3>;
-+					label = "lan4";
-+				};
-+
-+				port@6 {
-+					reg = <6>;
-+					label = "cpu";
-+					ethernet = <&gmac0>;
-+					phy-mode = "2500base-x";
-+
-+					fixed-link {
-+						speed = <2500>;
-+						full-duplex;
-+						pause;
-+					};
-+				};
-+			};
++		phy5: phy@5 {
++			compatible = "ethernet-phy-id67c9.de0a";
++			reg = <5>;
++			reset-gpios = <&pio 14 1>;
++			reset-assert-us = <600>;
++			reset-deassert-us = <20000>;
++			phy-mode = "2500base-x";
 +		};
 +	};
 +};
 +
 +&hnat {
-+	mtketh-wan = "eth1";
-+	mtketh-lan = "lan";
++	mtketh-wan = "eth0";
++	mtketh-lan = "eth1";
 +	mtketh-max-gmac = <2>;
 +	status = "okay";
 +};
