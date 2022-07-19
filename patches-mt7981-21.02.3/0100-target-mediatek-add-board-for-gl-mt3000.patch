@@ -1,21 +1,21 @@
-From 88c933b552b58760f480cd06dc343aba6192d068 Mon Sep 17 00:00:00 2001
+From 1a324e81552caa58d15ee6873242efd92793bf7a Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts   | 359 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 355 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 +
- 2 files changed, 377 insertions(+)
+ 2 files changed, 373 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..ad5f1275c8
+index 0000000000..7b79e9bce8
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,359 @@
+@@ -0,0 +1,355 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -34,10 +34,6 @@ index 0000000000..ad5f1275c8
 +	chosen {
 +		bootargs = "console=ttyS0,115200n1 loglevel=8  \
 +				earlycon=uart8250,mmio32,0x11002000";
-+	};
-+
-+	memory {
-+		reg = <0 0x40000000 0 0x10000000>;
 +	};
 +
 +	gpio-keys {
@@ -376,7 +372,7 @@ index 0000000000..ad5f1275c8
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index ab3ed5b42f..a216c20262 100755
+index ab3ed5b42f..3e47d600b5 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
 @@ -171,3 +171,21 @@ define Device/mt7981-fpga-sd
