@@ -1,0 +1,47 @@
+From a8da7b9f05f9d925da51bdf4fe2cd6234591eba3 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Tue, 19 Jul 2022 17:11:00 +0800
+Subject: [PATCH] axt1800: fix dts for sdhci
+
+---
+ .../arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts    | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
+index 483a655..dcfd71d 100644
+--- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
++++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
+@@ -31,6 +31,22 @@
+ 		#size-cells = <0>;
+ 		fan_speed_gpio = <31>;
+ 	};
++
++	V30:V30 {
++		compatible = "regulator-fixed";
++		regulator-name = "vmmc-supply";
++		regulator-min-microvolt = <3000000>;
++		regulator-max-microvolt = <3000000>;
++		regulator-always-on;
++	};
++
++	V18:V18 {
++		compatible = "regulator-fixed";
++		regulator-name = "vqmmc-supply";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		regulator-always-on;
++	};
+ };
+ 
+ &gl_hw {
+@@ -117,5 +133,7 @@
+ 	pinctrl-names = "default";
+ 	cd-gpios = <&tlmm 62 1>;
+ 	sd-ldo-gpios = <&tlmm 66 1>;
++	vqmmc-supply = <&V18>;
++	vmmc-supply = <&V30>;
+ 	status = "ok";
+ };
+-- 
+2.7.4
+
