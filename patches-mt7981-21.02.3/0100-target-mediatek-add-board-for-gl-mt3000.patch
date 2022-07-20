@@ -1,4 +1,4 @@
-From 4621b0f228a9c3ddcbc61fcaa4053897edc8cfd4 Mon Sep 17 00:00:00 2001
+From dbfcadd9b26d82f785289c31a1dc0c31ac42e6ea Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
@@ -7,7 +7,8 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 321 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 +
- 2 files changed, 339 insertions(+)
+ .../mt7981/base-files/etc/board.d/02_network  |   3 +
+ 3 files changed, 342 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
@@ -363,6 +364,20 @@ index ab3ed5b42f..3e47d600b5 100755
 +  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
 +endef
 +TARGET_DEVICES += glinet_gl-mt3000
+diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
+index 0d35a2207a..1a5cdf0df3 100755
+--- a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
++++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
+@@ -22,6 +22,9 @@ mediatek_setup_interfaces()
+ 	*2500wan-p5*)
+ 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" wan
+ 		;;
++	*mt3000*)
++		ucidef_set_interfaces_lan_wan eth1 eth0
++		;;
+ 	*)
+ 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" eth1
+ 		;;
 -- 
 2.25.1
 
