@@ -1,4 +1,4 @@
-From b3c7d8b91730fb92c0b872737c509a549d1eb137 Mon Sep 17 00:00:00 2001
+From 0365d55396f7d88624e918bb4a82eab0d6bed0d0 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
@@ -13,7 +13,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..61236c892f
+index 0000000000..59bdf537a7
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 @@ -0,0 +1,318 @@
@@ -111,8 +111,8 @@ index 0000000000..61236c892f
 +	gl-hw {
 +		compatible = "gl-hw-info";
 +		model = "mt3000";
-+		wan = "eth1";
-+		lan = "lan1 lan2 lan3 lan4";
++		wan = "eth0";
++		lan = "eth1";
 +		usb-port = "1-1";
 +		fan = "pwmchip0";
 +		flash_size = <128>;
