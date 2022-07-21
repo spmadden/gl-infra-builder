@@ -1,22 +1,22 @@
-From 07ace802dfc08b68917d24f53dbc2e24b449d76d Mon Sep 17 00:00:00 2001
+From b3c7d8b91730fb92c0b872737c509a549d1eb137 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 320 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 318 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 +
  .../mt7981/base-files/etc/board.d/02_network  |   3 +
- 3 files changed, 341 insertions(+)
+ 3 files changed, 339 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..3b6b0e656b
+index 0000000000..61236c892f
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,320 @@
+@@ -0,0 +1,318 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -189,7 +189,6 @@ index 0000000000..3b6b0e656b
 +		compatible = "mediatek,eth-mac";
 +		reg = <0>;
 +		phy-mode = "2500base-x";
-+
 +		fixed-link {
 +			speed = <2500>;
 +			full-duplex;
@@ -211,7 +210,6 @@ index 0000000000..3b6b0e656b
 +		phy0: phy@0 {
 +			compatible = "ethernet-phy-id03a2.9461";
 +			reg = <0>;
-+			phy-mode = "gmii";
 +			nvmem-cells = <&phy_calibration>;
 +			nvmem-cell-names = "phy-cal-data";
 +		};
@@ -222,7 +220,6 @@ index 0000000000..3b6b0e656b
 +			reset-gpios = <&pio 14 1>;
 +			reset-assert-us = <600>;
 +			reset-deassert-us = <20000>;
-+			phy-mode = "2500base-x";
 +		};
 +	};
 +};
@@ -230,6 +227,7 @@ index 0000000000..3b6b0e656b
 +&hnat {
 +	mtketh-wan = "eth0";
 +	mtketh-lan = "eth1";
++	mtketh-ppd = "eth1";
 +	mtketh-max-gmac = <2>;
 +	status = "okay";
 +};
