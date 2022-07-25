@@ -16,6 +16,3 @@ include:
 
 packages:
   - wget-ssl
-
-diffconfig: |
-  CONFIG_KERNEL_IPQ_MEM_PROFILE=0
