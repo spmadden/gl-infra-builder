@@ -1,22 +1,22 @@
-From 6d491cde4c57f91123e1c4a2862de621fc9b0ccd Mon Sep 17 00:00:00 2001
+From 88aa415bca03a5f572c0c78225367892a4e216eb Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 267 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 266 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 ++
  .../mt7981/base-files/etc/board.d/02_network  |   3 +
- 3 files changed, 288 insertions(+)
+ 3 files changed, 287 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..63f695fdb0
+index 0000000000..070acd6f44
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,267 @@
+@@ -0,0 +1,266 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -129,9 +129,8 @@ index 0000000000..63f695fdb0
 +
 +	gl_fan {
 +		compatible = "gl-fan";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		fan_speed_gpio = <29>;
++		interrupt-parent = <&pio>;
++		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
 +	};
 +
 +	pwm-fan {
