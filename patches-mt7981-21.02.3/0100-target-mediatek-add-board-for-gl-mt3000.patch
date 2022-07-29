@@ -58,12 +58,12 @@ index 0000000000..070acd6f44
 +
 +		led_run: led@0 {
 +			label = "blue:run";
-+			gpios = <&pio 30 GPIO_ACTIVE_LOW>;
++			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
 +		};
 +
 +		led@1 {
 +			label = "white:system";
-+			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
++			gpios = <&pio 30 GPIO_ACTIVE_LOW>;
 +		};
 +	};
 +
