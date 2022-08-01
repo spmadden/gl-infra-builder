@@ -1,14 +1,14 @@
-From d21da7726c607667732c017b0f8f2ecb4116a73e Mon Sep 17 00:00:00 2001
+From 09433aa39dacbeaf4dd23e77c7ad45b37a895646 Mon Sep 17 00:00:00 2001
 From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
 Date: Fri, 29 Jul 2022 17:01:42 +0800
-Subject: [PATCH]  target/mediatek: fix mac addr for gl-mt3000
+Subject: [PATCH] target/mediatek: fix mac addr for gl-mt3000
 
 ---
  .../mt7981/base-files/etc/board.d/02_network  | 27 +++++++------------
  1 file changed, 9 insertions(+), 18 deletions(-)
 
 diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
-index 4652f3eaf4..139233dd33 100755
+index 4652f3eaf4..fbf4bdae53 100755
 --- a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
 +++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
 @@ -44,30 +44,21 @@ mediatek_setup_macs()
@@ -23,8 +23,8 @@ index 4652f3eaf4..139233dd33 100755
  	*)
  		lan_mac_offset="0x2A"
  		wan_mac_offset="0x24"
-+        lan_mac=$(mtd_get_mac_binary $part_name $lan_mac_offset)
-+        wan_mac=$(mtd_get_mac_binary $part_name $wan_mac_offset)
++		lan_mac=$(mtd_get_mac_binary $part_name $lan_mac_offset)
++		wan_mac=$(mtd_get_mac_binary $part_name $wan_mac_offset)
  		;;
  	esac
  
@@ -46,11 +46,11 @@ index 4652f3eaf4..139233dd33 100755
 -		[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
 -	;;
 -	esac
-+    [ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
-+    [ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" "$lan_mac"
++	[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
++	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" "$lan_mac"
  }
  
  board_config_update
 -- 
-2.17.1
+2.25.1
 
