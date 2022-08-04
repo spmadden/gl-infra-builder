@@ -10,7 +10,7 @@ feeds:
     revision: 4c6b600
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: a4bf20662b3e2233590b1258346989c1c5ec0430
+    revision: 6d36fa8b49061674c709c40b8c3ed5881be3190a
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
@@ -19,7 +19,7 @@ feeds:
     revision: da09723846cf25c6b7e288cd1669c89ea4d6071e
   - name: mt7981
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: 5817a89ae6c1262778af932ee0a9a1c24f0bddaf
+    revision: 863f135f5cc62c4cc45ba78c68c153d6bd7a90d6
   - name: glinet
     path: ../feeds_dir/glinet
 
