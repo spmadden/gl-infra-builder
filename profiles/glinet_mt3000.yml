@@ -38,6 +38,9 @@ packages:
   - wireless-tools
   - kmod-conninfra
   - kmod-mt_wifi
+  - kmod-gl-sdk4-fan
+  - gl-sdk4-led
+  - gl-sdk4-adguardhome
 
 diffconfig: |
   CONFIG_MAP_R2_SUPPORT=y
