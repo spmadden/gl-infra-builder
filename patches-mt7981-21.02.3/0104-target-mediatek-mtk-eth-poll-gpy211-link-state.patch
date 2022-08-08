@@ -1,0 +1,52 @@
+From e0eca425f18dee5358f6cdfae10650feca104c63 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 8 Aug 2022 19:42:30 +0800
+Subject: [PATCH] target/mediatek: mtk-eth poll gpy211 link state
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../800-mtk-eth-poll-gpy211-link-state.patch  | 32 +++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100644 target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch
+
+diff --git a/target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch b/target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch
+new file mode 100644
+index 0000000000..9859d93cde
+--- /dev/null
++++ b/target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch
+@@ -0,0 +1,32 @@
++Index: linux-5.4.188/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++===================================================================
++--- linux-5.4.188.orig/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+++++ linux-5.4.188/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++@@ -3389,6 +3389,18 @@ static const struct net_device_ops mtk_n
++ #endif
++ };
++ 
+++static void phylink_fixed_state(struct net_device *dev,
+++					  struct phylink_link_state *state)
+++{
+++#define PHY_MIISTAT		0x18	/* MII state */
+++#define PHY_MIISTAT_LS		BIT(10)
+++
+++	struct mtk_mac *mac = netdev_priv(dev);
+++	u32 val = _mtk_mdio_read(mac->hw, 0x05, PHY_MIISTAT);
+++
+++	state->link = (val & PHY_MIISTAT_LS) ? 1 : 0;
+++}
+++
++ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
++ {
++ 	const __be32 *_id = of_get_property(np, "reg", NULL);
++@@ -3462,6 +3474,8 @@ static int mtk_add_mac(struct mtk_eth *e
++ 		goto free_netdev;
++ 	}
++ 
+++	phylink_fixed_state_cb(phylink, phylink_fixed_state);
+++
++ 	mac->phylink = phylink;
++ 
++ 	SET_NETDEV_DEV(eth->netdev[id], eth->dev);
+-- 
+2.25.1
+
