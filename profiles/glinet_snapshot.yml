@@ -1,0 +1,6 @@
+---
+description: Add the glinet dependencies
+feeds:
+  - name: glinet
+    path: ../feeds_dir/glinet
+
