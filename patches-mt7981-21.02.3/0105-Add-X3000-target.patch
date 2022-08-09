@@ -296,7 +296,7 @@ index b95df58..c097635 100755
 +  DEVICE_MODEL := GL-X3000
 +  DEVICE_DTS := mt7981-gl-x3000
 +  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
-+  SUPPORTED_DEVICES := glinet,mt3000-snand
++  SUPPORTED_DEVICES := glinet,x3000-snand
 +  DEVICE_PACKAGES := kmod-hwmon-pwmfan
 +  UBINIZE_OPTS := -E 5
 +  BLOCKSIZE := 128k
