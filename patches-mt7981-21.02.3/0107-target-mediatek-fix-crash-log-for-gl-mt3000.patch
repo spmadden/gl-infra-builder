@@ -1,0 +1,106 @@
+From a2a4380d23905bb5448bb32596ad6025203a4d45 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Wed, 10 Aug 2022 14:27:33 +0800
+Subject: [PATCH] target/mediatek: fix crash log for gl-mt3000
+
+---
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    |  9 ++-
+ .../patches-5.4/416-mtd-fix-mtdoops.patch     | 58 +++++++++++++++++++
+ 2 files changed, 66 insertions(+), 1 deletion(-)
+ create mode 100755 target/linux/mediatek/patches-5.4/416-mtd-fix-mtdoops.patch
+
+diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
+index 4a16357194..17289fef2b 100755
+--- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
++++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
+@@ -83,8 +83,13 @@
+ 			};
+ 
+ 			partition@580000 {
++				label = "log";
++				reg = <0x580000 0x40000>;
++			};
++
++			partition@5c0000 {
+ 				label = "ubi";
+-				reg = <0x580000 0>;
++				reg = <0x5c0000 0>;
+ 			};
+ 		};
+ 	};
+@@ -97,6 +102,8 @@
+ 		usb-port = "1-1";
+ 		fan = "pwmchip0";
+ 		flash_size = <256>;
++		switch-button = "gpio-0";
++		reset-button = "gpio-1";
+ 		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
+ 		dfs;
+ 		factory_data {
+diff --git a/target/linux/mediatek/patches-5.4/416-mtd-fix-mtdoops.patch b/target/linux/mediatek/patches-5.4/416-mtd-fix-mtdoops.patch
+new file mode 100755
+index 0000000000..4a41ec7181
+--- /dev/null
++++ b/target/linux/mediatek/patches-5.4/416-mtd-fix-mtdoops.patch
+@@ -0,0 +1,58 @@
++Index: b/drivers/mtd/mtdoops.c
++===================================================================
++--- a/drivers/mtd/mtdoops.c	2022-03-28 14:46:49.000000000 +0800
+++++ b/drivers/mtd/mtdoops.c	2022-08-10 12:14:40.365948475 +0800
++@@ -186,8 +186,25 @@ static void mtdoops_write(struct mtdoops
++ 	hdr[1] = MTDOOPS_KERNMSG_MAGIC;
++ 
++ 	if (panic) {
++-		ret = mtd_panic_write(mtd, cxt->nextpage * record_size,
++-				      record_size, &retlen, cxt->oops_buf);
+++		int count = record_size / 0x800;
+++		int i = 0;
+++		const u_char * p = cxt->oops_buf;
+++		while(count--) {
+++			ret = mtd_write(mtd, cxt->nextpage * record_size + i * 0x800,
+++				    	  record_size - i * 0x800, &retlen, p);
+++			if (ret == 0) {
+++				break;
+++			}
+++			else {
+++				if ((p + 0x800) != NULL) {
+++					p = p + 0x800;
+++					i++;
+++				}
+++				else  {
+++					break;
+++				}
+++			}
+++		}
++ 		if (ret == -EOPNOTSUPP) {
++ 			printk(KERN_ERR "mtdoops: Cannot write from panic without panic_write\n");
++ 			return;
++@@ -195,10 +212,11 @@ static void mtdoops_write(struct mtdoops
++ 	} else
++ 		ret = mtd_write(mtd, cxt->nextpage * record_size,
++ 				record_size, &retlen, cxt->oops_buf);
++-
+++#if 0
++ 	if (retlen != record_size || ret < 0)
++ 		printk(KERN_ERR "mtdoops: write failure at %ld (%td of %ld written), error %d\n",
++ 		       cxt->nextpage * record_size, retlen, record_size, ret);
+++#endif
++ 	mark_page_used(cxt, cxt->nextpage);
++ 	memset(cxt->oops_buf, 0xff, record_size);
++ 
++@@ -207,10 +225,12 @@ static void mtdoops_write(struct mtdoops
++ 
++ static void mtdoops_workfunc_write(struct work_struct *work)
++ {
+++#if 0
++ 	struct mtdoops_context *cxt =
++ 			container_of(work, struct mtdoops_context, work_write);
++ 
++ 	mtdoops_write(cxt, 0);
+++#endif
++ }
++ 
++ static void find_next_position(struct mtdoops_context *cxt)
+-- 
+2.17.1
+
