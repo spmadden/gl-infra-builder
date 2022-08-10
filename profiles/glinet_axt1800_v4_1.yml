@@ -10,5 +10,8 @@ packages:
   - kmod-gl-sdk4-fan
   - gl-sdk4-led
   - gl-sdk4-adguardhome
+  - gl-sdk4-timer
+  - gl-sdk4-igmp
+  - gl-sdk4-sms-forward
 
 diffconfig: |

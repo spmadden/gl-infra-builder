@@ -29,23 +29,3 @@ jobs:
           echo "COMPILE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
           cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR snapshot
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: snapshot_firmware_${{ env.COMPILE_DATE }}
-          path: |
-            ./output/**/*squashfs-sysupgrade.bin
-            ./output/**/*squashfs-factory.img
-            ./output/**/*nand-factory.img
-            ./output/**/*squashfs-sysupgrade.tar
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: snapshot_imagebuilder_${{ env.COMPILE_DATE }}
-          path: |
-            ./output/*-imagebuilder-*
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: snapshot_ipk_${{ env.COMPILE_DATE }}
-          path: |
-            ./output/*ipk*
