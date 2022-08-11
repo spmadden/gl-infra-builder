@@ -1,20 +1,20 @@
-From c01b4f277c99aeea2edeb8bfd88fba3409eca9b5 Mon Sep 17 00:00:00 2001
+From 3486958b3f3f6083d5168c081c82e862d116a260 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 8 Aug 2022 19:42:30 +0800
 Subject: [PATCH] target/mediatek: mtk-eth poll gpy211 link state
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../800-mtk-eth-poll-gpy211-link-state.patch  | 62 +++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ .../800-mtk-eth-poll-gpy211-link-state.patch  | 90 +++++++++++++++++++
+ 1 file changed, 90 insertions(+)
  create mode 100644 target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch
 
 diff --git a/target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch b/target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch
 new file mode 100644
-index 0000000000..1f171afc97
+index 0000000000..0dd10c67ef
 --- /dev/null
 +++ b/target/linux/mediatek/patches-5.4/800-mtk-eth-poll-gpy211-link-state.patch
-@@ -0,0 +1,62 @@
+@@ -0,0 +1,90 @@
 +Index: linux-5.4.188/drivers/net/ethernet/mediatek/mtk_eth_soc.c
 +===================================================================
 +--- linux-5.4.188.orig/drivers/net/ethernet/mediatek/mtk_eth_soc.c
@@ -27,7 +27,19 @@ index 0000000000..1f171afc97
 + #include <linux/clk.h>
 + #include <linux/pm_runtime.h>
 + #include <linux/if_vlan.h>
-+@@ -3390,6 +3391,40 @@ static const struct net_device_ops mtk_n
++@@ -410,7 +411,10 @@ static void mtk_mac_config(struct phylin
++ 		mcr_new |= MAC_MCR_SPEED_1000;
++ 		break;
++ 	case SPEED_100:
++-		mcr_new |= MAC_MCR_SPEED_100;
+++		if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
+++			mcr_new |= MAC_MCR_SPEED_1000;
+++		else
+++			mcr_new |= MAC_MCR_SPEED_100;
++ 		break;
++ 	}
++ 	if (state->duplex == DUPLEX_FULL) {
++@@ -3390,6 +3394,40 @@ static const struct net_device_ops mtk_n
 + #endif
 + };
 + 
@@ -68,7 +80,7 @@ index 0000000000..1f171afc97
 + static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
 + {
 + 	const __be32 *_id = of_get_property(np, "reg", NULL);
-+@@ -3463,6 +3498,8 @@ static int mtk_add_mac(struct mtk_eth *e
++@@ -3463,6 +3501,8 @@ static int mtk_add_mac(struct mtk_eth *e
 + 		goto free_netdev;
 + 	}
 + 
@@ -77,6 +89,22 @@ index 0000000000..1f171afc97
 + 	mac->phylink = phylink;
 + 
 + 	SET_NETDEV_DEV(eth->netdev[id], eth->dev);
++Index: linux-5.4.188/drivers/net/ethernet/mediatek/mtk_sgmii.c
++===================================================================
++--- linux-5.4.188.orig/drivers/net/ethernet/mediatek/mtk_sgmii.c
+++++ linux-5.4.188/drivers/net/ethernet/mediatek/mtk_sgmii.c
++@@ -94,7 +94,10 @@ int mtk_sgmii_setup_mode_force(struct mt
++ 		val |= SGMII_SPEED_10;
++ 		break;
++ 	case SPEED_100:
++-		val |= SGMII_SPEED_100;
+++		if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
+++			val |= SGMII_SPEED_1000;
+++		else
+++			val |= SGMII_SPEED_100;
++ 		break;
++ 	case SPEED_2500:
++ 	case SPEED_1000:
 -- 
 2.25.1
 
