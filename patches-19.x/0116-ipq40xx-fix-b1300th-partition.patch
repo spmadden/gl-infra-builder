@@ -1,0 +1,72 @@
+From 0b51f91f87b54e33e17f92708b97906ecf3f8909 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
+Date: Thu, 11 Aug 2022 10:55:19 +0800
+Subject: [PATCH] ipq40xx: fix b1300th partition
+
+---
+ package/boot/uboot-envtools/files/ipq40xx      |  4 +++-
+ .../arm/boot/dts/qcom-ipq4018-gl-b1300th.dts   | 18 ++++++++++++++----
+ 2 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/package/boot/uboot-envtools/files/ipq40xx b/package/boot/uboot-envtools/files/ipq40xx
+index 223a4e9f2c..6373beb190 100644
+--- a/package/boot/uboot-envtools/files/ipq40xx
++++ b/package/boot/uboot-envtools/files/ipq40xx
+@@ -32,12 +32,14 @@ ubootenv_mtdinfo () {
+ 
+ case "$board" in
+ alfa-network,ap120c-ac |\
+-glinet,gl-b1300th |\
+ glinet,gl-b1300 |\
+ openmesh,a42 |\
+ openmesh,a62)
+ 	ubootenv_add_uci_config "/dev/mtd5" "0x0" "0x10000" "0x10000"
+ 	;;
++glinet,gl-b1300th)
++	ubootenv_add_uci_config "/dev/mtd9" "0x0" "0x10000" "0x10000"
++	;;
+ linksys,ea6350v3)
+ 	ubootenv_add_uci_config "/dev/mtd7" "0x0" "0x20000" "0x20000"
+ 	;;
+diff --git a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+index c39d4b30ef..9f1e235031 100644
+--- a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
++++ b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4018-gl-b1300th.dts
+@@ -209,20 +209,30 @@
+ 				read-only;
+ 			};
+ 			partition5@e0000 {
+-				label = "APPSBLENV"; /* uboot env*/
++				label = "reserve"; /* old uboot env*/
+ 				reg = <0x000e0000 0x00010000>;
++				read-only;
+ 			};
+-			partition5@f0000 {
++			partition6@f0000 {
+ 				label = "APPSBL"; /* uboot */
+ 				reg = <0x000f0000 0x00080000>;
+ 				read-only;
+ 			};
+-            art: partition5@170000 {
++            art: partition7@170000 {
+ 				label = "ART";
+ 				reg = <0x00170000 0x00010000>;
+ 				read-only;
+ 			};
+-		};
++			partition8@180000 {
++				label = "reserve";
++				reg = <0x00180000 0x00080000>;
++				read-only;
++			};
++			partition9@200000 {
++				label = "APPSBLENV"; /* uboot env*/
++				reg = <0x00200000 0x00010000>;
++            };
++        };
+ 	};
+ 
+ 	spi-nand@1 {
+-- 
+2.17.1
+
