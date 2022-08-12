@@ -1,0 +1,37 @@
+---
+profile: glinet_gl-a1300
+target: ipq40xx
+subtarget: generic
+description: Build image for the GL.iNET A1300
+
+packages:
+  - wireless-regdb
+  - wget-ssl
+  - arp-scan
+  - shortcut-fe
+  - shortcut-fe-cm
+  
+diffconfig: |
+         CONFIG_ALL_NONSHARED=y
+         CONFIG_PACKAGE_wpad-basic-wolfssl=n 
+         CONFIG_PACKAGE_ath10k-firmware-qca4019=y
+         CONFIG_PACKAGE_ath10k-firmware-qca4019-ct=n
+         CONFIG_PACKAGE_kmod-ath10k=y
+         CONFIG_PACKAGE_kmod-ath10k-ct=n
+         CONFIG_ATH10K_LEDS=y
+         CONFIG_ATH10K-CT_LEDS=n
+         CONFIG_SIGNATURE_CHECK=y
+         CONFIG_KERNEL_DEVMEM=y
+         CONFIG_BUSYBOX_CONFIG_BLKID=y
+         CONFIG_BUSYBOX_CONFIG_DEVMEM=y
+         CONFIG_BUSYBOX_CONFIG_TLS=y
+         CONFIG_PACKAGE_libfdisk=y
+         CONFIG_PACKAGE_fdisk=y
+         CONFIG_PACKAGE_kmod-usb-storage-extras=y
+         CONFIG_PACKAGE_python3-openssl-src=y
+         CONFIG_PACKAGE_libfdisk=y
+         CONFIG_PACKAGE_libsmartcols=y
+         CONFIG_PACKAGE_dnscrypt-proxy2=y
+         CONFIG_PACKAGE_badblocks=y
+         CONFIG_PACKAGE_ipq-wifi-glinet_gl-a1300=y
+         CONFIG_PACKAGE_ip-tiny=y
