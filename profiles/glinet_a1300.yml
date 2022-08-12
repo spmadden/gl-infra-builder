@@ -1,0 +1,20 @@
+---
+description: Add the glinet dependencies
+feeds:
+  - name: gl_feeds_commmon
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 4f9654748fe1cc1e0d7eacab99019ae88ab61081
+  - name: gl_feeds
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 85a587c9c1a7f71f535272665f7272ca77b43422
+    # - name: glinet
+    #path: ../feeds_dir/glinet
+  - name: glinet
+    uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    branch: a1300
+
+packages:
+  - gl-sdk4-adguardhome
+  - gl-sdk4-led
+
+diffconfig: |
