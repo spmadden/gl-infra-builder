@@ -3,16 +3,22 @@ profile: glinet_gl-a1300
 target: ipq40xx
 subtarget: generic
 description: Build image for the GL.iNET A1300
+feeds:
+  - name: gl_feeds_commmon
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 6a45f3f7c0a6407f933f980b284bc217ee38643e
+  - name: gl_feeds
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 85a587c9c1a7f71f535272665f7272ca77b43422
 
 packages:
   - wireless-regdb
   - wget-ssl
   - arp-scan
-  - shortcut-fe
-  - shortcut-fe-cm
   
 diffconfig: |
          CONFIG_ALL_NONSHARED=y
+         CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
          CONFIG_PACKAGE_wpad-basic-wolfssl=n 
          CONFIG_PACKAGE_ath10k-firmware-qca4019=y
          CONFIG_PACKAGE_ath10k-firmware-qca4019-ct=n
