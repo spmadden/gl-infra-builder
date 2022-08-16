@@ -15,7 +15,7 @@ index 3fea647..06f857f 100644
  		usb-port = "1-1";
  		flash_size = <128>;
  		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
-+		radio = "raido0";
++		radio = "radio0";
  		factory_data {
  			device_mac = "0:ART", "0x0";
  			device_ddns = "0:ART", "0x20";
