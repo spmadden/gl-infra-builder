@@ -9,7 +9,7 @@ feeds:
     revision: 6a45f3f7c0a6407f933f980b284bc217ee38643e
   - name: gl_feeds
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 85a587c9c1a7f71f535272665f7272ca77b43422
+    revision: 54f7d5bf974c7e1bd4bf2ed29625aba4452f6e22
 
 packages:
   - wireless-regdb
