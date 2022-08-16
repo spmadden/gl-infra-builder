@@ -1,4 +1,4 @@
-From 1b2e2ae4ae98c25ee58c0871cb9659d6156dd25f Mon Sep 17 00:00:00 2001
+From 2efb13c7f463c843d9060b95c2d6d55d7d7b8ee2 Mon Sep 17 00:00:00 2001
 From: gl-yangweiping <weiping.yang@gl-inet.com>
 Date: Tue, 7 Jun 2022 21:57:04 -0400
 Subject: [PATCH] A1300 adapt 21.02.2
@@ -10,11 +10,11 @@ Subject: [PATCH] A1300 adapt 21.02.2
  .../patches/300-remove-limit-hostname.patch   |  11 +
  ...k-events-support-multiple-registrant.patch | 313 ++++++++++++++++++
  ...-linux-kernel-to-support-shortcut-fe.patch | 253 ++++++++++++++
- .../arm/boot/dts/qcom-ipq4018-gl-a1300.dts    |  22 +-
+ .../arm/boot/dts/qcom-ipq4018-gl-a1300.dts    |  23 +-
  target/linux/ipq40xx/image/generic.mk         |   4 +-
  .../patches-5.4/320-add_spi_nor_write.patch   |  11 +
  .../patches-5.4/700-add-modem-support.patch   | 280 ++++++++++++++++
- 10 files changed, 889 insertions(+), 8 deletions(-)
+ 10 files changed, 890 insertions(+), 8 deletions(-)
  create mode 100644 package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
  create mode 100644 target/linux/generic/hack-5.4/952-net-conntrack-events-support-multiple-registrant.patch
  create mode 100644 target/linux/generic/hack-5.4/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
@@ -737,10 +737,10 @@ index 0000000000..57b4029298
 + void nf_conntrack_unregister_notifier(struct net *net,
 + 				      struct nf_ct_event_notifier *new)
 diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
-index a6d662e6da..cc7e7acc74 100644
+index a6d662e6da..aa5632d720 100644
 --- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
 +++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
-@@ -22,14 +22,18 @@
+@@ -22,14 +22,19 @@
  		#address-cells = <1>;
  		#size-cells = <1>;
  		model = "a1300";
@@ -752,6 +752,7 @@ index a6d662e6da..cc7e7acc74 100644
 +		flash_size = <128>;
  		reset-button = "gpio-63";
 +		switch-button = "gpio-0";
++		radio = "radio0";
  		factory_data {
 -			device_mac = "ART", "0";
 +			device_mac = "ART", "0x0";
@@ -762,7 +763,7 @@ index a6d662e6da..cc7e7acc74 100644
  		};
  	};
  
-@@ -116,6 +120,12 @@
+@@ -116,6 +121,12 @@
  			gpios = <&tlmm 63 GPIO_ACTIVE_LOW>;
  			linux,code = <KEY_RESTART>;
  		};
@@ -775,7 +776,7 @@ index a6d662e6da..cc7e7acc74 100644
  	};
  
  	leds {
-@@ -136,7 +146,7 @@
+@@ -136,7 +147,7 @@
  		compatible = "gpio-export";
  
  		usb {
@@ -784,7 +785,7 @@ index a6d662e6da..cc7e7acc74 100644
  			gpio-export,output = <1>;
  			gpios = <&tlmm 4 GPIO_ACTIVE_HIGH>;
  		};
-@@ -216,6 +226,10 @@
+@@ -216,6 +227,10 @@
  				reg = <0x00170000 0x00010000>;
  				read-only;
  			};
