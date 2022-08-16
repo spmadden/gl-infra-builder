@@ -1,0 +1,88 @@
+From 2eebd05efa6e525919d74333de29cffc9d1052bb Mon Sep 17 00:00:00 2001
+From: ywp19980804 <weiping.yang@gl-inet.com>
+Date: Mon, 15 Aug 2022 23:48:28 -0400
+Subject: [PATCH] openwrt v21.02.2: revert to branch defaults
+
+---
+ feeds.conf.default                 | 8 ++++----
+ include/version.mk                 | 6 +++---
+ package/base-files/image-config.in | 4 ++--
+ version                            | 1 -
+ version.date                       | 1 -
+ 5 files changed, 9 insertions(+), 11 deletions(-)
+ delete mode 100644 version
+ delete mode 100644 version.date
+
+diff --git a/feeds.conf.default b/feeds.conf.default
+index 3dfca3a7df..e8d9548f60 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,4 +1,4 @@
+-src-git packages https://git.openwrt.org/feed/packages.git^b0ccc356900f6e1e1dc613d0ea980d5572f553dd
+-src-git luci https://git.openwrt.org/project/luci.git^cc582ebfb3cb2782db841ad2a4e908d1df4046f9
+-src-git routing https://git.openwrt.org/feed/routing.git^10d3ffd8b30186b49538167bac1fa1bf9c88f860
+-src-git telephony https://git.openwrt.org/feed/telephony.git^001ae7137c88bb679284bfac5087cde65b5abf9a
++src-git packages https://git.openwrt.org/feed/packages.git;openwrt-21.02
++src-git luci https://git.openwrt.org/project/luci.git;openwrt-21.02
++src-git routing https://git.openwrt.org/feed/routing.git;openwrt-21.02
++src-git telephony https://git.openwrt.org/feed/telephony.git;openwrt-21.02
+diff --git a/include/version.mk b/include/version.mk
+index 8559a53085..a4b47c8a57 100644
+--- a/include/version.mk
++++ b/include/version.mk
+@@ -23,13 +23,13 @@ PKG_CONFIG_DEPENDS += \
+ sanitize = $(call tolower,$(subst _,-,$(subst $(space),-,$(1))))
+ 
+ VERSION_NUMBER:=$(call qstrip,$(CONFIG_VERSION_NUMBER))
+-VERSION_NUMBER:=$(if $(VERSION_NUMBER),$(VERSION_NUMBER),21.02.2)
++VERSION_NUMBER:=$(if $(VERSION_NUMBER),$(VERSION_NUMBER),21.02-SNAPSHOT)
+ 
+ VERSION_CODE:=$(call qstrip,$(CONFIG_VERSION_CODE))
+-VERSION_CODE:=$(if $(VERSION_CODE),$(VERSION_CODE),r16495-bf0c965af0)
++VERSION_CODE:=$(if $(VERSION_CODE),$(VERSION_CODE),$(REVISION))
+ 
+ VERSION_REPO:=$(call qstrip,$(CONFIG_VERSION_REPO))
+-VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),https://downloads.openwrt.org/releases/21.02.2)
++VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),https://downloads.openwrt.org/releases/21.02-SNAPSHOT)
+ 
+ VERSION_DIST:=$(call qstrip,$(CONFIG_VERSION_DIST))
+ VERSION_DIST:=$(if $(VERSION_DIST),$(VERSION_DIST),OpenWrt)
+diff --git a/package/base-files/image-config.in b/package/base-files/image-config.in
+index 8f168dfd78..1f06332b00 100644
+--- a/package/base-files/image-config.in
++++ b/package/base-files/image-config.in
+@@ -183,7 +183,7 @@ if VERSIONOPT
+ 	config VERSION_REPO
+ 		string
+ 		prompt "Release repository"
+-		default "https://downloads.openwrt.org/releases/21.02.2"
++		default "https://downloads.openwrt.org/releases/21.02-SNAPSHOT"
+ 		help
+ 			This is the repository address embedded in the image, it defaults
+ 			to the trunk snapshot repo; the url may contain the following placeholders:
+@@ -259,7 +259,7 @@ if VERSIONOPT
+ 	config VERSION_CODE_FILENAMES
+ 		bool
+ 		prompt "Revision code in filenames"
+-		default n
++		default y
+ 		help
+ 			Enable this to include the revision identifier or the configured
+ 			version code into the firmware image, SDK- and Image Builder archive
+diff --git a/version b/version
+deleted file mode 100644
+index 522d57188e..0000000000
+--- a/version
++++ /dev/null
+@@ -1 +0,0 @@
+-r16495-bf0c965af0
+diff --git a/version.date b/version.date
+deleted file mode 100644
+index 65e307e608..0000000000
+--- a/version.date
++++ /dev/null
+@@ -1 +0,0 @@
+-1645043350
+-- 
+2.17.1
+
