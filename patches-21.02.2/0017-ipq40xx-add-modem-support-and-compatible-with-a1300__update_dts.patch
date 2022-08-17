@@ -1,20 +1,22 @@
-From 2efb13c7f463c843d9060b95c2d6d55d7d7b8ee2 Mon Sep 17 00:00:00 2001
+From a3e6c0445e986181058b5a226c930e0b13ced63a Mon Sep 17 00:00:00 2001
 From: gl-yangweiping <weiping.yang@gl-inet.com>
 Date: Tue, 7 Jun 2022 21:57:04 -0400
 Subject: [PATCH] A1300 adapt 21.02.2
 
 ---
  feeds.conf.default                            |   1 -
- include/image-commands.mk                     |   2 +-
+ include/image-commands.mk                     |  17 +-
  .../ipq-wifi/board-glinet_gl-a1300.qca4019    | Bin 48596 -> 24308 bytes
+ .../src/gpio-button-hotplug.c                 |   1 +
  .../patches/300-remove-limit-hostname.patch   |  11 +
+ package/network/services/ppp/files/ppp.sh     |   1 +
  ...k-events-support-multiple-registrant.patch | 313 ++++++++++++++++++
  ...-linux-kernel-to-support-shortcut-fe.patch | 253 ++++++++++++++
  .../arm/boot/dts/qcom-ipq4018-gl-a1300.dts    |  23 +-
  target/linux/ipq40xx/image/generic.mk         |   4 +-
  .../patches-5.4/320-add_spi_nor_write.patch   |  11 +
  .../patches-5.4/700-add-modem-support.patch   | 280 ++++++++++++++++
- 10 files changed, 890 insertions(+), 8 deletions(-)
+ 12 files changed, 902 insertions(+), 13 deletions(-)
  create mode 100644 package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
  create mode 100644 target/linux/generic/hack-5.4/952-net-conntrack-events-support-multiple-registrant.patch
  create mode 100644 target/linux/generic/hack-5.4/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
@@ -31,18 +33,45 @@ index c07b0bcc1e..3dfca3a7df 100644
  src-git luci https://git.openwrt.org/project/luci.git^cc582ebfb3cb2782db841ad2a4e908d1df4046f9
  src-git routing https://git.openwrt.org/feed/routing.git^10d3ffd8b30186b49538167bac1fa1bf9c88f860
 diff --git a/include/image-commands.mk b/include/image-commands.mk
-index 6908f5b5c1..ab9979d6c2 100644
+index 6908f5b5c1..5c416dfc28 100644
 --- a/include/image-commands.mk
 +++ b/include/image-commands.mk
-@@ -76,7 +76,7 @@ metadata_gl_json = \
- 			"revision": "$(call json_quote,$(REVISION))", \
+@@ -66,8 +66,13 @@ endef
+ 
+ metadata_gl_json = \
+ 	'{ $(if $(IMAGE_METADATA),$(IMAGE_METADATA)$(comma)) \
+-		"metadata_version": "1.0", \
+-		"supported_devices":[$(call metadata_devices,$(1))], \
++		"metadata_version": "1.1", \
++		"compat_version": "$(call json_quote,$(compat_version))", \
++		$(if $(DEVICE_COMPAT_MESSAGE),"compat_message": "$(call json_quote,$(DEVICE_COMPAT_MESSAGE))"$(comma)) \
++		$(if $(filter-out 1.0,$(compat_version)),"new_supported_devices": \
++			[$(call metadata_devices,$(SUPPORTED_DEVICES))]$(comma) \
++			"supported_devices": ["$(call json_quote,$(legacy_supported_message))"]$(comma)) \
++		$(if $(filter 1.0,$(compat_version)),"supported_devices":[$(call metadata_devices,$(SUPPORTED_DEVICES))]$(comma)) \
+ 		"version": { \
+ 			"release": "$(shell cat $(TOPDIR)/release)", \
+ 			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
+@@ -77,15 +82,15 @@ metadata_gl_json = \
  			"target": "$(call json_quote,$(TARGETID))", \
  			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
--		}, \
-+		} \
+ 		}, \
++		"upgrade_control":"$(shell python3 $(TOPDIR)/make_gl_metadata.py)", \
++		"release_note":"$(shell sed ':a;N;s/\n/\\n/g;s/\r/\\r/g;ta' $(TOPDIR)/gl_release_note)" \
  	}'
  
  define Build/append-gl-metadata
+ 	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
+-	[ ! -s "$(BUILD_KEY)" -o ! -s "$(BUILD_KEY).ucert" -o ! -s "$@"  ] || { \
+-		cp "$(BUILD_KEY).ucert" "$@.ucert" ;\
++	[ ! -s "$(BUILD_KEY)" -o ! -s "$@"  ] || { \
+ 		usign -S -m "$@" -s "$(BUILD_KEY)" -x "$@.sig" ;\
+-		ucert -A -c "$@.ucert" -x "$@.sig" ;\
+-		fwtool -S "$@.ucert" "$@" ;\
++		fwtool -S "$@.sig" "$@" ;\
+ 	}
+ endef
+ 
 diff --git a/package/firmware/ipq-wifi/board-glinet_gl-a1300.qca4019 b/package/firmware/ipq-wifi/board-glinet_gl-a1300.qca4019
 index 0b9a908bcdd0f86f1de1100b98556e353085fcef..d8695c983641b25f4e059f65a0ce8b4f2501338c 100644
 GIT binary patch
@@ -141,6 +170,18 @@ z$-?vP9e>waw}kli5Z~VV%rMe=<kJTX+GqyY6agih&=?&6l#IXt5fI>r0K~V4`1Ty9
 z3RD9G+ztVVZ;uf0?cHu#!+_>M0OH%v0nh>+2EIM;?H6e3aq1T0+jD}+Eh|BM`<UqY
 rjDZjF?F~zF4oJYacK|dnacu;+tQp(l*c<Czdz6lQ2Yma5z18?XSX<$f
 
+diff --git a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+index fcaf7f59de..125dbff2f5 100644
+--- a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
++++ b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+@@ -100,6 +100,7 @@ static struct bh_map button_map[] = {
+ 	BH_MAP(KEY_WIMAX,		"wwan"),
+ 	BH_MAP(KEY_WLAN,		"wlan"),
+ 	BH_MAP(KEY_WPS_BUTTON,		"wps"),
++	BH_MAP(KEY_SETUP,               "switch"),
+ };
+ 
+ /* -------------------------------------------------------------------------*/
 diff --git a/package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch b/package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
 new file mode 100644
 index 0000000000..a921c5e5b0
@@ -158,6 +199,18 @@ index 0000000000..a921c5e5b0
 + 	client_hostname = daemon->dhcp_buff;
 +     }
 + 
+diff --git a/package/network/services/ppp/files/ppp.sh b/package/network/services/ppp/files/ppp.sh
+index b553effd88..78a712b41a 100755
+--- a/package/network/services/ppp/files/ppp.sh
++++ b/package/network/services/ppp/files/ppp.sh
+@@ -140,6 +140,7 @@ ppp_generic_setup() {
+ 		${localip:+$localip:} \
+ 		${lcp_failure:+lcp-echo-interval $lcp_interval lcp-echo-failure $lcp_failure $lcp_adaptive} \
+ 		${ipv6:++ipv6} \
++		${ipv6:-noipv6} \
+ 		${autoipv6:+set AUTOIPV6=1} \
+ 		${ip6table:+set IP6TABLE=$ip6table} \
+ 		${peerdns:+set PEERDNS=$peerdns} \
 diff --git a/target/linux/generic/hack-5.4/952-net-conntrack-events-support-multiple-registrant.patch b/target/linux/generic/hack-5.4/952-net-conntrack-events-support-multiple-registrant.patch
 new file mode 100644
 index 0000000000..c763449594
@@ -737,7 +790,7 @@ index 0000000000..57b4029298
 + void nf_conntrack_unregister_notifier(struct net *net,
 + 				      struct nf_ct_event_notifier *new)
 diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
-index a6d662e6da..aa5632d720 100644
+index a6d662e6da..39c9032ac9 100644
 --- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
 +++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
 @@ -22,14 +22,19 @@
@@ -771,7 +824,7 @@ index a6d662e6da..aa5632d720 100644
 +		switch {
 +			label = "switch-button";
 +			gpios = <&tlmm 0 GPIO_ACTIVE_LOW>;
-+			linux,code = <BTN_0>;
++			linux,code = <KEY_SETUP>;
 +		};
  	};
  
@@ -790,7 +843,7 @@ index a6d662e6da..aa5632d720 100644
  				read-only;
  			};
 +			partition@180000 {
-+                                label = "LOG";
++                                label = "log";
 +                                reg = <0x00180000 0x00020000>;
 +                        };	
  		};
