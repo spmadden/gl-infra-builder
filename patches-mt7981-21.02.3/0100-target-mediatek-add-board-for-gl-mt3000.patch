@@ -1,22 +1,22 @@
-From 88aa415bca03a5f572c0c78225367892a4e216eb Mon Sep 17 00:00:00 2001
+From 907b856350b1a04125e1ee47b7a1218f7e5a9c5a Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 16 Jun 2022 15:06:35 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 266 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 274 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 ++
  .../mt7981/base-files/etc/board.d/02_network  |   3 +
- 3 files changed, 287 insertions(+)
+ 3 files changed, 295 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..070acd6f44
+index 0000000000..f382be2a2c
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,266 @@
+@@ -0,0 +1,274 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -102,8 +102,13 @@ index 0000000000..070acd6f44
 +			};
 +
 +			partition@580000 {
++				label = "log";
++				reg = <0x580000 0x40000>;
++			};
++
++			partition@5c0000 {
 +				label = "ubi";
-+				reg = <0x580000 0>;
++				reg = <0x5c0000 0>;
 +			};
 +		};
 +	};
@@ -117,6 +122,9 @@ index 0000000000..070acd6f44
 +		fan = "pwmchip0";
 +		flash_size = <256>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
++		switch-button = "gpio-455";
++		reset-button = "gpio-456";
++		radio = "mt798111 mt798112";
 +		dfs;
 +		factory_data {
 +			device_mac = "Factory", "0x0a";

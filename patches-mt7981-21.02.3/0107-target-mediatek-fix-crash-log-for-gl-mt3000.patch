@@ -1,42 +1,14 @@
-From a2a4380d23905bb5448bb32596ad6025203a4d45 Mon Sep 17 00:00:00 2001
-From: "GL.iNet-Hongjian.Zhang" <hongjian.zhang@gl-inet.com>
-Date: Wed, 10 Aug 2022 14:27:33 +0800
+From 5bebb7d75f88c08b23001e571688259e85d4c787 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 17 Aug 2022 17:35:25 +0800
 Subject: [PATCH] target/mediatek: fix crash log for gl-mt3000
 
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    |  9 ++-
  .../patches-5.4/416-mtd-fix-mtdoops.patch     | 58 +++++++++++++++++++
- 2 files changed, 66 insertions(+), 1 deletion(-)
+ 1 file changed, 58 insertions(+)
  create mode 100755 target/linux/mediatek/patches-5.4/416-mtd-fix-mtdoops.patch
 
-diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-index 4a16357194..17289fef2b 100755
---- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-+++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -83,8 +83,13 @@
- 			};
- 
- 			partition@580000 {
-+				label = "log";
-+				reg = <0x580000 0x40000>;
-+			};
-+
-+			partition@5c0000 {
- 				label = "ubi";
--				reg = <0x580000 0>;
-+				reg = <0x5c0000 0>;
- 			};
- 		};
- 	};
-@@ -97,6 +102,8 @@
- 		usb-port = "1-1";
- 		fan = "pwmchip0";
- 		flash_size = <256>;
-+		switch-button = "gpio-0";
-+		reset-button = "gpio-1";
- 		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
- 		dfs;
- 		factory_data {
 diff --git a/target/linux/mediatek/patches-5.4/416-mtd-fix-mtdoops.patch b/target/linux/mediatek/patches-5.4/416-mtd-fix-mtdoops.patch
 new file mode 100755
 index 0000000000..4a41ec7181
@@ -102,5 +74,5 @@ index 0000000000..4a41ec7181
 + 
 + static void find_next_position(struct mtdoops_context *cxt)
 -- 
-2.17.1
+2.25.1
 
