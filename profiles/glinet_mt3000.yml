@@ -20,9 +20,6 @@ feeds:
   - name: mt7981
     uri: git@gitlab.com:gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: 6486a523bb94969b7d031bfdcf2695241934f280
-  - name: glinet
-    uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 2ed713b8ee5b2853cb8e9e2a4bce3cd13962858d
 
 packages:
   - 8021xd
