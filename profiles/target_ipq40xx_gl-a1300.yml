@@ -26,6 +26,7 @@ diffconfig: |
          CONFIG_PACKAGE_kmod-ath10k-ct=n
          CONFIG_ATH10K_LEDS=y
          CONFIG_ATH10K-CT_LEDS=n
+         CONFIG_ATH10K_THERMAL=y
          CONFIG_SIGNATURE_CHECK=y
          CONFIG_KERNEL_DEVMEM=y
          CONFIG_BUSYBOX_CONFIG_BLKID=y
