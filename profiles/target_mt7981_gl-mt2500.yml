@@ -1,0 +1,108 @@
+---
+profile: glinet_gl-mt2500
+target: mediatek
+subtarget: mt7981
+description: Build image for the GL.iNET MT2500
+
+feeds:
+  - name: mtk_openwrt_feed
+    uri: https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git
+    revision: 4c6b600
+  - name: gl_feed_common
+    uri: https://github.com/gl-inet/gl-feeds.git
+    branch: common
+  - name: gl_feed_21_02
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
+  - name: gl_feed_mt7981
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: da09723846cf25c6b7e288cd1669c89ea4d6071e
+
+packages:
+  - fwdd
+  - mii_mgr
+  - losetup
+  - mkf2fs
+  - e2fsprogs
+  - blkid
+  - blockdev
+  - kmod-fs-ext4
+  - kmod-fs-f2fs
+  - kmod-fs-vfat
+  - kmod-nls-cp437
+  - regs
+  - switch
+  - mtk-base-files
+  - mtk_factory_rw
+  - ethtool
+  - luci-app-mtk
+  - mtkhnat_util
+  - kmod-conninfra
+
+diffconfig: |
+  CONFIG_MAP_R2_SUPPORT=y
+  CONFIG_MAP_R3_SUPPORT=y
+  CONFIG_MTK_CONNINFRA_APSOC=y
+  CONFIG_MTK_CONNINFRA_APSOC_MT7981=y
+  CONFIG_CONNINFRA_EMI_SUPPORT=y
+  CONFIG_CONNINFRA_AUTO_UP=y
+  CONFIG_MTK_FIRST_IF_MT7981=y
+  CONFIG_MTK_MT_WIFI=m
+  CONFIG_MTK_SCS_FW_OFFLOAD=y
+  CONFIG_MTK_OFFCHANNEL_SCAN_FEATURE=y
+  CONFIG_MTK_DEFAULT_5G_PROFILE=n
+  CONFIG_MTK_FAST_NAT_SUPPORT=y
+  CONFIG_MTK_WHNAT_SUPPORT=m
+  CONFIG_MTK_WARP_V2=y
+  CONFIG_MTK_MEMORY_SHRINK=y
+  CONFIG_MTK_PRE_CAL_TRX_SET1_SUPPORT=n
+  CONFIG_MTK_RLM_CAL_CACHE_SUPPORT=n
+  CONFIG_MTK_PRE_CAL_TRX_SET2_SUPPORT=n
+  CONFIG_MTK_WLAN_SERVICE=y
+  CONFIG_MTK_MBO_SUPPORT=y
+  CONFIG_MTK_MAP_SUPPORT=y
+  CONFIG_MTK_MAP_R2_VER_SUPPORT=y
+  CONFIG_MTK_MAP_R3_VER_SUPPORT=y
+  CONFIG_MTK_FIRST_IF_IPAILNA=y
+  CONFIG_MTK_WIFI_MODE_AP=m
+  CONFIG_MTK_APCLI_CERT_SUPPORT=y
+  CONFIG_MTK_MWDS=y
+  CONFIG_MTK_MLME_MULTI_QUEUE_SUPPORT=y
+  CONFIG_MTK_VLAN_SUPPORT=y
+  CONFIG_MTK_ANTENNA_CONTROL_SUPPORT=y
+  CONFIG_MTK_MGMT_TXPWR_CTRL=y
+  CONFIG_MTK_RA_PHY_RATE_SUPPORT=y
+  CONFIG_MTK_AMPDU_CONF_SUPPORT=y
+  CONFIG_MTK_ACK_CTS_TIMEOUT_SUPPORT=y
+  CONFIG_MTK_MBSS_DTIM_SUPPORT=y
+  CONFIG_MTK_QOS_R1_SUPPORT=y
+  CONFIG_MTK_DSCP_PRI_SUPPORT=y
+  CONFIG_MTK_CON_WPS_SUPPORT=y
+  CONFIG_MTK_LED_CONTROL_SUPPORT=y
+  CONFIG_MTK_WLAN_HOOK=y
+  CONFIG_MTK_PCIE_ASPM_DYM_CTRL_SUPPORT=n
+  CONFIG_MTK_AIR_MONITOR=y
+  CONFIG_MTK_WPA3_SUPPORT=y
+  CONFIG_MTK_OWE_SUPPORT=y
+  CONFIG_PACKAGE_kmod-mtfwd=y
+  CONFIG_PACKAGE_kmod-warp=y
+  CONFIG_WARP_VERSION=2
+  CONFIG_WARP_ATC_SUPPORT=n
+  CONFIG_WED_HW_RRO_SUPPORT=y
+  CONFIG_WARP_CHIPSET="mt7981"
+  CONFIG_first_card_name="MT7981"
+  CONFIG_first_card_profile_path="/etc/wireless/mediatek/mt7981.dbdc.b0.dat;/etc/wireless/mediatek/mt7981.dbdc.b1.dat"
+  CONFIG_first_card_init_script="/lib/wifi/mtwifi.lua;/lib/wifi/mtwifi.lua"
+  CONFIG_first_card_init_compatible="mtwifi;mtwifi"
+  CONFIG_first_card_EEPROM_size="0xA0000"
+  CONFIG_first_card_main_ifname="ra0;rax0"
+  CONFIG_first_card_ext_ifname="ra;rax"
+  CONFIG_first_card_wds_ifname="wds;wdsx"
+  CONFIG_first_card_apcli_ifname="apcli;apclix"
+  CONFIG_first_card_mesh_ifname="mesh;meshx"
+  CONFIG_first_card_nvram_zone="dev1;dev2"
+  CONFIG_first_card_single_sku_path="/etc/wireless/mediatek/mt7981-sku.dat"
+  CONFIG_first_card_bf_sku_path="/etc/wireless/mediatek/mt7981-sku-bf.dat"
+  CONFIG_second_card=n
+  CONFIG_third_card=n
+  CONFIG_WIFI_QUICK_SETTING=y
