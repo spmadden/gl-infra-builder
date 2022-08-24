@@ -17,7 +17,6 @@ packages:
   - arp-scan
   
 diffconfig: |
-         CONFIG_ALL_NONSHARED=y
          CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
          CONFIG_PACKAGE_wpad-basic-wolfssl=n 
          CONFIG_PACKAGE_ath10k-firmware-qca4019=y
