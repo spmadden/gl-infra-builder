@@ -37,6 +37,8 @@ packages:
   - ethtool
   - luci-app-mtk
   - mtkhnat_util
+  - gdisk
+  - mmc-utils
   - kmod-conninfra
 
 diffconfig: |

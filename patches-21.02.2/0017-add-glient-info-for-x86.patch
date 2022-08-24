@@ -1,0 +1,96 @@
+From e577117aabd73af3809dc2e9c69eda5fa515f6d0 Mon Sep 17 00:00:00 2001
+From: gl-luochongjun <luochongjun@gl-inet.com>
+Date: Thu, 11 Aug 2022 15:17:31 +0800
+Subject: [PATCH] add glient info for x86
+
+---
+ .../x86/base-files/etc/board.d/01_gl_info     | 26 +++++++++++++++++
+ .../x86/base-files/etc/board.d/02_network     |  3 ++
+ .../x86/base-files/etc/board.d/04_gl_firewall | 28 +++++++++++++++++++
+ 3 files changed, 57 insertions(+)
+ create mode 100755 target/linux/x86/base-files/etc/board.d/01_gl_info
+ create mode 100755 target/linux/x86/base-files/etc/board.d/04_gl_firewall
+
+diff --git a/target/linux/x86/base-files/etc/board.d/01_gl_info b/target/linux/x86/base-files/etc/board.d/01_gl_info
+new file mode 100755
+index 0000000000..a814196b36
+--- /dev/null
++++ b/target/linux/x86/base-files/etc/board.d/01_gl_info
+@@ -0,0 +1,26 @@
++#!/bin/sh
++#
++#
++
++ MAC=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum | sed -e 's/^\(..\)\(..\)\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4:\5:\6/' -e 's/^\(.\)[13579bdf]/\10/')
++ SN=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum |cut -c1-16)
++ SN_BAK=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum |cut -c1-16)
++ DDNS=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum |cut -c1-7)
++
++touch /etc/config/board_special 2>/dev/null
++
++uci -q batch <<-EOF
++	set board_special.hardware=board
++	set board_special.hardware.model='VMX86'
++	set board_special.hardware.wan='eth0'
++	set board_special.hardware.lan='eth1'
++	set board_special.hardware.mac='$MAC'
++	set board_special.hardware.sn='$SN'
++	set board_special.hardware.sn_bak='$SN_BAK'
++	set board_special.hardware.ddns='$DDNS'
++EOF
++
++uci commit board_special
++
++
++exit 0
+diff --git a/target/linux/x86/base-files/etc/board.d/02_network b/target/linux/x86/base-files/etc/board.d/02_network
+index 21f054019a..7ecdc7fd58 100755
+--- a/target/linux/x86/base-files/etc/board.d/02_network
++++ b/target/linux/x86/base-files/etc/board.d/02_network
+@@ -22,6 +22,9 @@ traverse-technologies-geos)
+ 	macaddr="$(cat /sys/class/net/eth0/address)" 2>/dev/null
+ 	[ -n "$macaddr" ] && ucidef_set_interface_macaddr "wan" "$macaddr"
+ 	;;
++	*)
++	ucidef_set_interfaces_lan_wan "eth1" "eth0"
++	;;
+ esac
+ board_config_flush
+ 
+diff --git a/target/linux/x86/base-files/etc/board.d/04_gl_firewall b/target/linux/x86/base-files/etc/board.d/04_gl_firewall
+new file mode 100755
+index 0000000000..2a8b9b09cf
+--- /dev/null
++++ b/target/linux/x86/base-files/etc/board.d/04_gl_firewall
+@@ -0,0 +1,28 @@
++#!/bin/sh
++#
++#
++
++uci -q batch <<-EOF
++	add firewall rule
++	set firewall.@rule[-1]=rule
++	set firewall.@rule[-1].dest_port='80'
++	set firewall.@rule[-1].proto='tcp udp'
++	set firewall.@rule[-1].name='GL-web'
++	set firewall.@rule[-1].target='ACCEPT'
++	set firewall.@rule[-1].enabled='1'
++	set firewall.@rule[-1].src='wan'
++	
++	add firewall rule
++	set firewall.@rule[-1]=rule
++	set firewall.@rule[-1].dest_port='22'
++	set firewall.@rule[-1].proto='tcp udp'
++	set firewall.@rule[-1].name='GL-ssh'
++	set firewall.@rule[-1].target='ACCEPT'
++	set firewall.@rule[-1].enabled='1'
++	set firewall.@rule[-1].src='wan'
++EOF
++
++uci commit firewall
++
++
++exit 0
+-- 
+2.25.1
+

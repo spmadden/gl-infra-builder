@@ -1,8 +1,13 @@
 ---
-profile: Generic
+profile: generic
 target: x86
 subtarget: 64
 description: Build image for the x86_64
+
+feeds:
+  - name: gl_feeds_common
+    uri: https://github.com/gl-inet/gl-feeds.git
+    branch: common
 
 diffconfig: |
  CONFIG_TARGET_IMAGES_GZIP=n
