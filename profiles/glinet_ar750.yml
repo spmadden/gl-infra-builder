@@ -8,7 +8,7 @@ feeds:
 
 packages:
   - curl
-  - oui-httpd
+  - gl-oui-rpc
   - oui-librpc
   - oui-ui-core
   - oui-app-admin

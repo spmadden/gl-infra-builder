@@ -28,7 +28,7 @@ packages:
   - kmod-fs-ntfs
   - kmod-fs-vfat
   - kmod-fs-exfat
-  - oui-httpd
+  - gl-oui-rpc
   - oui-librpc
   - gl-sdk4-luci
   - gl-sdk4-rtty

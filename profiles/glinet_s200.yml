@@ -15,7 +15,7 @@ packages:
   - dnsmasq-full
   - mwan3
   - iwinfo
-  - oui-httpd
+  - gl-oui-rpc
   - ot-br-posix 
   - gl-silabs-dfu
   - gl-sdk4-acl

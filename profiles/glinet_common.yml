@@ -25,7 +25,7 @@ packages:
   - kmod-inet-diag
   - iptables-mod-tproxy
   - iptables-mod-filter
-  - oui-httpd
+  - gl-oui-rpc
   - gl-sdk4-luci
   - gl-sdk4-rtty
   - gl-sdk4-cable
