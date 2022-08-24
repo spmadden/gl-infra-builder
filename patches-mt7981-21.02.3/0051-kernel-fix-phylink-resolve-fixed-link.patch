@@ -1,0 +1,32 @@
+From 2549668921d0521884b76d3b49fbd04bab9bf65d Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 24 Aug 2022 19:25:30 +0800
+Subject: [PATCH] kernel: fix phylink resolve fixed-link
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../hack-5.4/801-fix-phylink-resolve-fixed.patch     | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100644 target/linux/generic/hack-5.4/801-fix-phylink-resolve-fixed.patch
+
+diff --git a/target/linux/generic/hack-5.4/801-fix-phylink-resolve-fixed.patch b/target/linux/generic/hack-5.4/801-fix-phylink-resolve-fixed.patch
+new file mode 100644
+index 0000000000..971fbce35b
+--- /dev/null
++++ b/target/linux/generic/hack-5.4/801-fix-phylink-resolve-fixed.patch
+@@ -0,0 +1,12 @@
++Index: linux-5.4.188/drivers/net/phy/phylink.c
++===================================================================
++--- linux-5.4.188.orig/drivers/net/phy/phylink.c
+++++ linux-5.4.188/drivers/net/phy/phylink.c
++@@ -494,7 +494,6 @@ static void phylink_resolve(struct work_
++ 
++ 		case MLO_AN_FIXED:
++ 			phylink_get_fixed_state(pl, &link_state);
++-			phylink_mac_config_up(pl, &link_state);
++ 			break;
++ 
++ 		case MLO_AN_INBAND:
+-- 
+2.25.1
+
