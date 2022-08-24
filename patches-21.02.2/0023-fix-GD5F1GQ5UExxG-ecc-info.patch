@@ -1,0 +1,99 @@
+From 07d59ad2904e15a3af23a3fbea1c2e5c11aaccdc Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Wed, 24 Aug 2022 12:22:00 +0800
+Subject: [PATCH] fix GD5F1GQ5UExxG ecc info
+
+---
+ .../999-fix-GD5F1GQ5UExxG-ecc-info.patch      | 80 +++++++++++++++++++
+ 1 file changed, 80 insertions(+)
+ create mode 100644 target/linux/ipq40xx/patches-5.4/999-fix-GD5F1GQ5UExxG-ecc-info.patch
+
+diff --git a/target/linux/ipq40xx/patches-5.4/999-fix-GD5F1GQ5UExxG-ecc-info.patch b/target/linux/ipq40xx/patches-5.4/999-fix-GD5F1GQ5UExxG-ecc-info.patch
+new file mode 100644
+index 0000000000..8844b7d8e2
+--- /dev/null
++++ b/target/linux/ipq40xx/patches-5.4/999-fix-GD5F1GQ5UExxG-ecc-info.patch
+@@ -0,0 +1,80 @@
++From 9127ffb04ad07c66b2bfa1f6d5a54f5b35ce6ed8 Mon Sep 17 00:00:00 2001
++From: Dongming Han <handongming@gl-inet.com>
++Date: Wed, 24 Aug 2022 12:15:05 +0800
++Subject: [PATCH] fix GD5F1GQ5UExxG ecc info
++
++---
++ drivers/mtd/nand/spi/gigadevice.c | 45 ++++++++++++++++++++++++++++---
++ 1 file changed, 41 insertions(+), 4 deletions(-)
++
++diff --git a/drivers/mtd/nand/spi/gigadevice.c b/drivers/mtd/nand/spi/gigadevice.c
++index 9bd06c59b..e63ffc55e 100644
++--- a/drivers/mtd/nand/spi/gigadevice.c
+++++ b/drivers/mtd/nand/spi/gigadevice.c
++@@ -203,6 +203,43 @@ static int gd5fxgq4uexxg_ecc_get_status(struct spinand_device *spinand,
++ 	return -EINVAL;
++ }
++ 
+++static int gd5fxgq5xexxg_ecc_get_status(struct spinand_device *spinand,
+++					u8 status)
+++{
+++	u8 status2;
+++	struct spi_mem_op op = SPINAND_GET_FEATURE_OP(GD5FXGQ4UEXXG_REG_STATUS2,
+++						      &status2);
+++	int ret;
+++
+++	switch (status & STATUS_ECC_MASK) {
+++	case STATUS_ECC_NO_BITFLIPS:
+++		return 0;
+++
+++	case GD5FXGQ4XA_STATUS_ECC_1_7_BITFLIPS:
+++		/*
+++		 * Read status2 register to determine a more fine grained
+++		 * bit error status
+++		 */
+++		ret = spi_mem_exec_op(spinand->spimem, &op);
+++		if (ret)
+++			return ret;
+++
+++		/*
+++		 * 1 ... 4 bits are flipped (and corrected)
+++		 */
+++		/* bits sorted this way (1...0): ECCSE1, ECCSE0 */
+++		return ((status2 & STATUS_ECC_MASK) >> 4) + 1;
+++
+++	case STATUS_ECC_UNCOR_ERROR:
+++		return -EBADMSG;
+++
+++	default:
+++		break;
+++	}
+++
+++	return -EINVAL;
+++}
+++
++ static int gd5fxgq4ufxxg_ecc_get_status(struct spinand_device *spinand,
++ 					u8 status)
++ {
++@@ -233,15 +270,15 @@ static const struct spinand_info gigadevice_spinand_table[] = {
++ 		     SPINAND_HAS_QE_BIT,
++ 		     SPINAND_ECCINFO(&gd5fxgq4xa_ooblayout,
++ 				     gd5fxgq4xa_ecc_get_status)),
++-	SPINAND_INFO("GD5F1GQ5xExxG", 0x51,
+++	SPINAND_INFO("GD5F1GQ5UExxG", 0x51,
++ 		     NAND_MEMORG(1, 2048, 128, 64, 1024, 20, 1, 1, 1),
++-		     NAND_ECCREQ(8, 512),
+++		     NAND_ECCREQ(4, 512),
++ 		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
++ 			     		      &write_cache_variants,
++ 					      &update_cache_variants),
++ 		     SPINAND_HAS_QE_BIT,
++-		     SPINAND_ECCINFO(&gd5fxgq4xa_ooblayout,
++-			  	    gd5fxgq4xa_ecc_get_status)),
+++		     SPINAND_ECCINFO(&gd5fxgq4_variant2_ooblayout,
+++				     gd5fxgq5xexxg_ecc_get_status)),
++ 	SPINAND_INFO("GD5F2GQ4xA", 0xF2,
++ 		     NAND_MEMORG(1, 2048, 64, 64, 2048, 40, 1, 1, 1),
++ 		     NAND_ECCREQ(8, 512),
++-- 
++2.25.1
++
+-- 
+2.25.1
+
