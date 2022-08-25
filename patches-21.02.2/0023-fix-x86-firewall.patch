@@ -1,0 +1,56 @@
+From 8e87492c7eac93999f1dec803a9625b1dec248fd Mon Sep 17 00:00:00 2001
+From: gl-luochongjun <luochongjun@gl-inet.com>
+Date: Thu, 25 Aug 2022 12:02:03 +0800
+Subject: [PATCH] x86 fix default config
+
+---
+ target/linux/x86/base-files/etc/board.d/01_gl_info       | 3 +++
+ .../etc/{board.d => uci-defaults}/04_gl_firewall         | 9 +++++++++
+ 2 files changed, 12 insertions(+)
+ rename target/linux/x86/base-files/etc/{board.d => uci-defaults}/04_gl_firewall (68%)
+
+diff --git a/target/linux/x86/base-files/etc/board.d/01_gl_info b/target/linux/x86/base-files/etc/board.d/01_gl_info
+index a814196b36..b107f878e8 100755
+--- a/target/linux/x86/base-files/etc/board.d/01_gl_info
++++ b/target/linux/x86/base-files/etc/board.d/01_gl_info
+@@ -2,11 +2,14 @@
+ #
+ #
+ 
++[ -n "$(uci -q get board_special.hardware.model)" ] && exit 0
++
+  MAC=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum | sed -e 's/^\(..\)\(..\)\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4:\5:\6/' -e 's/^\(.\)[13579bdf]/\10/')
+  SN=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum |cut -c1-16)
+  SN_BAK=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum |cut -c1-16)
+  DDNS=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | md5sum |cut -c1-7)
+ 
++
+ touch /etc/config/board_special 2>/dev/null
+ 
+ uci -q batch <<-EOF
+diff --git a/target/linux/x86/base-files/etc/board.d/04_gl_firewall b/target/linux/x86/base-files/etc/uci-defaults/04_gl_firewall
+similarity index 68%
+rename from target/linux/x86/base-files/etc/board.d/04_gl_firewall
+rename to target/linux/x86/base-files/etc/uci-defaults/04_gl_firewall
+index 2a8b9b09cf..991bb538c6 100755
+--- a/target/linux/x86/base-files/etc/board.d/04_gl_firewall
++++ b/target/linux/x86/base-files/etc/uci-defaults/04_gl_firewall
+@@ -20,6 +20,15 @@ uci -q batch <<-EOF
+ 	set firewall.@rule[-1].target='ACCEPT'
+ 	set firewall.@rule[-1].enabled='1'
+ 	set firewall.@rule[-1].src='wan'
++	
++	add firewall rule
++	set firewall.@rule[-1]=rule
++	set firewall.@rule[-1].dest_port='3000'
++	set firewall.@rule[-1].proto='tcp udp'
++	set firewall.@rule[-1].name='AdguardHome'
++	set firewall.@rule[-1].target='ACCEPT'
++	set firewall.@rule[-1].enabled='1'
++	set firewall.@rule[-1].src='wan'
+ EOF
+ 
+ uci commit firewall
+-- 
+2.25.1
+

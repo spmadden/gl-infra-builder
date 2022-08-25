@@ -3,7 +3,7 @@ description: Add the glinet dependencies
 
 feeds:
   - name: glinet
-    uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
     branch: v4.1.0
 
 packages:
@@ -16,6 +16,7 @@ packages:
   - dnsmasq-full
   - mwan3
   - iwinfo
+  - mmc-utils
   - block-mount
   - blkid
   - ntfs-3g
@@ -24,6 +25,8 @@ packages:
   - kmod-fs-ntfs
   - kmod-fs-vfat
   - kmod-fs-exfat
+  - oui-httpd
+  - oui-librpc
   - gl-sdk4-luci
   - gl-sdk4-rtty
   - gl-sdk4-base-files
@@ -37,6 +40,9 @@ packages:
   - gl-sdk4-carrier-monitor
   - gl-sdk4-init-portal
   - gl-sdk4-s2s
+  - gl-sdk4-utils
+  - gl-sdk4-dns
+  - gl-sdk4-timer
 
   - gl-sdk4-ui-adguardhome
   - gl-sdk4-ui-adminpw
@@ -71,6 +77,9 @@ packages:
   - gl-sdk4-ui-welcome
   - gl-sdk4-ui-wgclient
   - gl-sdk4-ui-wgserver
+  - gl-sdk4-ui-igmp
+  - gl-sdk4-ui-overview
+  - gl-sdk4-ui-timedtask
 
 
 diffconfig: |
