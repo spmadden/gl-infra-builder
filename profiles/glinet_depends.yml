@@ -29,6 +29,7 @@ packages:
   - liblua5.1.5
   - libcurl
   - ethtool
+  - minidlna
   - lua
   - libubox-lua
   - libuci-lua
