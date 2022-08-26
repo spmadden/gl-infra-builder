@@ -11,7 +11,7 @@ feeds:
     branch: common
   - name: luci
     uri: https://github.com/openwrt/luci.git
-    revision: d5d2ece1c5fc954d28988b106427fdea2cafec72
+    revision: 1c3b32dc1bec15e3076a447762b1c4f94eb75fb7
 
 packages:
   - wireless-regdb
