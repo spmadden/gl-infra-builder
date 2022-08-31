@@ -6,7 +6,7 @@ description: Build image for the GL.iNET A1300
 feeds:
   - name: gl_feeds_commmon
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 8fc0e3b79124af005e9f91ef839811f6a46610fb
+    revision: b3d0c3b26e37e7e28261ad383f8f12372ee4b65f
   - name: gl_feeds
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 4edc69c3011968aaf4905a5f10e5bfb3b87ab6ff

@@ -1,0 +1,54 @@
+From 7aba28aeff2c9e7257e642596c7c9b84f5cb29f4 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Fri, 26 Aug 2022 16:45:49 +0800
+Subject: [PATCH] wext: increase scan data length
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../patches/100-increase-buffer-size.patch          | 13 +++++++++++++
+ .../9999-wext-increase-iw-scan-data-size.patch      | 13 +++++++++++++
+ 2 files changed, 26 insertions(+)
+ create mode 100644 package/network/utils/wireless-tools/patches/100-increase-buffer-size.patch
+ create mode 100644 target/linux/mediatek/patches-5.4/9999-wext-increase-iw-scan-data-size.patch
+
+diff --git a/package/network/utils/wireless-tools/patches/100-increase-buffer-size.patch b/package/network/utils/wireless-tools/patches/100-increase-buffer-size.patch
+new file mode 100644
+index 0000000000..697856b541
+--- /dev/null
++++ b/package/network/utils/wireless-tools/patches/100-increase-buffer-size.patch
+@@ -0,0 +1,13 @@
++Index: wireless_tools.29/iwpriv.c
++===================================================================
++--- wireless_tools.29.orig/iwpriv.c
+++++ wireless_tools.29/iwpriv.c
++@@ -259,7 +259,7 @@ set_private_cmd(int		skfd,		/* Socket */
++ 		int		priv_num)	/* Number of descriptions */
++ {
++   struct iwreq	wrq;
++-  u_char	buffer[4096];	/* Only that big in v25 and later */
+++  u_char	buffer[20 * 1024];	/* Only that big in v25 and later */
++   int		i = 0;		/* Start with first command arg */
++   int		k;		/* Index in private description table */
++   int		temp;
+diff --git a/target/linux/mediatek/patches-5.4/9999-wext-increase-iw-scan-data-size.patch b/target/linux/mediatek/patches-5.4/9999-wext-increase-iw-scan-data-size.patch
+new file mode 100644
+index 0000000000..0e61a0e986
+--- /dev/null
++++ b/target/linux/mediatek/patches-5.4/9999-wext-increase-iw-scan-data-size.patch
+@@ -0,0 +1,13 @@
++Index: linux-5.4.188/include/uapi/linux/wireless.h
++===================================================================
++--- linux-5.4.188.orig/include/uapi/linux/wireless.h
+++++ linux-5.4.188/include/uapi/linux/wireless.h
++@@ -544,7 +544,7 @@
++ #define IW_SCAN_TYPE_ACTIVE 0
++ #define IW_SCAN_TYPE_PASSIVE 1
++ /* Maximum size of returned data */
++-#define IW_SCAN_MAX_DATA	4096	/* In bytes */
+++#define IW_SCAN_MAX_DATA	20 * 1024	/* In bytes */
++ 
++ /* Scan capability flags - in (struct iw_range *)->scan_capa */
++ #define IW_SCAN_CAPA_NONE		0x00
+-- 
+2.25.1
+
