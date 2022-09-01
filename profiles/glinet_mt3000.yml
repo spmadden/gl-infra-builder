@@ -10,7 +10,7 @@ feeds:
     revision: 4c6b600
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: d2baa278c673d7026df24d7bf3fe82df54a14f2f
+    revision: db930daf15feaf072bccbac21e23b7511e98aaf5
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
@@ -19,7 +19,7 @@ feeds:
     revision: da09723846cf25c6b7e288cd1669c89ea4d6071e
   - name: mt7981
     uri: git@gitlab.com:gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: 0d850962ae777e98b0bc3fa16720177a8242e3e7
+    revision: 85560e6449a3af0d87cfe7faded98d923c83588c
 
 packages:
   - 8021xd
