@@ -26,10 +26,10 @@ index 0000000000..f382be2a2c
 +	compatible = "glinet,mt3000-snand", "mediatek,mt7981";
 +
 +	aliases {
-+		led-boot = &led_run;
-+		led-failsafe = &led_run;
-+		led-running = &led_run;
-+		led-upgrade = &led_run;
++		//led-boot = &led_run;
++		//led-failsafe = &led_run;
++		//led-running = &led_run;
++		//led-upgrade = &led_run;
 +	};
 +
 +	chosen {
