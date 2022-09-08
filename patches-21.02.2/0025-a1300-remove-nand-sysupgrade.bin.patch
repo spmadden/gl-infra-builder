@@ -1,0 +1,36 @@
+From 4c67145cae7ae578d1d69244f6b9b44e6fe6fbc3 Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Wed, 7 Sep 2022 14:16:46 +0800
+Subject: [PATCH] a1300: remove nand-sysupgrade.bin
+
+---
+ target/linux/ipq40xx/image/generic.mk | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/ipq40xx/image/generic.mk b/target/linux/ipq40xx/image/generic.mk
+index d9ace7711c..0071677cfb 100644
+--- a/target/linux/ipq40xx/image/generic.mk
++++ b/target/linux/ipq40xx/image/generic.mk
+@@ -486,7 +486,6 @@ TARGET_DEVICES += glinet_gl-ap1300
+ 
+ define Device/glinet_gl-a1300
+ 	$(call Device/FitImage)
+-	$(call Device/UbiFit)
+ 	DEVICE_VENDOR := GL.iNet
+ 	DEVICE_MODEL := GL-A1300
+ 	SOC := qcom-ipq4018
+@@ -495,8 +494,10 @@ define Device/glinet_gl-a1300
+ 	PAGESIZE := 2048
+ 	IMAGE_SIZE := 131072k
+ 	KERNEL_INSTALL := 1
++	KERNEL_IN_UBI := 1
+ 	DEVICE_PACKAGE := ipq-wifi-glinet_gl-a1300
+-	IMAGES += sysupgrade.tar
++	IMAGES := nand-factory.img sysupgrade.tar
++	IMAGE/nand-factory.img := append-ubi
+ 	IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-a1300
+-- 
+2.25.1
+
