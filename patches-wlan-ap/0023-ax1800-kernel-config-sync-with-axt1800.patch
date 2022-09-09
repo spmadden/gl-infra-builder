@@ -1,0 +1,21 @@
+From 3aeebef3953f02243419009204d08ae546e1d69c Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Fri, 9 Sep 2022 15:06:26 +0800
+Subject: [PATCH] ax1800 kernel config sync with axt1800
+
+---
+ feeds/ipq807x/ipq807x/config-4.4 | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/feeds/ipq807x/ipq807x/config-4.4 b/feeds/ipq807x/ipq807x/config-4.4
+index 2f8d74a7..c64eca49 100644
+--- a/feeds/ipq807x/ipq807x/config-4.4
++++ b/feeds/ipq807x/ipq807x/config-4.4
+@@ -828,3 +828,4 @@ CONFIG_DIAG_CHAR=y
+ # CONFIG_CRYPTO_DEV_QCRYPTO is not set
+ # CONFIG_MHI_BUS_TEST is not set
+ # CONFIG_IP6_NF_TARGET_MASQUERADE is not set
++CONFIG_SENSORS_PWM_FAN=m
+-- 
+2.25.1
+

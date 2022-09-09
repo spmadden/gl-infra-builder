@@ -1,0 +1,61 @@
+From 639c5cd8f5e55b7f8f5db1eaf3bf819799ed3d79 Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Fri, 9 Sep 2022 15:05:54 +0800
+Subject: [PATCH] ax1800 dts add ble uart
+
+---
+ .../boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts  | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts
+index 685cfc68..4d9ec935 100644
+--- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts
++++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts
+@@ -22,6 +22,8 @@
+ 	compatible = "glinet,ax1800", "qcom,ipq6018-cp03", "qcom,ipq6018";
+ 
+ 	aliases {
++		serial0 = &blsp1_uart3; //system uart = ttyMSM0
++		serial1 = &blsp1_uart4; //tl8251      = ttyMSM1
+ 		ethernet3 = "/soc/dp4";
+ 		ethernet4 = "/soc/dp5";
+ 	};
+@@ -58,6 +60,16 @@
+ };
+ 
+ &soc {
++	blsp1_uart4: serial@78b2000 {
++		compatible = "qcom,msm-uartdm-v1.4", "qcom,msm-uartdm";
++		reg = <0x78b2000 0x200>;
++		interrupts = <GIC_SPI 307 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&gcc GCC_BLSP1_UART4_APPS_CLK>,
++			<&gcc GCC_BLSP1_AHB_CLK>;
++		clock-names = "core", "iface";
++		status = "disabled";
++	};
++
+ 	dp4 {
+ 		device_type = "network";
+ 		compatible = "qcom,nss-dp";
+@@ -91,4 +103,18 @@
+ 			bias-pull-up;
+ 		};
+ 	};
++	uart_tl8251_pins: uart_tl8251_pins {
++		mux {
++			pins = "gpio75", "gpio76"; // gpio 77 reset tl8251
++			function = "blsp3_uart";
++			drive-strength = <8>;
++			bias-pull-down;
++		};
++	};
++};
++
++&blsp1_uart4 {
++	pinctrl-0 = <&uart_tl8251_pins>;
++	pinctrl-names = "default";
++	status = "ok";
+ };
+-- 
+2.25.1
+

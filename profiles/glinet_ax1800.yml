@@ -9,5 +9,7 @@ packages:
   - gl-sdk4-led
   - i2c-tools
   - kmod-i2c-gpio-custom
+  - gl-ble_cfg_ax1800
+  - gl-ble-ubus
 
 diffconfig: |
