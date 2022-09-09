@@ -3,10 +3,10 @@ description: Add the glinet dependencies
 
 feeds:
   - name: glinet
-    uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
     branch: v4.1.0
   - name: mt7981
-    uri: git@gitlab.com:gl.sdk4.0/gl.router/mt7981-feeds.git
+    uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: 5817a89ae6c1262778af932ee0a9a1c24f0bddaf
 
 packages:
@@ -42,10 +42,13 @@ packages:
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
   - gl-sdk4-init-portal
+  - gl-sdk4-vpn-policy
   - gl-sdk4-s2s
   - gl-sdk4-utils
   - gl-sdk4-dns
   - gl-sdk4-timer
+  - gl-sdk4-tor
+  - gl-sdk4-mwan3
 
   - gl-sdk4-ui-adguardhome
   - gl-sdk4-ui-adminpw
@@ -83,6 +86,9 @@ packages:
   - gl-sdk4-ui-igmp
   - gl-sdk4-ui-overview
   - gl-sdk4-ui-timedtask
+  - gl-sdk4-ui-hwnat
+  - gl-sdk4-ui-torview
+  - gl-sdk4-ui-multiwan
 
 
 diffconfig: |
@@ -122,3 +128,4 @@ diffconfig: |
   CONFIG_LIBCURL_OPENSSL=y
   CONFIG_OPENSSL_OPTIMIZE_SPEED=y
   CONFIG_LUCI_LANG_zh_Hans=y
+  TARGET_INITRAMFS_COMPRESSION_LZMA=y
