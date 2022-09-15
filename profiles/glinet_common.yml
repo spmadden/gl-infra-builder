@@ -51,7 +51,6 @@ packages:
   - gl-sdk4-network
   - gl-sdk4-acl
   - gl-sdk4-mqtt
-  - select-sdk4-ui-all
   - gl-sdk4-cloud
   - gl-sdk4-lan
   - gl-sdk4-ipv6
@@ -65,6 +64,49 @@ packages:
   - gl-sdk4-init-portal
   - gl-sdk4-s2s
   - gl-sdk4-edgerouter
+  - gl-sdk4-mwan3
+  - gl-sdk4-timer
+  - gl-sdk4-igmp
+  - gl-sdk4-ui-adguardhome
+  - gl-sdk4-ui-adminpw
+  - gl-sdk4-ui-advanced
+  - gl-sdk4-ui-bridge
+  - gl-sdk4-ui-btnsettings
+  - gl-sdk4-ui-clients
+  - gl-sdk4-ui-cloud
+  - gl-sdk4-ui-core
+  - gl-sdk4-ui-dnsview
+  - gl-sdk4-ui-dynamicdns
+  - gl-sdk4-ui-edgerouter
+  - gl-sdk4-ui-firewallview
+  - gl-sdk4-ui-home
+  - gl-sdk4-ui-igmp
+  - gl-sdk4-ui-internet
+  - gl-sdk4-ui-ipv6
+  - gl-sdk4-ui-lanip
+  - gl-sdk4-ui-login
+  - gl-sdk4-ui-logview
+  - gl-sdk4-ui-macclone
+  - gl-sdk4-ui-modemmanage
+  - gl-sdk4-ui-multiwan
+  - gl-sdk4-ui-nasview
+  - gl-sdk4-ui-overview
+  - gl-sdk4-ui-ovpnclient
+  - gl-sdk4-ui-ovpnserver
+  - gl-sdk4-ui-plugins
+  - gl-sdk4-ui-process
+  - gl-sdk4-ui-reset
+  - gl-sdk4-ui-sms
+  - gl-sdk4-ui-timedtask
+  - gl-sdk4-ui-timezone
+  - gl-sdk4-ui-torview
+  - gl-sdk4-ui-upgrade
+  - gl-sdk4-ui-vlan
+  - gl-sdk4-ui-vpndashboard
+  - gl-sdk4-ui-welcome
+  - gl-sdk4-ui-wgclient
+  - gl-sdk4-ui-wgserver
+  - gl-sdk4-ui-wireless
 
 
 diffconfig: |

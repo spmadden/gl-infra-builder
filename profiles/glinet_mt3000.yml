@@ -42,6 +42,7 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
+  - select-sdk4-ui-all
 
 diffconfig: |
   CONFIG_MAP_R2_SUPPORT=y
