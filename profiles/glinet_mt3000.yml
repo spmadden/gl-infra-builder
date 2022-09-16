@@ -19,7 +19,7 @@ feeds:
     revision: da09723846cf25c6b7e288cd1669c89ea4d6071e
   - name: mt7981
     uri: git@gitlab.com:gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: 4fa7f707e52f0c6e19d8e130f4591e34cdc446ce
+    revision: 6b3b18ad3c212096990eadbe64e96a19f081f8fb
 
 packages:
   - 8021xd
