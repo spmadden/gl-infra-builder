@@ -5,4 +5,4 @@ openwrt_root_dir: openwrt-19.07/openwrt-19.07.8
 revision: 31f2f76cd5d7745e28fae3797d79b746360461f5
 
 patch_folders:
-  - patchs-19.07.8/
+  - patches-19.07.8/
