@@ -26,7 +26,6 @@ packages:
   - fwdd
   - mii_mgr
   - regs
-  - switch
   - wificonf
   - mtk-base-files
   - mtk_factory_rw
