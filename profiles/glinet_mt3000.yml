@@ -13,7 +13,7 @@ feeds:
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
   - name: mt7981_private
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: ff220779f907c3e60fa14f72e895ad295c8b4344
+    revision: cd8805a396183d4d10162088778fa452b2b7e476
 
 packages:
   - ethtool
