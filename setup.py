@@ -70,7 +70,7 @@ def qsdk_reset_tree():
 def wlan_ap_reset_tree():
     os.chdir(git_clone_dir)
     run(["rm", "-rf", "openwrt"])
-    run(["git", "reset", "--hard", config.get("revision", config["branch"])], check=True)
+    run(["git", "reset", "--hard", config.get("revision", config.get("branch"))], check=True)
     run(["./setup.py", "--setup"])
 
 def reset_tree():
@@ -83,8 +83,7 @@ def reset_tree():
             wlan_ap_reset_tree()
         else:
             os.chdir(openwrt)
-            run(["git", "checkout", config["branch"]], check=True)
-            run(["git", "reset", "--hard", config.get("revision", config["branch"])], check=True)
+            run(["git", "reset", "--hard", config.get("revision", config.get("branch"))], check=True)
             run(["rm", "-rf", "profiles"], )
         print("### Reset done")
     except:
