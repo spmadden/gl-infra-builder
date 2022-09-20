@@ -1,22 +1,22 @@
-From 2dcedb28028296eace0551ebeb621724e5b75343 Mon Sep 17 00:00:00 2001
+From a9ebedf580d3acb5953b60b8aefb65079d18cf9a Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 19 Sep 2022 15:20:05 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 274 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 275 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 ++
  .../mt7981/base-files/etc/board.d/02_network  |  31 +-
- 3 files changed, 300 insertions(+), 23 deletions(-)
+ 3 files changed, 301 insertions(+), 23 deletions(-)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..f382be2a2c
+index 0000000000..147b437f30
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,274 @@
+@@ -0,0 +1,275 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -59,6 +59,7 @@ index 0000000000..f382be2a2c
 +		led_run: led@0 {
 +			label = "blue:run";
 +			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
++			default-state = "on";
 +		};
 +
 +		led@1 {
