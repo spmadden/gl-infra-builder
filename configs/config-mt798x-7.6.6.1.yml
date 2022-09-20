@@ -1,0 +1,7 @@
+repo: https://github.com/openwrt/openwrt.git
+git_clone_dir: mt7981/
+openwrt_root_dir: mt7981/
+revision: bcaabe6d0586fabab72aa1fc6c06b8f83b6dfa0c
+
+patch_folders:
+  - patches-mt798x-7.6.6.1

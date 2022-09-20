@@ -1,0 +1,104 @@
+From 87ca5eb7ee50f3a7f3b68d51d79d5526ae6b1727 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 19 Sep 2022 14:11:34 +0800
+Subject: [PATCH] target/mediatek: mtk-eth poll gpy211 link state
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../net/ethernet/mediatek/mtk_eth_soc.c       | 42 ++++++++++++++++++-
+ .../drivers/net/ethernet/mediatek/mtk_sgmii.c |  5 ++-
+ 2 files changed, 45 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index a05cd19df6..559a78fd58 100755
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -11,6 +11,7 @@
+ #include <linux/of_net.h>
+ #include <linux/mfd/syscon.h>
+ #include <linux/regmap.h>
++#include <linux/bitfield.h>
+ #include <linux/clk.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/if_vlan.h>
+@@ -423,7 +424,10 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
+ 		mcr_new |= MAC_MCR_SPEED_1000;
+ 		break;
+ 	case SPEED_100:
+-		mcr_new |= MAC_MCR_SPEED_100;
++		if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
++			mcr_new |= MAC_MCR_SPEED_1000;
++		else
++			mcr_new |= MAC_MCR_SPEED_100;
+ 		break;
+ 	}
+ 	if (state->duplex == DUPLEX_FULL) {
+@@ -3509,6 +3513,40 @@ static const struct net_device_ops mtk_netdev_ops = {
+ #endif
+ };
+ 
++static void phylink_fixed_state(struct net_device *dev,
++					  struct phylink_link_state *state)
++{
++#define PHY_MIISTAT		0x18	/* MII state */
++#define PHY_MIISTAT_SPD_MASK	GENMASK(2, 0)
++#define PHY_MIISTAT_DPX		BIT(3)
++#define PHY_MIISTAT_LS		BIT(10)
++#define PHY_MIISTAT_SPD_10	0
++#define PHY_MIISTAT_SPD_100	1
++#define PHY_MIISTAT_SPD_1000	2
++#define PHY_MIISTAT_SPD_2500	4
++
++	struct mtk_mac *mac = netdev_priv(dev);
++	u32 val = _mtk_mdio_read(mac->hw, 0x05, PHY_MIISTAT);
++
++	state->link = (val & PHY_MIISTAT_LS) ? 1 : 0;
++	state->duplex = (val & PHY_MIISTAT_DPX) ? DUPLEX_FULL : DUPLEX_HALF;
++
++	switch (FIELD_GET(PHY_MIISTAT_SPD_MASK, val)) {
++	case PHY_MIISTAT_SPD_10:
++		state->speed = SPEED_10;
++		break;
++	case PHY_MIISTAT_SPD_100:
++		state->speed = SPEED_100;
++		break;
++	case PHY_MIISTAT_SPD_1000:
++		state->speed = SPEED_1000;
++		break;
++	case PHY_MIISTAT_SPD_2500:
++		state->speed = SPEED_2500;
++		break;
++	}
++}
++
+ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
+ {
+ 	const __be32 *_id = of_get_property(np, "reg", NULL);
+@@ -3585,6 +3623,8 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
+ 		goto free_netdev;
+ 	}
+ 
++	phylink_fixed_state_cb(phylink, phylink_fixed_state);
++
+ 	mac->phylink = phylink;
+ 
+ 	fixed_node = fwnode_get_named_child_node(of_fwnode_handle(mac->of_node),
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
+index 8198c7cb59..e0406e2b86 100755
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
+@@ -111,7 +111,10 @@ int mtk_sgmii_setup_mode_force(struct mtk_sgmii *ss, unsigned int id,
+ 		val |= SGMII_SPEED_10;
+ 		break;
+ 	case SPEED_100:
+-		val |= SGMII_SPEED_100;
++		if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
++			val |= SGMII_SPEED_1000;
++		else
++			val |= SGMII_SPEED_100;
+ 		break;
+ 	case SPEED_2500:
+ 	case SPEED_1000:
+-- 
+2.25.1
+

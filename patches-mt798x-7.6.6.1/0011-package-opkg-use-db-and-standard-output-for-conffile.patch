@@ -1,0 +1,118 @@
+From e3a5f05367ff7c8994b2b5c429bd06ef0751f473 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 13 Jul 2022 11:18:43 +0800
+Subject: [PATCH] package/opkg: use db and standard output for conffile
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../system/opkg/patches/001-support-db.patch  | 64 +++++++++++++++++++
+ .../002-conffile-use-standard-output.patch    | 26 ++++++++
+ 2 files changed, 90 insertions(+)
+ create mode 100644 package/system/opkg/patches/001-support-db.patch
+ create mode 100644 package/system/opkg/patches/002-conffile-use-standard-output.patch
+
+diff --git a/package/system/opkg/patches/001-support-db.patch b/package/system/opkg/patches/001-support-db.patch
+new file mode 100644
+index 0000000000..ae8bfadc3f
+--- /dev/null
++++ b/package/system/opkg/patches/001-support-db.patch
+@@ -0,0 +1,64 @@
++Index: opkg-2021-06-13-1bf042dd/libopkg/opkg_cmd.c
++===================================================================
++--- opkg-2021-06-13-1bf042dd.orig/libopkg/opkg_cmd.c
+++++ opkg-2021-06-13-1bf042dd/libopkg/opkg_cmd.c
++@@ -41,6 +41,29 @@
++ #include "opkg_configure.h"
++ #include "xsystem.h"
++ 
+++int exec_command(const char *command)
+++{
+++    opkg_msg(NOTICE, "Updating database.\n");
+++    remove("/var/lock/opkg.lock");
+++
+++    FILE *fp;
+++
+++    fp = popen(command, "r");
+++    if (fp == NULL) {
+++        return -1;
+++    }
+++    pclose(fp);
+++
+++    fp = fopen("/var/lock/opkg.lock", "w+");
+++    if (fp != NULL) {
+++        fclose(fp);
+++    }
+++
+++    opkg_msg(NOTICE, "Database update completed.\n");
+++
+++    return 0;
+++}
+++
++ static void print_pkg(pkg_t * pkg)
++ {
++ 	char *version = pkg_version_str_alloc(pkg);
++@@ -201,6 +224,8 @@ static int opkg_update_cmd(int argc, cha
++ 	free(tmp);
++ 	free(lists_dir);
++ 
+++	exec_command("update_plugins_db update");
+++
++ 	return failures;
++ }
++ 
++@@ -487,6 +512,9 @@ static int opkg_install_cmd(int argc, ch
++ 
++ 	write_status_files_if_changed();
++ 
+++	if (err == 0)
+++		exec_command("update_plugins_db install");
+++
++ 	return err;
++ }
++ 
++@@ -914,6 +942,10 @@ static int opkg_remove_cmd(int argc, cha
++ 		opkg_msg(NOTICE, "No packages removed.\n");
++ 
++ 	write_status_files_if_changed();
+++
+++	if (err == 0)
+++		exec_command("update_plugins_db remove");
+++
++ 	return err;
++ }
++ 
+diff --git a/package/system/opkg/patches/002-conffile-use-standard-output.patch b/package/system/opkg/patches/002-conffile-use-standard-output.patch
+new file mode 100644
+index 0000000000..fbd5411f2f
+--- /dev/null
++++ b/package/system/opkg/patches/002-conffile-use-standard-output.patch
+@@ -0,0 +1,26 @@
++Index: opkg-2021-06-13-1bf042dd/libopkg/opkg_install.c
++===================================================================
++--- opkg-2021-06-13-1bf042dd.orig/libopkg/opkg_install.c
+++++ opkg-2021-06-13-1bf042dd/libopkg/opkg_install.c
++@@ -1151,7 +1151,7 @@ static int resolve_conffiles(pkg_t * pkg
++ 					char *new_conffile;
++ 					sprintf_alloc(&new_conffile, "%s-opkg",
++ 						      root_filename);
++-					opkg_msg(ERROR,
+++					opkg_msg(NOTICE,
++ 						 "Existing conffile %s "
++ 						 "is different from the conffile in the new package."
++ 						 " The new conffile will be placed at %s.\n",
++Index: opkg-2021-06-13-1bf042dd/libopkg/pkg.c
++===================================================================
++--- opkg-2021-06-13-1bf042dd.orig/libopkg/pkg.c
+++++ opkg-2021-06-13-1bf042dd/libopkg/pkg.c
++@@ -1409,7 +1409,7 @@ int pkg_run_script(pkg_t * pkg, const ch
++ 		return 0;
++ 	}
++ 
++-	sprintf_alloc(&cmd, "%s %s", path, args);
+++	sprintf_alloc(&cmd, "%s %s 2>&1", path, args);
++ 	free(path);
++ 	{
++ 		const char *argv[] = { "/bin/sh", "-c", cmd, NULL };
+-- 
+2.25.1
+

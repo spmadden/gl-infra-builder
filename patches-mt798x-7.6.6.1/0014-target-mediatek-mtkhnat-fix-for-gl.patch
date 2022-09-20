@@ -1,0 +1,35 @@
+From 8921a2f85f93142243dd33077fa51e6e5a3c6b19 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 19 Sep 2022 14:16:04 +0800
+Subject: [PATCH] target/mediatek: mtkhnat: fix for gl
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c     | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
+index 6b937d5f29..db2919a360 100644
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
+@@ -1526,7 +1526,7 @@ static unsigned int skb_to_hnat_info(struct sk_buff *skb,
+ 			gmac = ((skb_hnat_entry(skb) >> 1) % hnat_priv->gmac_num) ?
+ 				 NR_GMAC2_PORT : NR_GMAC1_PORT;
+ 		else
+-			gmac = NR_GMAC1_PORT;
++			gmac = NR_GMAC2_PORT;
+ 	} else if (IS_WAN(dev)) {
+ 		if (IS_DSA_WAN(dev))
+ 			port_id = hnat_dsa_fill_stag(dev,&entry, hw_path,
+@@ -1537,7 +1537,7 @@ static unsigned int skb_to_hnat_info(struct sk_buff *skb,
+ 			/* Set act_dp = wan_dev */
+ 			entry.ipv4_hnapt.act_dp = dev->ifindex;
+ 		} else {
+-			gmac = (IS_GMAC1_MODE) ? NR_GMAC1_PORT : NR_GMAC2_PORT;
++			gmac = NR_GMAC1_PORT;
+ 		}
+ 	} else if (IS_EXT(dev) && (FROM_GE_PPD(skb) || FROM_GE_LAN(skb) ||
+ 		   FROM_GE_WAN(skb) || FROM_GE_VIRTUAL(skb) || FROM_WED(skb))) {
+-- 
+2.25.1
+

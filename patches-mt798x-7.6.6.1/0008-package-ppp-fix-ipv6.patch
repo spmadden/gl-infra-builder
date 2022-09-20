@@ -1,0 +1,25 @@
+From 28dd27e933916445f3fbfb438f873eb01b4b9270 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 13 Jul 2022 10:10:52 +0800
+Subject: [PATCH] package/ppp: fix ipv6
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/network/services/ppp/files/ppp.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/network/services/ppp/files/ppp.sh b/package/network/services/ppp/files/ppp.sh
+index b553effd88..78a712b41a 100755
+--- a/package/network/services/ppp/files/ppp.sh
++++ b/package/network/services/ppp/files/ppp.sh
+@@ -140,6 +140,7 @@ ppp_generic_setup() {
+ 		${localip:+$localip:} \
+ 		${lcp_failure:+lcp-echo-interval $lcp_interval lcp-echo-failure $lcp_failure $lcp_adaptive} \
+ 		${ipv6:++ipv6} \
++		${ipv6:-noipv6} \
+ 		${autoipv6:+set AUTOIPV6=1} \
+ 		${ip6table:+set IP6TABLE=$ip6table} \
+ 		${peerdns:+set PEERDNS=$peerdns} \
+-- 
+2.25.1
+
