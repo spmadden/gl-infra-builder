@@ -5,6 +5,10 @@ diffconfig: |
     CONFIG_IB=y
     CONFIG_IB_STANDALONE=y
     CONFIG_ALL_NONSHARED=y
+    CONFIG_PACKAGE_kmod-dax=n
+    CONFIG_PACKAGE_kmod-dm=n
+    CONFIG_PACKAGE_kmod-dm-raid=n
+    CONFIG_PACKAGE_kmod-mt7915=n
     CONFIG_PACKAGE_kmod-mt7915e=n
     CONFIG_PACKAGE_kmod-sound-soc-ac97=n
     CONFIG_PACKAGE_kmod-sound-soc-core=n
