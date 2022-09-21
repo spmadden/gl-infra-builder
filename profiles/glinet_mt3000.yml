@@ -27,7 +27,6 @@ packages:
   - gl-sdk4-mwan3
   - select-sdk4-ui-all
   - 8021xd
-  - ated_ext
   - datconf
   - datconf-lua
   - fwdd
