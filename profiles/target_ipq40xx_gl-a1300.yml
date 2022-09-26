@@ -6,10 +6,10 @@ description: Build image for the GL.iNET A1300
 feeds:
   - name: gl_feeds_commmon
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: b3d0c3b26e37e7e28261ad383f8f12372ee4b65f
+    revision: 802a8260daadbfc53b37a409875e54bdccba44c2
   - name: gl_feeds
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 4edc69c3011968aaf4905a5f10e5bfb3b87ab6ff
+    revision: b0b2d6c2a563be5787bde3acb7b5cf4e83ddc0ce
 
 packages:
   - wireless-regdb
