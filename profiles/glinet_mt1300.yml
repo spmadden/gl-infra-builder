@@ -2,32 +2,9 @@
 description: Add the glinet dependencies
 feeds:
   - name: glinet
-    path: ../feeds_dir/glinet
-
-packages:
-  - kmod-mt7615
-  - 8021xd 
-  - gl-sdk4-mtk-wifi
-  - gl-sdk4-mtk-apcli
-
-diffconfig: |
-  CONFIG_PACKAGE_kmod-mt7603=n
-  CONFIG_PACKAGE_kmod-mt76x2=n
-  CONFIG_PACKAGE_kmod-mt7615e=n
-  CONFIG_PACKAGE_hostapd-common=n
-  CONFIG_PACKAGE_wpad-basic=n
-  CONFIG_PACKAGE_wpad-openssl=n
-  CONFIG_MTK_FIRST_IF_NONE=n
-  CONFIG_MTK_FIRST_IF_MT7615E=y
-  CONFIG_MTK_MT_WIFI=y
-  CONFIG_MTK_BRCM_256QAM_SUPPORT=y
-  CONFIG_MTK_VHT_TXBF_2G_EPIGRAM_IE_SUPPORT=y
-  CONFIG_MTK_OFFCHANNEL_SCAN_FEATURE=y
-  CONFIG_MTK_TCP_RACK_SUPPORT=y
-  CONFIG_MTK_WIFI_MODE_AP=y
-  CONFIG_MTK_FAST_UP_RATE_SUPPORT=y
-  CONFIG_MTK_LED_CONTROL_SUPPORT=y
-  CONFIG_MTK_LINUX_NET_TXQ_SUPPORT=y
-  CONFIG_MTK_WPA3_SUPPORT=y
-  CONFIG_MTK_OWE_SUPPORT=y
+    uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    branch: v4.1.0
+  - name: gl_feed_common
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 1c390c8a9f58a5e0a89998555956c894c7a5ff1f
 

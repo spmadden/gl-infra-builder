@@ -1,5 +1,5 @@
 ---
-profile: gl-mt1300
+profile: glinet_gl-mt1300
 target: ramips
 subtarget: mt7621
 description: Build image for the GL.iNET MT1300
