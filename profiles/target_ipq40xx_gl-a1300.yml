@@ -15,15 +15,16 @@ packages:
   - wireless-regdb
   - wget-ssl
   - arp-scan
-  
+  - i2c-tools
+
 diffconfig: |
          CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
          CONFIG_PACKAGE_wpad-basic-wolfssl=n 
-         CONFIG_PACKAGE_ath10k-firmware-qca4019=n
+         CONFIG_PACKAGE_ath10k-firmware-qca4019=m
          CONFIG_PACKAGE_ath10k-firmware-qca4019-ct=y
-         CONFIG_PACKAGE_kmod-ath10k=n
+         CONFIG_PACKAGE_kmod-ath10k=m
          CONFIG_PACKAGE_kmod-ath10k-ct=y
-         CONFIG_ATH10K_LEDS=n
+         CONFIG_ATH10K_LEDS=y
          CONFIG_ATH10K-CT_LEDS=y
          CONFIG_ATH10K_THERMAL=y
          CONFIG_SIGNATURE_CHECK=y
