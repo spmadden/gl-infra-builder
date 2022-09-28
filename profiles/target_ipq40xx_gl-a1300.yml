@@ -42,3 +42,4 @@ diffconfig: |
          CONFIG_PACKAGE_badblocks=y
          CONFIG_PACKAGE_ipq-wifi-glinet_gl-a1300=y
          CONFIG_PACKAGE_ip-tiny=y
+         CONFIG_KERNEL_SLABINFO=y
