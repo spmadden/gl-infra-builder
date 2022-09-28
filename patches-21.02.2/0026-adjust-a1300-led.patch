@@ -1,0 +1,39 @@
+From 5c98ea13448e8c73152856036be6d8704d39ddd0 Mon Sep 17 00:00:00 2001
+From: gl-yangweiping <weiping.yang@gl-inet.com>
+Date: Wed, 28 Sep 2022 04:16:27 -0400
+Subject: [PATCH] adjust-a1300-led
+
+---
+ .../files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts    | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
+index 39c9032ac9..845554ebc1 100644
+--- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
++++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
+@@ -10,10 +10,10 @@
+ 	compatible = "glinet,gl-a1300", "qcom,ipq4019";
+ 
+ 	aliases {
+-		led-boot = &led_run;
+-		led-failsafe = &led_run;
+-		led-running = &led_run;
+-		led-upgrade = &led_run;
++		//led-boot = &led_run;
++		//led-failsafe = &led_run;
++		//led-running = &led_run;
++		//led-upgrade = &led_run;
+ 	};
+ 
+ 	gl_hw {
+@@ -135,6 +135,7 @@
+ 		led_run: blue {
+ 			label = "gl-a1300:blue";
+ 			gpios = <&tlmm 2 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
+ 		};
+ 
+ 		white {
+-- 
+2.17.1
+
