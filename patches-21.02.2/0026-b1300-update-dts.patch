@@ -1,0 +1,44 @@
+From 9833e7fe9ce5bc1173dc25ed71ac41127c55920d Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Wed, 28 Sep 2022 17:10:01 +0800
+Subject: [PATCH] b1300: update dts
+
+---
+ .../arm/boot/dts/qcom-ipq4029-gl-b1300.dts    | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
+index a735d8e3ac..1b80d0d742 100644
+--- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
++++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
+@@ -30,6 +30,27 @@
+ 		led-upgrade = &power;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "b1300";
++		wan = "eth1";
++		lan = "eth0";
++		usb-port = "1-1";
++		flash_size = <32>;
++		reset-button = "gpio-63";
++		radio = "radio0";
++		factory_data {
++			device_mac = "ART", "0x0";
++			device_ddns = "ART", "0x10";
++			device_sn_bak = "ART", "0x20";
++			device_sn = "ART", "0x30";
++			country_code = "ART", "0x88";
++		};
++	};
++
+ 	memory {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x10000000>;
+-- 
+2.25.1
+
