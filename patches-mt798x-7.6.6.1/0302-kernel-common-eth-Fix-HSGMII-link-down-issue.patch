@@ -1,0 +1,90 @@
+From 2b76a9d983820ef4cce97bdcadcfcc14c18efc7f Mon Sep 17 00:00:00 2001
+From: developer <developer@mediatek.com>
+Date: Tue, 20 Sep 2022 14:59:45 +0800
+Subject: [PATCH] [][kernel][common][eth][Fix HSGMII link down issue]
+
+[Description]
+Fix HSGMII link down issue.
+
+If without this patch, HSGMII may link down when PHY performs re-AN.
+
+[Release-log]
+N/A
+
+Change-Id: I40ad6e5d35b92e4e36689ab3db9e25b7695d2f43
+Reviewed-on: https://gerrit.mediatek.inc/c/openwrt/feeds/mtk_openwrt_feeds/+/6538088
+---
+ .../drivers/net/ethernet/mediatek/mtk_eth_soc.h     |  4 ++++
+ .../drivers/net/ethernet/mediatek/mtk_sgmii.c       | 13 +++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+index 54674ad..edaeceb 100755
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.h
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+@@ -720,6 +720,10 @@
+ #define SGMII_SEND_AN_ERROR_EN		BIT(11)
+ #define SGMII_IF_MODE_MASK		GENMASK(5, 1)
+ 
++/* Register to reset SGMII design */
++#define SGMII_RESERVED_0	0x34
++#define SGMII_SW_RESET		BIT(0)
++
+ /* Register to set SGMII speed, ANA RG_ Control Signals III*/
+ #define SGMSYS_ANA_RG_CS3	0x2028
+ #define RG_PHY_SPEED_MASK	(BIT(2) | BIT(3))
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
+index 8198c7c..2661645 100755
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
+@@ -47,6 +47,9 @@ int mtk_sgmii_setup_mode_an(struct mtk_sgmii *ss, unsigned int id)
+ 	/* Assert PHYA power down state */
+ 	regmap_write(ss->regmap[id], SGMSYS_QPHY_PWR_STATE_CTRL, SGMII_PHYA_PWD);
+ 
++	/* Reset SGMII PCS state */
++	regmap_write(ss->regmap[id], SGMII_RESERVED_0, SGMII_SW_RESET);
++
+ 	regmap_read(ss->regmap[id], ss->ana_rgc3, &val);
+ 	val &= ~RG_PHY_SPEED_3_125G;
+ 	regmap_write(ss->regmap[id], ss->ana_rgc3, val);
+@@ -66,7 +69,6 @@ int mtk_sgmii_setup_mode_an(struct mtk_sgmii *ss, unsigned int id)
+ 	regmap_write(ss->regmap[id], SGMSYS_SGMII_MODE, val);
+ 
+ 	regmap_read(ss->regmap[id], SGMSYS_PCS_CONTROL_1, &val);
+-	val |= SGMII_AN_RESTART;
+ 	val |= SGMII_AN_ENABLE;
+ 	regmap_write(ss->regmap[id], SGMSYS_PCS_CONTROL_1, val);
+ 
+@@ -91,6 +93,9 @@ int mtk_sgmii_setup_mode_force(struct mtk_sgmii *ss, unsigned int id,
+ 	/* Assert PHYA power down state */
+ 	regmap_write(ss->regmap[id], SGMSYS_QPHY_PWR_STATE_CTRL, SGMII_PHYA_PWD);
+ 
++	/* Reset SGMII PCS state */
++	regmap_write(ss->regmap[id], SGMII_RESERVED_0, SGMII_SW_RESET);
++
+ 	regmap_read(ss->regmap[id], ss->ana_rgc3, &val);
+ 	val &= ~RG_PHY_SPEED_MASK;
+ 	if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
+@@ -105,6 +110,7 @@ int mtk_sgmii_setup_mode_force(struct mtk_sgmii *ss, unsigned int id,
+ 	/* SGMII force mode setting */
+ 	regmap_read(ss->regmap[id], SGMSYS_SGMII_MODE, &val);
+ 	val &= ~SGMII_IF_MODE_MASK;
++	val &= ~SGMII_REMOTE_FAULT_DIS;
+ 
+ 	switch (state->speed) {
+ 	case SPEED_10:
+@@ -119,7 +125,10 @@ int mtk_sgmii_setup_mode_force(struct mtk_sgmii *ss, unsigned int id,
+ 		break;
+ 	};
+ 
+-	if (state->duplex == DUPLEX_FULL)
++	/* SGMII 1G and 2.5G force mode can only work in full duplex
++	 * mode, no matter SGMII_FORCE_HALF_DUPLEX is set or not.
++	 */
++	if (state->duplex != DUPLEX_FULL)
+ 		val |= SGMII_DUPLEX_FULL;
+ 
+ 	regmap_write(ss->regmap[id], SGMSYS_SGMII_MODE, val);
+-- 
+2.25.1
+
