@@ -3,3 +3,40 @@ profile: glinet_gl-b1300
 target: ipq40xx
 subtarget: generic
 description: Build image for the GL.iNET B1300
+feeds:
+  - name: gl_feeds_commmon
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 963d8afb636623832371dd0ea920d52afca75421
+  - name: gl_feeds
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: b0b2d6c2a563be5787bde3acb7b5cf4e83ddc0ce
+
+packages:
+  - wireless-regdb
+  - wget-ssl
+  - arp-scan
+  
+diffconfig: |
+         CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
+         CONFIG_PACKAGE_wpad-basic-wolfssl=n 
+         CONFIG_PACKAGE_ath10k-firmware-qca4019=m
+         CONFIG_PACKAGE_ath10k-firmware-qca4019-ct=y
+         CONFIG_PACKAGE_kmod-ath10k=m
+         CONFIG_PACKAGE_kmod-ath10k-ct=y
+         CONFIG_ATH10K_LEDS=y
+         CONFIG_ATH10K-CT_LEDS=y
+         CONFIG_ATH10K_THERMAL=y
+         CONFIG_SIGNATURE_CHECK=y
+         CONFIG_KERNEL_DEVMEM=y
+         CONFIG_BUSYBOX_CONFIG_BLKID=y
+         CONFIG_BUSYBOX_CONFIG_DEVMEM=y
+         CONFIG_BUSYBOX_CONFIG_TLS=y
+         CONFIG_PACKAGE_libfdisk=y
+         CONFIG_PACKAGE_fdisk=y
+         CONFIG_PACKAGE_kmod-usb-storage-extras=y
+         CONFIG_PACKAGE_libfdisk=y
+         CONFIG_PACKAGE_libsmartcols=y
+         CONFIG_PACKAGE_dnscrypt-proxy2=y
+         CONFIG_PACKAGE_badblocks=y
+         CONFIG_PACKAGE_ip-tiny=y
+         CONFIG_KERNEL_SLABINFO=y
