@@ -29,8 +29,6 @@ packages:
   - kmod-inet-diag
   - iptables-mod-tproxy
   - iptables-mod-filter
-  - tor:gl_feed_common
-  - smstools3:packages
   - gl-oui-rpc
   - gl-sdk4-luci
   - gl-sdk4-rtty
