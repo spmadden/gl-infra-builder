@@ -32,10 +32,6 @@ index aee73e793f..4b68b5e930 100755
 +
 +	open(my $fd, ">>feeds.conf");
 +
-+	if ($opts{b}) {
-+		printf $fd "src-include defaults feeds.conf.default\n";
-+	}
-+
 +	while (my $entry = shift @ARGV) {
 +		my ($type, $name, $src) = split /,/, $entry;
 +
@@ -51,6 +47,10 @@ index aee73e793f..4b68b5e930 100755
 +			return 1;
 +		}
 +		printf $fd "%s %s %s\n", $type, $name, $src;
++	}
++
++	if ($opts{b}) {
++		printf $fd "src-include defaults feeds.conf.default\n";
 +	}
 +
 +	return 0;

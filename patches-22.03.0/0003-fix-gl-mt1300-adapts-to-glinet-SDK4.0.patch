@@ -41,7 +41,7 @@ index 384da1bfa9..23c5be89c8 100644
 +		radio = "radio0";
 +		usb-port = "1-1";
 +		factory_data {
-+			device_mac = "factory", "0x04";
++			device_mac = "factory", "0x4000";
 +			device_ddns = "factory", "0x4010";
 +			device_sn_bak = "factory", "0x4020";
 +			device_sn = "factory", "0x4030";
