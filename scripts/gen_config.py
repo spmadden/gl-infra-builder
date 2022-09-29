@@ -185,6 +185,13 @@ def setup_feeds(profile):
 
     packages = ["./scripts/feeds", "install" ]
     for package in profile.get("packages", []):
+        p = package.split(":")
+        if len(p) == 2:
+            run(["./scripts/feeds", "uninstall", p[0]])
+            this_packages = ["./scripts/feeds", "install", "-p", p[1], p[0] ]
+            if run(this_packages).returncode:
+                die(f"Error installing packages")
+            continue
         packages.append(package)
     if len(packages) > 2:
         if run(packages).returncode:
