@@ -1,0 +1,31 @@
+From af65d0c2debba9d2c1990e969dd2ff01fcbff6d4 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 11 Oct 2022 14:55:25 +0800
+Subject: [PATCH] target/mediatek: fix poll link state
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c  | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 559a78fd58..f2a9aeaa65 100755
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -3526,7 +3526,12 @@ static void phylink_fixed_state(struct net_device *dev,
+ #define PHY_MIISTAT_SPD_2500	4
+ 
+ 	struct mtk_mac *mac = netdev_priv(dev);
+-	u32 val = _mtk_mdio_read(mac->hw, 0x05, PHY_MIISTAT);
++	struct mtk_eth *eth = mac->hw;
++	u32 val;
++
++	mutex_lock(&eth->mii_bus->mdio_lock);
++	val = _mtk_mdio_read(eth, 0x05, PHY_MIISTAT);
++	mutex_unlock(&eth->mii_bus->mdio_lock);
+ 
+ 	state->link = (val & PHY_MIISTAT_LS) ? 1 : 0;
+ 	state->duplex = (val & PHY_MIISTAT_DPX) ? DUPLEX_FULL : DUPLEX_HALF;
+-- 
+2.25.1
+
