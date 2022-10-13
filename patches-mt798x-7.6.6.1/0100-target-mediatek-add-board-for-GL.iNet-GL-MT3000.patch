@@ -49,7 +49,7 @@ index 0000000000..147b437f30
 +		switch {
 +			label = "switch";
 +			linux,code = <KEY_SETUP>;
-+			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
++			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
 +		};
 +	};
 +
