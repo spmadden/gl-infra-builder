@@ -1,0 +1,47 @@
+From 477cbf0c843c055146b260db7154f702cf9bdae4 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 13 Oct 2022 17:02:10 +0800
+Subject: [PATCH] target/mediatek: fix poll link state
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../base-files/etc/init.d/gpy211-link-poll    | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+ create mode 100755 target/linux/mediatek/base-files/etc/init.d/gpy211-link-poll
+
+diff --git a/target/linux/mediatek/base-files/etc/init.d/gpy211-link-poll b/target/linux/mediatek/base-files/etc/init.d/gpy211-link-poll
+new file mode 100755
+index 0000000000..f09e3ffc1f
+--- /dev/null
++++ b/target/linux/mediatek/base-files/etc/init.d/gpy211-link-poll
+@@ -0,0 +1,27 @@
++#!/bin/sh /etc/rc.common
++# Copyright (C) 2014 OpenWrt.org
++
++START=99
++
++gpy211_link_poll() {
++	old_state=1
++
++	while [ 1 ];
++	do
++		val=$(mii_mgr -g -p 5 -r 18 | awk -F' ' '{printf("%d", "0x"$4)}')
++		bit10=$(echo $val | awk '{print and(rshift($1,10),1)}')
++
++		echo "$bit10" > /var/run/gpy211_satte
++
++		[ $bit10 -eq $old_state ] || {
++			old_state=$bit10
++			ifconfig eth0 down
++		}
++
++		sleep 1
++	done
++}
++
++start() {
++	gpy211_link_poll &
++}
+-- 
+2.25.1
+
