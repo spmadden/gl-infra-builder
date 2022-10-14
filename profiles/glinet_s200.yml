@@ -4,3 +4,152 @@ feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
     branch: v4.1.0_s200
+
+packages:
+  - kmod-usb2
+  - kmod-usb-ehci
+  - kmod-usb-serial
+  - kmod-gl-sdk4-hw-info
+  - kmod-gl-sdk4-tertf
+  - wpad-openssl
+  - wget-ssl
+  - dnsmasq-full
+  - mwan3
+  - iwinfo
+  - gl-oui-rpc
+  - ot-br-posix
+  - gl-iot-otbr-gw
+  - gl-iot-otbr-mgmt
+  - gl-silabs-dfu
+  - gl-sdk4-acl
+  - gl-sdk4-base-files
+  - gl-sdk4-cable
+  - gl-sdk4-carrier-monitor
+  - gl-sdk4-clients
+  - gl-sdk4-cloud
+  - gl-sdk4-cloud-batch-manage
+  - gl-sdk4-ddns
+  - gl-sdk4-dns
+  - gl-sdk4-firewall
+  - gl-sdk4-init-portal
+  - gl-sdk4-ipv6
+  - gl-sdk4-lan
+  - gl-sdk4-led
+  - gl-sdk4-log
+  - gl-sdk4-logread
+  - gl-sdk4-lua-utils
+  - gl-sdk4-luci
+  - gl-sdk4-macclone
+  - gl-sdk4-mqtt
+  - gl-sdk4-network
+  - gl-sdk4-network-diag
+  - gl-sdk4-ovpn-client
+  - gl-sdk4-ovpn-server
+  - gl-sdk4-plugins
+  - gl-sdk4-qos
+  - gl-sdk4-repeater
+  - gl-sdk4-rtty
+  - gl-sdk4-s2s
+  - gl-sdk4-switch-button
+  - gl-sdk4-system
+  - gl-sdk4-uci
+  - gl-sdk4-upgrade
+  - gl-sdk4-utils
+  - gl-sdk4-vpn-policy
+  - gl-sdk4-wg-client
+  - gl-sdk4-wg-server
+  - gl-sdk4-wifi
+  - gl-sdk4-timer
+  - gl-sdk4-igmp
+  - gl-sdk4-mwan3
+  - gl-led-daemon
+  - gl-ble-daemon
+  - gl-ble-to-remote
+  - gl-ble-sdk
+  - gl-sdk4-ui-adminpw
+  - gl-sdk4-ui-advanced
+  - gl-sdk4-ui-backbonerouters
+  - gl-sdk4-ui-clients
+  - gl-sdk4-ui-cloud
+  - gl-sdk4-ui-core
+  - gl-sdk4-ui-dnsview
+  - gl-sdk4-ui-dynamicdns
+  - gl-sdk4-ui-firewallview
+  - gl-sdk4-ui-home
+  - gl-sdk4-ui-internet
+  - gl-sdk4-ui-ipv6
+  - gl-sdk4-ui-lanip
+  - gl-sdk4-ui-login
+  - gl-sdk4-ui-logview
+  - gl-sdk4-ui-macclone
+  - gl-sdk4-ui-ovpnclient
+  - gl-sdk4-ui-ovpnserver
+  - gl-sdk4-ui-plugins
+  - gl-sdk4-ui-process
+  - gl-sdk4-ui-reset
+  - gl-sdk4-ui-snooping
+  - gl-sdk4-ui-threaddevices
+  - gl-sdk4-ui-threadnetwork
+  - gl-sdk4-ui-threadtopologies
+  - gl-sdk4-ui-timezone
+  - gl-sdk4-ui-upgrade
+  - gl-sdk4-ui-vpndashboard
+  - gl-sdk4-ui-welcome
+  - gl-sdk4-ui-wgclient
+  - gl-sdk4-ui-wgserver
+  - gl-sdk4-ui-wireless
+  - gl-sdk4-ui-timedtask
+  - gl-sdk4-ui-multiwan
+  - gl-sdk4-ui-igmp
+  - gl-sdk4-ui-btnsettings
+  - gl-sdk4-ui-overview
+  - gl-sdk4-ui-sensors
+  - gl-sdk4-ui-bluetoothdevices
+  - gl-sdk4-ui-bluetoothremotemanage
+  - gl-sdk4-ui-bluetoothreport
+  - gl-sdk4-ui-bluetoothsettings
+
+diffconfig: |
+  CONFIG_PACKAGE_kmod-shortcut-fe-cm=n
+  CONFIG_SIGNATURE_CHECK=n
+  CONFIG_PACKAGE_dnsmasq=n
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad=n
+  CONFIG_BUSYBOX_CUSTOM=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
+  CONFIG_BUSYBOX_CONFIG_FLOAT_DURATION=y
+  CONFIG_NGINX_HTTP_CHARSET=n
+  CONFIG_NGINX_HTTP_GZIP=n
+  CONFIG_NGINX_HTTP_SSI=n
+  CONFIG_NGINX_HTTP_USERID=n
+  CONFIG_NGINX_HTTP_ACCESS=n
+  CONFIG_NGINX_HTTP_AUTH_BASIC=n
+  CONFIG_NGINX_HTTP_AUTOINDEX=n
+  CONFIG_NGINX_HTTP_GEO=n
+  CONFIG_NGINX_HTTP_MAP=n
+  CONFIG_NGINX_HTTP_SPLIT_CLIENTS=n
+  CONFIG_NGINX_HTTP_REFERER=n
+  CONFIG_NGINX_HTTP_REWRITE=n
+  CONFIG_NGINX_HTTP_FASTCGI=n
+  CONFIG_NGINX_HTTP_SCGI=n
+  CONFIG_NGINX_HTTP_MEMCACHED=n
+  CONFIG_NGINX_HTTP_LIMIT_CONN=n
+  CONFIG_NGINX_HTTP_LIMIT_REQ=n
+  CONFIG_NGINX_HTTP_EMPTY_GIF=n
+  CONFIG_NGINX_HTTP_BROWSER=n
+  CONFIG_NGINX_HTTP_UPSTREAM_HASH=n
+  CONFIG_NGINX_HTTP_UPSTREAM_IP_HASH=n
+  CONFIG_NGINX_HTTP_UPSTREAM_LEAST_CONN=n
+  CONFIG_NGINX_HTTP_UPSTREAM_KEEPALIVE=n
+  CONFIG_NGINX_HTTP_CACHE=n
+  CONFIG_NGINX_NAXSI=n
+  CONFIG_NGINX_HEADERS_MORE=n
+  CONFIG_LIBCURL_MBEDTLS=n
+  CONFIG_LIBCURL_OPENSSL=y
+  CONFIG_OPENSSL_OPTIMIZE_SPEED=y
+  CONFIG_PACKAGE_wpad-basic-wolfssl=n
+  CONFIG_PACKAGE_nginx-ssl-util=n
+  CONFIG_PACKAGE_kmod-crypto-hash=n
+  CONFIG_PACKAGE_kmod-crypto-kpp=n
+  CONFIG_PACKAGE_kmod-usb-serial-ch341=n
+  CONFIG_PACKAGE_libustream-wolfssl=n
