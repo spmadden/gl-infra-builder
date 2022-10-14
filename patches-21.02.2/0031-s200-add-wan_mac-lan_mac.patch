@@ -1,0 +1,61 @@
+From 51c9b9c91cb605c56e019d341500e8456b524661 Mon Sep 17 00:00:00 2001
+From: gl-yangweiping <weiping.yang@gl-inet.com>
+Date: Fri, 14 Oct 2022 03:39:01 -0400
+Subject: [PATCH] s200 add wan_mac-lan_mac
+
+---
+ target/linux/ath79/dts/qca9531_glinet_gl-s200.dtsi        | 8 +++-----
+ target/linux/ath79/nand/base-files/etc/board.d/02_network | 4 ++++
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-s200.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-s200.dtsi
+index 49307fc2a9..0b1c8594ee 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-s200.dtsi
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-s200.dtsi
+@@ -20,6 +20,8 @@
+ 		lan = "eth1";
+ 		reset-button = "gpio-3";
+ 		flash_size = <128>;
++		switch-button = "gpio-14";
++		radio = "radio0";
+ 		factory_data {
+ 			device_mac = "art";
+ 			device_ddns = "art", "0x10";
+@@ -45,7 +47,7 @@
+ 
+ 		switch {
+ 			label = "switch";
+-			linux,code = <BTN_1>;
++			linux,code = <KEY_SETUP>;
+ 			linux,input-type = <EV_SW>;
+ 			gpios = <&gpio 14 GPIO_ACTIVE_LOW>;
+ 		};
+@@ -180,10 +182,6 @@
+ 	};
+ };
+ 
+-&bootargs {
+-	bootargs="";
+-};
+-
+ &eth0 {
+ 	status = "okay";
+ 	mtd-mac-address = <&art 0x0>;
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index f277679f3e..30ba94d981 100755
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -79,6 +79,10 @@ ath79_setup_macs()
+ 	netgear,wndr4500-v3)
+ 		wan_mac=$(mtd_get_mac_binary caldata 0x6)
+ 		;;
++	glinet,gl-s200-nor-nand)
++		wan_mac=$(mtd_get_mac_binary art 0)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
+ 	esac
+ 
+ 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
+-- 
+2.17.1
+
