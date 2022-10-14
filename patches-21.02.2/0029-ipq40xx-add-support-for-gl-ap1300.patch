@@ -1,0 +1,126 @@
+From d5f3390a5cacb6384202316f7d99691dd63576a4 Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Tue, 4 Oct 2022 10:38:52 +0800
+Subject: [PATCH] ipq40xx: add support for gl ap1300
+
+---
+ .../ipq40xx/base-files/etc/board.d/02_network |  1 +
+ .../arm/boot/dts/qcom-ipq4018-gl-ap1300.dts   | 43 +++++++++++++++++++
+ target/linux/ipq40xx/image/generic.mk         |  7 ++-
+ 3 files changed, 49 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/ipq40xx/base-files/etc/board.d/02_network b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+index a5f13039be..1a7a7c2d37 100755
+--- a/target/linux/ipq40xx/base-files/etc/board.d/02_network
++++ b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+@@ -183,6 +183,7 @@ ipq40xx_setup_macs()
+ 		label_mac="$lan_mac"
+ 		;;
+ 	glinet,gl-b1300|\
++	glinet,gl-ap1300|\
+ 	glinet,gl-a1300)
+ 		wan_mac=$(mtd_get_mac_binary ART 0)
+ 		lan_mac=$(macaddr_add "$wan_mac" 1)
+diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts
+index 3fd5406d39..295e2217fd 100644
+--- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts
++++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts
+@@ -16,6 +16,28 @@
+ 		led-upgrade = &led_power;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "ap1300";
++		wan = "eth1";
++		lan = "eth0";
++		usb-port = "1-1";
++		flash_size = <128>;
++		reset-button = "gpio-63";
++		switch-button = "gpio-0";
++		radio = "radio0";
++		factory_data {
++			device_mac = "ART", "0x0";
++			device_ddns = "ART", "0x10";
++			device_sn_bak = "ART", "0x20";
++			device_sn = "ART", "0x30";
++			country_code = "ART", "0x88";
++		};
++	};
++
+ 	memory {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x10000000>;
+@@ -190,6 +212,10 @@
+ 				reg = <0x00170000 0x00010000>;
+ 				read-only;
+ 			};
++			partition@180000 {
++                                label = "log";
++                                reg = <0x00180000 0x00020000>;
++                        };
+ 		};
+ 	};
+ 
+@@ -227,6 +253,17 @@
+ 			bias-disable;
+ 		};
+ 	};
++	i2c_0_pins: i2c_0_pinmux {
++		pinmux {
++			function = "blsp_i2c0";
++			pins = "gpio58", "gpio59";
++		};
++		pinconf {
++			pins = "gpio58", "gpio59";
++			drive-strength = <16>;
++			bias-pull-up;
++		};
++	};
+ 
+ 	spi0_pins: spi0_pinmux {
+ 		mux_spi {
+@@ -246,6 +283,12 @@
+ 	};
+ };
+ 
++&blsp1_i2c3 {
++        status = "okay";
++        pinctrl-0 = <&i2c_0_pins>;
++        pinctrl-names = "default";
++};
++
+ &usb2_hs_phy {
+ 	status = "okay";
+ };
+diff --git a/target/linux/ipq40xx/image/generic.mk b/target/linux/ipq40xx/image/generic.mk
+index ee8d5b2853..239b753ce4 100644
+--- a/target/linux/ipq40xx/image/generic.mk
++++ b/target/linux/ipq40xx/image/generic.mk
+@@ -471,7 +471,6 @@ TARGET_DEVICES += ezviz_cs-w3-wd1200g-eup
+ 
+ define Device/glinet_gl-ap1300
+ 	$(call Device/FitImage)
+-	$(call Device/UbiFit)
+ 	DEVICE_VENDOR := GL.iNet
+ 	DEVICE_MODEL := GL-AP1300
+ 	SOC := qcom-ipq4018
+@@ -480,7 +479,11 @@ define Device/glinet_gl-ap1300
+ 	PAGESIZE := 2048
+ 	IMAGE_SIZE := 131072k
+ 	KERNEL_INSTALL := 1
+-	DEVICE_PACKAGES := ipq-wifi-glinet_gl-ap1300
++	KERNEL_IN_UBI := 1
++	DEVICE_PACKAGE := ipq-wifi-glinet_gl-ap1300
++	IMAGES := nand-factory.img sysupgrade.tar
++	IMAGE/nand-factory.img := append-ubi
++	IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-ap1300
+ 
+-- 
+2.25.1
+
