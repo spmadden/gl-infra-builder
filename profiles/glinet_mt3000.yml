@@ -20,6 +20,7 @@ packages:
   - iwinfo
   - wireless-tools
   - kmod-gl-sdk4-fan
+  - gl-sdk4-mtk-wifi-event
   - gl-sdk4-led
   - gl-sdk4-adguardhome
   - gl-sdk4-timer

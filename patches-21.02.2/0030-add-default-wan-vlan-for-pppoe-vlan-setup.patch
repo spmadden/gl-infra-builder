@@ -1,0 +1,25 @@
+From 2ed47ed11fd789bd8eacb1d75eec9dbdf103d82b Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Fri, 14 Oct 2022 10:30:46 +0800
+Subject: [PATCH] add default wan vlan for pppoe vlan setup
+
+---
+ target/linux/ipq40xx/base-files/etc/board.d/02_network | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/linux/ipq40xx/base-files/etc/board.d/02_network b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+index 1a7a7c2d37..2b3f710458 100755
+--- a/target/linux/ipq40xx/base-files/etc/board.d/02_network
++++ b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+@@ -100,7 +100,7 @@ ipq40xx_setup_interfaces()
+ 	glinet,gl-s1300)
+ 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
+ 		ucidef_add_switch "switch0" \
+-			"0u@eth0" "3:lan" "4:lan"
++			"0u@eth0" "3:lan" "4:lan" "0u@eth1" "5:wan"
+ 		;;
+ 	mobipromo,cm520-79f)
+ 		ucidef_add_switch "switch0" \
+-- 
+2.25.1
+
