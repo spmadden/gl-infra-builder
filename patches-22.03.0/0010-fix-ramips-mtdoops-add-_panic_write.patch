@@ -1,0 +1,32 @@
+From 03e26f26d9151977c5b7a0aef378d0faddb80086 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 18 Oct 2022 11:15:45 +0800
+Subject: [PATCH] fix: mtdoops add _panic_write
+
+---
+ .../patches-5.10/857-mtd-oops-add-panic-write.patch | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 target/linux/ramips/patches-5.10/857-mtd-oops-add-panic-write.patch
+
+diff --git a/target/linux/ramips/patches-5.10/857-mtd-oops-add-panic-write.patch b/target/linux/ramips/patches-5.10/857-mtd-oops-add-panic-write.patch
+new file mode 100644
+index 0000000000..50231e50e6
+--- /dev/null
++++ b/target/linux/ramips/patches-5.10/857-mtd-oops-add-panic-write.patch
+@@ -0,0 +1,13 @@
++Index: linux-5.10.138/drivers/mtd/spi-nor/core.c
++===================================================================
++--- linux-5.10.138.orig/drivers/mtd/spi-nor/core.c
+++++ linux-5.10.138/drivers/mtd/spi-nor/core.c
++@@ -3207,6 +3207,8 @@ int spi_nor_scan(struct spi_nor *nor, co
++ 
++ 	mtd->_write = spi_nor_write;
++ 
+++	mtd->_panic_write = spi_nor_write;
+++
++ 	/* Init flash parameters based on flash_info struct and SFDP */
++ 	ret = spi_nor_init_params(nor);
++ 	if (ret)
+-- 
+2.34.1
+
