@@ -6,7 +6,7 @@ description: Build image for the GL.iNET B1300
 feeds:
   - name: gl_feeds_commmon
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 963d8afb636623832371dd0ea920d52afca75421
+    revision: ca7c1c54636ea521b1452c443e1a0bb4deb41990
   - name: gl_feeds
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: b0b2d6c2a563be5787bde3acb7b5cf4e83ddc0ce
@@ -15,7 +15,7 @@ packages:
   - wireless-regdb
   - wget-ssl
   - arp-scan
-  
+
 diffconfig: |
          CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
          CONFIG_PACKAGE_wpad-basic-wolfssl=n 
@@ -39,4 +39,3 @@ diffconfig: |
          CONFIG_PACKAGE_dnscrypt-proxy2=y
          CONFIG_PACKAGE_badblocks=y
          CONFIG_PACKAGE_ip-tiny=y
-         CONFIG_KERNEL_SLABINFO=y
