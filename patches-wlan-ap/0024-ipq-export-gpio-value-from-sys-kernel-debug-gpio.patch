@@ -1,0 +1,60 @@
+From e640851b77a77d3f22e3e5caa35f356e29c336f0 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 26 Oct 2022 17:39:05 +0800
+Subject: [PATCH] ipq: export gpio value from /sys/kernel/debug/gpio
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../patches/302-gpio-debug-export-value.patch | 40 +++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+ create mode 100644 feeds/ipq807x/ipq807x/patches/302-gpio-debug-export-value.patch
+
+diff --git a/feeds/ipq807x/ipq807x/patches/302-gpio-debug-export-value.patch b/feeds/ipq807x/ipq807x/patches/302-gpio-debug-export-value.patch
+new file mode 100644
+index 00000000..d84dab5d
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/patches/302-gpio-debug-export-value.patch
+@@ -0,0 +1,40 @@
++Index: linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016/drivers/pinctrl/qcom/pinctrl-msm.c
++===================================================================
++--- linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016.orig/drivers/pinctrl/qcom/pinctrl-msm.c
+++++ linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016/drivers/pinctrl/qcom/pinctrl-msm.c
++@@ -497,6 +497,15 @@ static void msm_gpio_set(struct gpio_chi
++ #ifdef CONFIG_DEBUG_FS
++ #include <linux/seq_file.h>
++ 
+++struct gpio_desc {
+++	struct gpio_chip	*chip;
+++	unsigned long		flags;
+++	/* Connection label */
+++	const char		*label;
+++	/* Name of the GPIO */
+++	const char		*name;
+++};
+++
++ static void msm_gpio_dbg_show_one(struct seq_file *s,
++ 				  struct pinctrl_dev *pctldev,
++ 				  struct gpio_chip *chip,
++@@ -505,6 +514,7 @@ static void msm_gpio_dbg_show_one(struct
++ {
++ 	const struct msm_pingroup *g;
++ 	struct msm_pinctrl *pctrl = container_of(chip, struct msm_pinctrl, chip);
+++	struct gpio_desc	*gdesc = &chip->desc[offset];
++ 	unsigned func;
++ 	int is_out;
++ 	int drive;
++@@ -526,9 +536,10 @@ static void msm_gpio_dbg_show_one(struct
++ 	drive = (ctl_reg >> g->drv_bit) & 7;
++ 	pull = (ctl_reg >> g->pull_bit) & 3;
++ 
++-	seq_printf(s, " %-8s: %-3s %d", g->name, is_out ? "out" : "in", func);
+++	seq_printf(s, " %-8s(%-20.20s): %-3s %d", g->name, gdesc->label ? gdesc->label : "", is_out ? "out" : "in", func);
++ 	seq_printf(s, " %dmA", msm_regval_to_drive(drive));
++ 	seq_printf(s, " %s", pulls[pull]);
+++	seq_printf(s, " %s", chip->get(chip, offset) ? "hi" : "lo");
++ }
++ 
++ static void msm_gpio_dbg_show(struct seq_file *s, struct gpio_chip *chip)
+-- 
+2.25.1
+
