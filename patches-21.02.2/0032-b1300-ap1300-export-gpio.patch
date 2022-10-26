@@ -1,0 +1,95 @@
+From 9edd14c1193dfb8eba07462a1281db1dba2edcf7 Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Wed, 26 Oct 2022 18:27:04 +0800
+Subject: [PATCH] b1300 ap1300 export gpio
+
+---
+ .../arm/boot/dts/qcom-ipq4018-gl-ap1300.dts   | 29 ++++++++++++++-----
+ .../arm/boot/dts/qcom-ipq4029-gl-b1300.dts    | 10 +++++++
+ 2 files changed, 32 insertions(+), 7 deletions(-)
+
+diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts
+index 295e2217fd..826412ba2f 100644
+--- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts
++++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-ap1300.dts
+@@ -27,7 +27,6 @@
+ 		usb-port = "1-1";
+ 		flash_size = <128>;
+ 		reset-button = "gpio-63";
+-		switch-button = "gpio-0";
+ 		radio = "radio0";
+ 		factory_data {
+ 			device_mac = "ART", "0x0";
+@@ -137,6 +136,22 @@
+ 			gpios = <&tlmm 3 GPIO_ACTIVE_HIGH>;
+ 		};
+ 	};
++
++	gpio_export {
++		compatible = "gpio-export";
++
++		lte_rst {
++			gpio-export,name = "lte_rst";
++			gpio-export,output = <0>;
++			gpios = <&tlmm 1 GPIO_ACTIVE_HIGH>;
++		};
++
++		ble_rst {
++			gpio-export,name = "ble_rst";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 62 GPIO_ACTIVE_LOW>;
++		};
++	};
+ };
+ 
+ &blsp_dma {
+@@ -213,9 +228,9 @@
+ 				read-only;
+ 			};
+ 			partition@180000 {
+-                                label = "log";
+-                                reg = <0x00180000 0x00020000>;
+-                        };
++				label = "log";
++				reg = <0x00180000 0x00020000>;
++			};
+ 		};
+ 	};
+ 
+@@ -284,9 +299,9 @@
+ };
+ 
+ &blsp1_i2c3 {
+-        status = "okay";
+-        pinctrl-0 = <&i2c_0_pins>;
+-        pinctrl-names = "default";
++	status = "okay";
++	pinctrl-0 = <&i2c_0_pins>;
++	pinctrl-names = "default";
+ };
+ 
+ &usb2_hs_phy {
+diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
+index 1b80d0d742..c3474a7871 100644
+--- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
++++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-b1300.dts
+@@ -157,6 +157,16 @@
+ 			gpios = <&tlmm 2 GPIO_ACTIVE_HIGH>;
+ 		};
+ 	};
++
++	gpio_export {
++		compatible = "gpio-export";
++
++		usb {
++			gpio-export,name = "usb_power";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 0 GPIO_ACTIVE_HIGH>;
++		};
++	};
+ };
+ 
+ &blsp_dma {
+-- 
+2.25.1
+
