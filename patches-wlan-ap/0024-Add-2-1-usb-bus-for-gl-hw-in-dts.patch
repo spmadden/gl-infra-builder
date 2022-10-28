@@ -1,0 +1,26 @@
+From a221add5b3e1d73724f09987ec6232d32e5d1c33 Mon Sep 17 00:00:00 2001
+From: Li Zhang <li.zhang@gl-inet.com>
+Date: Fri, 28 Oct 2022 10:54:02 +0800
+Subject: [PATCH] Add 2-1 usb-bus for gl-hw in dts
+
+Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
+---
+ .../ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
+index 55e8d62..05d71d6 100644
+--- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
++++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
+@@ -35,7 +35,7 @@
+ &gl_hw {
+ 	model = "axt1800";
+ 	lan = "eth1 eth2";
+-	usb-port = "1-1";
++	usb-port = "1-1,2-1";
+ 	fan = "pwmchip0";
+ 	switch-button = "gpio-16";
+ 	dfs;
+-- 
+2.7.4
+
