@@ -1,0 +1,66 @@
+From 3fe7a357073346fa3b2ecc184f45cb2b80752e46 Mon Sep 17 00:00:00 2001
+From: Li Zhang <li.zhang@gl-inet.com>
+Date: Fri, 28 Oct 2022 11:02:23 +0800
+Subject: [PATCH] Support EM160R/EM060k/EM120K/RM520N modem
+
+Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
+---
+ ...support-EM160R-EM060k-EM120K-RM520N-modem.patch | 46 ++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 feeds/ipq807x/ipq807x/patches/302-support-EM160R-EM060k-EM120K-RM520N-modem.patch
+
+diff --git a/feeds/ipq807x/ipq807x/patches/302-support-EM160R-EM060k-EM120K-RM520N-modem.patch b/feeds/ipq807x/ipq807x/patches/302-support-EM160R-EM060k-EM120K-RM520N-modem.patch
+new file mode 100644
+index 0000000..5a5c441
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/patches/302-support-EM160R-EM060k-EM120K-RM520N-modem.patch
+@@ -0,0 +1,46 @@
++--- linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016/drivers/usb/serial/option.c	2022-10-28 09:58:48.103870967 +0800
+++++ a/drivers/usb/serial/option.c	2022-10-27 14:46:15.577142176 +0800
++@@ -700,6 +700,9 @@
++ 	{ USB_DEVICE(0x2C7C, 0x0296) }, /* Quectel BG96 */
++ 	{ USB_DEVICE(0x2C7C, 0x0435) }, /* Quectel AG35 */
++ 	{ USB_DEVICE(0x2C7C, 0x6026) }, /* Quectel AG35 */
+++	{ USB_DEVICE(0x2C7C, 0x030b) }, /* Quectel EM060K-GL EM120K-GL*/
+++	{ USB_DEVICE(0x2C7C, 0x0620) }, /* Quectel EM160R-GL */
+++	{ USB_DEVICE(0x2C7C, 0x0801) }, /* Quectel RM520N-GL */
++ #endif
++ 	{ USB_DEVICE(0x19d2, 0x0536) },/* MZ386 */
++ 	{ USB_DEVICE(0x19d2, 0x0117) },
++@@ -2145,6 +2148,21 @@
++ 	/* Store the blacklist info so we can use it during attach. */
++ 	//usb_set_serial_data(serial, (void *)blacklist);
++ #if 1 //Added by Quectel
+++	if (serial->dev->descriptor.idVendor == cpu_to_le16(0x2C7C)) { 
+++		__u16 idProduct = le16_to_cpu(serial->dev->descriptor.idProduct);
+++		struct usb_interface_descriptor *intf = &serial->interface->cur_altsetting->desc;
+++		if (intf->bInterfaceClass != 0xFF || intf->bInterfaceSubClass == 0x42) {
+++			//ECM, RNDIS, NCM, MBIM, ACM, UAC, ADB 
+++			return -ENODEV;
+++		}
+++
+++		if ((idProduct&0xF000) == 0x0000) {
+++			//MDM interface 4 is QMI 
+++			if (intf->bInterfaceNumber == 4 && intf->bNumEndpoints == 3
+++				&& intf->bInterfaceSubClass == 0xFF && intf->bInterfaceProtocol == 0xFF)
+++				return -ENODEV;
+++		}
+++	}
++ 	//Quectel UC20's interface 4 can be used as USB network device
++ 	if (serial->dev->descriptor.idVendor == cpu_to_le16(0x05C6) && \
++ 			serial->dev->descriptor.idProduct == cpu_to_le16(0x9003) \
++--- linux-4.4.60-qsdk-11f09717303ecd83c3a64e9efe23f25921dc1016/drivers/net/usb/qmi_wwan.c	2022-10-28 09:59:01.704202689 +0800
+++++ a/drivers/net/usb/qmi_wwan.c	2022-10-27 14:46:18.617125147 +0800
++@@ -444,6 +444,9 @@
++ 	{ QMI_FIXED_INTF(0x2C7C, 0x0306, 4) }, /* Quectel EG06/EP06/EM06 */
++ 	{ QMI_FIXED_INTF(0x2C7C, 0x0296, 4) }, /* Quectel BG96 */
++ 	{ QMI_FIXED_INTF(0x2C7C, 0x0435, 4) }, /* Quectel AG35 */
+++	{ QMI_FIXED_INTF(0x2C7C, 0x030b, 4) }, /* Quectel Quectel EM060K-GL EM120K-GL */
+++	{ QMI_FIXED_INTF(0x2C7C, 0x0620, 4) }, /* Quectel AG35 */
+++	{ QMI_FIXED_INTF(0x2C7C, 0x0801, 4) }, /* Quectel AG35 */
++ #endif
++ 
++ 	/* 1. CDC ECM like devices match on the control interface */
+-- 
+2.7.4
+
