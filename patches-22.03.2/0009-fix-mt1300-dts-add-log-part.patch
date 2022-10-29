@@ -1,0 +1,30 @@
+From d0df617b77d67c842308d2f04687052c13b46c12 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 18 Oct 2022 11:17:31 +0800
+Subject: [PATCH] fix: mt1300 dts add log part
+
+---
+ target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
+index c488d72e36..54ff1019b1 100644
+--- a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
++++ b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
+@@ -119,7 +119,12 @@
+ 			partition@50000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x50000 0x1fb0000>;
++				reg = <0x50000 0x1f90000>;
++			};
++
++			partition@1ff0000 {
++				label = "log";
++                                reg = <0x1fe0000 0x20000>;
+ 			};
+ 		};
+ 	};
+-- 
+2.34.1
+
