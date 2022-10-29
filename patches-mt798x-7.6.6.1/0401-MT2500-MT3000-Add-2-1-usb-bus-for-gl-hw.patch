@@ -1,0 +1,40 @@
+From 12beef422616e1fc0f93ef7648ba06e6702100e0 Mon Sep 17 00:00:00 2001
+From: Li Zhang <li.zhang@gl-inet.com>
+Date: Sat, 29 Oct 2022 15:29:05 +0800
+Subject: [PATCH] MT2500/MT3000: Add 2-1 usb-bus for gl-hw
+
+Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
+---
+ .../files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts         | 2 +-
+ .../files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
+index 29645b3..748983c 100755
+--- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
++++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
+@@ -25,7 +25,7 @@
+ 		model = "mt2500";
+ 		wan = "eth0";
+ 		lan = "eth1";
+-		usb-port = "1-1";
++		usb-port = "1-1,2-1";
+ 		flash_size = <7456>;
+ 		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
+ 		factory_data {
+diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
+index 40f38f3..544cb2f 100755
+--- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
++++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
+@@ -100,7 +100,7 @@
+ 		model = "mt3000";
+ 		wan = "eth0";
+ 		lan = "eth1";
+-		usb-port = "1-1";
++		usb-port = "1-1,2-1";
+ 		fan = "pwmchip0";
+ 		flash_size = <256>;
+ 		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
+-- 
+2.7.4
+
