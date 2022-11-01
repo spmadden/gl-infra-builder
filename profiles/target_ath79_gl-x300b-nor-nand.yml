@@ -1,0 +1,9 @@
+---
+profile: glinet_gl-x300b-nor-nand
+target: ath79
+subtarget: nand
+description: Build image for the GL.iNET X300B
+feeds:
+  - name: gl_feeds_commmon
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: c3c61a5e480a44e90389fe37d7d0f07938139ada

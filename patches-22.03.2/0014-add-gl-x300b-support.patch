@@ -1,0 +1,607 @@
+From e87a37af8288ad2faab7dd00e059e56c8f1d3ee4 Mon Sep 17 00:00:00 2001
+From: lincolnzh <hongjian.zhang@gl-inet.com>
+Date: Tue, 1 Nov 2022 17:05:03 +0800
+Subject: [PATCH] add gl-x300b support
+
+---
+ .../dts/qca9531_glinet_gl-x300b-nor-nand.dts  |  25 +++
+ .../ath79/dts/qca9531_glinet_gl-x300b-nor.dts |  18 ++
+ .../ath79/dts/qca9531_glinet_gl-x300b.dts     | 152 -------------
+ .../ath79/dts/qca9531_glinet_gl-x300b.dtsi    | 205 ++++++++++++++++++
+ .../generic/base-files/etc/board.d/01_leds    |   1 -
+ .../generic/base-files/etc/board.d/02_network |   5 -
+ target/linux/ath79/image/generic.mk           |   9 -
+ target/linux/ath79/image/nand.mk              |  28 +++
+ .../ath79/nand/base-files/etc/board.d/01_leds |   6 +
+ .../nand/base-files/etc/board.d/02_network    |   9 +
+ .../etc/uci-defaults/04_led_migration         |   2 +-
+ .../nand/base-files/lib/upgrade/platform.sh   |   1 +
+ 12 files changed, 293 insertions(+), 168 deletions(-)
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor-nand.dts
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor.dts
+ delete mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x300b.dts
+ create mode 100755 target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor-nand.dts
+new file mode 100644
+index 0000000000..b50ed14f26
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor-nand.dts
+@@ -0,0 +1,25 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++/dts-v1/;
++
++#include "qca9531_glinet_gl-x300b.dtsi"
++
++/ {
++	compatible = "glinet,gl-x300b-nor-nand", "qca,qca9531";
++	model = "GL.iNet GL-X300B (NOR/NAND)";
++};
++
++&nor_partitions {
++	partition@60000 {
++		label = "kernel";
++		reg = <0x060000 0x200000>;
++	};
++	parition@260000 {
++		label = "nor_reserved";
++		reg = <0x260000 0xbc0000>;
++	};
++};
++
++&nand_ubi {
++	label = "ubi";
++};
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor.dts
+new file mode 100644
+index 0000000000..566df3c238
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor.dts
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++/dts-v1/;
++
++#include "qca9531_glinet_gl-x300b.dtsi"
++
++/ {
++	compatible = "glinet,gl-x300b-nor", "qca,qca9531";
++	model = "GL.iNet GL-X300B (NOR)";
++};
++
++&nor_partitions {
++	partition@60000 {
++		compatible = "denx,uimage";
++		label = "firmware";
++		reg = <0x060000 0xfa0000>;
++	};
++};
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dts
+deleted file mode 100644
+index 5f5646b3e0..0000000000
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dts
++++ /dev/null
+@@ -1,152 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+-
+-#include "qca953x.dtsi"
+-
+-#include <dt-bindings/gpio/gpio.h>
+-#include <dt-bindings/input/input.h>
+-
+-/ {
+-	compatible = "glinet,gl-x300b", "qca,qca9531";
+-	model = "GL.iNet GL-X300B";
+-
+-	keys {
+-		compatible = "gpio-keys";
+-
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&jtag_disable_pins>;
+-
+-		reset {
+-			label = "reset";
+-			linux,code = <KEY_RESTART>;
+-			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
+-		};
+-	};
+-
+-	leds {
+-		compatible = "gpio-leds";
+-
+-		wlan2g {
+-			label = "green:wlan2g";
+-			gpios = <&gpio 4 GPIO_ACTIVE_LOW>;
+-			linux,default-trigger = "phy0tpt";
+-		};
+-
+-		wan {
+-			label = "green:wan";
+-			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
+-		};
+-
+-		lte {
+-			label = "green:lte";
+-			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
+-		};
+-	};
+-
+-	gpio-export {
+-		compatible = "gpio-export";
+-
+-		minipcie {
+-			gpio-export,name = "minipcie";
+-			gpio-export,output = <0>;
+-			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
+-		};
+-
+-		rs485tx_en {
+-			gpio-export,name = "rs485tx_en";
+-			gpio-export,output = <0>;
+-			gpios = <&gpio 1 GPIO_ACTIVE_HIGH>;
+-		};
+-
+-		ble_rst {
+-			gpio-export,name = "ble_rst";
+-			gpio-export,output = <0>;
+-			gpios = <&gpio 16 GPIO_ACTIVE_HIGH>;
+-		};
+-	};
+-
+-	watchdog {
+-		compatible = "hw_wdt";
+-		dog_en_gpio = <12>;
+-		feed_dog_gpio = <2>;
+-		feed_dog_interval = <100000000>;
+-	};
+-};
+-
+-&usb0 {
+-	status = "okay";
+-};
+-
+-&usb_phy {
+-	status = "okay";
+-};
+-
+-&spi {
+-	status = "okay";
+-
+-	flash@0 {
+-		compatible = "jedec,spi-nor";
+-		reg = <0>;
+-		spi-max-frequency = <25000000>;
+-
+-		partitions {
+-			compatible = "fixed-partitions";
+-			#address-cells = <1>;
+-			#size-cells = <1>;
+-
+-			partition@0 {
+-				label = "u-boot";
+-				reg = <0x000000 0x040000>;
+-				read-only;
+-			};
+-
+-			partition@40000 {
+-				label = "u-boot-env";
+-				reg = <0x040000 0x010000>;
+-			};
+-
+-			art: partition@50000 {
+-				label = "art";
+-				reg = <0x050000 0x010000>;
+-				read-only;
+-			};
+-
+-			partition@60000 {
+-				compatible = "denx,uimage";
+-				label = "firmware";
+-				reg = <0x060000 0xfa0000>;
+-			};
+-
+-		};
+-	};
+-};
+-
+-&eth0 {
+-	status = "okay";
+-
+-	nvmem-cells = <&macaddr_art_0>;
+-	nvmem-cell-names = "mac-address";
+-
+-	phy-handle = <&swphy4>;
+-};
+-
+-&eth1 {
+-	nvmem-cells = <&macaddr_art_0>;
+-	nvmem-cell-names = "mac-address";
+-	mac-address-increment = <1>;
+-};
+-
+-&wmac {
+-	status = "okay";
+-
+-	mtd-cal-data = <&art 0x1000>;
+-};
+-
+-&art {
+-	compatible = "nvmem-cells";
+-	#address-cells = <1>;
+-	#size-cells = <1>;
+-
+-	macaddr_art_0: macaddr@0 {
+-		reg = <0x0 0x6>;
+-	};
+-};
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
+new file mode 100755
+index 0000000000..5b308c8754
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
+@@ -0,0 +1,205 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/dts-v1/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++#include "qca953x.dtsi"
++
++/ {
++	compatible = "glinet,gl-x300b", "qca,qca9531";
++	model = "GL.iNet GL-X300B";
++
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "x300b";
++		wan = "eth0";
++		lan = "eth1";
++		build-in-modem = "1-1";
++		reset-button = "gpio-3";
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys-polled";
++
++		poll-interval = <20>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&jtag_disable_pins>;
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		wlan2g {
++			label = "gl-x300b:green:wlan2g";
++			gpios = <&gpio 4 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "phy0tpt";
++		};
++
++		wan {
++			label = "gl-x300b:green:wan";
++			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
++		};
++
++		lte {
++			label = "gl-x300b:green:lte";
++			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
++		};
++	};
++    gpio-export {
++		compatible = "gpio-export";
++
++		minocie {
++			gpio-export,name = "gpio0";
++			gpio-export,output = <0>;
++			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
++		};
++
++		rs485tx_en {
++			gpio-export,name = "gpio1";
++			gpio-export,output = <0>;
++			gpios = <&gpio 1 GPIO_ACTIVE_HIGH>;
++		};
++
++		feed_dog {
++			gpio-export,name = "gpio2";
++			gpio-export,output = <0>;
++			gpios = <&gpio 2 GPIO_ACTIVE_HIGH>;
++		};
++
++		dog_en {
++			gpio-export,name = "gpio12";
++			gpio-export,output = <0>;
++			gpios = <&gpio 12 GPIO_ACTIVE_HIGH>;
++		};
++
++		ble_rst {
++			gpio-export,name = "gpio16";
++			gpio-export,output = <0>;
++			gpios = <&gpio 16 GPIO_ACTIVE_HIGH>;
++		};
++
++    };
++    watchdog {
++        compatible = "hw_wdt";
++        dog_en_gpio= <12>;
++        feed_dog_gpio=<2>;
++        feed_dog_interval=<100000000>;
++    };
++
++};
++
++
++&uart {
++	status = "okay";
++    rs485_pin=<1>;
++};
++
++&usb0 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	hub_port: port@1 {
++		reg = <1>;
++		#trigger-source-cells = <0>;
++	};
++};
++
++&usb_phy {
++	status = "okay";
++};
++
++&spi {
++	status = "okay";
++	num-cs = <2>;
++	cs-gpios = <0>, <0>;
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <25000000>;
++
++		nor_partitions: partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x000000 0x040000>;
++				read-only;
++			};
++
++			partition@40000 {
++				label = "u-boot-env";
++				reg = <0x040000 0x010000>;
++			};
++
++			art: partition@50000 {
++				label = "art";
++				reg = <0x050000 0x010000>;
++				read-only;
++			};
++		};
++	};
++
++	flash_nand: flash@1 {
++		compatible = "spi-nand";
++		reg = <1>;
++		spi-max-frequency = <25000000>;
++
++		nand_partitions: partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			nand_ubi: partition@0 {
++				label = "nand_ubi";
++				reg = <0x000000 0x8000000>;
++			};
++		};
++	};
++
++};
++/*
++&bootargs {
++	bootargs="";
++};*/
++
++&eth0 {
++        status = "okay";
++        mtd-mac-address = <&art 0x0>;
++        phy-handle = <&swphy4>;
++        ifname = "eth0";
++};
++
++&eth1 {
++        mtd-mac-address = <&art 0x0>;
++        mtd-mac-address-increment = <1>;
++        ifname = "eth1";
++};
++
++
++&wmac {
++	status = "okay";
++	mtd-cal-data = <&art 0x1000>;
++	mtd-mac-address = <&art 0x1002>;
++};
++
+diff --git a/target/linux/ath79/generic/base-files/etc/board.d/01_leds b/target/linux/ath79/generic/base-files/etc/board.d/01_leds
+index 8b4c83fd2c..46f343b0d6 100644
+--- a/target/linux/ath79/generic/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/generic/base-files/etc/board.d/01_leds
+@@ -239,7 +239,6 @@ qxwlan,e750a-v4-16m)
+ 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x02"
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+ 	;;
+-glinet,gl-x300b|\
+ glinet,gl-x750)
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+ 	;;
+diff --git a/target/linux/ath79/generic/base-files/etc/board.d/02_network b/target/linux/ath79/generic/base-files/etc/board.d/02_network
+index 4d3296c0af..ee5f4daa7f 100644
+--- a/target/linux/ath79/generic/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/generic/base-files/etc/board.d/02_network
+@@ -297,11 +297,6 @@ ath79_setup_interfaces()
+ 		ucidef_add_switch "switch0" \
+ 			"0@eth0" "1:lan" "2:lan"
+ 		;;
+-	glinet,gl-x300b)
+-		ucidef_set_interface_wan "eth1"
+-		ucidef_add_switch "switch0" \
+-			"0@eth0" "4:lan"
+-		;;
+ 	iodata,etg3-r|\
+ 	iodata,wn-ac1167dgr|\
+ 	iodata,wn-ac1600dgr|\
+diff --git a/target/linux/ath79/image/generic.mk b/target/linux/ath79/image/generic.mk
+index d9aa600410..67cb4d3995 100644
+--- a/target/linux/ath79/image/generic.mk
++++ b/target/linux/ath79/image/generic.mk
+@@ -1342,15 +1342,6 @@ define Device/glinet_gl-usb150
+ endef
+ TARGET_DEVICES += glinet_gl-usb150
+ 
+-define Device/glinet_gl-x300b
+-  SOC := qca9531
+-  DEVICE_VENDOR := GL.iNet
+-  DEVICE_MODEL := GL-X300B
+-  DEVICE_PACKAGES := kmod-usb2
+-  IMAGE_SIZE := 16000k
+-endef
+-TARGET_DEVICES += glinet_gl-x300b
+-
+ define Device/glinet_gl-x750
+   SOC := qca9531
+   DEVICE_VENDOR := GL.iNet
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index 1d086b1918..fc1054f19a 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -153,6 +153,34 @@ define Device/glinet_gl-ar300m-nor
+ endef
+ TARGET_DEVICES += glinet_gl-ar300m-nor
+ 
++define Device/glinet_gl-x300b-common
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-X300B
++  DEVICE_PACKAGES := kmod-usb2 block-mount
++  SUPPORTED_DEVICES += gl-x300b glinet,gl-x300b
++endef
++
++define Device/glinet_gl-x300b-nor
++  $(Device/glinet_gl-x300b-common)
++  DEVICE_VARIANT := NOR
++  IMAGE_SIZE := 16000k
++endef
++TARGET_DEVICES += glinet_gl-x300b-nor
++
++define Device/glinet_gl-x300b-nor-nand
++  $(Device/glinet_gl-x300b-common)
++  DEVICE_VARIANT := NOR/NAND
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-x300b-nor-nand
++
+ define Device/glinet_gl-ar750s-common
+   SOC := qca9563
+   DEVICE_VENDOR := GL.iNet
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index e493298457..a7fb509137 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -18,6 +18,12 @@ glinet,gl-xe300)
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+ 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x10"
+ 	;;
++glinet,gl-x300b-nor|\
++glinet,gl-x300b-nor-nand)
++        ucidef_set_led_netdev "wlan2g" "WLAN2G" "gl-x300b:green:wlan2g" "wlan0"
++        ucidef_set_led_netdev "wan"    "WAN"    "gl-x300b:green:wan"    "eth0"
++        ucidef_set_led_netdev "3gnet"  "3GNET"  "gl-x300b:green:lte"    "3g-wan"
++        ;;
+ netgear,r6100)
+ 	ucidef_set_led_netdev "wan-green" "WAN (green)" "green:wan" "eth1"
+ 	;;
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index b533e5be6c..3f1ae6d7b2 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -65,6 +65,10 @@ ath79_setup_interfaces()
+ 		ucidef_add_switch "switch0" \
+ 			"0@eth0" "1:lan" "2:lan" "3:lan" "4:lan" "5:wan" "6@eth1"
+ 		;;
++	glinet,gl-x300b-nor|\
++	glinet,gl-x300b-nor-nand)
++		ucidef_set_interfaces_lan_wan "eth1" "eth0"
++		;;
+ 	*)
+ 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
+ 		;;
+@@ -88,6 +92,11 @@ ath79_setup_macs()
+ 	netgear,wndr4500-v3)
+ 		wan_mac=$(mtd_get_mac_binary caldata 0x6)
+ 		;;
++	glinet,gl-x300b-nor|\
++	glinet,gl-x300b-nor-nand)
++		wan_mac=$(mtd_get_mac_binary art 0x0)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
+ 	esac
+ 
+ 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
+diff --git a/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration b/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration
+index 281d6ac0bc..0d20953919 100644
+--- a/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration
++++ b/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration
+@@ -6,7 +6,7 @@ board=$(board_name)
+ case "$board" in
+ esac
+ 
+-remove_devicename_leds
++#remove_devicename_leds
+ 
+ migrations_apply system
+ 
+diff --git a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh b/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
+index ea77345b06..b7b6b23b98 100644
+--- a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
+@@ -19,6 +19,7 @@ platform_do_upgrade() {
+ 		glinet_nand_nor_do_upgrade "$1"
+ 		;;
+ 	glinet,gl-ar750s-nor|\
++	glinet,gl-x300b-nor-nand|\
+ 	glinet,gl-ar750s-nor-nand)
+ 		nand_nor_do_upgrade "$1"
+ 		;;
+-- 
+2.17.1
+
