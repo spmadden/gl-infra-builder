@@ -1,0 +1,95 @@
+From 8cd3038363555906d2023eebd0d80b36ab1374a4 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 1 Nov 2022 11:09:27 +0800
+Subject: [PATCH] hostapd: support disable dfs cac dynamically
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ ...-support-disable-dfs-cac-dynamically.patch | 75 +++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+ create mode 100644 package/network/services/hostapd/patches/800-support-disable-dfs-cac-dynamically.patch
+
+diff --git a/package/network/services/hostapd/patches/800-support-disable-dfs-cac-dynamically.patch b/package/network/services/hostapd/patches/800-support-disable-dfs-cac-dynamically.patch
+new file mode 100644
+index 0000000000..a0dde1413a
+--- /dev/null
++++ b/package/network/services/hostapd/patches/800-support-disable-dfs-cac-dynamically.patch
+@@ -0,0 +1,75 @@
++Index: hostapd-2022-01-16-cff80b4f/src/ap/dfs.c
++===================================================================
++--- hostapd-2022-01-16-cff80b4f.orig/src/ap/dfs.c
+++++ hostapd-2022-01-16-cff80b4f/src/ap/dfs.c
++@@ -803,7 +803,10 @@ int hostapd_handle_dfs(struct hostapd_if
++ 		n_chans = dfs_get_used_n_chans(iface, &n_chans1);
++ 
++ 		/* Setup CAC time */
++-		iface->dfs_cac_ms = dfs_get_cac_time(iface, start_chan_idx,
+++		if (iface->interfaces->dfs_cac_disabled)
+++			iface->dfs_cac_ms = 1000;
+++		else
+++			iface->dfs_cac_ms = dfs_get_cac_time(iface, start_chan_idx,
++ 						     n_chans);
++ 
++ 		/* Check if any of configured channels require DFS */
++Index: hostapd-2022-01-16-cff80b4f/src/ap/hostapd.h
++===================================================================
++--- hostapd-2022-01-16-cff80b4f.orig/src/ap/hostapd.h
+++++ hostapd-2022-01-16-cff80b4f/src/ap/hostapd.h
++@@ -82,6 +82,7 @@ struct hapd_interfaces {
++        unsigned char ctrl_iface_cookie[CTRL_IFACE_COOKIE_LEN];
++ #endif /* CONFIG_CTRL_IFACE_UDP */
++ 	struct ubus_object ubus;
+++	bool dfs_cac_disabled;
++ };
++ 
++ enum hostapd_chan_status {
++Index: hostapd-2022-01-16-cff80b4f/src/ap/ubus.c
++===================================================================
++--- hostapd-2022-01-16-cff80b4f.orig/src/ap/ubus.c
+++++ hostapd-2022-01-16-cff80b4f/src/ap/ubus.c
++@@ -765,6 +765,34 @@ hostapd_config_remove(struct ubus_contex
++ 	return UBUS_STATUS_OK;
++ }
++ 
+++enum  {
+++	DFS_CAC_ENABLE_ON,
+++	__DFS_CAC_ENABLE_MAX
+++};
+++
+++static const struct blobmsg_policy dfs_cac_enable_policy[__DFS_CAC_ENABLE_MAX] = {
+++	[DFS_CAC_ENABLE_ON] = { "on", BLOBMSG_TYPE_BOOL },
+++};
+++
+++static int
+++hostapd_dfs_cac_enable(struct ubus_context *ctx, struct ubus_object *obj,
+++		      struct ubus_request_data *req, const char *method,
+++		      struct blob_attr *msg)
+++{
+++	struct hapd_interfaces *interfaces = get_hapd_interfaces_from_object(obj);
+++	struct blob_attr *tb[__DFS_CAC_ENABLE_MAX];
+++	char buf[128];
+++
+++	blobmsg_parse(dfs_cac_enable_policy, __DFS_CAC_ENABLE_MAX, tb, blob_data(msg), blob_len(msg));
+++
+++	if (!tb[DFS_CAC_ENABLE_ON])
+++		return UBUS_STATUS_INVALID_ARGUMENT;
+++	
+++	interfaces->dfs_cac_disabled = !blobmsg_get_bool(tb[DFS_CAC_ENABLE_ON]);
+++
+++	return UBUS_STATUS_OK;
+++}
+++
++ enum {
++ 	CSA_FREQ,
++ 	CSA_BCN_COUNT,
++@@ -1802,6 +1830,7 @@ void hostapd_ubus_remove_vlan(struct hos
++ static const struct ubus_method daemon_methods[] = {
++ 	UBUS_METHOD("config_add", hostapd_config_add, config_add_policy),
++ 	UBUS_METHOD("config_remove", hostapd_config_remove, config_remove_policy),
+++	UBUS_METHOD("dfs_cac_enable", hostapd_dfs_cac_enable, dfs_cac_enable_policy),
++ };
++ 
++ static struct ubus_object_type daemon_object_type =
+-- 
+2.25.1
+
