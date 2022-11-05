@@ -1,0 +1,41 @@
+From 9f05a27f14c05f721d00a0c830b9e65799c8dba6 Mon Sep 17 00:00:00 2001
+From: lincolnzh <hongjian.zhang@gl-inet.com>
+Date: Sat, 5 Nov 2022 16:29:43 +0800
+Subject: [PATCH] ath79 eth support ifname
+
+---
+ .../911-ath79-eth-support-ifname.patch        | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100755 target/linux/ath79/patches-5.10/911-ath79-eth-support-ifname.patch
+
+diff --git a/target/linux/ath79/patches-5.10/911-ath79-eth-support-ifname.patch b/target/linux/ath79/patches-5.10/911-ath79-eth-support-ifname.patch
+new file mode 100755
+index 0000000000..2a4b439200
+--- /dev/null
++++ b/target/linux/ath79/patches-5.10/911-ath79-eth-support-ifname.patch
+@@ -0,0 +1,22 @@
++Index: b/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c
++===================================================================
++--- a/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c	2022-10-25 17:33:05.221293818 +0800
+++++ b/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c	2022-10-31 16:26:34.010031506 +0800
++@@ -1515,6 +1515,7 @@ static int ag71xx_probe(struct platform_
++ 	struct net_device *dev;
++ 	struct resource *res;
++ 	struct ag71xx *ag;
+++	const char *ifname = NULL;
++ 	u32 max_frame_len;
++ 	int tx_size, err;
++ 
++@@ -1732,6 +1733,9 @@ static int ag71xx_probe(struct platform_
++ 		goto err_phy_disconnect;
++ 
++ 	platform_set_drvdata(pdev, dev);
+++	
+++	if(!of_property_read_string(np, "ifname",&ifname))
+++		memcpy(dev->name,ifname,strlen(ifname)+1);
++ 
++ 	err = register_netdev(dev);
++ 	if (err) {
+-- 
+2.17.1
+
