@@ -6,7 +6,7 @@ feeds:
     branch: v4.1.0_mt1300
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 886a4930f6738fca88a23d2042234cebe5ce028d
+    revision: 3736d7437fb9a57014bb779d495aa11700462959
 
 packages:
   - kmod-ipt-offload
@@ -77,6 +77,7 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-tor
   - gl-sdk4-igmp
+  - gl-sdk4-keepcfg
   - gl-sdk4-ui-adminpw
   - gl-sdk4-ui-advanced
   - gl-sdk4-ui-bridge
