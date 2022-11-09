@@ -111,7 +111,9 @@ packages:
   - gl-sdk4-ui-bluetoothsettings
 
 diffconfig: |
+  CONFIG_PACKAGE_kmod-fast-classifier=n
   CONFIG_PACKAGE_kmod-shortcut-fe-cm=n
+  CONFIG_PACKAGE_kmod-shortcut-fe=n
   CONFIG_SIGNATURE_CHECK=n
   CONFIG_PACKAGE_dnsmasq=n
   CONFIG_PACKAGE_wpad-basic=n
