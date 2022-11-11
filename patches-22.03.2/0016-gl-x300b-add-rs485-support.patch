@@ -1,23 +1,23 @@
-From 8e9681d3398013a4a40a20691e33881cc3a734b6 Mon Sep 17 00:00:00 2001
+From acfe10d9101cbdb0d07839b46c4c11bdceb56f07 Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
-Date: Sat, 5 Nov 2022 16:26:03 +0800
-Subject: [PATCH] gl-x300b:add rs485 support
+Date: Fri, 11 Nov 2022 15:35:43 +0800
+Subject: [PATCH] fix glinet rs485 auto txrx
 
 ---
  .../821-fix-glinet-rs485-auto-txrx.patch      | 78 +++++++++++++++++++
  1 file changed, 78 insertions(+)
- create mode 100755 target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch
+ create mode 100644 target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch
 
 diff --git a/target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch b/target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch
-new file mode 100755
-index 0000000000..1250d603d1
+new file mode 100644
+index 0000000000..ffbc50138e
 --- /dev/null
 +++ b/target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch
 @@ -0,0 +1,78 @@
 +Index: b/drivers/tty/serial/8250/8250.h
 +===================================================================
-+--- a/drivers/tty/serial/8250/8250.h	2022-09-28 17:10:41.000000000 +0800
-++++ b/drivers/tty/serial/8250/8250.h	2022-11-01 16:19:35.071881661 +0800
++--- a/drivers/tty/serial/8250/8250.h	2022-11-11 15:32:57.058347175 +0800
+++++ b/drivers/tty/serial/8250/8250.h	2022-11-11 15:32:57.054347212 +0800
 +@@ -13,6 +13,8 @@
 + 
 + #include "../serial_mctrl_gpio.h"
@@ -29,8 +29,8 @@ index 0000000000..1250d603d1
 + 	int (*rx_dma)(struct uart_8250_port *p);
 +Index: b/drivers/tty/serial/8250/8250_of.c
 +===================================================================
-+--- a/drivers/tty/serial/8250/8250_of.c	2022-09-28 17:10:41.000000000 +0800
-++++ b/drivers/tty/serial/8250/8250_of.c	2022-11-01 16:22:38.013543531 +0800
++--- a/drivers/tty/serial/8250/8250_of.c	2022-11-11 15:32:57.058347175 +0800
+++++ b/drivers/tty/serial/8250/8250_of.c	2022-11-11 15:32:57.054347212 +0800
 +@@ -193,6 +193,7 @@ err_pmruntime:
 + /*
 +  * Try to register a serial port
@@ -51,8 +51,8 @@ index 0000000000..1250d603d1
 + 	if (ret < 0)
 +Index: b/drivers/tty/serial/8250/8250_port.c
 +===================================================================
-+--- a/drivers/tty/serial/8250/8250_port.c	2022-09-28 17:10:41.000000000 +0800
-++++ b/drivers/tty/serial/8250/8250_port.c	2022-11-01 16:27:40.125685174 +0800
++--- a/drivers/tty/serial/8250/8250_port.c	2022-11-11 15:32:57.058347175 +0800
+++++ b/drivers/tty/serial/8250/8250_port.c	2022-11-11 15:34:05.781713932 +0800
 +@@ -31,6 +31,7 @@
 + #include <linux/uaccess.h>
 + #include <linux/pm_runtime.h>
@@ -81,17 +81,17 @@ index 0000000000..1250d603d1
 + }
 + 
 + static inline void __stop_tx(struct uart_8250_port *p)
-+@@ -1546,6 +1555,10 @@ static void serial8250_stop_tx(struct ua
-+ 
-+ static inline void __start_tx(struct uart_port *port)
++@@ -1548,6 +1557,10 @@ static inline void __start_tx(struct uar
 + {
++ 	struct uart_8250_port *up = up_to_u8250p(port);
++ 
 ++	if(0xff != rs485txen_gpio){
 ++		gpiod_set_value(gpio_to_desc(rs485txen_gpio),1);
 ++	}
 ++
-+ 	struct uart_8250_port *up = up_to_u8250p(port);
-+ 
 + 	if (up->dma && !up->dma->tx_dma(up))
++ 		return;
++ 
 -- 
 2.17.1
 
