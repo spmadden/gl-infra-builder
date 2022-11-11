@@ -1,0 +1,46 @@
+From 9518363f17ac90cf9f0d101d3becd20f196247c6 Mon Sep 17 00:00:00 2001
+From: lincolnzh <hongjian.zhang@gl-inet.com>
+Date: Fri, 11 Nov 2022 15:19:52 +0800
+Subject: [PATCH] fix led netdev trigger by wwanx
+
+---
+ .../835-fix-led-netdev-trigger-by-wwanx.patch | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+ create mode 100755 target/linux/generic/pending-5.10/835-fix-led-netdev-trigger-by-wwanx.patch
+
+diff --git a/target/linux/generic/pending-5.10/835-fix-led-netdev-trigger-by-wwanx.patch b/target/linux/generic/pending-5.10/835-fix-led-netdev-trigger-by-wwanx.patch
+new file mode 100755
+index 0000000000..79ac4693f2
+--- /dev/null
++++ b/target/linux/generic/pending-5.10/835-fix-led-netdev-trigger-by-wwanx.patch
+@@ -0,0 +1,27 @@
++Index: b/drivers/leds/trigger/ledtrig-netdev.c
++===================================================================
++--- a/drivers/leds/trigger/ledtrig-netdev.c	2022-09-28 17:10:41.000000000 +0800
+++++ b/drivers/leds/trigger/ledtrig-netdev.c	2022-11-09 11:34:47.445351382 +0800
++@@ -109,6 +109,7 @@ static ssize_t device_name_store(struct
++ 				 size_t size)
++ {
++ 	struct led_netdev_data *trigger_data = led_trigger_get_drvdata(dev);
+++	unsigned int flags;
++ 
++ 	if (size >= IFNAMSIZ)
++ 		return -EINVAL;
++@@ -132,10 +133,11 @@ static ssize_t device_name_store(struct
++ 		    dev_get_by_name(&init_net, trigger_data->device_name);
++ 
++ 	clear_bit(NETDEV_LED_MODE_LINKUP, &trigger_data->mode);
++-	if (trigger_data->net_dev != NULL)
++-		if (netif_carrier_ok(trigger_data->net_dev))
+++	if (trigger_data->net_dev != NULL){
+++		flags = dev_get_flags(trigger_data->net_dev);
+++		if (flags & IFF_LOWER_UP)
++ 			set_bit(NETDEV_LED_MODE_LINKUP, &trigger_data->mode);
++-
+++	}
++ 	trigger_data->last_activity = 0;
++ 
++ 	set_baseline_state(trigger_data);
+-- 
+2.17.1
+
