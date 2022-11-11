@@ -3,7 +3,7 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    branch: v4.1.0_s200
+    branch: v4.1.0_x300b
     #revision: 63f18b774dc2b069d2a3cdc2c44189ba62a671fb
 
 packages:
@@ -11,6 +11,7 @@ packages:
   - kmod-usb-ehci
   - kmod-usb-serial
   - kmod-gl-sdk4-hw-info
+  - kmod-gl-hw-wdt
   - kmod-gl-sdk4-tertf
   - wpad-openssl
   - wget-ssl
