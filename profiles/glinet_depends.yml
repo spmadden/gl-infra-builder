@@ -97,6 +97,7 @@ packages:
   - wpad-openssl
   - tor
   - tor-geoip
+  - swconfig
 
 
 
