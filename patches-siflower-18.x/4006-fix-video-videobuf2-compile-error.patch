@@ -1,0 +1,26 @@
+From 090c589d7f58f795d3365515782c59922ba80ff6 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 8 Nov 2022 19:34:33 +0800
+Subject: [PATCH] fix: video-videobuf2 compile error
+
+---
+ openwrt-18.06/package/kernel/linux/modules/video.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/openwrt-18.06/package/kernel/linux/modules/video.mk b/openwrt-18.06/package/kernel/linux/modules/video.mk
+index 7e300bf48..80a29d0c7 100644
+--- a/openwrt-18.06/package/kernel/linux/modules/video.mk
++++ b/openwrt-18.06/package/kernel/linux/modules/video.mk
+@@ -320,7 +320,8 @@ define KernelPackage/video-videobuf2
+ 	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-common.ko@ge4.16 \
+ 	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-v4l2.ko@ge4.16 \
+ 	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-memops.ko@ge4.16 \
+-	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-vmalloc.ko@ge4.16
++	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-vmalloc.ko@ge4.16 \
++	$(LINUX_DIR)/drivers/dma-buf/dma-shared-buffer.ko
+   AUTOLOAD:=$(call AutoLoad,65,videobuf2-core videobuf-v4l2@ge4.4 videobuf2-memops videobuf2-vmalloc)
+   $(call AddDepends/video)
+ endef
+-- 
+2.34.1
+

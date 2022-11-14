@@ -1,0 +1,24 @@
+From 20098384f2ae0d01b9b78004270198e0834a99eb Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Mon, 14 Nov 2022 15:46:27 +0800
+Subject: [PATCH] fix: 5g band set acs_noradar as 1
+
+---
+ openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh b/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+index 4927d576a..8dc299755 100755
+--- a/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
++++ b/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+@@ -164,6 +164,7 @@ detect_mac80211() {
+ 			set wireless.default_radio${devidx}.wps_label=0
+ 
+ EOF
++		[ "$band" == "5g" ] && uci -q set wireless.radio${devidx}.acs_noradar="1"
+ 		uci -q commit wireless
+ 
+ 		devidx=$(($devidx + 1))
+-- 
+2.34.1
+

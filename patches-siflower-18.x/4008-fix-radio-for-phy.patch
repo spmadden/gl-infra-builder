@@ -1,0 +1,26 @@
+From 3dbe2197354ee3bcd75f4ad5c8b2962c76795310 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 8 Nov 2022 19:35:43 +0800
+Subject: [PATCH] fix: radio for phy
+
+---
+ .../package/kernel/mac80211/files/lib/wifi/mac80211.sh         | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh b/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+index 1aa2804dc..e3f7a3564 100755
+--- a/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
++++ b/openwrt-18.06/package/kernel/mac80211/files/lib/wifi/mac80211.sh
+@@ -67,8 +67,7 @@ detect_mac80211() {
+ 		devidx=$(($devidx + 1))
+ 	done
+ 
+-	for _dev in `ls /sys/class/ieee80211/ -r`; do
+-		_dev="/sys/class/ieee80211/$_dev"
++	for _dev in /sys/class/ieee80211/*; do
+ 		[ -e "$_dev" ] || continue
+ 
+ 		dev="${_dev##*/}"
+-- 
+2.34.1
+

@@ -1,0 +1,79 @@
+From 9a92f9df5d80c41d352d5ae91eb99c1a8715f42a Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 8 Nov 2022 18:18:27 +0800
+Subject: [PATCH] fix: ubuntu 21.04 compile error
+
+---
+ .../scripts/dtc/dtc-lexer.lex.c_shipped       |  2 +-
+ openwrt-18.06/include/prereq-build.mk         | 22 +++++++++----------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/linux-4.14.90-dev/linux-4.14.90/scripts/dtc/dtc-lexer.lex.c_shipped b/linux-4.14.90-dev/linux-4.14.90/scripts/dtc/dtc-lexer.lex.c_shipped
+index 64c243772..fa93d2398 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/scripts/dtc/dtc-lexer.lex.c_shipped
++++ b/linux-4.14.90-dev/linux-4.14.90/scripts/dtc/dtc-lexer.lex.c_shipped
+@@ -631,7 +631,7 @@ char *yytext;
+ #include "srcpos.h"
+ #include "dtc-parser.tab.h"
+ 
+-YYLTYPE yylloc;
++extern YYLTYPE yylloc;
+ extern bool treesource_error;
+ 
+ /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
+diff --git a/openwrt-18.06/include/prereq-build.mk b/openwrt-18.06/include/prereq-build.mk
+index f01e2aea5..8e2c85b53 100644
+--- a/openwrt-18.06/include/prereq-build.mk
++++ b/openwrt-18.06/include/prereq-build.mk
+@@ -14,8 +14,8 @@ PKG_NAME:=Build dependency
+ 
+ # Required for the toolchain
+ $(eval $(call TestHostCommand,working-make, \
+-	Please install GNU make v3.81 or later. (This version has bugs), \
+-	$(MAKE) -v | grep -E 'Make (3\.8[1-9]|3\.9[0-9]|[4-9]\.)'))
++	Please install GNU make v4.1 or later., \
++	$(MAKE) -v | grep -E 'Make (4\.[1-9]|[5-9]\.)'))
+ 
+ $(eval $(call TestHostCommand,case-sensitive-fs, \
+ 	OpenWrt can only be built on a case-sensitive filesystem, \
+@@ -24,28 +24,28 @@ $(eval $(call TestHostCommand,case-sensitive-fs, \
+ 
+ $(eval $(call TestHostCommand,proper-umask, \
+ 	Please build with umask 022 - other values produce broken packages, \
+-	umask | grep -xE 00[012][012]))
++	umask | grep -xE 0?0[012][012]))
+ 
+ $(eval $(call SetupHostCommand,gcc, \
+-	Please install the GNU C Compiler (gcc) 4.8 or later, \
+-	$(CC) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
+-	gcc -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
++	Please install the GNU C Compiler (gcc) 6 or later, \
++	$(CC) -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
++	gcc -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
+ 	gcc --version | grep -E 'Apple.(LLVM|clang)' ))
+ 
+ $(eval $(call TestHostCommand,working-gcc, \
+-	\nPlease reinstall the GNU C Compiler (4.8 or later) - \
++	Please reinstall the GNU C Compiler (6 or later) - \
+ 	it appears to be broken, \
+ 	echo 'int main(int argc, char **argv) { return 0; }' | \
+ 		gcc -x c -o $(TMP_DIR)/a.out -))
+ 
+ $(eval $(call SetupHostCommand,g++, \
+-	Please install the GNU C++ Compiler (g++) 4.8 or later, \
+-	$(CXX) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
+-	g++ -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
++	Please install the GNU C++ Compiler (g++) 6 or later, \
++	$(CXX) -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
++	g++ -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
+ 	g++ --version | grep -E 'Apple.(LLVM|clang)' ))
+ 
+ $(eval $(call TestHostCommand,working-g++, \
+-	\nPlease reinstall the GNU C++ Compiler (4.8 or later) - \
++	Please reinstall the GNU C++ Compiler (6 or later) - \
+ 	it appears to be broken, \
+ 	echo 'int main(int argc, char **argv) { return 0; }' | \
+ 		g++ -x c++ -o $(TMP_DIR)/a.out - -lstdc++ && \
+-- 
+2.34.1
+
