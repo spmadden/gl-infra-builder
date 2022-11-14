@@ -2,4 +2,4 @@
 profile: glinet_gl-s1300-emmc
 target: ipq40xx
 subtarget: generic
-description: Build image for the GL.iNET S1300
+description: Build image for the GL.iNET S1300 EMMC

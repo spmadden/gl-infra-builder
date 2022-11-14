@@ -1,0 +1,580 @@
+From 0f5e588f06413a5d1d23d092376c8f7000a1b47a Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Wed, 2 Nov 2022 23:47:24 +0800
+Subject: [PATCH] ipq40xx add support for gl-s1300-emmc
+
+---
+ .../ipq40xx/base-files/etc/board.d/01_leds    |   8 +-
+ .../ipq40xx/base-files/etc/board.d/02_network |   9 +
+ .../base-files/lib/upgrade/platform.sh        |   2 +
+ .../boot/dts/qcom-ipq4029-gl-s1300-emmc.dts   | 412 ++++++++++++++++++
+ target/linux/ipq40xx/image/generic.mk         |  29 ++
+ .../901-arm-boot-add-dts-files.patch          |   3 +-
+ 6 files changed, 461 insertions(+), 2 deletions(-)
+ create mode 100644 target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts
+
+diff --git a/target/linux/ipq40xx/base-files/etc/board.d/01_leds b/target/linux/ipq40xx/base-files/etc/board.d/01_leds
+index 0e473534f5..d8e69da700 100644
+--- a/target/linux/ipq40xx/base-files/etc/board.d/01_leds
++++ b/target/linux/ipq40xx/base-files/etc/board.d/01_leds
+@@ -28,10 +28,15 @@ avm,fritzbox-4040)
+ 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x1e"
+ 	;;
+ avm,fritzbox-7530 |\
+-glinet,gl-b1300 |\
+ mikrotik,lhgg-60ad)
+ 	ucidef_set_led_wlan "wlan" "WLAN" "green:wlan" "phy0tpt"
+ 	;;
++glinet,gl-s1300 |\
++glinet,gl-s1300-emmc |\
++glinet,gl-b1300)
++	ucidef_set_led_default "power" "POWER" "green:power" "1"
++	ucidef_set_led_wlan "wlan" "WLAN" "green:wlan" "phy0tpt"
++	;;
+ edgecore,oap100)
+ 	ucidef_set_led_wlan "wlan2g" "WLAN2G" "blue:wlan2g" "phy0tpt"
+ 	ucidef_set_led_wlan "wlan5g" "WLAN5G" "blue:wlan5g" "phy1tpt"
+@@ -53,6 +58,7 @@ engenius,ens620ext)
+ 	ucidef_set_led_netdev "lan2" "LAN2" "green:lan2" "eth1"
+ 	;;
+ glinet,gl-ap1300)
++	ucidef_set_led_default "power" "POWER" "green:power" "1"
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+ 	;;
+ mikrotik,cap-ac)
+diff --git a/target/linux/ipq40xx/base-files/etc/board.d/02_network b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+index 2aa4886e6a..53a5f3f4cf 100644
+--- a/target/linux/ipq40xx/base-files/etc/board.d/02_network
++++ b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+@@ -110,6 +110,7 @@ ipq40xx_setup_interfaces()
+ 		;;
+ 	glinet,gl-ap1300 |\
+ 	glinet,gl-b1300 |\
++	glinet,gl-s1300-emmc |\
+ 	glinet,gl-s1300)
+ 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
+ 		ucidef_add_switch "switch0" \
+@@ -216,6 +217,14 @@ ipq40xx_setup_macs()
+ 		lan_mac=$(cat /sys/firmware/mikrotik/hard_config/mac_base)
+ 		label_mac="$lan_mac"
+ 		;;
++	glinet,gl-s1300-emmc|\
++	glinet,gl-s1300|\
++	glinet,gl-b1300|\
++	glinet,gl-ap1300|\
++	glinet,gl-a1300)
++		wan_mac=$(mtd_get_mac_binary ART 0)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
+ 	esac
+ 
+ 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
+diff --git a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
+index e8c94409a7..856a793e19 100644
+--- a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
+@@ -119,6 +119,7 @@ platform_do_upgrade() {
+ 	qxwlan,e2600ac-c2)
+ 		nand_do_upgrade "$1"
+ 		;;
++	glinet,gl-s1300-emmc |\
+ 	glinet,gl-b2200)
+ 		CI_KERNPART="0:HLOS"
+ 		CI_ROOTPART="rootfs"
+@@ -200,6 +201,7 @@ platform_do_upgrade() {
+ 
+ platform_copy_config() {
+ 	case "$(board_name)" in
++	glinet,gl-s1300-emmc |\
+ 	glinet,gl-b2200)
+ 		emmc_copy_config
+ 		;;
+diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts
+new file mode 100644
+index 0000000000..1ba67cdea0
+--- /dev/null
++++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts
+@@ -0,0 +1,412 @@
++// SPDX-License-Identifier: GPL-2.0-only OR MIT
++
++#include "qcom-ipq4019.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/soc/qcom,tcsr.h>
++
++/ {
++	model = "GL.iNet GL-S1300-EMMC";
++	compatible = "glinet,gl-s1300-emmc";
++
++	aliases {
++		led-boot = &led_power;
++		led-failsafe = &led_power;
++		led-running = &led_power;
++		led-upgrade = &led_power;
++	};
++
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "s1300";
++		wan = "eth1";
++		lan = "eth0";
++		usb-port = "1-1,2-1";
++		flash_size = <512>;
++		reset-button = "gpio-18";
++		radio = "radio0";
++		factory_data {
++			device_mac = "ART", "0x0";
++			device_ddns = "ART", "0x10";
++			device_sn_bak = "ART", "0x20";
++			device_sn = "ART", "0x30";
++			country_code = "ART", "0x88";
++		};
++	};
++
++	memory {
++		device_type = "memory";
++		reg = <0x80000000 0x10000000>;
++	};
++
++	chosen {
++		bootargs-append = " root=/dev/mmcblk0p2 rw rootwait clk_ignore_unused";
++	};
++
++	soc {
++		rng@22000 {
++			status = "okay";
++		};
++
++		mdio@90000 {
++			status = "okay";
++		};
++
++		ess-psgmii@98000 {
++			status = "okay";
++		};
++
++		tcsr@1949000 {
++			compatible = "qcom,tcsr";
++			reg = <0x1949000 0x100>;
++			qcom,wifi_glb_cfg = <TCSR_WIFI_GLB_CFG>;
++		};
++
++		tcsr@194b000 {
++			/* select hostmode */
++			compatible = "qcom,tcsr";
++			reg = <0x194b000 0x100>;
++			qcom,usb-hsphy-mode-select = <TCSR_USB_HSPHY_HOST_MODE>;
++			status = "okay";
++		};
++
++		ess_tcsr@1953000 {
++			compatible = "qcom,tcsr";
++			reg = <0x1953000 0x1000>;
++			qcom,ess-interface-select = <TCSR_ESS_PSGMII>;
++		};
++
++		tcsr@1957000 {
++			compatible = "qcom,tcsr";
++			reg = <0x1957000 0x100>;
++			qcom,wifi_noc_memtype_m0_m2 = <TCSR_WIFI_NOC_MEMTYPE_M0_M2>;
++		};
++
++		usb2@60f8800 {
++			status = "okay";
++		};
++
++		usb3@8af8800 {
++			status = "okay";
++		};
++
++		crypto@8e3a000 {
++			status = "okay";
++		};
++
++		watchdog@b017000 {
++			status = "okay";
++		};
++
++		ess-switch@c000000 {
++			status = "okay";
++			switch_lan_bmp = <0x18>;
++			switch_wan_bmp = <0x20>;
++		};
++
++		edma@c080000 {
++			status = "okay";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++
++		wps {
++			label = "wps";
++			gpios = <&tlmm 53 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_WPS_BUTTON>;
++		};
++
++		reset {
++			label = "reset";
++			gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_RESTART>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led_power: power {
++			label = "green:power";
++			gpios = <&tlmm 57 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++
++		mesh {
++			label = "green:mesh";
++			gpios = <&tlmm 59 GPIO_ACTIVE_HIGH>;
++		};
++
++		wlan {
++			label = "green:wlan";
++			gpios = <&tlmm 60 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "phy0tpt";
++		};
++	};
++
++	gpio_export {
++		compatible = "gpio-export";
++
++		usb {
++			gpio-export,name = "usb_power";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 35 GPIO_ACTIVE_HIGH>;
++		};
++
++		zb_rst {
++			gpio-export,name = "zb_rst";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 49 GPIO_ACTIVE_LOW>;
++		};
++
++		ble_rst {
++			gpio-export,name = "ble_rst";
++			gpio-export,output = <1>;
++			gpios = <&tlmm 48 GPIO_ACTIVE_LOW>;
++		};
++	};
++};
++
++&vqmmc {
++	status = "okay";
++};
++
++&sdhci {
++	status = "okay";
++	pinctrl-0 = <&sd_pins>;
++	pinctrl-names = "default";
++	cd-gpios = <&tlmm 22 GPIO_ACTIVE_LOW>;
++	vqmmc-supply = <&vqmmc>;
++};
++
++&blsp_dma {
++	status = "okay";
++};
++
++&cryptobam {
++	status = "okay";
++};
++
++&blsp1_spi1 {
++	pinctrl-0 = <&spi_0_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++	cs-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>;
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <24000000>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			SBL1@0 {
++				label = "SBL1";
++				reg = <0x0 0x40000>;
++				read-only;
++			};
++
++			MIBIB@40000 {
++				label = "MIBIB";
++				reg = <0x40000 0x20000>;
++				read-only;
++			};
++
++			QSEE@60000 {
++				label = "QSEE";
++				reg = <0x60000 0x60000>;
++				read-only;
++			};
++
++			CDT@c0000 {
++				label = "CDT";
++				reg = <0xc0000 0x10000>;
++				read-only;
++			};
++
++			DDRPARAMS@d0000 {
++				label = "DDRPARAMS";
++				reg = <0xd0000 0x10000>;
++				read-only;
++			};
++
++			APPSBLENV@e0000 {
++				label = "APPSBLENV";
++				reg = <0xe0000 0x10000>;
++				read-only;
++			};
++
++			APPSBL@f0000 {
++				label = "APPSBL";
++				reg = <0xf0000 0x80000>;
++				read-only;
++			};
++
++			ART@170000 {
++				label = "ART";
++				reg = <0x170000 0x10000>;
++				read-only;
++				compatible = "nvmem-cells";
++				#address-cells = <1>;
++				#size-cells = <1>;
++
++				precal_art_1000: precal@1000 {
++					reg = <0x1000 0x2f20>;
++				};
++
++				precal_art_5000: precal@5000 {
++					reg = <0x5000 0x2f20>;
++				};
++			};
++		};
++	};
++};
++
++&blsp1_spi2 {
++	pinctrl-0 = <&spi_1_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	spidev1: spi@0 {
++		compatible = "siliconlabs,si3210";
++		reg = <0>;
++		spi-max-frequency = <24000000>;
++	};
++};
++
++&blsp1_uart1 {
++	pinctrl-0 = <&serial_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++};
++
++&blsp1_uart2 {
++	pinctrl-0 = <&serial_1_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++};
++
++&tlmm {
++	serial_pins: serial_pinmux {
++		mux {
++			pins = "gpio16", "gpio17";
++			function = "blsp_uart0";
++			bias-disable;
++		};
++	};
++
++	serial_1_pins: serial1_pinmux {
++		mux {
++			pins = "gpio8", "gpio9",
++				"gpio10", "gpio11";
++			function = "blsp_uart1";
++			bias-disable;
++		};
++	};
++
++	spi_0_pins: spi_0_pinmux {
++		pinmux {
++			function = "blsp_spi0";
++			pins = "gpio13", "gpio14", "gpio15";
++		};
++		pinmux_cs {
++			function = "gpio";
++			pins = "gpio12";
++		};
++		pinconf {
++			pins = "gpio13", "gpio14", "gpio15";
++			drive-strength = <12>;
++			bias-disable;
++		};
++		pinconf_cs {
++			pins = "gpio12";
++			drive-strength = <2>;
++			bias-disable;
++			output-high;
++		};
++	};
++
++	spi_1_pins: spi_1_pinmux {
++		mux {
++			pins = "gpio44", "gpio46", "gpio47";
++			function = "blsp_spi1";
++			bias-disable;
++		};
++		host_int {
++			pins = "gpio42";
++			function = "gpio";
++			input;
++		};
++		cs {
++			pins = "gpio45";
++			function = "gpio";
++			bias-pull-up;
++		};
++		wake {
++			pins = "gpio40";
++			function = "gpio";
++			output-high;
++		};
++		reset {
++			pins = "gpio49";
++			function = "gpio";
++			output-high;
++		};
++	};
++
++	sd_pins: sd_pins {
++		pinmux {
++			function = "sdio";
++			pins = "gpio23", "gpio24", "gpio25", "gpio26",
++				"gpio28", "gpio29", "gpio30", "gpio31";
++			drive-strength = <10>;
++		};
++
++		pinmux_sd_clk {
++			function = "sdio";
++			pins = "gpio27";
++			drive-strength = <16>;
++		};
++
++		pinmux_sd7 {
++			function = "sdio";
++			pins = "gpio32";
++			drive-strength = <10>;
++			bias-disable;
++		};
++	};
++};
++
++&usb2_hs_phy {
++	status = "okay";
++};
++
++&usb3_hs_phy {
++	status = "okay";
++};
++
++&usb3_ss_phy {
++	status = "okay";
++};
++
++&wifi0 {
++	status = "okay";
++	nvmem-cell-names = "pre-calibration";
++	nvmem-cells = <&precal_art_1000>;
++	qcom,ath10k-calibration-variant = "GL-S1300-EMMC";
++};
++
++&wifi1 {
++	status = "okay";
++	nvmem-cell-names = "pre-calibration";
++	nvmem-cells = <&precal_art_5000>;
++	qcom,ath10k-calibration-variant = "GL-S1300-EMMC";
++};
+diff --git a/target/linux/ipq40xx/image/generic.mk b/target/linux/ipq40xx/image/generic.mk
+index cf89409b17..3201c89a3d 100644
+--- a/target/linux/ipq40xx/image/generic.mk
++++ b/target/linux/ipq40xx/image/generic.mk
+@@ -106,6 +106,17 @@ define Build/qsdk-ipq-app-gpt
+ 	rm $@.tmp
+ endef
+ 
++define Build/qsdk-ipq-app-gpt2
++	cp $@ $@.tmp 2>/dev/null || true
++	ptgen -g -o $@.tmp -a 1 -l 1 \
++			-t 0x2e -N 0:HLOS -r -p 32M \
++			-t 0x83 -N rootfs -r -p 128M \
++				-N rootfs_data -p 512M \
++				-N user_data -p 6774M
++	cat $@.tmp >> $@
++	rm $@.tmp
++endef
++
+ define Build/SenaoFW
+ 	-$(STAGING_DIR_HOST)/bin/mksenaofw \
+ 		-n $(BOARD_NAME) -r $(VENDOR_ID) -p $(1) \
+@@ -587,6 +598,24 @@ define Device/glinet_gl-b2200
+ endef
+ TARGET_DEVICES += glinet_gl-b2200
+ 
++define Device/glinet_gl-s1300-emmc
++	$(call Device/FitzImage)
++	DEVICE_VENDOR := GL.iNet
++	DEVICE_MODEL := GL-S1300-EMMC
++	SOC := qcom-ipq4029
++	DEVICE_DTS_CONFIG := config@ap.dk04.1-c1
++	KERNEL_INITRAMFS_SUFFIX := -recovery.itb
++	IMAGES := emmc.img sysupgrade.bin
++	IMAGE/emmc.img := qsdk-ipq-app-gpt2 |\
++		pad-to 17k | append-kernel |\
++		pad-to 32785k | append-rootfs |\
++		append-gl-metadata
++	IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++	DEVICE_PACKAGES := ipq-wifi-glinet_gl-s1300 \
++		kmod-fs-ext4 kmod-mmc kmod-spi-dev mkf2fs e2fsprogs kmod-fs-f2fs
++endef
++TARGET_DEVICES += glinet_gl-s1300-emmc
++
+ define Device/glinet_gl-s1300
+ 	$(call Device/FitzImage)
+ 	DEVICE_VENDOR := GL.iNet
+diff --git a/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch b/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch
+index 4fc0566c73..5add3c7bf0 100644
+--- a/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch
++++ b/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch
+@@ -10,7 +10,7 @@ Signed-off-by: John Crispin <john@phrozen.org>
+ 
+ --- a/arch/arm/boot/dts/Makefile
+ +++ b/arch/arm/boot/dts/Makefile
+-@@ -904,11 +904,75 @@ dtb-$(CONFIG_ARCH_QCOM) += \
++@@ -904,11 +904,76 @@ dtb-$(CONFIG_ARCH_QCOM) += \
+  	qcom-apq8074-dragonboard.dtb \
+  	qcom-apq8084-ifc6540.dtb \
+  	qcom-apq8084-mtp.dtb \
+@@ -82,6 +82,7 @@ Signed-off-by: John Crispin <john@phrozen.org>
+ +	qcom-ipq4029-gl-b1300.dtb \
+ +	qcom-ipq4019-gl-b2200.dtb \
+ +	qcom-ipq4029-gl-s1300.dtb \
+++	qcom-ipq4029-gl-s1300-emmc.dtb \
+ +	qcom-ipq4029-mr33.dtb \
+  	qcom-ipq8064-ap148.dtb \
+  	qcom-ipq8064-rb3011.dtb \
+-- 
+2.25.1
+

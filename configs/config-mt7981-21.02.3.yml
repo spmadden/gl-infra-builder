@@ -1,8 +1,0 @@
-repo: https://github.com/openwrt/openwrt.git
-branch: v21.02.3
-git_clone_dir: mt7981/
-openwrt_root_dir: mt7981/
-revision: 42a15ca378e1bc52f125f894d748c31ce3c52903
-
-patch_folders:
-  - patches-mt7981-21.02.3
