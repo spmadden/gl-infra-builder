@@ -1,0 +1,138 @@
+From b1035d96a30c32f6e4ff758c6b938bad69dc755b Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 15 Nov 2022 15:37:38 +0800
+Subject: [PATCH] fix: support sysupgrade T command
+
+---
+ openwrt-18.06/include/image-commands.mk       | 18 +++--
+ .../files/usr/libexec/validate_firmware_image | 66 +++++++++++++++++++
+ .../target/linux/siflower/image/nand.mk       |  1 +
+ 3 files changed, 80 insertions(+), 5 deletions(-)
+ create mode 100755 openwrt-18.06/package/base-files/files/usr/libexec/validate_firmware_image
+
+diff --git a/openwrt-18.06/include/image-commands.mk b/openwrt-18.06/include/image-commands.mk
+index 4fbc74a9a..072cf89d3 100644
+--- a/openwrt-18.06/include/image-commands.mk
++++ b/openwrt-18.06/include/image-commands.mk
+@@ -339,21 +339,29 @@ endif
+ 
+ metadata_gl_json = \
+ 	'{ $(if $(IMAGE_METADATA),$(IMAGE_METADATA)$(comma)) \
+-		"metadata_version": "1.0", \
+-		"supported_devices":[$(supported_devices)], \
++		"metadata_version": "1.1", \
++		"compat_version": "$(call json_quote,$(compat_version))", \
++		$(if $(DEVICE_COMPAT_MESSAGE),"compat_message": "$(call json_quote,$(DEVICE_COMPAT_MESSAGE))"$(comma)) \
++		"supported_devices": [$(call metadata_devices,$(SUPPORTED_DEVICES))]$(comma) \
+ 		"version": { \
+-			"release": "$(release)", \
++			"release": "$(shell cat $(TOPDIR)/release)", \
+ 			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
+ 			"dist": "$(call json_quote,$(VERSION_DIST))", \
+ 			"version": "$(call json_quote,$(VERSION_NUMBER))", \
+ 			"revision": "$(call json_quote,$(REVISION))", \
+ 			"target": "$(call json_quote,$(TARGETID))", \
+-			"board": "$(metadate_board)" \
+-		} \
++			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
++		}, \
++		"upgrade_control":"$(shell python3 $(TOPDIR)/make_gl_metadata.py)", \
++		"release_note":"$(shell sed ':a;N;s/\n/\\n/g;s/\r/\\r/g;ta' $(TOPDIR)/gl_release_note)" \
+ 	}'
+ 
+ define Build/append-gl-metadata
+ 	echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@
++	[ ! -s "$(BUILD_KEY)" -o ! -s "$@" ] || { \
++		usign -S -m "$@" -s "$(BUILD_KEY)" -x "$@.sig" ;\
++		fwtool -S "$@.sig" "$@" ;\
++	}
+ endef
+ 
+ define Build/append-metadata
+diff --git a/openwrt-18.06/package/base-files/files/usr/libexec/validate_firmware_image b/openwrt-18.06/package/base-files/files/usr/libexec/validate_firmware_image
+new file mode 100755
+index 000000000..4732707e7
+--- /dev/null
++++ b/openwrt-18.06/package/base-files/files/usr/libexec/validate_firmware_image
+@@ -0,0 +1,66 @@
++#!/bin/sh
++
++. /lib/functions.sh
++. /lib/functions/system.sh
++. /usr/share/libubox/jshn.sh
++
++include /lib/upgrade
++
++VALID=1
++FORCEABLE=1
++ALLOW_BACKUP=1
++
++# Mark image as invalid but still possible to install
++notify_firmware_invalid() {
++        VALID=0
++}
++
++# Mark image as broken (impossible to install)
++notify_firmware_broken() {
++        VALID=0
++        FORCEABLE=0
++}
++
++# Mark image as incompatible with preserving a backup
++notify_firmware_no_backup() {
++        ALLOW_BACKUP=0
++}
++
++# Add result of validation test
++notify_firmware_test_result() {
++        local old_ns
++
++        json_set_namespace validate_firmware_image old_ns
++        json_add_boolean "$1" "$2"
++        json_set_namespace $old_ns
++}
++
++err_to_bool() {
++        [ "$1" -ne 0 ] && echo 0 || echo 1
++}
++
++fwtool_check_signature "$1" >&2
++FWTOOL_SIGNATURE=$?
++[ "$FWTOOL_SIGNATURE" -ne 0 ] && notify_firmware_invalid
++
++fwtool_check_image "$1" >&2
++FWTOOL_DEVICE_MATCH=$?
++[ "$FWTOOL_DEVICE_MATCH" -ne 0 ] && notify_firmware_invalid
++
++json_set_namespace validate_firmware_image old_ns
++json_init
++        json_add_object "tests"
++                json_add_boolean fwtool_signature "$(err_to_bool $FWTOOL_SIGNATURE)"
++                json_add_boolean fwtool_device_match "$(err_to_bool $FWTOOL_DEVICE_MATCH)"
++
++                # Call platform_check_image() here so it can add its test
++                # results and still mark image properly.
++                json_set_namespace $old_ns
++                platform_check_image "$1" >&2 || notify_firmware_invalid
++                json_set_namespace validate_firmware_image old_ns
++        json_close_object
++        json_add_boolean valid "$VALID"
++        json_add_boolean forceable "$FORCEABLE"
++        json_add_boolean allow_backup "$ALLOW_BACKUP"
++json_dump -i
++json_set_namespace $old_ns
+diff --git a/openwrt-18.06/target/linux/siflower/image/nand.mk b/openwrt-18.06/target/linux/siflower/image/nand.mk
+index e7ae4764c..5da6f2c18 100644
+--- a/openwrt-18.06/target/linux/siflower/image/nand.mk
++++ b/openwrt-18.06/target/linux/siflower/image/nand.mk
+@@ -5,6 +5,7 @@ define Device/glinet_gl-sft1200
+   BLOCKSIZE := 128k
+   PAGESIZE := 2048
+   VID_HDR_OFFSET := 2048
++  SUPPORTED_DEVICES := glinet,gl-sft1200
+   IMAGES += factory.img sysupgrade.tar
+   IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+   IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
+-- 
+2.34.1
+
