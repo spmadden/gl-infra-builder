@@ -61,7 +61,7 @@ index 0eaa1ce37..9608336c4 100644
 -		label = "BTN_0";
 -		linux,code = <0x100>; //BTN_0
 +		label = "switch";
-+		linux,code = <KEY_SETUP>;
++		linux,code = <141>;
  		gpios = <&gpio 1 1>;
  		poll-interval = <10>;
  		debounce-interval = <20>;
