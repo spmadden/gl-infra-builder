@@ -9,7 +9,7 @@ feeds:
     revision: 3736d7437fb9a57014bb779d495aa11700462959
   - name: gl_feed_1806
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 51ff30e61f2927e8c14da5b44b9f0e9e1eba8bb0
+    revision: 1316311f43c7c30ad9b4173a5af0f5e492e28f03
 
 packages:
   - kmod-ipt-offload
