@@ -72,6 +72,46 @@ $ ls -l /usr/bin/python3*
  make -j5
 ```
 
+2. Compile AXT1800(2022.11.23)
+```
+ git clone https://github.com/gl-inet/gl-infra-builder.git
+```
+```
+ cd gl-infra-builder
+```
+```
+ python3 setup.py -c configs/config-wlan-ap.yml
+```
+```
+ cd wlan-ap/openwrt
+```
+```
+ ./scripts/gen_config.py target_wlan_ap-gl-axt1800 luci
+```
+```
+ make -j5
+```
+
+3. Compile SFT1200(2022.11.23)
+```
+ git clone https://github.com/gl-inet/gl-infra-builder.git
+```
+```
+ cd gl-infra-builder
+```
+```
+ python3 setup.py -c config-siflower-18.x.yml
+```
+```
+ cd openwrt-18.06/siflower/openwrt-18.06
+```
+```
+ ./scripts/gen_config.py target_siflower_gl-sft1200
+```
+```
+ make -j5
+```
+
 ### Note
 1. If you gcc version is 10, you will encounter some error, like this:
 ```
