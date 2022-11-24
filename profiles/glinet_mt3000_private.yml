@@ -3,5 +3,5 @@ description: Add the glinet mt3000 private package
 feeds:
   - name: glinet
     uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: b0342cc109f1434d0eb97315f51cdc8bc818d902
+    revision: 089a8ca1ef684d50796a7449097f4fc7b529203e
 
