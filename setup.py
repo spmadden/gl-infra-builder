@@ -200,6 +200,8 @@ def remove_feeds():
             os.system('rm feeds -fr')
         if Path("package/feeds").exists():
             os.system('rm package/feeds -fr')
+        if Path("dl").exists():
+            os.system('rm -r dl')
         print("### Remove feeds done")
     except:
         print("### Remove feeds failed")

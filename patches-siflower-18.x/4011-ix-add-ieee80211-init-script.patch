@@ -1,0 +1,30 @@
+From 629375434d0c1f41db5f62155667a23503ccdea5 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Wed, 9 Nov 2022 12:08:07 +0800
+Subject: [PATCH] fix: add ieee80211 init script
+
+---
+ .../package/base-files/files/etc/init.d/ieee80211     | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100755 openwrt-18.06/package/base-files/files/etc/init.d/ieee80211
+
+diff --git a/openwrt-18.06/package/base-files/files/etc/init.d/ieee80211 b/openwrt-18.06/package/base-files/files/etc/init.d/ieee80211
+new file mode 100755
+index 000000000..dfb0999fe
+--- /dev/null
++++ b/openwrt-18.06/package/base-files/files/etc/init.d/ieee80211
+@@ -0,0 +1,11 @@
++#!/bin/sh /etc/rc.common
++# Copyright (C) 2008 OpenWrt.org
++
++START=50
++
++start() {
++	for phy in `ls /sys/class/ieee80211`
++	do
++		env -i ACTION="add" DEVICENAME="$phy" sh /etc/hotplug.d/ieee80211/99-gl-detect
++	done
++}
+-- 
+2.34.1
+

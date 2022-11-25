@@ -1,0 +1,24 @@
+From 09c603fb217deada0bf50b1e08d3bc88860645c1 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Mon, 14 Nov 2022 19:48:28 +0800
+Subject: [PATCH] fix: switch button execute etc rc.button switch
+
+---
+ openwrt-18.06/package/kernel/button-hotplug/src/button-hotplug.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/openwrt-18.06/package/kernel/button-hotplug/src/button-hotplug.c b/openwrt-18.06/package/kernel/button-hotplug/src/button-hotplug.c
+index 5294a9700..e038702cc 100644
+--- a/openwrt-18.06/package/kernel/button-hotplug/src/button-hotplug.c
++++ b/openwrt-18.06/package/kernel/button-hotplug/src/button-hotplug.c
+@@ -88,6 +88,7 @@ static struct bh_map button_map[] = {
+ 	BH_MAP(KEY_RFKILL,	"rfkill"),
+ 	BH_MAP(KEY_WPS_BUTTON,	"wps"),
+ 	BH_MAP(KEY_WIMAX,	"wwan"),
++	BH_MAP(KEY_SETUP,	"switch"),
+ };
+ 
+ /* -------------------------------------------------------------------------*/
+-- 
+2.34.1
+

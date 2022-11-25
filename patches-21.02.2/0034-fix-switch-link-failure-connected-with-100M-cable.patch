@@ -1,0 +1,37 @@
+From c3a07b20739a9c10906a8c49b2c09ed0c1f8e57e Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Wed, 16 Nov 2022 19:00:24 +0800
+Subject: [PATCH] fix switch link failure connected with 100M cable
+
+---
+ .../linux/ipq40xx/files/drivers/net/phy/ar40xx.c   | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/target/linux/ipq40xx/files/drivers/net/phy/ar40xx.c b/target/linux/ipq40xx/files/drivers/net/phy/ar40xx.c
+index ca7f0ca350..84ddcf155d 100644
+--- a/target/linux/ipq40xx/files/drivers/net/phy/ar40xx.c
++++ b/target/linux/ipq40xx/files/drivers/net/phy/ar40xx.c
+@@ -1408,20 +1408,6 @@ ar40xx_sw_mac_polling_task(struct ar40xx_priv *priv)
+ 					 */
+ 					usleep_range(100, 200);
+ 
+-					if (speed == AR40XX_PORT_SPEED_100M) {
+-						u16 phy_val = 0;
+-						/* Enable @100M, if down to 10M
+-						 * clock will change smoothly
+-						 */
+-						ar40xx_phy_dbg_read(priv, i-1,
+-								    0,
+-								    &phy_val);
+-						phy_val |=
+-							AR40XX_PHY_MANU_CTRL_EN;
+-						ar40xx_phy_dbg_write(priv, i-1,
+-								     0,
+-								     phy_val);
+-					}
+ 					priv->ar40xx_port_old_link[i] = link;
+ 				}
+ 			}
+-- 
+2.25.1
+

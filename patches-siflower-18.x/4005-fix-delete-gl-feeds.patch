@@ -1,0 +1,23 @@
+From c09d1f5f672fa6cc32104970f82e33fd0a9bc68b Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 8 Nov 2022 18:36:13 +0800
+Subject: [PATCH] fix: delete gl feeds
+
+---
+ openwrt-18.06/feeds.conf.default | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/openwrt-18.06/feeds.conf.default b/openwrt-18.06/feeds.conf.default
+index 3bb472ea2..311ab4abb 100644
+--- a/openwrt-18.06/feeds.conf.default
++++ b/openwrt-18.06/feeds.conf.default
+@@ -1,5 +1,4 @@
+-src-git gl https://github.com/gl-inet/gl-feeds.git;18.06
+-src-git packages https://git.openwrt.org/feed/packages.git^35e0b737ab496f5b51e80079b0d8c9b442e223f5
++src-git packages https://git.openwrt.org/feed/packages.git^1236ebb5051bcb4151d62c20fa001a1dc5178dde
+ src-git luci https://git.openwrt.org/project/luci.git^f64b1523447547032d5280fb0bcdde570f2ca913
+ src-git routing https://git.openwrt.org/feed/routing.git^1b9d1c419f0ecefda51922a7845ab2183d6acd76
+ src-git telephony https://git.openwrt.org/feed/telephony.git^b9d7b321d15a44c5abb9e5d43a4ec78abfd9031b
+-- 
+2.34.1
+

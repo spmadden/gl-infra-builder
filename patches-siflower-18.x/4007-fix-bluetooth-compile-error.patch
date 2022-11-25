@@ -1,0 +1,30 @@
+From af6a15cbf4867600c08664871688f1ce6ff8258a Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 8 Nov 2022 19:33:37 +0800
+Subject: [PATCH] fix: bluetooth compile error
+
+---
+ openwrt-18.06/package/kernel/linux/modules/other.mk | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/openwrt-18.06/package/kernel/linux/modules/other.mk b/openwrt-18.06/package/kernel/linux/modules/other.mk
+index c52140504..7c6bf73cd 100644
+--- a/openwrt-18.06/package/kernel/linux/modules/other.mk
++++ b/openwrt-18.06/package/kernel/linux/modules/other.mk
+@@ -52,12 +52,7 @@ define KernelPackage/bluetooth
+ 	$(LINUX_DIR)/net/bluetooth/rfcomm/rfcomm.ko \
+ 	$(LINUX_DIR)/net/bluetooth/bnep/bnep.ko \
+ 	$(LINUX_DIR)/net/bluetooth/hidp/hidp.ko \
+-	$(LINUX_DIR)/drivers/bluetooth/hci_uart.ko \
+-	$(LINUX_DIR)/drivers/bluetooth/btusb.ko
+-ifeq ($(strip $(call CompareKernelPatchVer,$(KERNEL_PATCHVER),ge,4.1.0)),1)
+-  FILES+= \
+-	$(LINUX_DIR)/drivers/bluetooth/btintel.ko
+-endif
++	$(LINUX_DIR)/drivers/bluetooth/hci_uart.ko
+   AUTOLOAD:=$(call AutoProbe,bluetooth rfcomm bnep hidp hci_uart btusb)
+ endef
+ 
+-- 
+2.34.1
+

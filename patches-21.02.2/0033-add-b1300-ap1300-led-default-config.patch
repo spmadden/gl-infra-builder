@@ -1,0 +1,35 @@
+From 8868c1904242dcfef2079ebd1a8f2d7b87450024 Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Mon, 14 Nov 2022 22:18:09 +0800
+Subject: [PATCH] add b1300 ap1300 led default config
+
+---
+ target/linux/ipq40xx/base-files/etc/board.d/01_leds | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/target/linux/ipq40xx/base-files/etc/board.d/01_leds b/target/linux/ipq40xx/base-files/etc/board.d/01_leds
+index ac11655904..ed54960a36 100755
+--- a/target/linux/ipq40xx/base-files/etc/board.d/01_leds
++++ b/target/linux/ipq40xx/base-files/etc/board.d/01_leds
+@@ -22,10 +22,17 @@ avm,fritzbox-4040)
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+ 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x1e"
+ 	;;
+-avm,fritzbox-7530 |\
++avm,fritzbox-7530)
++	ucidef_set_led_wlan "wlan" "WLAN" "green:wlan" "phy0tpt"
++	;;
+ glinet,gl-b1300)
++	ucidef_set_led_default "power" "POWER" "green:power" "1"
+ 	ucidef_set_led_wlan "wlan" "WLAN" "green:wlan" "phy0tpt"
+ 	;;
++glinet,gl-ap1300)
++	ucidef_set_led_default "power" "POWER" "green:power" "1"
++	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
++	;;
+ edgecore,oap100)
+ 	ucidef_set_led_wlan "wlan2g" "WLAN2G" "blue:wlan2g" "phy0tpt"
+ 	ucidef_set_led_wlan "wlan5g" "WLAN5G" "blue:wlan5g" "phy1tpt"
+-- 
+2.25.1
+

@@ -1,3 +1,4 @@
+
 # Under development, please do not use
 
 ## Requirements
@@ -33,60 +34,92 @@ $ ls -l /usr/bin/python3*
 
 ### Quickstart
 
-1. Clone repository.
+1. Run `git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder` to clone repository
 
-```
-$ git clone https://github.com/gl-inet/gl-infra-builder.git
-```
+2. Run `ls configs -hl` to list the openwrt verizon
 
-```
-$ cd gl-infra-builder
-```
+3. Chose your want version, for example, if you want to use openwrt-19.07.8, Run `python3 setup.py -c configs/config-19.07.8.yml` to download openwrt-19.07.8 source code
 
-2. If you have a [offline dl folder](https://sources.openwrt.org/) and corresponding packages, you can make a symlink to feeds/dl (assuming the dl location is /data/dl), it will make compilation easier. If there is no dl and corresponding packages, ignore this command.
+4. Run `cd openwrt-19.07/openwrt-19.07.8/` to enter openwrt-19.07.8 directory
 
-```
-$ ln -sf /data/dl feeds/
-```
+5. Run `./scripts/gen_config.py list` to get target_xxx and glinet_xxx files. target_xxx is you want to compile products, don't modify. glinet_xxx is you want to add/delete packages, you can modify. Those files in the **profiles** directory.
 
-3. Setup, the command will auto download openwrt-19.07.7 by default and auto config, and then patch all the the GL product Patches
+6. Run `./scripts/gen_config.py <target_profile> <function_profile>` to chose the product target and add some packages. <target_profile> is you want to compile products. <function_profile> is you want to add/delete packages. 
 
-```
-$ python3 setup.py
-$ cd openwrt-19.07/openwrt-19.07.7/
-```
+7. For example, If you want to compile GL-AR150 product and add luci, you can run `./scripts/gen_config.py target_ath79_gl-ar150 luci`. You can run `make menuconfig` to chose other packages
 
-Note: If you want to use different branch, please use the -c parameter, for example. If you want to use 18.06
+8. Run `make` to build your firmware.
 
+   
+### Example
+1. Compile MT2500(2022.11.22)
 ```
-$ python3 setup.py -c config-18.x.yml
-$ cd openwrt-18.06
+ git clone https://github.com/gl-inet/gl-infra-builder.git
 ```
-
-4. Generate your target configuration. (For the following content, we will continue to take 19.07 as an example)
-
 ```
-$ ./scripts/gen_config.py list		# show available profile
-$ ./scripts/gen_config.py <target_profile> <function_profile>
+ cd gl-infra-builder
 ```
-Note: excute ./scripts/gen_config.py list command, you can get Target Profiles and Function Profiles. Target Profiles is you want to compile products, don't modify. Function Profiles is you want to add/delete packages, you can modify. Those files in the **profiles** directory.
-
-For example, If you want to compile GL-AR150 product you can use command:
 ```
-$ ./scripts/gen_config.py target_ar71xx_gl-ar150
+ python3 setup.py -c  configs/config-mt798x-7.6.6.1.yml
+```
+```
+ cd mt7981
+```
+```
+ ./scripts/gen_config.py target_mt7981_gl-mt2500 luci
+```
+```
+ make -j5
 ```
 
-If you want to compile GL-AR150 product and add some packages, you can excute **make menuconfig** to chose the product and other packages.
+2. Compile AXT1800(2022.11.23)
+```
+ git clone https://github.com/gl-inet/gl-infra-builder.git
+```
+```
+ cd gl-infra-builder
+```
+```
+ python3 setup.py -c configs/config-wlan-ap.yml
+```
+```
+ cd wlan-ap/openwrt
+```
+```
+ ./scripts/gen_config.py target_wlan_ap-gl-axt1800 luci
+```
+```
+ make -j5
+```
 
-5. Run `make` to build your firmware.
+3. Compile SFT1200(2022.11.23)
+```
+ git clone https://github.com/gl-inet/gl-infra-builder.git
+```
+```
+ cd gl-infra-builder
+```
+```
+ python3 setup.py -c config-siflower-18.x.yml
+```
+```
+ cd openwrt-18.06/siflower/openwrt-18.06
+```
+```
+ ./scripts/gen_config.py target_siflower_gl-sft1200
+```
+```
+ make -j5
+```
 
-Note: If you gcc version is 10, you will encounter some error, like this:
+### Note
+1. If you gcc version is 10, you will encounter some error, like this:
 ```
 /usr/bin/ld: scripts/dtc/dtc-parser.tab.o:(.bss+0x10): multiple definition of `yylloc'; scripts/dtc/dtc-lexer.lex.o:(.bss+0x0): first defined here
 collect2: error：ld returned 1 exit status.
 ```
 You should execute the following command to reduce the gcc version:
 ```
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
-update-alternatives --config gcc
+$ update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+$ update-alternatives --config gcc
 ```

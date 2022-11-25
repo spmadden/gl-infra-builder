@@ -1,0 +1,228 @@
+From 5775362e4b7974e010b9779ad614f213f1292b45 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 8 Nov 2022 18:21:39 +0800
+Subject: [PATCH] fix: update cmake to 3.19.1
+
+---
+ openwrt-18.06/tools/cmake/Makefile            | 11 +++---
+ .../cmake/patches/100-disable_qt_tests.patch  | 34 -------------------
+ .../tools/cmake/patches/100-no-testing.patch  | 33 ++++++++++++++++++
+ .../110-libarchive-fix-libressl-compat.patch  | 11 ------
+ .../120-curl-fix-libressl-linking.patch       |  8 ++---
+ .../130-bootstrap_parallel_make_flag.patch    |  8 ++---
+ .../patches/140-libarchive-fix-libressl.patch | 25 --------------
+ 7 files changed, 48 insertions(+), 82 deletions(-)
+ delete mode 100644 openwrt-18.06/tools/cmake/patches/100-disable_qt_tests.patch
+ create mode 100644 openwrt-18.06/tools/cmake/patches/100-no-testing.patch
+ delete mode 100644 openwrt-18.06/tools/cmake/patches/110-libarchive-fix-libressl-compat.patch
+ delete mode 100644 openwrt-18.06/tools/cmake/patches/140-libarchive-fix-libressl.patch
+
+diff --git a/openwrt-18.06/tools/cmake/Makefile b/openwrt-18.06/tools/cmake/Makefile
+index 087411013..006934466 100644
+--- a/openwrt-18.06/tools/cmake/Makefile
++++ b/openwrt-18.06/tools/cmake/Makefile
+@@ -7,13 +7,14 @@
+ include $(TOPDIR)/rules.mk
+ 
+ PKG_NAME:=cmake
+-PKG_VERSION:=3.12.4
++PKG_VERSION:=3.19.1
++PKG_RELEASE:=1
+ PKG_CPE_ID:=cpe:/a:kitware:cmake
+ 
+ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+-PKG_SOURCE_URL:=https://cmake.org/files/v3.12/ \
+-		https://fossies.org/linux/misc/
+-PKG_HASH:=5255584bfd043eb717562cff8942d472f1c0e4679c4941d84baadaa9b28e3194
++PKG_SOURCE_URL:=https://github.com/Kitware/CMake/releases/download/v$(PKG_VERSION)/ \
++		https://cmake.org/files/v3.19/
++PKG_HASH:=1d266ea3a76ef650cdcf16c782a317cb4a7aa461617ee941e389cb48738a3aba
+ 
+ HOST_BUILD_PARALLEL:=1
+ HOST_CONFIGURE_PARALLEL:=1
+@@ -21,6 +22,8 @@ HOST_CONFIGURE_PARALLEL:=1
+ include $(INCLUDE_DIR)/host-build.mk
+ 
+ HOST_CONFIGURE_VARS += \
++	CC="$(HOSTCC_NOCACHE)" \
++	CXX="$(HOSTCXX_NOCACHE)" \
+ 	MAKEFLAGS="$(HOST_JOBS)" \
+ 	CXXFLAGS="$(HOST_CFLAGS)"
+ 
+diff --git a/openwrt-18.06/tools/cmake/patches/100-disable_qt_tests.patch b/openwrt-18.06/tools/cmake/patches/100-disable_qt_tests.patch
+deleted file mode 100644
+index a354e1cac..000000000
+--- a/openwrt-18.06/tools/cmake/patches/100-disable_qt_tests.patch
++++ /dev/null
+@@ -1,34 +0,0 @@
+---- a/Tests/RunCMake/CMakeLists.txt
+-+++ b/Tests/RunCMake/CMakeLists.txt
+-@@ -290,15 +290,6 @@ add_RunCMake_test(no_install_prefix)
+- add_RunCMake_test(configure_file)
+- add_RunCMake_test(CTestTimeoutAfterMatch)
+- 
+--find_package(Qt4 QUIET)
+--find_package(Qt5Core QUIET)
+--if (QT4_FOUND AND Qt5Core_FOUND AND NOT Qt5Core_VERSION VERSION_LESS 5.1.0)
+--  add_RunCMake_test(IncompatibleQt)
+--endif()
+--if (QT4_FOUND)
+--  add_RunCMake_test(ObsoleteQtMacros -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
+--endif()
+--
+- find_package(PkgConfig QUIET)
+- if(PKG_CONFIG_FOUND)
+-   add_RunCMake_test(FindPkgConfig)
+---- a/Tests/CMakeLists.txt
+-+++ b/Tests/CMakeLists.txt
+-@@ -435,13 +435,6 @@ if(BUILD_TESTING)
+- 
+-   list(APPEND TEST_BUILD_DIRS ${CMake_TEST_INSTALL_PREFIX})
+- 
+--  if(NOT DEFINED CMake_TEST_Qt4)
+--    set(CMake_TEST_Qt4 1)
+--  endif()
+--  if(CMake_TEST_Qt4 AND NOT QT4_FOUND)
+--    find_package(Qt4 QUIET)
+--  endif()
+--
+-   if(CMake_TEST_Qt4 AND QT4_FOUND)
+-     # test whether the Qt4 which has been found works, on some machines
+-     # which run nightly builds there were errors like "wrong file format"
+diff --git a/openwrt-18.06/tools/cmake/patches/100-no-testing.patch b/openwrt-18.06/tools/cmake/patches/100-no-testing.patch
+new file mode 100644
+index 000000000..44452ce39
+--- /dev/null
++++ b/openwrt-18.06/tools/cmake/patches/100-no-testing.patch
+@@ -0,0 +1,33 @@
++--- a/Modules/CTest.cmake
+++++ b/Modules/CTest.cmake
++@@ -47,7 +47,7 @@ the :variable:`CTEST_USE_LAUNCHERS` vari
++ in the ``CTestConfig.cmake`` file.
++ #]=======================================================================]
++ 
++-option(BUILD_TESTING "Build the testing tree." ON)
+++option(BUILD_TESTING "Build the testing tree." OFF)
++ 
++ # function to turn generator name into a version string
++ # like vs9 or vs10
++--- a/Modules/Dart.cmake
+++++ b/Modules/Dart.cmake
++@@ -33,7 +33,7 @@ whether testing support should be enable
++ #
++ #
++ 
++-option(BUILD_TESTING "Build the testing tree." ON)
+++option(BUILD_TESTING "Build the testing tree." OFF)
++ 
++ if(BUILD_TESTING)
++   find_package(Dart QUIET)
++--- a/Tests/Contracts/VTK/Dashboard.cmake.in
+++++ b/Tests/Contracts/VTK/Dashboard.cmake.in
++@@ -25,7 +25,7 @@ ctest_empty_binary_directory(${CTEST_BIN
++ 
++ file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
++   VTK_BUILD_EXAMPLES:BOOL=ON
++-  VTK_BUILD_TESTING:STRING=WANT
+++  VTK_BUILD_TESTING:STRING=OFF
++   VTK_WRAP_PYTHON:BOOL=ON
++   ExternalData_OBJECT_STORES:FILEPATH=@base_dir@/ExternalData
++ ")
+diff --git a/openwrt-18.06/tools/cmake/patches/110-libarchive-fix-libressl-compat.patch b/openwrt-18.06/tools/cmake/patches/110-libarchive-fix-libressl-compat.patch
+deleted file mode 100644
+index ba6565b6a..000000000
+--- a/openwrt-18.06/tools/cmake/patches/110-libarchive-fix-libressl-compat.patch
++++ /dev/null
+@@ -1,11 +0,0 @@
+---- a/Utilities/cmlibarchive/libarchive/archive_openssl_evp_private.h
+-+++ b/Utilities/cmlibarchive/libarchive/archive_openssl_evp_private.h
+-@@ -28,7 +28,7 @@
+- #include <openssl/evp.h>
+- #include <openssl/opensslv.h>
+- 
+--#if OPENSSL_VERSION_NUMBER < 0x10100000L
+-+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+- #include <stdlib.h> /* malloc, free */
+- #include <string.h> /* memset */
+- static inline EVP_MD_CTX *EVP_MD_CTX_new(void)
+diff --git a/openwrt-18.06/tools/cmake/patches/120-curl-fix-libressl-linking.patch b/openwrt-18.06/tools/cmake/patches/120-curl-fix-libressl-linking.patch
+index 20c5052cc..1095a4f8a 100644
+--- a/openwrt-18.06/tools/cmake/patches/120-curl-fix-libressl-linking.patch
++++ b/openwrt-18.06/tools/cmake/patches/120-curl-fix-libressl-linking.patch
+@@ -20,10 +20,10 @@ Signed-off-by: Jo-Philipp Wich <jo@mein.io>
+ ---
+ --- a/Utilities/cmcurl/CMakeLists.txt
+ +++ b/Utilities/cmcurl/CMakeLists.txt
+-@@ -452,6 +452,14 @@ if(CMAKE_USE_OPENSSL)
++@@ -508,6 +508,14 @@ if(CMAKE_USE_OPENSSL)
++   endif()
++   set(SSL_ENABLED ON)
+    set(USE_OPENSSL ON)
+-   set(HAVE_LIBCRYPTO ON)
+-   set(HAVE_LIBSSL ON)
+ +  check_library_exists("rt" clock_gettime "" HAVE_LIBRT)
+ +  if(HAVE_LIBRT)
+ +    list(APPEND OPENSSL_LIBRARIES rt)
+@@ -34,4 +34,4 @@ Signed-off-by: Jo-Philipp Wich <jo@mein.io>
+ +  endif()
+    list(APPEND CURL_LIBS ${OPENSSL_LIBRARIES})
+    include_directories(${OPENSSL_INCLUDE_DIR})
+-   set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
++ 
+diff --git a/openwrt-18.06/tools/cmake/patches/130-bootstrap_parallel_make_flag.patch b/openwrt-18.06/tools/cmake/patches/130-bootstrap_parallel_make_flag.patch
+index 375bc5d97..512765c5a 100644
+--- a/openwrt-18.06/tools/cmake/patches/130-bootstrap_parallel_make_flag.patch
++++ b/openwrt-18.06/tools/cmake/patches/130-bootstrap_parallel_make_flag.patch
+@@ -1,14 +1,14 @@
+ --- a/bootstrap
+ +++ b/bootstrap
+-@@ -1163,7 +1163,10 @@ int main(){ printf("1%c", (char)0x0a); r
++@@ -1397,7 +1397,10 @@ int main(){ printf("1%c", (char)0x0a); r
+  ' > "test.c"
+  cmake_original_make_flags="${cmake_make_flags}"
+- if [ "x${cmake_parallel_make}" != "x" ]; then
++ if test "x${cmake_parallel_make}" != "x"; then
+ -  cmake_make_flags="${cmake_make_flags} -j ${cmake_parallel_make}"
+-+  case "$cmake_paralle_make" in
+++  case "$cmake_parallel_make" in
+ +    [0-9]*) cmake_parallel_make="-j ${cmake_parallel_make}";;
+ +  esac
+ +  cmake_make_flags="${cmake_make_flags} ${cmake_parallel_make}"
+  fi
+  for a in ${cmake_make_processors}; do
+-   if [ -z "${cmake_make_processor}" ] && cmake_try_make "${a}" "${cmake_make_flags}" >> ../cmake_bootstrap.log 2>&1; then
++   if test -z "${cmake_make_processor}" && cmake_try_make "${a}" "${cmake_make_flags}" >> ../cmake_bootstrap.log 2>&1; then
+diff --git a/openwrt-18.06/tools/cmake/patches/140-libarchive-fix-libressl.patch b/openwrt-18.06/tools/cmake/patches/140-libarchive-fix-libressl.patch
+deleted file mode 100644
+index ddddc5e83..000000000
+--- a/openwrt-18.06/tools/cmake/patches/140-libarchive-fix-libressl.patch
++++ /dev/null
+@@ -1,25 +0,0 @@
+-From 5da00ad75b09e262774ec3675bbe4d5a4502a852 Mon Sep 17 00:00:00 2001
+-From: Bernard Spil <brnrd@FreeBSD.org>
+-Date: Sun, 1 Apr 2018 23:01:44 +0200
+-Subject: [PATCH] fix build with LibreSSL 2.7
+-
+-LibreSSL 2.7 adds OpenSSL 1.1 API leading to conflicts on method names
+-
+-See also: https://bugs.freebsd.org/226853
+-Signed-off-by: Bernard Spil <brnrd@FreeBSD.org>
+----
+- libarchive/archive_openssl_hmac_private.h | 3 ++-
+- 1 file changed, 2 insertions(+), 1 deletion(-)
+-
+---- a/Utilities/cmlibarchive/libarchive/archive_openssl_evp_private.h
+-+++ b/Utilities/cmlibarchive/libarchive/archive_openssl_evp_private.h
+-@@ -28,7 +28,8 @@
+- #include <openssl/evp.h>
+- #include <openssl/opensslv.h>
+- 
+--#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+-+#if OPENSSL_VERSION_NUMBER < 0x10100000L || \
+-+	(defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000L)
+- #include <stdlib.h> /* malloc, free */
+- #include <string.h> /* memset */
+- static inline EVP_MD_CTX *EVP_MD_CTX_new(void)
+-- 
+2.34.1
+

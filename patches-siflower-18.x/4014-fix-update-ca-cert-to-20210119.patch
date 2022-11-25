@@ -1,0 +1,67 @@
+From c99d0a152e5b34a6dda4d5660d08bd7b0be1fdec Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Mon, 14 Nov 2022 11:58:14 +0800
+Subject: [PATCH] fix: update ca-cert to 20210119
+
+---
+ .../package/system/ca-certificates/Makefile   | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/openwrt-18.06/package/system/ca-certificates/Makefile b/openwrt-18.06/package/system/ca-certificates/Makefile
+index e1c6d41ba..2b5f96b20 100644
+--- a/openwrt-18.06/package/system/ca-certificates/Makefile
++++ b/openwrt-18.06/package/system/ca-certificates/Makefile
+@@ -7,15 +7,13 @@
+ include $(TOPDIR)/rules.mk
+ 
+ PKG_NAME:=ca-certificates
+-PKG_VERSION:=20180409
+-PKG_RELEASE:=3
++PKG_VERSION:=20210119
++PKG_RELEASE:=1
+ PKG_MAINTAINER:=
+ 
+ PKG_SOURCE:=$(PKG_NAME)_$(PKG_VERSION).tar.xz
+ PKG_SOURCE_URL:=http://ftp.debian.org/debian/pool/main/c/ca-certificates
+-PKG_HASH:=7af6f5bfc619fd29cbf0258c1d95107c38ce840ad6274e343e1e0d971fc72b51
+-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+-
++PKG_HASH:=daa3afae563711c30a0586ddae4336e8e3974c2b627faaca404c4e0141b64665
+ PKG_INSTALL:=1
+ 
+ include $(INCLUDE_DIR)/package.mk
+@@ -25,6 +23,7 @@ define Package/ca-certificates
+   CATEGORY:=Base system
+   TITLE:=System CA certificates
+   PKGARCH:=all
++  PROVIDES:=ca-certs
+ endef
+ 
+ define Package/ca-bundle
+@@ -32,8 +31,16 @@ define Package/ca-bundle
+   CATEGORY:=Base system
+   TITLE:=System CA certificates as a bundle
+   PKGARCH:=all
++  PROVIDES:=ca-certs
++endef
++
++define Build/Prepare
++	$(DECOMPRESS_CMD) $(HOST_TAR) -C $(PKG_BUILD_DIR) $(TAR_OPTIONS)
++	$(Build/Patch)
+ endef
+ 
++MAKE_PATH := work
++
+ define Build/Install
+ 	mkdir -p \
+ 		$(PKG_INSTALL_DIR)/usr/sbin \
+@@ -60,5 +67,5 @@ define Package/ca-bundle/install
+ 	cat $(PKG_INSTALL_DIR)/usr/share/ca-certificates/*/*.crt >$(1)/etc/ssl/certs/ca-certificates.crt
+ 	$(LN) /etc/ssl/certs/ca-certificates.crt $(1)/etc/ssl/cert.pem
+ endef
+-$(eval $(call BuildPackage,ca-certificates))
+ $(eval $(call BuildPackage,ca-bundle))
++$(eval $(call BuildPackage,ca-certificates))
+-- 
+2.34.1
+

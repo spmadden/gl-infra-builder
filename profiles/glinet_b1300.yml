@@ -5,7 +5,7 @@ feeds:
     #path: ../feeds_dir/glinet
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 16afb012c8309522ac92c059b47062dbfd64f818
+    revision: ec21225b66ea8cc06165bb504824d8acb0e7ead5
 
 packages:
   - kmod-usb-storage

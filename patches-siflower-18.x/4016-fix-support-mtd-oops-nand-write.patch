@@ -1,0 +1,24 @@
+From ad7fb0421e358a99518afb9f2f00cc786f43cef5 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Mon, 14 Nov 2022 12:21:12 +0800
+Subject: [PATCH] fix: support mtd oops nand write
+
+---
+ .../linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c           | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c
+index 338c75b7d..1b6c4c4ea 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c
++++ b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/spi_nand_core.c
+@@ -1079,6 +1079,7 @@ static int spinand_init(struct spinand_device *spinand)
+ 	mtd->_read = spinand_mtd_compat_read;
+ 	mtd->_write_oob = spinand_mtd_write;
+ 	mtd->_write = spinand_mtd_compat_write;
++	mtd->_panic_write = spinand_mtd_compat_write;
+ 	mtd->_block_isbad = spinand_mtd_block_isbad;
+ 	mtd->_block_markbad = spinand_mtd_block_markbad;
+ 	mtd->_block_isreserved = spinand_mtd_block_isreserved;
+-- 
+2.34.1
+

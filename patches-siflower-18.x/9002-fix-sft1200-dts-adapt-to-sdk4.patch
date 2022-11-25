@@ -1,0 +1,70 @@
+From a0f055ab3bb8328a5572d7287907fec9ccd5c1ae Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Mon, 14 Nov 2022 15:37:55 +0800
+Subject: [PATCH] fix: sft1200 dts adapt to sdk4
+
+---
+ .../siflower/sf19a28_fullmask_gl_sft1200.dts  | 33 +++++++++++++++++--
+ 1 file changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts b/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts
+index 0eaa1ce37..9608336c4 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts
++++ b/linux-4.14.90-dev/linux-4.14.90/arch/mips/boot/dts/siflower/sf19a28_fullmask_gl_sft1200.dts
+@@ -11,6 +11,28 @@
+ 	//bootargs: chosen {
+ 	//	bootargs = " ubi.mtd=5 rootfstype=ubifs root=/dev/mtd5";
+ 	//};
++
++gl_hw: gl_hw {
++        compatible = "gl-hw-info";
++        #address-cells = <1>;
++        #size-cells = <1>;
++        model = "sft1200";
++        wan = "eth0.2";
++        lan = "eth0.1";
++        reset-button = "gpio-27";
++        usb-port = "1-1";
++        switch-button = "gpio-1";
++        flash_size = <128>;
++        radio = "radio0";
++        nowds = "1";
++        factory_data {
++            device_mac = "factory", "0x400";
++            device_ddns = "factory", "0x410";
++            device_sn_bak = "factory", "0x420";
++            device_sn = "factory", "0x430";
++            country_code = "factory", "0x440";
++        };
++    };
+ };
+ 
+ &gmac {
+@@ -65,7 +87,12 @@
+ 
+ 		partition@c0000 {
+ 			label = "firmware";
+-			reg = <0xc0000 0x7f400000>; /* 768k-128M */
++			reg = <0xc0000 0x7d40000>; /* 768k-125M */
++		};
++
++		partition@7c00000 {
++			label = "log";
++			reg = <0x7e00000 0x40000>; /* 125M-(125M+256k) */
+ 		};
+ 
+ 	};
+@@ -118,8 +145,8 @@
+ 	};
+ 	
+ 	switch@1 {
+-		label = "BTN_0";
+-		linux,code = <0x100>; //BTN_0
++		label = "switch";
++		linux,code = <141>;
+ 		gpios = <&gpio 1 1>;
+ 		poll-interval = <10>;
+ 		debounce-interval = <20>;
+-- 
+2.34.1
+

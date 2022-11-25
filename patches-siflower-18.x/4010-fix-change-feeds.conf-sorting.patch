@@ -1,0 +1,38 @@
+From a92b114df90f4608df8e0f2a5b8d2a10e872deee Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Wed, 9 Nov 2022 10:38:28 +0800
+Subject: [PATCH] fix: change feeds.conf sorting
+
+---
+ openwrt-18.06/scripts/feeds | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/openwrt-18.06/scripts/feeds b/openwrt-18.06/scripts/feeds
+index 46c5f5cb9..de7595751 100755
+--- a/openwrt-18.06/scripts/feeds
++++ b/openwrt-18.06/scripts/feeds
+@@ -894,10 +894,6 @@ sub setup {
+ 
+ 	open(my $fd, ">>feeds.conf");
+ 
+-	if ($opts{b}) {
+-		printf $fd "src-include defaults feeds.conf.default\n";
+-	}
+-
+ 	while (my $entry = shift @ARGV) {
+ 		my ($type, $name, $src) = split /,/, $entry;
+ 
+@@ -915,6 +911,10 @@ sub setup {
+ 		printf $fd "%s %s %s\n", $type, $name, $src;
+ 	}
+ 
++	if ($opts{b}) {
++		printf $fd "src-include defaults feeds.conf.default\n";
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.34.1
+

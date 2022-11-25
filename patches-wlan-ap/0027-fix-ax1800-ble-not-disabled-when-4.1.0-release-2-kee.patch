@@ -1,0 +1,34 @@
+From cfd044f39ffa8d82e9e08cc477063c3c07e146c3 Mon Sep 17 00:00:00 2001
+From: Dongming Han <handongming@gl-inet.com>
+Date: Tue, 15 Nov 2022 15:17:20 +0800
+Subject: [PATCH] fix ax1800 ble not disabled when 4.1.0 release 2 keepsetting
+
+---
+ .../etc/uci-defaults/14_fix_ble_keepsetting        | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100755 feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_ble_keepsetting
+
+diff --git a/feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_ble_keepsetting b/feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_ble_keepsetting
+new file mode 100755
+index 00000000..c9b221b2
+--- /dev/null
++++ b/feeds/ipq807x/ipq807x/base-files/etc/uci-defaults/14_fix_ble_keepsetting
+@@ -0,0 +1,14 @@
++#!/bin/sh
++
++. /lib/functions.sh
++board=$(board_name)
++
++if [ "$board" = "glinet,ax1800" ]; then
++	pwd=`cat /etc/shadow | grep 'root:$1$*'`
++	if [ -n "$pwd" ];then
++		if [ -f /usr/sbin/ble_config_wifi ]; then
++			uci set glconfig.general.blueconfig='1'
++			uci commit glconfig
++		fi
++	fi
++fi
+\ No newline at end of file
+-- 
+2.25.1
+

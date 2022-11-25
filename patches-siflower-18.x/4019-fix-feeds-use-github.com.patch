@@ -1,0 +1,25 @@
+From deb76130ee942f22ef5b32b193be8f645c1c6e69 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Mon, 21 Nov 2022 16:33:27 +0800
+Subject: [PATCH] fix: feeds use github.com
+
+---
+ openwrt-18.06/feeds.conf.default | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/openwrt-18.06/feeds.conf.default b/openwrt-18.06/feeds.conf.default
+index 311ab4abb..204798765 100644
+--- a/openwrt-18.06/feeds.conf.default
++++ b/openwrt-18.06/feeds.conf.default
+@@ -1,4 +1,4 @@
+-src-git packages https://git.openwrt.org/feed/packages.git^1236ebb5051bcb4151d62c20fa001a1dc5178dde
+-src-git luci https://git.openwrt.org/project/luci.git^f64b1523447547032d5280fb0bcdde570f2ca913
+-src-git routing https://git.openwrt.org/feed/routing.git^1b9d1c419f0ecefda51922a7845ab2183d6acd76
+-src-git telephony https://git.openwrt.org/feed/telephony.git^b9d7b321d15a44c5abb9e5d43a4ec78abfd9031b
++src-git packages https://github.com/openwrt/packages.git^1236ebb5051bcb4151d62c20fa001a1dc5178dde
++src-git luci https://github.com/openwrt/luci.git^f64b1523447547032d5280fb0bcdde570f2ca913
++src-git routing https://github.com/openwrt/routing.git^1b9d1c419f0ecefda51922a7845ab2183d6acd76
++src-git telephony https://github.com/openwrt/telephony.git^b9d7b321d15a44c5abb9e5d43a4ec78abfd9031b
+-- 
+2.34.1
+
