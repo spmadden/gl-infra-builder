@@ -50,6 +50,7 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-tor
   - gl-sdk4-mwan3
+  - gl-sdk4-zerotier
   - gl-sdk4-cloud-batch-manage
   - kmod-gl-sdk4-parental-control
 
@@ -91,6 +92,8 @@ packages:
   - gl-sdk4-ui-hwnat
   - gl-sdk4-ui-torview
   - gl-sdk4-ui-multiwan
+  - gl-sdk4-ui-parentalcontrol
+  - gl-sdk4-ui-zerotierview
 
 
 diffconfig: |
