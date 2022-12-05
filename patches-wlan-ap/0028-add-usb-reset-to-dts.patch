@@ -1,0 +1,24 @@
+From 355f73d78def0d32b12c0f535b5919ad81d2274c Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Thu, 24 Nov 2022 09:30:57 +0800
+Subject: [PATCH] add usb-reset to dts
+
+---
+ .../files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi   | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
+index 6cad60c9..f8ffd6f2 100644
+--- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
++++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
+@@ -47,6 +47,7 @@
+ 		wan = "eth0";
+ 		reset-button = "gpio-50";
+ 		usb-port = "1-1";
++		usb-reset = "usb_power,1";
+ 		flash_size = <128>;
+ 		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
+ 		radio = "radio0";
+-- 
+2.34.1
+
