@@ -1,0 +1,24 @@
+From 67e05cf16a0c562c85cb61de3d849ad7b370229f Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Mon, 5 Dec 2022 10:11:47 +0800
+Subject: [PATCH] fix: dnsmasq mount /tmp/resolv.conf.xxx
+
+---
+ package/network/services/dnsmasq/files/dnsmasq.init | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/network/services/dnsmasq/files/dnsmasq.init b/package/network/services/dnsmasq/files/dnsmasq.init
+index c4ca3eb2db..618f101835 100755
+--- a/package/network/services/dnsmasq/files/dnsmasq.init
++++ b/package/network/services/dnsmasq/files/dnsmasq.init
+@@ -1173,6 +1173,7 @@ dnsmasq_start()
+ 	procd_add_jail_mount $EXTRA_MOUNT $RFC6761FILE $TRUSTANCHORSFILE
+ 	procd_add_jail_mount $dnsmasqconffile $dnsmasqconfdir $resolvdir $user_dhcpscript
+ 	procd_add_jail_mount /etc/passwd /etc/group /etc/TZ /etc/hosts /etc/ethers
++	procd_add_jail_mount /tmp/resolv.conf.vpn /tmp/resolv.conf.auto /tmp/resolv.conf.wg /tmp/resolv.conf.ovpn
+ 	procd_add_jail_mount_rw /var/run/dnsmasq/ $leasefile
+ 	case "$logfacility" in */*)
+ 		[ ! -e "$logfacility" ] && touch "$logfacility"
+-- 
+2.34.1
+
