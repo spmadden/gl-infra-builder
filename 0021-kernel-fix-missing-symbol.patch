@@ -1,0 +1,33 @@
+From 774baafb7b625a680a08c375f380e524caff0e45 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 6 Dec 2022 12:04:41 +0800
+Subject: [PATCH] kernel: fix missing symbol
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ target/linux/generic/config-4.4 | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/target/linux/generic/config-4.4 b/target/linux/generic/config-4.4
+index 4e7602f236..a321548eea 100644
+--- a/target/linux/generic/config-4.4
++++ b/target/linux/generic/config-4.4
+@@ -630,6 +630,7 @@ CONFIG_CC_STACKPROTECTOR_NONE=y
+ # CONFIG_CIFS_DEBUG2 is not set
+ # CONFIG_CIFS_FSCACHE is not set
+ # CONFIG_CIFS_NFSD_EXPORT is not set
++# CONFIG_NFSD_PNFS is not set
+ CONFIG_CIFS_POSIX=y
+ # CONFIG_CIFS_SMB2 is not set
+ CONFIG_CIFS_STATS=y
+@@ -955,6 +956,7 @@ CONFIG_DOUBLEFAULT=y
+ CONFIG_DQL=y
+ # CONFIG_DRAGONRISE_FF is not set
+ # CONFIG_DRM is not set
++# CONFIG_DM_REQ_CRYPT is not set
+ # CONFIG_DS1682 is not set
+ # CONFIG_DTLK is not set
+ # CONFIG_DUMMY is not set
+-- 
+2.25.1
+
