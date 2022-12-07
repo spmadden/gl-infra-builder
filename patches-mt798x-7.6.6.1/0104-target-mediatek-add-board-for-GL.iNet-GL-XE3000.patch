@@ -94,12 +94,6 @@ index 0000000..6606681
 +			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 +		};
 +
-+		thread_reset {
-+			gpio-export,name = "thread_reset";
-+			gpio-export,output = <1>;
-+			gpios = <&pio 26 GPIO_ACTIVE_HIGH>;
-+		};
-+
 +		fan_power {
 +			gpio-export,name = "fan_power";
 +			gpio-export,output = <1>;
