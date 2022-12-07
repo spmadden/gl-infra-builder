@@ -1,22 +1,22 @@
-From a88732dc78e16e8816818c0ca48a99863e2a4ed3 Mon Sep 17 00:00:00 2001
+From bbc2ac592cc38cdb52d3671513154a14d908aaa4 Mon Sep 17 00:00:00 2001
 From: Li Zhang <li.zhang@gl-inet.com>
 Date: Tue, 6 Dec 2022 22:10:07 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-XE3000
 
 Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
 ---
- .../arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts   | 295 +++++++++++++++++++++
- target/linux/mediatek/image/mt7981.mk              |  11 +
- .../mt7981/base-files/etc/board.d/02_network       |   2 +
- 3 files changed, 308 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 302 ++++++++++++++++++
+ target/linux/mediatek/image/mt7981.mk         |  11 +
+ .../mt7981/base-files/etc/board.d/02_network  |   2 +
+ 3 files changed, 315 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 new file mode 100755
-index 0000000..6606681
+index 0000000000..a151651d8b
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
-@@ -0,0 +1,295 @@
+@@ -0,0 +1,302 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -185,6 +185,12 @@ index 0000000..6606681
 +	status = "okay";
 +};
 +
++&uart1 {
++	pinctrl-names = "default";
++        pinctrl-0 = <&uart1_pins>;
++	status = "okay";
++};
++
 +&watchdog {
 +	status = "okay";
 +};
@@ -289,6 +295,13 @@ index 0000000..6606681
 +			groups = "pwm0_1";
 +		};
 +	};
++
++	uart1_pins: uart1-pins-g1 {
++		mux {
++                        function = "uart";
++                        groups = "uart1_1";
++		};
++	};
 +};
 +
 +&xhci {
@@ -307,7 +320,7 @@ index 0000000..6606681
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index 7aa981e..19c5fce 100755
+index 7aa981e3d6..19c5fce95d 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
 @@ -201,6 +201,17 @@ define Device/glinet_gl-x3000
@@ -329,7 +342,7 @@ index 7aa981e..19c5fce 100755
    DEVICE_VENDOR := GL.iNet
    DEVICE_MODEL := GL-MT2500
 diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
-index fcb05fd..ea22d67 100755
+index fcb05fdf5d..ea22d67df0 100755
 --- a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
 +++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
 @@ -24,6 +24,7 @@ mediatek_setup_interfaces()
@@ -349,5 +362,5 @@ index fcb05fd..ea22d67 100755
  		wan_mac=$(get_mac_binary /dev/mmcblk0boot1 0x0a)
  		lan_mac=$(macaddr_add "$wan_mac" 1)
 -- 
-2.7.4
+2.34.1
 
