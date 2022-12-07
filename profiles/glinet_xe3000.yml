@@ -1,8 +1,8 @@
 ---
-profile: glinet_gl-x3000
+profile: glinet_gl-xe3000
 target: mediatek
 subtarget: mt7981
-description: Build image for the GL.iNET X3000
+description: Build image for the GL.iNET XE3000
 
 feeds:
   - name: gl_feed_common
