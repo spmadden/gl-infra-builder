@@ -5,7 +5,7 @@ feeds:
     #path: ../feeds_dir/glinet
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 8410a8fc81ca1ce196f32df4c4afa7f348160e61
+    revision: 9dafef23e072bd2018e0fabc2cecfa7e8c18060d
 
 packages:
   - gl-sdk4-adguardhome
