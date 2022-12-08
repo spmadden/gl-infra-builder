@@ -1,0 +1,45 @@
+From d36cae648736cb36e5b8b03aa8baa1788e503f71 Mon Sep 17 00:00:00 2001
+From: gl-luochongjun <luochongjun@gl-inet.com>
+Date: Thu, 8 Dec 2022 19:14:00 +0800
+Subject: [PATCH] compat gpy211 external flash
+
+---
+ .../mediatek/files-5.4/drivers/net/phy/gpy211.c      | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/phy/gpy211.c b/target/linux/mediatek/files-5.4/drivers/net/phy/gpy211.c
+index 4ac83b34c1..3023edb5a1 100644
+--- a/target/linux/mediatek/files-5.4/drivers/net/phy/gpy211.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/phy/gpy211.c
+@@ -2,6 +2,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/module.h>
+ #include <linux/phy.h>
++#include <linux/delay.h>
+ 
+ static int gpy211_phy_config_init(struct phy_device *phydev)
+ {
+@@ -10,10 +11,19 @@ static int gpy211_phy_config_init(struct phy_device *phydev)
+ 
+ int gpy211_phy_probe(struct phy_device *phydev)
+ {
++	int i;
+ 	int sgmii_reg = phy_read_mmd(phydev, MDIO_MMD_VEND1, 8);
+ 
++	//GPY211 with external flash requires at least 750ms to wait for mdio ready, here 1000ms
++	for(i=0;i<1000;i++){
++		if( sgmii_reg > 0 )
++			break;
++		usleep_range(1000,1001);
++		sgmii_reg = phy_read_mmd(phydev, MDIO_MMD_VEND1, 8);
++	}
++
+ 	/* enable 2.5G SGMII rate adaption */
+-	phy_write_mmd(phydev, MDIO_MMD_VEND1, 8, 0x24e2);
++	phy_write_mmd(phydev, MDIO_MMD_VEND1, 8, 0xa4fa);
+ 
+ 	return 0;
+ }
+-- 
+2.25.1
+
