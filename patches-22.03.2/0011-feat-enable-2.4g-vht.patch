@@ -1,4 +1,4 @@
-From 06476a2c422a9c88678568d9e305c201dd9641e3 Mon Sep 17 00:00:00 2001
+From e143d19401fb421105a811984e631db9b80f3a0f Mon Sep 17 00:00:00 2001
 From: gl-dengxinfa <xinfa.deng@gl-inet.com>
 Date: Tue, 18 Oct 2022 11:20:01 +0800
 Subject: [PATCH] feat: enable 2.4g vht
@@ -94,15 +94,15 @@ index 0000000000..0c8bd53db7
 + 		have_80mhz = true;
 diff --git a/package/kernel/mt76/patches/001-allow-VHT-rate-on-2.4GHz.patch b/package/kernel/mt76/patches/001-allow-VHT-rate-on-2.4GHz.patch
 new file mode 100644
-index 0000000000..c063a6f78f
+index 0000000000..a334e98550
 --- /dev/null
 +++ b/package/kernel/mt76/patches/001-allow-VHT-rate-on-2.4GHz.patch
 @@ -0,0 +1,47 @@
-+Index: mt76-2022-08-26-5ec78e1e/mac80211.c
++Index: mt76-2022-09-06-d7054646/mac80211.c
 +===================================================================
-+--- mt76-2022-08-26-5ec78e1e.orig/mac80211.c
-++++ mt76-2022-08-26-5ec78e1e/mac80211.c
-+@@ -274,7 +274,7 @@ static void mt76_init_stream_cap(struct
++--- mt76-2022-09-06-d7054646.orig/mac80211.c
+++++ mt76-2022-09-06-d7054646/mac80211.c
++@@ -275,7 +275,7 @@ static void mt76_init_stream_cap(struct
 + void mt76_set_stream_caps(struct mt76_phy *phy, bool vht)
 + {
 + 	if (phy->cap.has_2ghz)
@@ -111,7 +111,7 @@ index 0000000000..c063a6f78f
 + 	if (phy->cap.has_5ghz)
 + 		mt76_init_stream_cap(phy, &phy->sband_5g.sband, vht);
 + 	if (phy->cap.has_6ghz)
-+@@ -341,13 +341,13 @@ mt76_init_sband(struct mt76_phy *phy, st
++@@ -342,13 +342,13 @@ mt76_init_sband(struct mt76_phy *phy, st
 + 
 + static int
 + mt76_init_sband_2g(struct mt76_phy *phy, struct ieee80211_rate *rates,
@@ -127,7 +127,7 @@ index 0000000000..c063a6f78f
 + }
 + 
 + static int
-+@@ -495,7 +495,7 @@ int mt76_register_phy(struct mt76_phy *p
++@@ -496,7 +496,7 @@ int mt76_register_phy(struct mt76_phy *p
 + 		return ret;
 + 
 + 	if (phy->cap.has_2ghz) {
@@ -136,7 +136,7 @@ index 0000000000..c063a6f78f
 + 		if (ret)
 + 			return ret;
 + 	}
-+@@ -620,7 +620,7 @@ int mt76_register_device(struct mt76_dev
++@@ -621,7 +621,7 @@ int mt76_register_device(struct mt76_dev
 + 		return ret;
 + 
 + 	if (phy->cap.has_2ghz) {
@@ -146,7 +146,7 @@ index 0000000000..c063a6f78f
 + 			return ret;
 + 	}
 diff --git a/package/network/services/hostapd/files/hostapd.sh b/package/network/services/hostapd/files/hostapd.sh
-index 3f24fd5e44..a4a8b9f5bb 100644
+index e32ed5846d..2e27e28e8a 100644
 --- a/package/network/services/hostapd/files/hostapd.sh
 +++ b/package/network/services/hostapd/files/hostapd.sh
 @@ -104,7 +104,7 @@ hostapd_common_add_device_config() {
