@@ -10,9 +10,10 @@ feeds:
     branch: common
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
+    revision: 6b4d34ac72719c22de6e2c365b476e5e9bef18ca
 
 packages:
+  - tailscale
   - fwdd
   - mii_mgr
   - losetup
