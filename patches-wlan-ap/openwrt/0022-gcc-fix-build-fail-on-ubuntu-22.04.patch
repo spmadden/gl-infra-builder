@@ -1,0 +1,25 @@
+From 28c1868c680e7e5d09f64b34a999c6f23da247cb Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Sat, 10 Dec 2022 21:41:51 +0800
+Subject: [PATCH] gcc: fix build fail on ubuntu-22.04
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ toolchain/gcc/common.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/toolchain/gcc/common.mk b/toolchain/gcc/common.mk
+index d9372f9961..c436429c63 100644
+--- a/toolchain/gcc/common.mk
++++ b/toolchain/gcc/common.mk
+@@ -94,6 +94,7 @@ GCC_CONFIGURE:= \
+ 		CFLAGS="-O2 -fbracket-depth=512 -pipe" \
+ 		CXXFLAGS="-O2 -fbracket-depth=512 -pipe" \
+ 	) \
++	CXXFLAGS=--std=c++14 \
+ 	$(HOST_SOURCE_DIR)/configure \
+ 		--with-bugurl=$(BUGURL) \
+ 		--with-pkgversion="$(PKGVERSION)" \
+-- 
+2.34.1
+
