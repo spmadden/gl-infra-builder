@@ -56,7 +56,8 @@ packages:
   - gl-sdk4-dns
   - gl-sdk4-tor
   - gl-sdk4-mwan3
-
+  - gl-sdk4-zerotier
+  - kmod-gl-sdk4-parental-control
   - gl-sdk4-cloud-batch-manage
   - gl-sdk4-repeater
   - gl-sdk4-wifi
@@ -98,6 +99,8 @@ packages:
   - gl-sdk4-ui-timedtask
   - gl-sdk4-ui-torview
   - gl-sdk4-ui-multiwan
+  - gl-sdk4-ui-parentalcontrol
+  - gl-sdk4-ui-zerotierview
 
   - gl-sdk4-ui-wireless
 
