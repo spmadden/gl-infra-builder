@@ -2,7 +2,7 @@
 allpkg
 gl-axt1800
 qsdk*
-wlan-ap
+/wlan-ap
 mt7981
 feeds/dl
 feeds/glinet

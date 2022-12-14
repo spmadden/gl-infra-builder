@@ -114,7 +114,7 @@ def pull_tree():
 def setup_tree():
     if not config.get("wlan_ap"):
         print("copy build scripts to " +openwrt + "/scripts")
-        call("cp ./scripts/* %s" % (path.join(openwrt,"scripts")), shell=True)
+        call("cp ./scripts/openwrt/* %s" % (path.join(openwrt,"scripts")), shell=True)
 
     try:
         print("### Copying files")
@@ -191,6 +191,9 @@ def setup_tree():
         sys.exit(1)
     finally:
         os.chdir(base_dir)
+    if  config.get("wlan_ap"):
+        print("copy build scripts to " +openwrt + "/scripts")
+        call("cp ./scripts/wlan-ap/* %s" % (path.join(openwrt,"scripts")), shell=True)
 
 def remove_feeds():
     try:
