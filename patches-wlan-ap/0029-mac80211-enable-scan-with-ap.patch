@@ -1,0 +1,32 @@
+From 802e04b7a71e090d590ea848a58e296ff2d7f88a Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 15 Dec 2022 09:16:55 +0800
+Subject: [PATCH] mac80211: enable scan with ap
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../patches/pending/301-enable-scan-with-ap.patch    | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100644 feeds/wifi-ax/mac80211/patches/pending/301-enable-scan-with-ap.patch
+
+diff --git a/feeds/wifi-ax/mac80211/patches/pending/301-enable-scan-with-ap.patch b/feeds/wifi-ax/mac80211/patches/pending/301-enable-scan-with-ap.patch
+new file mode 100644
+index 00000000..fac25699
+--- /dev/null
++++ b/feeds/wifi-ax/mac80211/patches/pending/301-enable-scan-with-ap.patch
+@@ -0,0 +1,12 @@
++Index: backports-20210222_001-4.4.60-b157d2276/net/mac80211/cfg.c
++===================================================================
++--- backports-20210222_001-4.4.60-b157d2276.orig/net/mac80211/cfg.c
+++++ backports-20210222_001-4.4.60-b157d2276/net/mac80211/cfg.c
++@@ -2629,6 +2629,7 @@ static int ieee80211_scan(struct wiphy *
++ 		 */
++ 		fallthrough;
++ 	case NL80211_IFTYPE_AP:
+++		break;
++ 		/*
++ 		 * If the scan has been forced (and the driver supports
++ 		 * forcing), don't care about being beaconing already.
+-- 
+2.34.1
+
