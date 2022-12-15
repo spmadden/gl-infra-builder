@@ -1,0 +1,56 @@
+From aed2d2193b4639aa500dfea14a7ef6d6dfde6091 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 15 Dec 2022 10:03:30 +0800
+Subject: [PATCH] mac80211: indicate scanning state via debugfs
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../302-indicate-scanning-state-via-debugfs   | 36 +++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+ create mode 100644 feeds/wifi-ax/mac80211/patches/pending/302-indicate-scanning-state-via-debugfs
+
+diff --git a/feeds/wifi-ax/mac80211/patches/pending/302-indicate-scanning-state-via-debugfs b/feeds/wifi-ax/mac80211/patches/pending/302-indicate-scanning-state-via-debugfs
+new file mode 100644
+index 00000000..54d5cb5a
+--- /dev/null
++++ b/feeds/wifi-ax/mac80211/patches/pending/302-indicate-scanning-state-via-debugfs
+@@ -0,0 +1,36 @@
++Index: backports-20210222_001-4.4.60-b157d2276/net/mac80211/debugfs.c
++===================================================================
++--- backports-20210222_001-4.4.60-b157d2276.orig/net/mac80211/debugfs.c
+++++ backports-20210222_001-4.4.60-b157d2276/net/mac80211/debugfs.c
++@@ -587,6 +587,24 @@ DEBUGFS_DEVSTATS_FILE(dot11RTSFailureCou
++ DEBUGFS_DEVSTATS_FILE(dot11FCSErrorCount);
++ DEBUGFS_DEVSTATS_FILE(dot11RTSSuccessCount);
++ 
+++static ssize_t scanning_read(struct file *file,
+++							  char __user *user_buf,
+++							  size_t count, loff_t *ppos)
+++{
+++	struct ieee80211_local *local = file->private_data;
+++	char buf[3];
+++	int len;
+++
+++	len = scnprintf(buf, sizeof(buf), "%c\n", local->scanning ? 'Y' : 'N');
+++	return simple_read_from_buffer(user_buf, count, ppos, buf, len);
+++}
+++
+++static const struct file_operations scanning_ops = {
+++	.read = scanning_read,
+++	.open = simple_open,
+++	.llseek = default_llseek,
+++};
+++
++ void debugfs_hw_add(struct ieee80211_local *local)
++ {
++ 	struct dentry *phyd = local->hw.wiphy->debugfsdir;
++@@ -658,4 +676,6 @@ void debugfs_hw_add(struct ieee80211_loc
++ 	DEBUGFS_DEVSTATS_ADD(dot11RTSFailureCount);
++ 	DEBUGFS_DEVSTATS_ADD(dot11FCSErrorCount);
++ 	DEBUGFS_DEVSTATS_ADD(dot11RTSSuccessCount);
+++
+++	DEBUGFS_ADD(scanning);
++ }
+-- 
+2.34.1
+
