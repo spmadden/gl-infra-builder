@@ -1,0 +1,179 @@
+From 70a3e219eccf25cd28484006a8a7d5b8667ebcb5 Mon Sep 17 00:00:00 2001
+From: gl-yangweiping <weiping.yang@gl-inet.com>
+Date: Thu, 15 Dec 2022 03:44:25 -0500
+Subject: [PATCH] add-gl-ar750s-support
+
+---
+ .../ath79/dts/qca9563_glinet_gl-ar750s.dtsi   | 47 ++++++++++++++-----
+ target/linux/ath79/image/nand.mk              |  8 +++-
+ .../ath79/nand/base-files/etc/board.d/01_leds |  5 ++
+ .../nand/base-files/etc/board.d/02_network    |  2 +
+ .../499-mtd-spinand-add-support.patch         | 19 ++++++++
+ 5 files changed, 68 insertions(+), 13 deletions(-)
+ create mode 100644 target/linux/ath79/patches-5.10/499-mtd-spinand-add-support.patch
+
+diff --git a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
+index 878a740cfd..41c6cf5c63 100644
+--- a/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
++++ b/target/linux/ath79/dts/qca9563_glinet_gl-ar750s.dtsi
+@@ -10,11 +10,34 @@
+ 	model = "GL.iNet GL-AR750S";
+ 
+ 	aliases {
+-		led-boot = &led_power;
+-		led-failsafe = &led_power;
+-		led-running = &led_power;
+-		led-upgrade = &led_power;
+-		label-mac-device = &eth0;
++		//led-boot = &led_power;
++		//led-failsafe = &led_power;
++		//led-running = &led_power;
++		//led-upgrade = &led_power;
++		//label-mac-device = &eth0;
++	};
++
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "ar750s";
++		wan = "eth0.2";
++		lan = "eth0.1";
++		flash_size = <128>;
++		switch-button = "gpio-8";
++		reset-button = "gpio-2";
++		usb-port = "1-1";
++		radio = "radio0";
++		nand;
++		factory_data {
++			device_mac = "art";
++			device_ddns = "art", "0x10";
++			device_sn_bak = "art", "0x20";
++			device_sn = "art", "0x30";
++			country_code = "art", "0x88";
++		};
+ 	};
+ 
+ 	keys {
+@@ -29,10 +52,9 @@
+ 			gpios = <&gpio 2 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+-		mode {
+-			label = "mode";
+-			linux,code = <BTN_0>;
+-			linux,input-type = <EV_SW>;
++		switch {
++			label = "switch-button";
++			linux,code = <KEY_SETUP>;
+ 			gpios = <&gpio 8 GPIO_ACTIVE_LOW>;
+ 		};
+ 	};
+@@ -41,19 +63,20 @@
+ 		compatible = "gpio-leds";
+ 
+ 		led_power: power {
+-			label = "green:power";
++			label = "gl-ar750s:green:power";
+ 			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
++			//default-state = "on";
+ 			default-state = "keep";
+ 		};
+ 
+ 		led_wlan2g: wlan2g {
+-			label = "green:wlan2g";
++			label = "gl-ar750s:green:wlan2g";
+ 			gpios = <&gpio 19 GPIO_ACTIVE_LOW>;
+ 			linux,default-trigger = "phy1tpt";
+ 		};
+ 
+ 		led_wlan5g: wlan5g {
+-			label = "green:wlan5g";
++			label = "gl-ar750s:green:wlan5g";
+ 			gpios = <&gpio 20 GPIO_ACTIVE_HIGH>;
+ 			linux,default-trigger = "phy0tpt";
+ 		};
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index fc1054f19a..583d70ccbe 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -194,7 +194,12 @@ define Device/glinet_gl-ar750s-nor-nand
+   $(Device/glinet_gl-ar750s-common)
+   DEVICE_VARIANT := NOR/NAND
+   KERNEL_SIZE := 4096k
+-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
+   SUPPORTED_DEVICES += glinet,gl-ar750s-nor
+ endef
+ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
+@@ -202,6 +207,7 @@ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
+ define Device/glinet_gl-ar750s-nor
+   $(Device/glinet_gl-ar750s-common)
+   DEVICE_VARIANT := NOR
++  BLOCKSIZE := 64k
+   SUPPORTED_DEVICES += gl-ar750s glinet,gl-ar750s glinet,gl-ar750s-nor-nand
+ endef
+ TARGET_DEVICES += glinet_gl-ar750s-nor
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index a7fb509137..8507425aaf 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -14,6 +14,11 @@ glinet,gl-ar300m-nand|\
+ glinet,gl-ar300m-nor)
+ 	ucidef_set_led_netdev "lan" "LAN" "green:lan" "eth0"
+ 	;;
++glinet,gl-ar750s-nor|\
++glinet,gl-ar750s-nor-nand)
++	ucidef_set_led_wlan "wlan2g" "WLAN2G" "gl-ar750s:green:wlan2g" "phy1tpt"
++	ucidef_set_led_wlan "wlan5g" "WLAN5G" "gl-ar750s:green:wlan5g" "phy0tpt"
++	;;
+ glinet,gl-xe300)
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+ 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x10"
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index 3f1ae6d7b2..522451e31e 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -92,6 +92,8 @@ ath79_setup_macs()
+ 	netgear,wndr4500-v3)
+ 		wan_mac=$(mtd_get_mac_binary caldata 0x6)
+ 		;;
++	glinet,gl-ar750s-nor|\
++	glinet,gl-ar750s-nor-nand|\
+ 	glinet,gl-x300b-nor|\
+ 	glinet,gl-x300b-nor-nand)
+ 		wan_mac=$(mtd_get_mac_binary art 0x0)
+diff --git a/target/linux/ath79/patches-5.10/499-mtd-spinand-add-support.patch b/target/linux/ath79/patches-5.10/499-mtd-spinand-add-support.patch
+new file mode 100644
+index 0000000000..1d161e812e
+--- /dev/null
++++ b/target/linux/ath79/patches-5.10/499-mtd-spinand-add-support.patch
+@@ -0,0 +1,19 @@
++--- a/drivers/mtd/nand/spi/gigadevice.c
+++++ b/drivers/mtd/nand/spi/gigadevice.c
++@@ -284,6 +284,16 @@ static const struct spinand_info gigadev
++ 		     SPINAND_HAS_QE_BIT,
++ 		     SPINAND_ECCINFO(&gd5fxgq4_variant2_ooblayout,
++ 				     gd5fxgq4uexxg_ecc_get_status)),
+++	SPINAND_INFO("GD5F1GQ5UExxG",
+++		     SPINAND_ID(SPINAND_READID_METHOD_OPCODE_ADDR, 0x51),
+++		     NAND_MEMORG(1, 2048, 128, 64, 1024, 20, 1, 1, 1),
+++		     NAND_ECCREQ(8, 512),
+++		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
+++			     		      &write_cache_variants,
+++					      &update_cache_variants),
+++		     SPINAND_HAS_QE_BIT,
+++		     SPINAND_ECCINFO(&gd5fxgq4_variant2_ooblayout,
+++			     	     gd5fxgq4uexxg_ecc_get_status)),
++ 	SPINAND_INFO("GD5F1GQ4UFxxG",
++ 		     SPINAND_ID(SPINAND_READID_METHOD_OPCODE, 0xb1, 0x48),
++ 		     NAND_MEMORG(1, 2048, 128, 64, 1024, 20, 1, 1, 1),
+-- 
+2.17.1
+
