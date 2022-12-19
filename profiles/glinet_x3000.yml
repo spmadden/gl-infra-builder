@@ -19,6 +19,10 @@ packages:
   - ethtool
   - iwinfo
   - mmc-utils
+  - losetup
+  - mkf2fs
+  - blockdev
+  - gdisk
   - wireless-tools
   - kmod-gl-sdk4-fan
   - gl-sdk4-led
