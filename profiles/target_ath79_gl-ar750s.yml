@@ -14,4 +14,3 @@ feeds:
 packages:
   - tor:gl_feeds_common
   - smstools3:gl_feeds_common
-  - tailscale:gl_feeds_common
