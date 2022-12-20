@@ -3,3 +3,11 @@ profile: glinet_gl-xe300-nor-nand
 target: ath79
 subtarget: nand
 description: Build image for the GL.iNET XE300
+
+feeds:
+  - name: gl_feed_common
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 1578e4874d215129db361345fa570a287d191494
+  - name: gl_feed_21_02
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 6b4d34ac72719c22de6e2c365b476e5e9bef18ca
