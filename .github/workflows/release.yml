@@ -28,7 +28,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body_path: |
-            ./gl_release_note
+            /home/glinet/work/_github/gl_release_note
           draft: false
           prerelease: true
           
@@ -39,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.create_release.outputs.id }}
-          assets_path: ./assets
+          assets_path: /home/glinet/work/_github/assets
 
       - name: notify
         run: |
