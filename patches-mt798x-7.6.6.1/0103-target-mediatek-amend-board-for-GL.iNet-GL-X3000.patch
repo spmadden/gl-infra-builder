@@ -16,7 +16,7 @@ diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981
 index 769a941..775b818 100755
 --- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
-@@ -1,8 +1,304 @@
+@@ -1,8 +1,305 @@
  /dts-v1/;
 -
 -#include "mt7981-gl-mt3000.dts"
@@ -48,6 +48,7 @@ index 769a941..775b818 100755
 +		model = "x3000";
 +		wan = "eth0";
 +		lan = "eth1";
++		fan = "pwmchip0";
 +		build-in-modem = "0001:01:00.0";
 +		pcie-bus = "0001:01:00.0";
 +		usb-port = "1-1.3";
