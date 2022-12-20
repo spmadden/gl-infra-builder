@@ -1,0 +1,240 @@
+From 77303911f73a3d4c29a54671a8cd777bb5ae80bf Mon Sep 17 00:00:00 2001
+From: niyin <yin.ni@gl-inet.com>
+Date: Fri, 16 Dec 2022 00:40:14 -0800
+Subject: [PATCH] add xe300-nor-nand.dts
+
+---
+ .../dts/qca9531_glinet_gl-xe300-nor-nand.dts  | 192 ++++++++++++++++++
+ target/linux/ath79/image/nand.mk              |  17 ++
+ 2 files changed, 209 insertions(+)
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+new file mode 100644
+index 0000000000..f127d896ca
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
+@@ -0,0 +1,192 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++#include "qca953x.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	compatible = "glinet,gl-xe300-nor-nand", "qca,qca9531";
++	model = "GL.iNet GL-XE300(NOR/NAND)";
++	
++	gl_hw {
++                compatible = "gl-hw-info";
++
++                #address-cells = <1>;
++                #size-cells = <1>;
++                model = "xe300";
++                wan = "eth1";
++                lan = "eth0";
++                build-in-modem = "1-1.2";
++                reset-button = "gpio-3";
++                usb-port = "1-1.3";
++				radio = "mac80211";
++               microsd = "1-1.1";
++               mcu;
++                nand;
++                factory_data {
++                        device_mac = "art";
++                        device_ddns = "art", "0x10";
++                        device_sn_bak = "art", "0x20";
++                        device_sn = "art", "0x30";
++                        country_code = "art", "0x88";
++                };
++        };
++
++	gpio-export {
++		compatible = "gpio-export";
++
++		gpio_lte_power {
++			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
++			gpio-export,name = "lte_power";
++			gpio-export,output = <1>;
++		};
++
++		gpio_sd_detect {
++			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
++			gpio-export,name = "sd_detect";
++			gpio-export,output = <0>;
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&jtag_disable_pins>;
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		lan {
++			gpios = <&gpio 10 GPIO_ACTIVE_LOW>;
++			label = "green:lan";
++		};
++
++		wan {
++			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
++			label = "green:wan";
++		};
++
++		wlan {
++			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
++			label = "green:wlan";
++			linux,default-trigger = "phy0tpt";
++		};
++
++		lte {
++			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
++			label = "green:lte";
++		};
++	};
++};
++
++&pcie0 {
++	status = "okay";
++};
++
++&usb0 {
++	status = "okay";
++};
++
++&usb_phy {
++	status = "okay";
++};
++
++&spi {
++	status = "okay";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <25000000>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x0 0x40000>;
++				read-only;
++			};
++
++			partition@40000 {
++				label = "u-boot-env";
++				reg = <0x40000 0x10000>;
++			};
++
++			art: partition@50000 {
++				label = "art";
++				reg = <0x50000 0x10000>;
++				read-only;
++			};
++
++			partition@60000 {
++				label = "kernel";
++				reg = <0x60000 0x400000>;
++			};
++
++			partition@460000 {
++				label = "nor_reserved";
++				reg = <0x460000 0xba0000>;
++			};
++		};
++	};
++
++	flash@1 {
++		compatible = "spi-nand";
++		reg = <1>;
++		spi-max-frequency = <25000000>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "ubi";
++				reg = <0x0 0x8000000>;
++			};
++		};
++	};
++};
++
++&eth0 {
++	status = "okay";
++
++	phy-handle = <&swphy4>;
++
++	nvmem-cells = <&macaddr_art_0>;
++	nvmem-cell-names = "mac-address";
++};
++
++&eth1 {
++	nvmem-cells = <&macaddr_art_0>;
++	nvmem-cell-names = "mac-address";
++	mac-address-increment = <1>;
++};
++
++&wmac {
++	status = "okay";
++
++	mtd-cal-data = <&art 0x1000>;
++};
++
++&art {
++	compatible = "nvmem-cells";
++	#address-cells = <1>;
++	#size-cells = <1>;
++
++	macaddr_art_0: macaddr@0 {
++		reg = <0x0 0x6>;
++	};
++};
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index fc1054f19a..204fc3881d 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -239,6 +239,23 @@ define Device/glinet_gl-xe300
+ endef
+ TARGET_DEVICES += glinet_gl-xe300
+ 
++define Device/glinet_gl-xe300-nor-nand
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE300-NOR-NAND
++  DEVICE_TITLE := GL.iNet GL-XE300 (NOR/NAND)
++  DEVICE_PACKAGES := kmod-usb2 block-mount kmod-usb-serial-ch341
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-metadata
++  SUPPORTED_DEVICES += gl-xe300 glinet,gl-xe300
++endef
++TARGET_DEVICES += glinet_gl-xe300-nor-nand
++
+ # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
+ define Device/netgear_ath79_nand
+   DEVICE_VENDOR := NETGEAR
+-- 
+2.25.1
+
