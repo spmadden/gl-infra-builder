@@ -9,8 +9,6 @@ feeds:
 packages:
   - i2c-tools
   - kmod-i2c-gpio-custom
-  - gl-ble_cfg_ax1800
-  - gl-ble-ubus
   - gl-sdk4-led
   - gl-sdk4-adguardhome
   - gl-sdk4-timer
@@ -75,11 +73,13 @@ packages:
   - gl-sdk4-ui-login
   - gl-sdk4-ui-logview
   - gl-sdk4-ui-macclone
+  - gl-sdk4-ui-modemmanage
   - gl-sdk4-ui-ovpnclient
   - gl-sdk4-ui-ovpnserver
   - gl-sdk4-ui-plugins
   - gl-sdk4-ui-process
   - gl-sdk4-ui-reset
+  - gl-sdk4-ui-sms
   - gl-sdk4-ui-timezone
   - gl-sdk4-ui-upgrade
   - gl-sdk4-ui-vpndashboard
@@ -96,6 +96,7 @@ diffconfig: |
   CONFIG_SIGNATURE_CHECK=n
   CONFIG_PACKAGE_dnsmasq=n
   CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad-basic-wolfssl=n
   CONFIG_PACKAGE_wpad=n
   CONFIG_BUSYBOX_CUSTOM=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
