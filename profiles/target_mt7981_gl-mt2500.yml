@@ -13,6 +13,7 @@ feeds:
     revision: 6b4d34ac72719c22de6e2c365b476e5e9bef18ca
 
 packages:
+  - tailscale:gl_feed_common
   - fwdd
   - mii_mgr
   - losetup

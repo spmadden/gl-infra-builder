@@ -10,7 +10,6 @@ feeds:
     revision: 9c0cc6ca1e6aba94c7818583fc619535600ee7d1
 
 packages:
-  - tailscale
   - kmod-usb-storage
   - kmod-usb-uhci
   - kmod-usb2
