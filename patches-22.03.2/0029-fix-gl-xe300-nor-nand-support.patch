@@ -1,20 +1,20 @@
-From 77303911f73a3d4c29a54671a8cd777bb5ae80bf Mon Sep 17 00:00:00 2001
+From a132c36a4710dc695d024205290e0f6c2de8ef72 Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
 Date: Fri, 16 Dec 2022 00:40:14 -0800
 Subject: [PATCH] add xe300-nor-nand.dts
 
 ---
- .../dts/qca9531_glinet_gl-xe300-nor-nand.dts  | 192 ++++++++++++++++++
+ .../dts/qca9531_glinet_gl-xe300-nor-nand.dts  | 193 ++++++++++++++++++
  target/linux/ath79/image/nand.mk              |  17 ++
- 2 files changed, 209 insertions(+)
+ 2 files changed, 210 insertions(+)
  create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
 
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
 new file mode 100644
-index 0000000000..f127d896ca
+index 0000000000..f99806eb75
 --- /dev/null
 +++ b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
-@@ -0,0 +1,192 @@
+@@ -0,0 +1,193 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 +
 +#include "qca953x.dtsi"
@@ -37,6 +37,7 @@ index 0000000000..f127d896ca
 +                build-in-modem = "1-1.2";
 +                reset-button = "gpio-3";
 +                usb-port = "1-1.3";
++		flash_size = <128>;
 +				radio = "mac80211";
 +               microsd = "1-1.1";
 +               mcu;
@@ -208,10 +209,10 @@ index 0000000000..f127d896ca
 +	};
 +};
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index fc1054f19a..204fc3881d 100644
+index 583d70ccbe..c51e61d507 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
-@@ -239,6 +239,23 @@ define Device/glinet_gl-xe300
+@@ -245,6 +245,23 @@ define Device/glinet_gl-xe300
  endef
  TARGET_DEVICES += glinet_gl-xe300
  
