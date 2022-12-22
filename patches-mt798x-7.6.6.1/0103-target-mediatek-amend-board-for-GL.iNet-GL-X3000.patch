@@ -32,7 +32,7 @@ index 769a9416e6..25647db01d 100755
 +		bootargs = "console=ttyS0,115200n1 loglevel=8  \
 +				earlycon=uart8250,mmio32,0x11002000 \
 +				root=PARTLABEL=rootfs rootwait rootfstype=squashfs,f2fs \
-+				block2mtd.block2mtd=/dev/mmcblk0p1,65536,log";
++				block2mtd.block2mtd=/dev/mmcblk0p1,65536,log;/dev/mmcblk0p5,65536,custom";
 +	};
 +
 +	reg_3p3v: regulator-3p3v {

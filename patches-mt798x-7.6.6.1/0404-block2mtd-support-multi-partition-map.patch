@@ -1,0 +1,110 @@
+From b5e925691515b17c0353d164eb96fc3e1fc402be Mon Sep 17 00:00:00 2001
+From: Li Zhang <li.zhang@gl-inet.com>
+Date: Thu, 22 Dec 2022 17:40:04 +0800
+Subject: [PATCH] block2mtd: support multi partition map
+
+Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
+---
+ ...999-support-block2mtd-multi-partition-map.patch | 90 ++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
+ create mode 100644 target/linux/mediatek/patches-5.4/9999-support-block2mtd-multi-partition-map.patch
+
+diff --git a/target/linux/mediatek/patches-5.4/9999-support-block2mtd-multi-partition-map.patch b/target/linux/mediatek/patches-5.4/9999-support-block2mtd-multi-partition-map.patch
+new file mode 100644
+index 0000000..d4b3440
+--- /dev/null
++++ b/target/linux/mediatek/patches-5.4/9999-support-block2mtd-multi-partition-map.patch
+@@ -0,0 +1,90 @@
++--- linux-origin/drivers/mtd/devices/block2mtd.c	2022-12-21 14:34:02.660311157 +0800
+++++ linux/drivers/mtd/devices/block2mtd.c	2022-12-22 15:42:12.318660704 +0800
++@@ -386,9 +386,10 @@
++ 
++ static int block2mtd_setup2(const char *val)
++ {
+++	char cmdline[256] = {0};
+++	char *cmd = cmdline;
++ 	/* 80 for device, 12 for erase size, 80 for name, 8 for timeout */
++ 	char buf[80 + 12 + 80 + 8];
++-	char *str = buf;
++ 	char *token[4];
++ 	char *name;
++ 	size_t erase_size = PAGE_SIZE;
++@@ -400,42 +401,47 @@
++ 		return 0;
++ 	}
++ 
++-	strcpy(str, val);
++-	kill_final_newline(str);
+++	strcpy(cmd,val);
+++	kill_final_newline(cmd);
+++	for(;NULL != cmd;){
+++		memset(buf, 0, sizeof(cmd));
+++		strcpy(buf, strsep(&cmd, ";"));
+++		char *str = buf;
++ 
++-	for (i = 0; i < 4; i++)
++-		token[i] = strsep(&str, ",");
+++		for (i = 0; i < 4; i++)
+++			token[i] = strsep(&str, ",");
++ 
++-	if (str) {
++-		pr_err("too many arguments\n");
++-		return 0;
++-	}
++-
++-	if (!token[0]) {
++-		pr_err("no argument\n");
++-		return 0;
++-	}
+++		if (str) {
+++			pr_err("too many arguments\n");
+++			return 0;
+++		}
++ 
++-	name = token[0];
++-	if (strlen(name) + 1 > 80) {
++-		pr_err("device name too long\n");
++-		return 0;
++-	}
+++		if (!token[0]) {
+++			pr_err("no argument\n");
+++			return 0;
+++		}
++ 
++-	if (token[1]) {
++-		ret = parse_num(&erase_size, token[1]);
++-		if (ret) {
++-			pr_err("illegal erase size\n");
+++		name = token[0];
+++		if (strlen(name) + 1 > 80) {
+++			pr_err("device name too long\n");
++ 			return 0;
++ 		}
++-	}
++-	if (token[2] && (strlen(token[2]) + 1 > 80))
++-		pr_err("mtd device name too long\n");
++ 
++-	if (token[3] && kstrtoul(token[3], 0, &timeout))
++-		pr_err("invalid timeout\n");
+++		if (token[1]) {
+++			ret = parse_num(&erase_size, token[1]);
+++			if (ret) {
+++				pr_err("illegal erase size\n");
+++				return 0;
+++			}
+++		}
+++		if (token[2] && (strlen(token[2]) + 1 > 80))
+++			pr_err("mtd device name too long\n");
+++
+++		if (token[3] && kstrtoul(token[3], 0, &timeout))
+++			pr_err("invalid timeout\n");
++ 
++-	add_device(name, erase_size, token[2], timeout);
+++		add_device(name, erase_size, token[2], timeout);
+++	}
++ 
++ 	return 0;
++ }
+-- 
+2.7.4
+
