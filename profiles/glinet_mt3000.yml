@@ -13,7 +13,7 @@ feeds:
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
   - name: mt7981_private
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: 9c0cc6ca1e6aba94c7818583fc619535600ee7d1
+    revision: c8031866e73dfb6d7a4912113c1bcab77046fd0b
 
 packages:
   - ethtool
@@ -25,10 +25,9 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
+  - gl-sdk4-mtk-wifi-v2
   - select-sdk4-ui-all
   - 8021xd
-  - datconf
-  - datconf-lua
   - fwdd
   - kmod-conninfra
   - kmod-mediatek_hnat
@@ -36,14 +35,11 @@ packages:
   - kmod-mtfwd
   - kmod-mtqos
   - kmod-warp
-  - luci-app-mtk
   - mii_mgr
   - mtk-base-files
-  - mtk_factory_rw
   - mtkhnat_util
   - regs
   - wifi-profile
-  - wificonf
 
 diffconfig: |
   CONFIG_CONNINFRA_AUTO_UP=y
