@@ -11,9 +11,12 @@ feeds:
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
+  - name: gl_feed_mtk
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 1b1b4feaf649cbf39d6de072fa6a24c2fb18ffc6
   - name: mt7981_private
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: a9dfe60cafd770b6809a196187c645fa47bde1c2
+    revision: c8031866e73dfb6d7a4912113c1bcab77046fd0b
   - name: glinet
     uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
     revision: 2710ec4908cf866e9e88c9534267361acb88ba3d
@@ -33,10 +36,9 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
+  - gl-sdk4-mtk-wifi-v2
   - select-sdk4-ui-all
   - 8021xd
-  - datconf
-  - datconf-lua
   - fwdd
   - kmod-conninfra
   - kmod-mediatek_hnat
@@ -44,14 +46,11 @@ packages:
   - kmod-mtfwd
   - kmod-mtqos
   - kmod-warp
-  - luci-app-mtk
   - mii_mgr
   - mtk-base-files
-  - mtk_factory_rw
   - mtkhnat_util
   - regs
   - wifi-profile
-  - wificonf
 
 diffconfig: |
   CONFIG_CONNINFRA_AUTO_UP=y
