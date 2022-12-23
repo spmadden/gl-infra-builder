@@ -1,0 +1,24 @@
+---
+profile: glinet_gl-mt3000
+target: mediatek
+subtarget: mt7981
+description: Build image for the GL.iNET MT3000
+
+feeds:
+  - name: gl_feed_mtk
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 57a572aa38ec27150978dd9a916e6313c0169e47
+
+packages:
+  - ethtool
+  - iwinfo
+  - wireless-tools
+  - gl-sdk4-mtk-wifi-v2
+  - kmod-conninfra-mt7981-ko
+  - kmod-mt-wifi-mt7981-ko
+  - kmod-warp-mt7981-ko
+  - kmod-mediatek_hnat
+  - mii_mgr
+  - mtkhnat_util
+  - regs
+  
