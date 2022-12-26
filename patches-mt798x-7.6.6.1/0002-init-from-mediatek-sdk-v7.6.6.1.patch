@@ -1,4 +1,4 @@
-From fade63aacbe7d106ef0f7aece96af62d149ac28a Mon Sep 17 00:00:00 2001
+From a150cac1ac161be34aeceb01686d9eb4896d821b Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 19 Sep 2022 11:24:33 +0800
 Subject: [PATCH] init from mediatek sdk v7.6.6.1
@@ -72,7 +72,6 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  ..._eth_soc-set-PPE-flow-hash-as-skb-ha.patch |   41 -
  ...iatek-mtk_eth_soc-add-support-for-in.patch | 1058 -----
  ...iatek-mtk_eth_soc-add-flow-offloadin.patch |  401 --
- .../850-force-dm-verity-dax-built-in.patch    |   26 +
  target/linux/mediatek/Makefile                |    2 +-
  .../base-files/etc/hotplug.d/iface/98-mtk-vpn |   11 +
  target/linux/mediatek/base-files/etc/inittab  |    2 +-
@@ -345,7 +344,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  .../src/libfdt/libfdt_env.h                   |   96 +
  .../src/libfdt/libfdt_internal.h              |   51 +
  tools/fdt-patch-dm-verify/src/main.c          |  685 +++
- 340 files changed, 78327 insertions(+), 3338 deletions(-)
+ 339 files changed, 78301 insertions(+), 3338 deletions(-)
  delete mode 100755 package/base-files/files/sbin/wifi
  create mode 100644 package/boot/uboot-envtools/files/mediatek
  create mode 100644 package/network/utils/wireless-tools/patches/006-fix-iwconfig-rate-print-format.patch
@@ -401,7 +400,6 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  delete mode 100644 target/linux/generic/pending-5.4/770-14-net-ethernet-mtk_eth_soc-set-PPE-flow-hash-as-skb-ha.patch
  delete mode 100644 target/linux/generic/pending-5.4/770-15-net-ethernet-mediatek-mtk_eth_soc-add-support-for-in.patch
  delete mode 100644 target/linux/generic/pending-5.4/770-16-net-ethernet-mediatek-mtk_eth_soc-add-flow-offloadin.patch
- create mode 100644 target/linux/generic/pending-5.4/850-force-dm-verity-dax-built-in.patch
  create mode 100644 target/linux/mediatek/base-files/etc/hotplug.d/iface/98-mtk-vpn
  create mode 100644 target/linux/mediatek/base-files/etc/sysupgrade.conf
  create mode 100644 target/linux/mediatek/base-files/lib/upgrade/mmc.sh
@@ -11736,38 +11734,6 @@ index 5d821f0d74..0000000000
 -+
 -+	return 0;
 -+}
-diff --git a/target/linux/generic/pending-5.4/850-force-dm-verity-dax-built-in.patch b/target/linux/generic/pending-5.4/850-force-dm-verity-dax-built-in.patch
-new file mode 100644
-index 0000000000..e091dd3036
---- /dev/null
-+++ b/target/linux/generic/pending-5.4/850-force-dm-verity-dax-built-in.patch
-@@ -0,0 +1,26 @@
-+Index: linux-5.4.211/drivers/dax/Kconfig
-+===================================================================
-+--- linux-5.4.211.orig/drivers/dax/Kconfig
-++++ linux-5.4.211/drivers/dax/Kconfig
-+@@ -4,7 +4,7 @@ config DAX_DRIVER
-+ 	bool
-+ 
-+ menuconfig DAX
-+-	tristate "DAX: direct access to differentiated memory"
-++	bool "DAX: direct access to differentiated memory"
-+ 	select SRCU
-+ 	default m if NVDIMM_DAX
-+ 
-+Index: linux-5.4.211/drivers/md/Kconfig
-+===================================================================
-+--- linux-5.4.211.orig/drivers/md/Kconfig
-++++ linux-5.4.211/drivers/md/Kconfig
-+@@ -486,7 +486,7 @@ config DM_FLAKEY
-+          A target that intermittently fails I/O for debugging purposes.
-+ 
-+ config DM_VERITY
-+-	tristate "Verity target support"
-++	bool "Verity target support"
-+ 	depends on BLK_DEV_DM
-+ 	select CRYPTO
-+ 	select CRYPTO_HASH
 diff --git a/target/linux/mediatek/Makefile b/target/linux/mediatek/Makefile
 index c8ab5e01e6..a04a06eab9 100644
 --- a/target/linux/mediatek/Makefile
