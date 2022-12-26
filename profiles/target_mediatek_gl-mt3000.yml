@@ -7,7 +7,7 @@ description: Build image for the GL.iNET MT3000
 feeds:
   - name: gl_feed_mtk
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 6cf43c3d6da56c96b50933abf80a6524f0b1144c
+    branch: mtk
 
 packages:
   - ethtool
