@@ -8,7 +8,7 @@ feeds:
     path: ../../feeds/wifi-ax
   - name: gl_feeds_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    branch: common
+    revision: f86ec7f77b7a36c96a9b5a9b7fea30ccc9ac5fe6
   - name: luci
     uri: https://github.com/openwrt/luci.git
     revision: 1c3b32dc1bec15e3076a447762b1c4f94eb75fb7

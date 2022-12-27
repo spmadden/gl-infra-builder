@@ -7,7 +7,7 @@ description: Build image for the GL.iNET MT2500
 feeds:
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    branch: common
+    revision: f86ec7f77b7a36c96a9b5a9b7fea30ccc9ac5fe6
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 6b4d34ac72719c22de6e2c365b476e5e9bef18ca
