@@ -11,6 +11,9 @@ feeds:
   - name: mt7981_private
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: c8031866e73dfb6d7a4912113c1bcab77046fd0b
+  - name: glinet
+    uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    revision: 33cf610c5de1c8a4ccad4edc45982c3b3917a4ce
 
 packages:
   - kmod-gl-sdk4-fan
