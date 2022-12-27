@@ -1,7 +1,0 @@
----
-description: Add the glinet x3000 private package
-feeds:
-  - name: glinet
-    uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 048c6e02cbc3ade54a12b9d22419ed4b963fa3b6
-

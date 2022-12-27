@@ -209,11 +209,11 @@ CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}=y
 CONFIG_TARGET_{profile["target"]}_{profile["subtarget"]}_DEVICE_{profile["profile"]}=y
 """
 
-    config_output += f"{profile.get('diffconfig', '')}"
-
     for package in profile.get("packages", []):
         print(f"Add package to .config: {package}")
         config_output += f"CONFIG_PACKAGE_{package}=y\n"
+
+    config_output += f"{profile.get('diffconfig', '')}"
 
     Path(".config").write_text(config_output)
     print("Configuration written to .config")
