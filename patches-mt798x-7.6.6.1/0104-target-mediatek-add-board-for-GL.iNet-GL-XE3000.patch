@@ -54,11 +54,11 @@ index 0000000000..a151651d8b
 +		radio = "mt798111 mt798112";
 +		dfs;
 +		factory_data {
-+			device_mac = "/dev/mmcblk0boot1", "0x0a";
-+			device_ddns = "/dev/mmcblk0boot1", "0x10";
-+			device_sn_bak = "/dev/mmcblk0boot1", "0x20";
-+			device_sn = "/dev/mmcblk0boot1", "0x30";
-+			country_code = "/dev/mmcblk0boot1", "0x88";
++			device_mac = "/dev/mmcblk0p3", "0x0a";
++			device_ddns = "/dev/mmcblk0p3", "0x10";
++			device_sn_bak = "/dev/mmcblk0p3", "0x20";
++			device_sn = "/dev/mmcblk0p3", "0x30";
++			country_code = "/dev/mmcblk0p3", "0x88";
 +		};
 +	};
 +
