@@ -1,0 +1,29 @@
+---
+profile: glinet_gl-xe3000
+target: mediatek
+subtarget: mt7981
+description: Build image for the GL.iNET XE3000
+
+feeds:
+  - name: gl_feed_mtk
+    uri: https://github.com/gl-inet/gl-feeds.git
+    branch: mtk
+
+packages:
+  - ethtool
+  - iwinfo
+  - mmc-utils
+  - losetup
+  - mkf2fs
+  - blockdev
+  - gdisk
+  - wireless-tools
+  - gl-sdk4-mtk-wifi-v2
+  - kmod-conninfra-mt7981-ko
+  - kmod-mt-wifi-mt7981-ko
+  - kmod-warp-mt7981-ko
+  - kmod-mediatek_hnat
+  - mii_mgr
+  - mtkhnat_util
+  - regs
+  
