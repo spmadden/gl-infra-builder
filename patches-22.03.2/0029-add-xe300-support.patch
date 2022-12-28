@@ -1,12 +1,13 @@
-From a132c36a4710dc695d024205290e0f6c2de8ef72 Mon Sep 17 00:00:00 2001
+From 154342d9937aed9dccd43ede3c5336dddf8bc47e Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
 Date: Fri, 16 Dec 2022 00:40:14 -0800
-Subject: [PATCH] add xe300-nor-nand.dts
+Subject: [PATCH] add xe300 support
 
 ---
  .../dts/qca9531_glinet_gl-xe300-nor-nand.dts  | 193 ++++++++++++++++++
  target/linux/ath79/image/nand.mk              |  17 ++
- 2 files changed, 210 insertions(+)
+ .../ath79/nand/base-files/etc/board.d/01_leds |   5 +-
+ 3 files changed, 214 insertions(+), 1 deletion(-)
  create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
 
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
@@ -236,6 +237,25 @@ index 583d70ccbe..c51e61d507 100644
  # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
  define Device/netgear_ath79_nand
    DEVICE_VENDOR := NETGEAR
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index 8507425aaf..41454cd63d 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -19,10 +19,13 @@ glinet,gl-ar750s-nor-nand)
+ 	ucidef_set_led_wlan "wlan2g" "WLAN2G" "gl-ar750s:green:wlan2g" "phy1tpt"
+ 	ucidef_set_led_wlan "wlan5g" "WLAN5G" "gl-ar750s:green:wlan5g" "phy0tpt"
+ 	;;
+-glinet,gl-xe300)
++glinet,gl-xe300|\
++glinet,gl-xe300-nor-nand)
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+ 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x10"
++	ucidef_set_led_netdev "3gnet" "LTE" "green:lte" "wwan0"
+ 	;;
++
+ glinet,gl-x300b-nor|\
+ glinet,gl-x300b-nor-nand)
+         ucidef_set_led_netdev "wlan2g" "WLAN2G" "gl-x300b:green:wlan2g" "wlan0"
 -- 
 2.25.1
 
