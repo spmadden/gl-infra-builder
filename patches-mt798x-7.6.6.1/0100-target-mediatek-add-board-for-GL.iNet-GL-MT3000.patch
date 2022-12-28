@@ -313,9 +313,9 @@ index ab3ed5b42f..3e47d600b5 100755
 +  PAGESIZE := 2048
 +  IMAGE_SIZE := 65536k
 +  KERNEL_IN_UBI := 1
-+  IMAGES += factory.bin
-+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGES += factory.img sysupgrade.tar
++  IMAGE/factory.img := append-ubi | check-size $$$$(IMAGE_SIZE)
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
 +endef
 +TARGET_DEVICES += glinet_gl-mt3000
 diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
