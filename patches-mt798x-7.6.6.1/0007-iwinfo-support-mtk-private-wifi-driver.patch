@@ -1,4 +1,4 @@
-From 9e780b505183e3f754666adddd77b8084ca7b45b Mon Sep 17 00:00:00 2001
+From aeae5b1596a5240663d2e3a6461a26f9a0363b83 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -6,14 +6,16 @@ Subject: [PATCH] iwinfo: support mtk private wifi driver
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/network/utils/iwinfo/Makefile         |   2 +-
- .../iwinfo/patches/0100-support-mtk.patch     | 112 +++++++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 299 ++++++++++++++++++
- 3 files changed, 412 insertions(+), 1 deletion(-)
+ .../iwinfo/patches/0001-fix-wext-h.patch      |  13 +
+ .../iwinfo/patches/0100-support-mtk.patch     | 112 ++++
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 504 ++++++++++++++++++
+ 4 files changed, 630 insertions(+), 1 deletion(-)
+ create mode 100644 package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
 
 diff --git a/package/network/utils/iwinfo/Makefile b/package/network/utils/iwinfo/Makefile
-index 815c477988..4fa21e7dee 100644
+index 25cc210acb..e312ddd7df 100644
 --- a/package/network/utils/iwinfo/Makefile
 +++ b/package/network/utils/iwinfo/Makefile
 @@ -80,7 +80,7 @@ MAKE_FLAGS += \
@@ -25,6 +27,25 @@ index 815c477988..4fa21e7dee 100644
  	SOVERSION="$(IWINFO_ABI_VERSION)"
  
  define Build/InstallDev
+diff --git a/package/network/utils/iwinfo/patches/0001-fix-wext-h.patch b/package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
+new file mode 100644
+index 0000000000..d8e6dc8c80
+--- /dev/null
++++ b/package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
+@@ -0,0 +1,13 @@
++Index: libiwinfo-2022-04-26-dc6847eb/api/wext.h
++===================================================================
++--- libiwinfo-2022-04-26-dc6847eb.orig/api/wext.h
+++++ libiwinfo-2022-04-26-dc6847eb/api/wext.h
++@@ -677,7 +677,7 @@
++  */
++ struct	iw_param
++ {
++-  int32_t		value;		/* The value of the parameter itself */
+++  uint64_t		value;		/* The value of the parameter itself */
++   uint8_t		fixed;		/* Hardware should not use auto select */
++   uint8_t		disabled;	/* Disable the feature */
++   uint16_t		flags;		/* Various specifc flags (if any) */
 diff --git a/package/network/utils/iwinfo/patches/0100-support-mtk.patch b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
 new file mode 100644
 index 0000000000..4c5ebc014c
@@ -145,10 +166,10 @@ index 0000000000..4c5ebc014c
 + 	luaL_register(L, NULL, R_wext);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..55f9d28e0c
+index 0000000000..fed7f61dc0
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,299 @@
+@@ -0,0 +1,504 @@
 +#include "iwinfo.h"
 +#include "iwinfo_wext.h"
 +
@@ -220,9 +241,14 @@ index 0000000000..55f9d28e0c
 +    return !strncmp(ifname, "wds", 3);
 +}
 +
++static int mtk_isdev(const char *ifname)
++{
++    return !strcmp(ifname, "mt798111") || !strcmp(ifname, "mt798112");
++}
++
 +static int mtk_probe(const char *ifname)
 +{
-+	return mtk_isap(ifname) || mtk_iscli(ifname) || mtk_iswds(ifname);
++	return mtk_isap(ifname) || mtk_iscli(ifname) || mtk_iswds(ifname) || mtk_isdev(ifname);
 +}
 +
 +static void mtk_close(void)
@@ -269,12 +295,35 @@ index 0000000000..55f9d28e0c
 +
 +static int mtk_get_frequency(const char *ifname, int *buf)
 +{
-+	return wext_ops.frequency(ifname, buf);
++	int channel;
++	int freq;
++
++	if (wext_ops.channel(ifname, &channel))
++		return -1;
++
++	if (channel < 36) {
++		if (channel == 14)
++			return 2484;
++		freq = 2407 + channel * 5;
++	} else {
++		if (channel >= 182 && channel <= 196)
++			freq = 4000 + channel * 5;
++		else
++			freq = 5000 + channel * 5;
++	}
++
++	*buf = freq;
++	return 0;
 +}
 +
 +static int mtk_get_txpower(const char *ifname, int *buf)
 +{
-+	return wext_ops.txpower(ifname, buf);
++	if (wext_ops.txpower(ifname, buf))
++		return -1;
++
++	*buf = iwinfo_mw2dbm(*buf);
++
++	return 0;
 +}
 +
 +static int mtk_get_signal(const char *ifname, int *buf)
@@ -315,6 +364,8 @@ index 0000000000..55f9d28e0c
 +		return -1;
 +	}
 +
++	*len = 0;
++
 +	for (i = 0; i < table->Num; i++) {
 +		RT_802_11_MAC_ENTRY *pe = &(table->Entry[i]);
 +		struct iwinfo_assoclist_entry *e = (struct iwinfo_assoclist_entry *)buf + i;
@@ -330,16 +381,158 @@ index 0000000000..55f9d28e0c
 +
 +static int mtk_get_txpwrlist(const char *ifname, char *buf, int *len)
 +{
-+	return wext_ops.txpwrlist(ifname, buf, len);
++	struct iwinfo_txpwrlist_entry entry;
++	int i;
++
++	for(i = 0; i < 21; i++) {
++		entry.dbm = i;
++		entry.mw  = iwinfo_mw2dbm(i);
++		memcpy(&buf[i * sizeof(entry)], &entry, sizeof(entry));
++	}
++
++	*len = i * sizeof(entry);
++
++	return 0;
 +}
++
++static int mtk_get_scanlist_dump(const char *ifname, int index, char *data)
++{
++	struct iwreq wrq = {};
++
++	snprintf(wrq.ifr_name, sizeof(wrq.ifr_name), "%s", ifname);
++    snprintf(data, sizeof(data), "%d", index);
++
++	wrq.u.data.pointer = data;
++    wrq.u.data.length = sizeof(data);
++
++	return iwinfo_ioctl(RTPRIV_IOCTL_GSITESURVEY, &wrq);
++}
++
++struct scan_data_offset {
++	int offset;
++	int width;
++};
++
++enum {
++	SCAN_DATA_CH,
++	SCAN_DATA_SSID,
++	SCAN_DATA_BSSID,
++	SCAN_DATA_SECURITY,
++	SCAN_DATA_RSSI,
++	SCAN_DATA_NT,
++	SCAN_DATA_SSID_LEN,
++	SCAN_DATA_MAX
++};
 +
 +static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
 +{
-+	return -1;
++	struct iwinfo_scanlist_entry *e = (struct iwinfo_scanlist_entry *)buf;
++	int offsets[SCAN_DATA_MAX];
++	char data[20 * 1024 + 1];
++	char cmd[128];
++	int index = 0;
++	int total = -1;
++	char *pos;
++
++	*len = 0;
++
++	if (!strcmp(ifname, "mt798111"))
++		ifname = "ra0";
++	else if (!strcmp(ifname, "mt798112"))
++		ifname = "rax0";
++
++	sprintf(cmd, "iwpriv %s set SiteSurvey=", ifname);
++	system(cmd);
++
++	sleep(8);
++
++	while (1) {
++		if (mtk_get_scanlist_dump(ifname, index, data))
++			return -1;
++
++		sscanf(data, "\nTotal=%d", &total);
++
++		strtok(data, "\n");
++		pos = strtok(NULL, "\n");
++
++		offsets[SCAN_DATA_CH] = strstr(pos, "Ch ") - pos;
++		offsets[SCAN_DATA_SSID] = strstr(pos, "SSID ") - pos;
++		offsets[SCAN_DATA_BSSID] = strstr(pos, "BSSID ") - pos;
++		offsets[SCAN_DATA_SECURITY] = strstr(pos, "Security ") - pos;
++		offsets[SCAN_DATA_RSSI] = strstr(pos, "Rssi") - pos;
++		offsets[SCAN_DATA_NT] = strstr(pos, "NT") - pos;
++		offsets[SCAN_DATA_SSID_LEN] = strstr(pos, "SSID_Len") - pos;
++
++		while (1) {
++			struct iwinfo_crypto_entry *crypto = &e->crypto;
++			const char *security;
++			uint8_t *mac = e->mac;
++			int signal;
++			int ssid_len;
++
++			pos = strtok(NULL, "\n");
++			if (!pos)
++				break;
++
++			sscanf(pos, "%d", &index);
++
++			if (strncmp(pos + offsets[SCAN_DATA_NT], "In", 2))
++				continue;;
++
++			security = pos + offsets[SCAN_DATA_SECURITY];
++			if (!strstr(security, "PSK") && !strstr(security, "OPEN"))
++				continue;
++
++			memset(crypto, 0, sizeof(struct iwinfo_crypto_entry));
++
++			if (strstr(security, "PSK")) {
++				crypto->enabled = true;
++
++				if (strstr(security, "WPAPSK")) {
++					crypto->wpa_version |= 1 << 0;
++					crypto->auth_suites |= IWINFO_KMGMT_PSK;
++				}
++
++				if (strstr(security, "WPA2PSK")) {
++					crypto->wpa_version |= 1 << 1;
++					crypto->auth_suites |= IWINFO_KMGMT_PSK;
++				}
++
++				if (strstr(security, "WPAP3SK")) {
++					crypto->wpa_version |= 1 << 2;
++					crypto->auth_suites |= IWINFO_KMGMT_SAE;
++				}
++			}
++
++			e->mode = IWINFO_OPMODE_MASTER;
++
++			sscanf(pos + offsets[SCAN_DATA_CH], "%d", &e->channel);
++			sscanf(pos + offsets[SCAN_DATA_RSSI] + 1, "%d", &signal);
++			e->signal = -signal + 0x100;
++
++			sscanf(pos + offsets[SCAN_DATA_BSSID], "%02x:%02x:%02x:%02x:%02x:%02x",
++				mac + 0, mac + 1, mac + 2, mac + 3, mac + 4, mac + 5);
++
++			sscanf(pos + offsets[SCAN_DATA_SSID_LEN], "%d", &ssid_len);
++			memcpy(e->ssid, pos + offsets[SCAN_DATA_SSID], ssid_len);
++
++			*len += sizeof(struct iwinfo_scanlist_entry);
++			e++;
++		}
++
++		if (index + 1 == total)
++			break;
++	}
++
++	return 0;
 +}
 +
 +static int mtk_get_freqlist(const char *ifname, char *buf, int *len)
 +{
++	if (!strcmp(ifname, "mt798111"))
++		ifname = "ra0";
++	else if (!strcmp(ifname, "mt798112"))
++		ifname = "rax0";
 +	return wext_ops.freqlist(ifname, buf, len);
 +}
 +
@@ -357,13 +550,46 @@ index 0000000000..55f9d28e0c
 +
 +static int mtk_get_hwmodelist(const char *ifname, int *buf)
 +{
-+	return wext_ops.hwmodelist(ifname, buf);
++	*buf = 0;
++
++	if (!strncmp(ifname, "rax", 3)) {
++		*buf |= IWINFO_80211_A;
++		*buf |= IWINFO_80211_N;
++		*buf |= IWINFO_80211_AC;
++		*buf |= IWINFO_80211_AX;
++	} else {
++		*buf |= IWINFO_80211_B;
++		*buf |= IWINFO_80211_G;
++		*buf |= IWINFO_80211_N;
++		*buf |= IWINFO_80211_AX;
++	}
++
++	return 0;
 +}
 +
 +static int mtk_get_htmodelist(const char *ifname, int *buf)
 +{
-+	/* Stub */
-+	return -1;
++	*buf = 0;
++
++	if (!strncmp(ifname, "rax", 3)) {
++		*buf |= IWINFO_HTMODE_HT20;
++		*buf |= IWINFO_HTMODE_HT40;
++		*buf |= IWINFO_HTMODE_VHT20;
++		*buf |= IWINFO_HTMODE_VHT40;
++		*buf |= IWINFO_HTMODE_VHT80;
++		*buf |= IWINFO_HTMODE_VHT160;
++		*buf |= IWINFO_HTMODE_HE20;
++		*buf |= IWINFO_HTMODE_HE40;
++		*buf |= IWINFO_HTMODE_HE80;
++		*buf |= IWINFO_HTMODE_HE160;
++	} else {
++		*buf |= IWINFO_HTMODE_HT20;
++		*buf |= IWINFO_HTMODE_HT40;
++		*buf |= IWINFO_HTMODE_HE20;
++		*buf |= IWINFO_HTMODE_HE40;
++	}
++
++	return 0;
 +}
 +
 +static int mtk_get_encryption(const char *ifname, char *buf)
@@ -449,5 +675,5 @@ index 0000000000..55f9d28e0c
 +	.close            = mtk_close
 +};
 -- 
-2.25.1
+2.34.1
 
