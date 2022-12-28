@@ -2,18 +2,12 @@
 description: Add the glinet dependencies for the GL.iNET X3000
 
 feeds:
-  - name: gl_feed_common
-    uri: https://github.com/gl-inet/gl-feeds.git
-    revision: f86ec7f77b7a36c96a9b5a9b7fea30ccc9ac5fe6
-  - name: gl_feed_21_02
-    uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
   - name: mt7981_private
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: c8031866e73dfb6d7a4912113c1bcab77046fd0b
   - name: glinet
     uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 5171bb505ca5800a69644818ec2e318e0ea1d117
+    revision: 32782821e35c98df5503b261db98b8f0a089f16e
 
 packages:
   - kmod-gl-sdk4-fan
