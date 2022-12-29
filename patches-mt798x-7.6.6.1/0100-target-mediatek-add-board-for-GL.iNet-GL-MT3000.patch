@@ -1,6 +1,6 @@
-From f3ff60a6f62a2dbf7d464c501e2ed52d0c6cdb48 Mon Sep 17 00:00:00 2001
+From 911e6dbaeec202f9d230a437c5773ddd55b4e774 Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
-Date: Thu, 29 Dec 2022 09:27:40 +0800
+Date: Thu, 29 Dec 2022 16:19:53 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 ---
@@ -292,7 +292,7 @@ index 0000000000..40f38f3398
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index ab3ed5b42f..610009816f 100755
+index ab3ed5b42f..a798034da9 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
 @@ -171,3 +171,21 @@ define Device/mt7981-fpga-sd
@@ -312,7 +312,7 @@ index ab3ed5b42f..610009816f 100755
 +  PAGESIZE := 2048
 +  IMAGE_SIZE := 65536k
 +  KERNEL_IN_UBI := 1
-+  IMAGES += factory.img sysupgrade.tar
++  IMAGES := factory.img sysupgrade.tar
 +  IMAGE/factory.img := append-ubi | check-size $$$$(IMAGE_SIZE)
 +  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
 +endef
