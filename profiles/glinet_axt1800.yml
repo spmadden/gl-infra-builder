@@ -4,7 +4,7 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 5152ffdef8ae51863282d1e747b0b20801c41990
+    revision: cdd5e917f28822810189966c9ab82d622979efbf
 
 packages:
   - kmod-gl-sdk4-fan
