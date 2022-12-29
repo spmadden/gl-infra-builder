@@ -1,9 +1,8 @@
-From a9ebedf580d3acb5953b60b8aefb65079d18cf9a Mon Sep 17 00:00:00 2001
-From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
-Date: Mon, 19 Sep 2022 15:20:05 +0800
+From f3ff60a6f62a2dbf7d464c501e2ed52d0c6cdb48 Mon Sep 17 00:00:00 2001
+From: lincolnzh <hongjian.zhang@gl-inet.com>
+Date: Thu, 29 Dec 2022 09:27:40 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
-Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 275 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 ++
@@ -13,7 +12,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..147b437f30
+index 0000000000..40f38f3398
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 @@ -0,0 +1,275 @@
@@ -293,7 +292,7 @@ index 0000000000..147b437f30
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index ab3ed5b42f..3e47d600b5 100755
+index ab3ed5b42f..610009816f 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
 @@ -171,3 +171,21 @@ define Device/mt7981-fpga-sd
@@ -373,5 +372,5 @@ index 0d35a2207a..6865f52bb8 100755
  
  board_config_update
 -- 
-2.25.1
+2.17.1
 
