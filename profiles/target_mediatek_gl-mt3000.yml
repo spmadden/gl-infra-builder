@@ -27,4 +27,5 @@ packages:
   - mii_mgr
   - mtkhnat_util
   - regs
+  - luci
   
