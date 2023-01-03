@@ -1,4 +1,4 @@
-From 66b6cdad1cd68ce42f4b6b7fe17ef08e5c66f8eb Mon Sep 17 00:00:00 2001
+From 8e79ecb7e6caab8af0a10a7248f8e77b557eb599 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -185,7 +185,7 @@ index 0000000000..4c5ebc014c
 + 	luaL_register(L, NULL, R_wext);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..51f0fa83aa
+index 0000000000..fe9036d274
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 @@ -0,0 +1,510 @@
@@ -683,7 +683,7 @@ index 0000000000..51f0fa83aa
 +	.mbssid_support   = mtk_get_mbssid_support,
 +	.hwmodelist       = mtk_get_hwmodelist,
 +	.htmodelist       = mtk_get_htmodelist,
-+	.htmode           = mtk_get_htmode;
++	.htmode           = mtk_get_htmode,
 +	.mode             = mtk_get_mode,
 +	.ssid             = mtk_get_ssid,
 +	.bssid            = mtk_get_bssid,
