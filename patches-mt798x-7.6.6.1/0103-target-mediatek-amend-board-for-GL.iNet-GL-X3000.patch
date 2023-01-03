@@ -1,23 +1,23 @@
-From 143512bba3454468815e56432b9a08833c5650a8 Mon Sep 17 00:00:00 2001
+From 5dc8df764b9b2d4d094cd20ed72a34c0e1e13341 Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
-Date: Wed, 21 Dec 2022 15:45:28 +0800
+Date: Tue, 3 Jan 2023 15:20:23 +0800
 Subject: [PATCH] target/mediatek: amend board for GL.iNet GL-X3000
 
 ---
- .../boot/dts/mediatek/mt7981-gl-x3000.dts     | 307 +++++++++++++++++-
+ .../boot/dts/mediatek/mt7981-gl-x3000.dts     | 313 +++++++++++++++++-
  target/linux/mediatek/image/mt7981.mk         |  11 +-
  .../mt7981/base-files/etc/board.d/01_leds     |  20 ++
  .../mt7981/base-files/etc/board.d/02_network  |   6 +-
  .../patches-5.4/403-support-x3000-emmc.patch  |  30 ++
- 5 files changed, 358 insertions(+), 16 deletions(-)
+ 5 files changed, 364 insertions(+), 16 deletions(-)
  create mode 100755 target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
  create mode 100644 target/linux/mediatek/patches-5.4/403-support-x3000-emmc.patch
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
-index 769a9416e6..25647db01d 100755
+index 769a9416e6..0197460aac 100755
 --- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
-@@ -1,8 +1,307 @@
+@@ -1,8 +1,313 @@
  /dts-v1/;
 -
 -#include "mt7981-gl-mt3000.dts"
@@ -112,9 +112,15 @@ index 769a9416e6..25647db01d 100755
 +		};
 +
 +		thread_reset {
-+			gpio-export,name = "thread_reset";
++			gpio-export,name = "gpio26";
 +			gpio-export,output = <1>;
 +			gpios = <&pio 26 GPIO_ACTIVE_HIGH>;
++		};
++
++		thread_dfu {
++			gpio-export,name = "gpio27";
++			gpio-export,output = <1>;
++			gpios = <&pio 27 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		fan_power {
@@ -330,7 +336,7 @@ index 769a9416e6..25647db01d 100755
 +	pinctrl-0 = <&pwm0_pin>;
  };
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index 043ac1f35e..7aa981e3d6 100755
+index c44f760b25..4774f0b51e 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
 @@ -195,15 +195,8 @@ define Device/glinet_gl-x3000
