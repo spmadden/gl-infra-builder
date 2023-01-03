@@ -1,4 +1,4 @@
-From aeae5b1596a5240663d2e3a6461a26f9a0363b83 Mon Sep 17 00:00:00 2001
+From 66b6cdad1cd68ce42f4b6b7fe17ef08e5c66f8eb Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -6,10 +6,10 @@ Subject: [PATCH] iwinfo: support mtk private wifi driver
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/network/utils/iwinfo/Makefile         |   2 +-
- .../iwinfo/patches/0001-fix-wext-h.patch      |  13 +
+ .../iwinfo/patches/0001-fix-wext-h.patch      |  32 ++
  .../iwinfo/patches/0100-support-mtk.patch     | 112 ++++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 504 ++++++++++++++++++
- 4 files changed, 630 insertions(+), 1 deletion(-)
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 510 ++++++++++++++++++
+ 4 files changed, 655 insertions(+), 1 deletion(-)
  create mode 100644 package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
@@ -29,10 +29,10 @@ index 25cc210acb..e312ddd7df 100644
  define Build/InstallDev
 diff --git a/package/network/utils/iwinfo/patches/0001-fix-wext-h.patch b/package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
 new file mode 100644
-index 0000000000..d8e6dc8c80
+index 0000000000..be03cb5c26
 --- /dev/null
 +++ b/package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,32 @@
 +Index: libiwinfo-2022-04-26-dc6847eb/api/wext.h
 +===================================================================
 +--- libiwinfo-2022-04-26-dc6847eb.orig/api/wext.h
@@ -42,10 +42,29 @@ index 0000000000..d8e6dc8c80
 + struct	iw_param
 + {
 +-  int32_t		value;		/* The value of the parameter itself */
-++  uint64_t		value;		/* The value of the parameter itself */
+++  int64_t		value;		/* The value of the parameter itself */
 +   uint8_t		fixed;		/* Hardware should not use auto select */
 +   uint8_t		disabled;	/* Disable the feature */
 +   uint16_t		flags;		/* Various specifc flags (if any) */
++@@ -988,6 +988,9 @@ struct	iw_range
++ 	uint16_t		old_num_channels;
++ 	uint8_t		old_num_frequency;
++ 
+++	/* Scan capabilities */
+++	uint8_t		scan_capa; 	/* IW_SCAN_CAPA_* bit field */
+++
++ 	/* Wireless event capability bitmasks */
++ 	uint32_t		event_capa[6];
++ 
++@@ -1013,7 +1016,7 @@ struct	iw_range
++ 
++ 	/* Rates */
++ 	uint8_t		num_bitrates;	/* Number of entries in the list */
++-	int32_t		bitrate[IW_MAX_BITRATES];	/* list, in bps */
+++	int64_t		bitrate[IW_MAX_BITRATES];	/* list, in bps */
++ 
++ 	/* RTS threshold */
++ 	int32_t		min_rts;	/* Minimal RTS threshold */
 diff --git a/package/network/utils/iwinfo/patches/0100-support-mtk.patch b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
 new file mode 100644
 index 0000000000..4c5ebc014c
@@ -166,10 +185,10 @@ index 0000000000..4c5ebc014c
 + 	luaL_register(L, NULL, R_wext);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..fed7f61dc0
+index 0000000000..51f0fa83aa
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,504 @@
+@@ -0,0 +1,510 @@
 +#include "iwinfo.h"
 +#include "iwinfo_wext.h"
 +
@@ -592,6 +611,11 @@ index 0000000000..fed7f61dc0
 +	return 0;
 +}
 +
++static int mtk_get_htmode(const char *ifname, int *buf)
++{
++	return -1;
++}
++
 +static int mtk_get_encryption(const char *ifname, char *buf)
 +{
 +	/* No reliable crypto info in wext */
@@ -659,6 +683,7 @@ index 0000000000..fed7f61dc0
 +	.mbssid_support   = mtk_get_mbssid_support,
 +	.hwmodelist       = mtk_get_hwmodelist,
 +	.htmodelist       = mtk_get_htmodelist,
++	.htmode           = mtk_get_htmode;
 +	.mode             = mtk_get_mode,
 +	.ssid             = mtk_get_ssid,
 +	.bssid            = mtk_get_bssid,
