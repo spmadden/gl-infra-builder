@@ -4,7 +4,7 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 2c989a42ca2bfe37bdaa2afb0cd4cc9acb3a4c17
+    revision: ca28f53e9214fee6ae1c5f73c67e7cbb118ea6b5
 
 packages:
   - i2c-tools
@@ -119,7 +119,6 @@ packages:
   - gl-sdk4-ui-edgerouter
   - gl-sdk4-ui-nasview
   - gl-sdk4-ui-parentalcontrol
-  - gl-sdk4-ui-security
   - gl-sdk4-ui-vlan
   - gl-sdk4-ui-wireless
   - gl-sdk4-ui-zerotierview
