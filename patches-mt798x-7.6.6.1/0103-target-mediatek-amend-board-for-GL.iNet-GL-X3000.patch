@@ -6,7 +6,7 @@ Subject: [PATCH] target/mediatek: amend board for GL.iNet GL-X3000
 ---
  .../boot/dts/mediatek/mt7981-gl-x3000.dts     | 313 +++++++++++++++++-
  target/linux/mediatek/image/mt7981.mk         |  11 +-
- .../mt7981/base-files/etc/board.d/01_leds     |  20 ++
+ .../mt7981/base-files/etc/board.d/01_leds     |  21 ++
  .../mt7981/base-files/etc/board.d/02_network  |   6 +-
  .../patches-5.4/403-support-x3000-emmc.patch  |  30 ++
  5 files changed, 364 insertions(+), 16 deletions(-)
@@ -362,7 +362,7 @@ new file mode 100755
 index 0000000000..7e1f8bf8a4
 --- /dev/null
 +++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,21 @@
 +
 +. /lib/functions/uci-defaults.sh
 +
@@ -371,6 +371,7 @@ index 0000000000..7e1f8bf8a4
 +board=$(board_name)
 +
 +case "$board" in
++glinet,xe3000-emmc |\
 +glinet,x3000-emmc)
 +        ucidef_set_led_netdev  "wlan2g" "WLAN2G" "wifi:2g"  "ra0"
 +        ucidef_set_led_netdev  "wlan5g" "WLAN5G" "wifi:5g"  "rax0"
