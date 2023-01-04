@@ -1,4 +1,4 @@
-From b0c4cc307193ba06e386cd99c05768202d959ec5 Mon Sep 17 00:00:00 2001
+From 1cd9b6b59ba8e3281c1491d3f6ab2852072dafdd Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 19 Sep 2022 15:53:15 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT2500
@@ -10,13 +10,13 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  .../0001-add-support-for-dual-boot.patch      | 574 ------------------
  .../patches/0001-support-partlable.patch      |  23 +
  ...-jffs2-mount-on-mtk-flash-workaround.patch |  14 -
- .../boot/dts/mediatek/mt7981-gl-mt2500.dts    | 183 ++++++
+ .../boot/dts/mediatek/mt7981-gl-mt2500.dts    | 184 ++++++
  target/linux/mediatek/image/mt7981.mk         |  11 +
  .../mt7981/base-files/etc/board.d/02_network  |   7 +-
  target/linux/mediatek/mt7981/config-5.4       |   5 +-
  .../9999-block2mtd-support-partline.patch     | 139 +++++
  .../9999-support-partition-split.patch        | 186 ++++++
- 11 files changed, 558 insertions(+), 612 deletions(-)
+ 11 files changed, 559 insertions(+), 612 deletions(-)
  delete mode 100644 package/system/fstools/patches/0001-add-support-for-dual-boot.patch
  create mode 100644 package/system/fstools/patches/0001-support-partlable.patch
  delete mode 100644 package/system/fstools/patches/0101-jffs2-mount-on-mtk-flash-workaround.patch
@@ -743,10 +743,10 @@ index 4db38994d0..0000000000
 - }
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
 new file mode 100755
-index 0000000000..e5d793cd1f
+index 0000000000..2b673e74cc
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
-@@ -0,0 +1,183 @@
+@@ -0,0 +1,184 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -782,6 +782,7 @@ index 0000000000..e5d793cd1f
 +			device_ddns = "/dev/mmcblk0boot1", "0x10";
 +			device_sn_bak = "/dev/mmcblk0boot1", "0x20";
 +			device_sn = "/dev/mmcblk0boot1", "0x30";
++			country_code = "/dev/mmcblk0boot1", "0x88";
 +		};
 +	};
 +
@@ -931,7 +932,7 @@ index 0000000000..e5d793cd1f
 +	status = "okay";
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index c6259ccd5f..043ac1f35e 100755
+index 1956a36128..c44f760b25 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
 @@ -207,3 +207,14 @@ define Device/glinet_gl-x3000
@@ -1341,5 +1342,5 @@ index 0000000000..8e0026c216
 ++
 ++#endif
 -- 
-2.25.1
+2.34.1
 
