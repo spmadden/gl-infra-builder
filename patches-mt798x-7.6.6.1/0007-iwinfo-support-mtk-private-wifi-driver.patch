@@ -1,4 +1,4 @@
-From 8e79ecb7e6caab8af0a10a7248f8e77b557eb599 Mon Sep 17 00:00:00 2001
+From 1b95b3a5a361624daf6d3a8a16c538e2ff032d3f Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -8,8 +8,8 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  package/network/utils/iwinfo/Makefile         |   2 +-
  .../iwinfo/patches/0001-fix-wext-h.patch      |  32 ++
  .../iwinfo/patches/0100-support-mtk.patch     | 112 ++++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 510 ++++++++++++++++++
- 4 files changed, 655 insertions(+), 1 deletion(-)
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 513 ++++++++++++++++++
+ 4 files changed, 658 insertions(+), 1 deletion(-)
  create mode 100644 package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
@@ -185,10 +185,10 @@ index 0000000000..4c5ebc014c
 + 	luaL_register(L, NULL, R_wext);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..fe9036d274
+index 0000000000..652760b42e
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,510 @@
+@@ -0,0 +1,513 @@
 +#include "iwinfo.h"
 +#include "iwinfo_wext.h"
 +
@@ -446,8 +446,8 @@ index 0000000000..fe9036d274
 +static int mtk_get_scanlist(const char *ifname, char *buf, int *len)
 +{
 +	struct iwinfo_scanlist_entry *e = (struct iwinfo_scanlist_entry *)buf;
++	static char data[20 * 1024 + 1];
 +	int offsets[SCAN_DATA_MAX];
-+	char data[20 * 1024 + 1];
 +	char cmd[128];
 +	int index = 0;
 +	int total = -1;
@@ -537,6 +537,9 @@ index 0000000000..fe9036d274
 +
 +			*len += sizeof(struct iwinfo_scanlist_entry);
 +			e++;
++
++			if (index + 1 == total)
++				break;
 +		}
 +
 +		if (index + 1 == total)
