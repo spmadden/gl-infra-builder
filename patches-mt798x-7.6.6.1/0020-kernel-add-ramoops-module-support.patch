@@ -1,0 +1,88 @@
+From 4f612b3bc2419630ac9a5e1958b4bfd1b5a41d20 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 4 Jan 2023 15:19:37 +0800
+Subject: [PATCH] kernel: add ramoops module support
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/linux/modules/fs.mk                | 15 +++++++++++++++
+ package/kernel/linux/modules/lib.mk               |  9 +++++++++
+ target/linux/generic/config-5.4                   |  8 ++++++++
+ .../arch/arm64/boot/dts/mediatek/mt7981.dtsi      |  2 +-
+ 4 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/fs.mk b/package/kernel/linux/modules/fs.mk
+index d43542b17e..87558c8c28 100644
+--- a/package/kernel/linux/modules/fs.mk
++++ b/package/kernel/linux/modules/fs.mk
+@@ -573,3 +573,18 @@ define KernelPackage/fuse/description
+ endef
+ 
+ $(eval $(call KernelPackage,fuse))
++
++define KernelPackage/ramoops
++  SUBMENU:=$(FS_MENU)
++  TITLE:=Log panic/oops to a RAM buffer
++  KCONFIG:= CONFIG_PSTORE=y CONFIG_PSTORE_RAM
++  DEPENDS:= +kmod-reed-solomon
++  FILES:=$(LINUX_DIR)/fs/pstore/ramoops.ko
++  AUTOLOAD:=$(call AutoLoad,10,ramoops)
++endef
++
++define KernelPackage/ramoops/description
++ Kernel module for log panic/oops to a RAM buffer support
++endef
++
++$(eval $(call KernelPackage,ramoops))
+diff --git a/package/kernel/linux/modules/lib.mk b/package/kernel/linux/modules/lib.mk
+index 9a341932bd..4968ec74f7 100644
+--- a/package/kernel/linux/modules/lib.mk
++++ b/package/kernel/linux/modules/lib.mk
+@@ -272,3 +272,12 @@ define KernelPackage/asn1-decoder
+ endef
+ 
+ $(eval $(call KernelPackage,asn1-decoder))
++
++define KernelPackage/reed-solomon
++  SUBMENU:=$(LIB_MENU)
++  TITLE:=Reed Solomon
++  HIDDEN:=1
++  FILES:=$(LINUX_DIR)/lib/reed_solomon/reed_solomon.ko
++endef
++
++$(eval $(call KernelPackage,reed-solomon))
+diff --git a/target/linux/generic/config-5.4 b/target/linux/generic/config-5.4
+index 18825fc1fc..63213a8e1f 100644
+--- a/target/linux/generic/config-5.4
++++ b/target/linux/generic/config-5.4
+@@ -4186,6 +4186,14 @@ CONFIG_PROC_SYSCTL=y
+ # CONFIG_PSB6970_PHY is not set
+ # CONFIG_PSI is not set
+ # CONFIG_PSTORE is not set
++# CONFIG_PSTORE_DEFLATE_COMPRESS is not set
++# CONFIG_PSTORE_LZO_COMPRESS is not set
++# CONFIG_PSTORE_LZ4_COMPRESS is not set
++# CONFIG_PSTORE_LZ4HC_COMPRESS is not set
++# CONFIG_PSTORE_842_COMPRESS is not set
++# CONFIG_PSTORE_ZSTD_COMPRESS is not set
++# CONFIG_PSTORE_CONSOLE is not set
++# CONFIG_PSTORE_PMSG is not set
+ # CONFIG_PTP_1588_CLOCK is not set
+ # CONFIG_PTP_1588_CLOCK_IXP46X is not set
+ # CONFIG_PTP_1588_CLOCK_KVM is not set
+diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981.dtsi b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981.dtsi
+index e99ef83829..fe765bc92a 100644
+--- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981.dtsi
++++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981.dtsi
+@@ -135,7 +135,7 @@
+ 		reg = <0 0x15194000 0 0x1000>;
+ 	};
+ 
+-	reserved-memory {
++	reserved_memory: reserved-memory {
+ 		#address-cells = <2>;
+ 		#size-cells = <2>;
+ 		ranges;
+-- 
+2.34.1
+
