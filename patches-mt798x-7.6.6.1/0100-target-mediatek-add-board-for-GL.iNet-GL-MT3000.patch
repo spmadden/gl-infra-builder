@@ -1,21 +1,21 @@
-From c2a3ead3628049dff0cce55a53c1efe36e90e786 Mon Sep 17 00:00:00 2001
+From bb9b133dfafc7fdbe3d147a23a5e0f665cd1e04e Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
 Date: Thu, 29 Dec 2022 16:19:53 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
 
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 281 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 282 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  18 ++
  .../mt7981/base-files/etc/board.d/02_network  |  31 +-
- 3 files changed, 307 insertions(+), 23 deletions(-)
+ 3 files changed, 308 insertions(+), 23 deletions(-)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..a0b6f17c9c
+index 0000000000..e69dac67f4
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,281 @@
+@@ -0,0 +1,282 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -114,6 +114,7 @@ index 0000000000..a0b6f17c9c
 +			partition@fb80000 {
 +				label = "cfg";
 +				reg = <0xfb80000 0x0080000>;
++				read-only;
 +			};
 +		};
 +	};
