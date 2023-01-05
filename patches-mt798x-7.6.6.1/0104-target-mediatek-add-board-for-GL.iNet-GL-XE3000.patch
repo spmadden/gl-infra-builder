@@ -1,22 +1,22 @@
-From bbc2ac592cc38cdb52d3671513154a14d908aaa4 Mon Sep 17 00:00:00 2001
+From 53750c67edaa94a0002adc5000c6f8c3efed7358 Mon Sep 17 00:00:00 2001
 From: Li Zhang <li.zhang@gl-inet.com>
 Date: Tue, 6 Dec 2022 22:10:07 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-XE3000
 
 Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
 ---
- .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 302 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 309 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  11 +
  .../mt7981/base-files/etc/board.d/02_network  |   2 +
- 3 files changed, 315 insertions(+)
+ 3 files changed, 322 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 new file mode 100755
-index 0000000000..a151651d8b
+index 0000000000..319c0e772f
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
-@@ -0,0 +1,308 @@
+@@ -0,0 +1,309 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -52,6 +52,7 @@ index 0000000000..a151651d8b
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
 +		reset-button = "gpio-456";
 +		radio = "mt798111 mt798112";
++		cfg-partition = "/dev/mmcblk0p5";
 +		dfs;
 +		factory_data {
 +			device_mac = "/dev/mmcblk0p3", "0x0a";
@@ -326,7 +327,7 @@ index 0000000000..a151651d8b
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index 7aa981e3d6..19c5fce95d 100755
+index 4774f0b51e..b7f1f6d437 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
 @@ -201,6 +201,17 @@ define Device/glinet_gl-x3000

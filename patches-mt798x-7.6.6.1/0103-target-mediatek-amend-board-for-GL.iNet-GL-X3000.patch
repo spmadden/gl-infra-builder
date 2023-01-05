@@ -1,23 +1,23 @@
-From 5dc8df764b9b2d4d094cd20ed72a34c0e1e13341 Mon Sep 17 00:00:00 2001
+From 764d3c98e9dfa1362be45dad35fe4aeaae52433b Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
 Date: Tue, 3 Jan 2023 15:20:23 +0800
 Subject: [PATCH] target/mediatek: amend board for GL.iNet GL-X3000
 
 ---
- .../boot/dts/mediatek/mt7981-gl-x3000.dts     | 313 +++++++++++++++++-
+ .../boot/dts/mediatek/mt7981-gl-x3000.dts     | 314 +++++++++++++++++-
  target/linux/mediatek/image/mt7981.mk         |  11 +-
  .../mt7981/base-files/etc/board.d/01_leds     |  21 ++
  .../mt7981/base-files/etc/board.d/02_network  |   6 +-
  .../patches-5.4/403-support-x3000-emmc.patch  |  30 ++
- 5 files changed, 364 insertions(+), 16 deletions(-)
+ 5 files changed, 366 insertions(+), 16 deletions(-)
  create mode 100755 target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
  create mode 100644 target/linux/mediatek/patches-5.4/403-support-x3000-emmc.patch
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
-index 769a9416e6..0197460aac 100755
+index 769a9416e6..2429d14892 100755
 --- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
-@@ -1,8 +1,313 @@
+@@ -1,8 +1,314 @@
  /dts-v1/;
 -
 -#include "mt7981-gl-mt3000.dts"
@@ -57,6 +57,7 @@ index 769a9416e6..0197460aac 100755
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
 +		reset-button = "gpio-456";
 +		radio = "mt798111 mt798112";
++		cfg-partition = "/dev/mmcblk0p5";
 +		dfs;
 +		factory_data {
 +			device_mac = "/dev/mmcblk0p3", "0x0a";
@@ -359,7 +360,7 @@ index c44f760b25..4774f0b51e 100755
  TARGET_DEVICES += glinet_gl-x3000
 diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds b/target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
 new file mode 100755
-index 0000000000..7e1f8bf8a4
+index 0000000000..e5e5aca029
 --- /dev/null
 +++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
 @@ -0,0 +1,21 @@
@@ -441,5 +442,5 @@ index 0000000000..afa8309b2a
 + 	"wf0_mode1", "wf0_mode3", "mt7531_int", };
 + static const char *mt7981_ant_groups[] = { "ant_sel", };
 -- 
-2.17.1
+2.34.1
 
