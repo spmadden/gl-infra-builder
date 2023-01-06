@@ -89,6 +89,9 @@ packages:
   - gl-sdk4-ui-process
   - gl-sdk4-ui-reset
   - gl-sdk4-ui-snooping
+  - gl-sdk4-ui-devboardautomations
+  - gl-sdk4-ui-devboarddevices
+  - gl-sdk4-ui-threadadvanced
   - gl-sdk4-ui-threaddevices
   - gl-sdk4-ui-threadnetwork
   - gl-sdk4-ui-threadtopologies
