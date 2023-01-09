@@ -1,9 +1,8 @@
-From 53750c67edaa94a0002adc5000c6f8c3efed7358 Mon Sep 17 00:00:00 2001
-From: Li Zhang <li.zhang@gl-inet.com>
-Date: Tue, 6 Dec 2022 22:10:07 +0800
+From d35e1431ce85e2449086da0f924c8bbf819f9581 Mon Sep 17 00:00:00 2001
+From: lincolnzh <hongjian.zhang@gl-inet.com>
+Date: Mon, 9 Jan 2023 11:05:16 +0800
 Subject: [PATCH] target/mediatek: add board for GL.iNet GL-XE3000
 
-Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
 ---
  .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 309 ++++++++++++++++++
  target/linux/mediatek/image/mt7981.mk         |  11 +
@@ -13,7 +12,7 @@ Signed-off-by: Li Zhang <li.zhang@gl-inet.com>
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 new file mode 100755
-index 0000000000..319c0e772f
+index 0000000000..8d3902d418
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 @@ -0,0 +1,309 @@
@@ -119,7 +118,7 @@ index 0000000000..319c0e772f
 +
 +		led@1 {
 +			label = "wifi:5g";
-+			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
++			gpios = <&pio 38 GPIO_ACTIVE_LOW>;
 +			default-state = "off";
 +		};
 +
@@ -155,7 +154,7 @@ index 0000000000..319c0e772f
 +
 +		led@7 {
 +			label = "internet";
-+			gpios = <&pio 38 GPIO_ACTIVE_LOW>;
++			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
 +			default-state = "off";
 +		};
 +	};
@@ -369,5 +368,5 @@ index fcb05fdf5d..ea22d67df0 100755
  		wan_mac=$(get_mac_binary /dev/mmcblk0boot1 0x0a)
  		lan_mac=$(macaddr_add "$wan_mac" 1)
 -- 
-2.34.1
+2.17.1
 

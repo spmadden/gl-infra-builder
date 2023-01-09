@@ -1,6 +1,6 @@
-From 764d3c98e9dfa1362be45dad35fe4aeaae52433b Mon Sep 17 00:00:00 2001
+From 83417ded8d085db21847d9e6710679c46d85c700 Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
-Date: Tue, 3 Jan 2023 15:20:23 +0800
+Date: Mon, 9 Jan 2023 10:59:24 +0800
 Subject: [PATCH] target/mediatek: amend board for GL.iNet GL-X3000
 
 ---
@@ -14,7 +14,7 @@ Subject: [PATCH] target/mediatek: amend board for GL.iNet GL-X3000
  create mode 100644 target/linux/mediatek/patches-5.4/403-support-x3000-emmc.patch
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
-index 769a9416e6..2429d14892 100755
+index 769a9416e6..457b67fc7d 100755
 --- a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
 @@ -1,8 +1,314 @@
@@ -142,7 +142,7 @@ index 769a9416e6..2429d14892 100755
 +
 +		led@1 {
 +			label = "wifi:5g";
-+			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
++			gpios = <&pio 38 GPIO_ACTIVE_LOW>;
 +			default-state = "off";
 +		};
 +
@@ -178,7 +178,7 @@ index 769a9416e6..2429d14892 100755
 +
 +		led@7 {
 +			label = "internet";
-+			gpios = <&pio 38 GPIO_ACTIVE_LOW>;
++			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
 +			default-state = "off";
 +		};
 +	};
@@ -442,5 +442,5 @@ index 0000000000..afa8309b2a
 + 	"wf0_mode1", "wf0_mode3", "mt7531_int", };
 + static const char *mt7981_ant_groups[] = { "ant_sel", };
 -- 
-2.34.1
+2.17.1
 
