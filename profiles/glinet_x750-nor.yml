@@ -1,0 +1,132 @@
+---
+description: Add the glinet dependencies
+
+feeds:
+  - name: glinet
+    uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    revision: 2c989a42ca2bfe37bdaa2afb0cd4cc9acb3a4c17
+
+packages:
+  - gl-sdk4-acl
+  - dnsmasq-full
+  - gl-oui-rpc
+  - oui-librpc
+  - gl-sdk4-firewall
+  - gl-sdk4-clients 
+  - gl-sdk4-lan 
+  - gl-sdk4-system 
+  - gl-sdk4-carrier-monitor  
+  - gl-sdk4-wg-server
+  - gl-sdk4-wg-client 
+  - gl-sdk4-ui-overview 
+  - gl-sdk4-ui-internet   
+  - gl-sdk4-ddns 
+  - gl-sdk4-cloud
+  - gl-sdk4-cloud-batch-manage
+  - gl-sdk4-ui-cloud  
+  - gl-sdk4-ui-process 
+  - gl-sdk4-edgerouter 
+  - gl-sdk4-wifi 
+  - gl-sdk4-ui-ovpnserver
+  - gl-sdk4-ui-ovpnclient 
+  - gl-sdk4-macclone 
+  - gl-sdk4-igmp 
+  - gl-sdk4-init-portal 
+  - gl-sdk4-ipv6 
+  - gl-sdk4-keepcfg 
+  - gl-sdk4-luci 
+  - gl-sdk4-modem
+  - gl-sdk4-ui-modemmanage 
+  - gl-sdk4-mqtt 
+  - gl-sdk4-mwan3  
+  - gl-sdk4-netmode 
+  - gl-sdk4-network
+  - gl-sdk4-network-diag 
+  - gl-sdk4-nl80211-event 
+  - gl-sdk4-plugins 
+  - gl-sdk4-repeater
+  - gl-sdk4-rtty 
+  - gl-sdk4-sms-forward 
+  - gl-sdk4-vpn-policy
+  - gl-sdk4-tethering 
+  - kmod-gl-sdk4-parental-control
+
+  - gl-sdk4-ui-clients 
+  - gl-sdk4-ui-adminpw 
+  - gl-sdk4-ui-advanced 
+  - gl-sdk4-ui-bridge 
+  - gl-sdk4-ui-btnsettings 
+  - gl-sdk4-ui-core
+  - gl-sdk4-ui-dnsview
+  - gl-sdk4-ui-home
+  - gl-sdk4-ui-login
+  - gl-sdk4-ui-logview
+  - gl-sdk4-ui-upgrade
+  - gl-sdk4-ui-welcome
+  - gl-sdk4-s2s
+  - gl-sdk4-ui-dynamicdns
+  - gl-sdk4-ui-edgerouter
+  - gl-sdk4-ui-firewallview
+  - gl-sdk4-ui-igmp
+  - gl-sdk4-ui-ipv6
+  - gl-sdk4-ui-lanip 
+  - gl-sdk4-ui-macclone
+  - gl-sdk4-ui-multiwan
+  - gl-sdk4-ui-parentalcontrol
+  - gl-sdk4-ui-plugins
+  - gl-sdk4-ui-reset
+  - gl-sdk4-ui-sms
+  - gl-sdk4-ui-timedtask
+  - gl-sdk4-ui-timezone
+  - gl-sdk4-ui-vlan
+  - gl-sdk4-ui-vpndashboard
+  - gl-sdk4-ui-wgclient
+  - gl-sdk4-ui-wgserver
+  - gl-sdk4-ui-wireless
+
+diffconfig: |
+  CONFIG_SIGNATURE_CHECK=n
+  CONFIG_PACKAGE_dnsmasq=n
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad-basic-wolfssl=n
+  CONFIG_PACKAGE_wpad=n
+  CONFIG_BUSYBOX_CUSTOM=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
+  CONFIG_NGINX_HTTP_CHARSET=n
+  CONFIG_NGINX_HTTP_GZIP=n
+  CONFIG_NGINX_HTTP_SSI=n
+  CONFIG_NGINX_HTTP_USERID=n
+  CONFIG_NGINX_HTTP_ACCESS=n
+  CONFIG_NGINX_HTTP_AUTH_BASIC=n
+  CONFIG_NGINX_HTTP_AUTOINDEX=n
+  CONFIG_NGINX_HTTP_GEO=n
+  CONFIG_NGINX_HTTP_MAP=n
+  CONFIG_NGINX_HTTP_SPLIT_CLIENTS=n
+  CONFIG_NGINX_HTTP_REFERER=n
+  CONFIG_NGINX_HTTP_REWRITE=n
+  CONFIG_NGINX_HTTP_FASTCGI=n
+  CONFIG_NGINX_HTTP_SCGI=n
+  CONFIG_NGINX_HTTP_MEMCACHED=n
+  CONFIG_NGINX_HTTP_LIMIT_CONN=n
+  CONFIG_NGINX_HTTP_LIMIT_REQ=n
+  CONFIG_NGINX_HTTP_EMPTY_GIF=n
+  CONFIG_NGINX_HTTP_BROWSER=n
+  CONFIG_NGINX_HTTP_UPSTREAM_HASH=n
+  CONFIG_NGINX_HTTP_UPSTREAM_IP_HASH=n
+  CONFIG_NGINX_HTTP_UPSTREAM_LEAST_CONN=n
+  CONFIG_NGINX_HTTP_UPSTREAM_KEEPALIVE=n
+  CONFIG_NGINX_HTTP_CACHE=n
+  CONFIG_NGINX_NAXSI=n
+  CONFIG_NGINX_HEADERS_MORE=n
+  CONFIG_LIBCURL_MBEDTLS=n
+  CONFIG_LIBCURL_OPENSSL=y
+  CONFIG_OPENSSL_OPTIMIZE_SPEED=y
+  CONFIG_LUCI_LANG_zh_Hans=y
+
+  CONFIG_BUSYBOX_CONFIG_ADDGROUP=y 
+  CONFIG_BUSYBOX_CONFIG_FEATURE_ADDUSER_TO_GROUP=y
+  CONFIG_BUSYBOX_CONFIG_ADDUSER=y
+  CONFIG_BUSYBOX_CONFIG_CHPASSWD=y
+  CONFIG_BUSYBOX_CONFIG_DELUSER=y
+  CONFIG_BUSYBOX_CONFIG_DELGROUP=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_DEL_USER_FROM_GROUP=y

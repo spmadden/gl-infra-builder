@@ -1,0 +1,248 @@
+From 9db9b4b989953a8a7420acf9b4f6edb4cb885ef8 Mon Sep 17 00:00:00 2001
+From: niyin <yin.ni@gl-inet.com>
+Date: Wed, 28 Dec 2022 20:28:15 -0800
+Subject: [PATCH] add x750 support
+
+---
+ .../ath79/dts/qca9531_glinet_gl-x750-nor.dts  | 182 ++++++++++++++++++
+ target/linux/ath79/image/nand.mk              |  22 +++
+ .../nand/base-files/lib/upgrade/platform.sh   |   1 +
+ 3 files changed, 205 insertions(+)
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+new file mode 100644
+index 0000000000..37c96a7243
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+@@ -0,0 +1,182 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++#include "qca953x.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	compatible = "glinet,gl-x750-nor", "qca,qca9531";
++	model = "GL.iNet GL-X750";
++
++	gl_hw {
++	            compatible = "gl-hw-info";
++                #address-cells = <1>;
++                #size-cells = <1>;
++    	        model = "x750";
++                wan = "eth0";
++                lan = "eth1";
++                build-in-modem = "1-1.2";
++                reset-button = "gpio-3";
++                usb-port = "1-1.3";
++				flash_size = <16>;
++				radio = "mac80211";
++               microsd = "1-1.1";
++                factory_data {
++                        device_mac = "art";
++                        device_ddns = "art", "0x10";
++                        device_sn_bak = "art", "0x20";
++                        device_sn = "art", "0x30";
++                        country_code = "art", "0x88";
++                };
++        };
++
++	keys {
++		compatible = "gpio-keys-polled";
++		poll-interval = <20>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&jtag_disable_pins>;
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		power {
++			label = "green:power";
++			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
++			default-state = "on";
++		};
++
++		wlan2g {
++			label = "green:wlan2g";
++			gpios = <&gpio 4 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "phy1tpt";
++		};
++
++		wlan5g {
++			label = "green:wlan5g";
++			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "phy0tpt";
++		};
++
++		wan {
++			label = "green:wan";
++			gpios = <&gpio 14 GPIO_ACTIVE_LOW>;
++		};
++
++		lte {
++			label = "green:lte";
++			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
++		};
++	};
++	gpio-export {
++                compatible = "gpio-export";
++
++                gpio_pci_power {
++                        gpio-export,name = "pci_power";
++                        gpio-export,output = <0>;
++                        gpios = <&gpio 0 GPIO_ACTIVE_LOW>;
++                };
++
++                gpio_usb_power {
++                        gpio-export,name = "usb_power";
++                        gpio-export,output = <0>;
++                        gpios = <&gpio 2 GPIO_ACTIVE_LOW>;
++                };
++
++                gpio_ble_reset {
++                        //set name as gpio1 to compat 1806 gpio name
++                        gpio-export,name = "gpio1";
++                        gpio-export,output = <0>;
++                        gpios = <&gpio 1 GPIO_ACTIVE_HIGH>;
++                };
++    };
++};
++
++&pcie0 {
++	status = "okay";
++};
++
++&uart {
++        status = "okay";
++};
++
++&usb0 {
++	status = "okay";
++};
++
++&usb_phy {
++	status = "okay";
++};
++
++&spi {
++	status = "okay";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <25000000>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x000000 0x040000>;
++				read-only;
++			};
++
++			partition@40000 {
++				label = "u-boot-env";
++				reg = <0x040000 0x010000>;
++			};
++
++			art: partition@50000 {
++				label = "art";
++				reg = <0x050000 0x010000>;
++				read-only;
++			};
++			partition@60000 {
++				compatible = "denx,uimage";
++				label = "firmware";
++				reg = <0x060000 0xfa0000>;
++			};
++		};
++	};
++};
++
++&eth0 {
++        status = "okay";
++        mtd-mac-address = <&art 0x0>;
++        phy-handle = <&swphy4>;
++        ifname = "eth1";
++};
++
++&eth1 {
++        mtd-mac-address = <&art 0x0>;
++        mtd-mac-address-increment = <1>;
++        ifname = "eth0";
++};
++
++&wmac {
++        status = "okay";
++        mtd-cal-data = <&art 0x1000>;
++        mtd-mac-address = <&art 0x1002>;
++};
++&art {
++        compatible = "nvmem-cells";
++        #address-cells = <1>;
++        #size-cells = <1>;
++
++        macaddr_art_0: macaddr@0 {
++                reg = <0x0 0x6>;
++        };
++};
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index c51e61d507..d5b9a78628 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -262,6 +262,28 @@ define Device/glinet_gl-xe300-nor-nand
+ endef
+ TARGET_DEVICES += glinet_gl-xe300-nor-nand
+ 
++define Device/glinet_gl-x750-common
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-X750
++  DEVICE_PACKAGES := kmod-usb2 kmod-ath10k ath10k-firmware-qca9887 block-mount PCI_SUPPORT kmod-usb-storage
++  SUPPORTED_DEVICES += gl-x750 glinet,gl-x750
++endef
++
++define Device/glinet_gl-x750-nor
++  $(Device/glinet_gl-x750-common)
++  DEVICE_VARIANT := NOR
++  KERNEL_SIZE := 4096k
++  IMAGE_SIZE := 16064k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.bin
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-x750-nor
++
+ # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
+ define Device/netgear_ath79_nand
+   DEVICE_VENDOR := NETGEAR
+diff --git a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh b/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
+index b7b6b23b98..6caa30b637 100644
+--- a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
+@@ -19,6 +19,7 @@ platform_do_upgrade() {
+ 		glinet_nand_nor_do_upgrade "$1"
+ 		;;
+ 	glinet,gl-ar750s-nor|\
++	glinet,gl-x750-nor|\
+ 	glinet,gl-x300b-nor-nand|\
+ 	glinet,gl-ar750s-nor-nand)
+ 		nand_nor_do_upgrade "$1"
+-- 
+2.25.1
+
