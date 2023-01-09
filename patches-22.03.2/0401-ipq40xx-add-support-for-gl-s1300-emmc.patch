@@ -1,16 +1,17 @@
-From 0f5e588f06413a5d1d23d092376c8f7000a1b47a Mon Sep 17 00:00:00 2001
+From fe57f2b44ee73af99177d0659ce65e6a178dcc8f Mon Sep 17 00:00:00 2001
 From: Dongming Han <handongming@gl-inet.com>
-Date: Wed, 2 Nov 2022 23:47:24 +0800
-Subject: [PATCH] ipq40xx add support for gl-s1300-emmc
+Date: Mon, 9 Jan 2023 14:25:58 +0800
+Subject: [PATCH] ipq40xx: add support for gl-s1300-emmc
 
+Signed-off-by: Dongming Han <handongming@gl-inet.com>
 ---
  .../ipq40xx/base-files/etc/board.d/01_leds    |   8 +-
  .../ipq40xx/base-files/etc/board.d/02_network |   9 +
  .../base-files/lib/upgrade/platform.sh        |   2 +
  .../boot/dts/qcom-ipq4029-gl-s1300-emmc.dts   | 412 ++++++++++++++++++
- target/linux/ipq40xx/image/generic.mk         |  29 ++
+ target/linux/ipq40xx/image/generic.mk         |  28 ++
  .../901-arm-boot-add-dts-files.patch          |   3 +-
- 6 files changed, 461 insertions(+), 2 deletions(-)
+ 6 files changed, 460 insertions(+), 2 deletions(-)
  create mode 100644 target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts
 
 diff --git a/target/linux/ipq40xx/base-files/etc/board.d/01_leds b/target/linux/ipq40xx/base-files/etc/board.d/01_leds
@@ -508,7 +509,7 @@ index 0000000000..1ba67cdea0
 +	qcom,ath10k-calibration-variant = "GL-S1300-EMMC";
 +};
 diff --git a/target/linux/ipq40xx/image/generic.mk b/target/linux/ipq40xx/image/generic.mk
-index cf89409b17..3201c89a3d 100644
+index cf89409b17..03b03e7e3c 100644
 --- a/target/linux/ipq40xx/image/generic.mk
 +++ b/target/linux/ipq40xx/image/generic.mk
 @@ -106,6 +106,17 @@ define Build/qsdk-ipq-app-gpt
@@ -529,7 +530,7 @@ index cf89409b17..3201c89a3d 100644
  define Build/SenaoFW
  	-$(STAGING_DIR_HOST)/bin/mksenaofw \
  		-n $(BOARD_NAME) -r $(VENDOR_ID) -p $(1) \
-@@ -587,6 +598,24 @@ define Device/glinet_gl-b2200
+@@ -587,6 +598,23 @@ define Device/glinet_gl-b2200
  endef
  TARGET_DEVICES += glinet_gl-b2200
  
@@ -540,12 +541,11 @@ index cf89409b17..3201c89a3d 100644
 +	SOC := qcom-ipq4029
 +	DEVICE_DTS_CONFIG := config@ap.dk04.1-c1
 +	KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-+	IMAGES := emmc.img sysupgrade.bin
++	IMAGES := emmc.img sysupgrade.tar
 +	IMAGE/emmc.img := qsdk-ipq-app-gpt2 |\
 +		pad-to 17k | append-kernel |\
-+		pad-to 32785k | append-rootfs |\
-+		append-gl-metadata
-+	IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++		pad-to 32785k | append-rootfs
++	IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
 +	DEVICE_PACKAGES := ipq-wifi-glinet_gl-s1300 \
 +		kmod-fs-ext4 kmod-mmc kmod-spi-dev mkf2fs e2fsprogs kmod-fs-f2fs
 +endef
