@@ -1,4 +1,4 @@
-From 589de56c3dbde6aa45c0c49c3c5165d344fed723 Mon Sep 17 00:00:00 2001
+From cf238106a885b93e29a93cfd6960695fa216cfe6 Mon Sep 17 00:00:00 2001
 From: gl-yangweiping <weiping.yang@gl-inet.com>
 Date: Tue, 7 Jun 2022 21:57:04 -0400
 Subject: [PATCH] A1300 adapt 21.02.2
@@ -15,8 +15,8 @@ Subject: [PATCH] A1300 adapt 21.02.2
  .../patches-5.4/320-add_spi_nor_write.patch   |  11 +
  .../patches-5.4/700-add-modem-support.patch   | 280 ++++++++++++++++
  ...k-events-support-multiple-registrant.patch | 313 ++++++++++++++++++
- ...-linux-kernel-to-support-shortcut-fe.patch | 253 ++++++++++++++
- 12 files changed, 902 insertions(+), 13 deletions(-)
+ ...-linux-kernel-to-support-shortcut-fe.patch | 282 ++++++++++++++++
+ 12 files changed, 931 insertions(+), 13 deletions(-)
  create mode 100644 package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
  create mode 100644 target/linux/ipq40xx/patches-5.4/320-add_spi_nor_write.patch
  create mode 100644 target/linux/ipq40xx/patches-5.4/700-add-modem-support.patch
@@ -910,12 +910,14 @@ index 0000000000..c763449594
 + 	.fcn = ctnetlink_expect_event,
 diff --git a/target/linux/ipq40xx/patches-5.4/953-net-patch-linux-kernel-to-support-shortcut-fe.patch b/target/linux/ipq40xx/patches-5.4/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
 new file mode 100644
-index 0000000000..57b4029298
+index 0000000000..6de31b973d
 --- /dev/null
 +++ b/target/linux/ipq40xx/patches-5.4/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
-@@ -0,0 +1,253 @@
-+--- a/include/linux/if_bridge.h
-++++ b/include/linux/if_bridge.h
+@@ -0,0 +1,282 @@
++Index: linux-5.4.179/include/linux/if_bridge.h
++===================================================================
++--- linux-5.4.179.orig/include/linux/if_bridge.h
+++++ linux-5.4.179/include/linux/if_bridge.h
 +@@ -52,6 +52,9 @@ struct br_ip_list {
 + 
 + extern void brioctl_set(int (*ioctl_hook)(struct net *, unsigned int, void __user *));
@@ -926,8 +928,10 @@ index 0000000000..57b4029298
 + #if IS_ENABLED(CONFIG_BRIDGE) && IS_ENABLED(CONFIG_BRIDGE_IGMP_SNOOPING)
 + int br_multicast_list_adjacent(struct net_device *dev,
 + 			       struct list_head *br_ip_list);
-+--- a/include/linux/skbuff.h
-++++ b/include/linux/skbuff.h
++Index: linux-5.4.179/include/linux/skbuff.h
++===================================================================
++--- linux-5.4.179.orig/include/linux/skbuff.h
+++++ linux-5.4.179/include/linux/skbuff.h
 +@@ -826,6 +826,10 @@ struct sk_buff {
 + #endif
 + 	__u8			gro_skip:1;
@@ -939,8 +943,10 @@ index 0000000000..57b4029298
 + #ifdef CONFIG_NET_SCHED
 + 	__u16			tc_index;	/* traffic control index */
 + #endif
-+--- a/include/linux/timer.h
-++++ b/include/linux/timer.h
++Index: linux-5.4.179/include/linux/timer.h
++===================================================================
++--- linux-5.4.179.orig/include/linux/timer.h
+++++ linux-5.4.179/include/linux/timer.h
 +@@ -18,6 +18,10 @@ struct timer_list {
 + 	void			(*function)(struct timer_list *);
 + 	u32			flags;
@@ -952,8 +958,10 @@ index 0000000000..57b4029298
 + #ifdef CONFIG_LOCKDEP
 + 	struct lockdep_map	lockdep_map;
 + #endif
-+--- a/include/net/netfilter/nf_conntrack_ecache.h
-++++ b/include/net/netfilter/nf_conntrack_ecache.h
++Index: linux-5.4.179/include/net/netfilter/nf_conntrack_ecache.h
++===================================================================
++--- linux-5.4.179.orig/include/net/netfilter/nf_conntrack_ecache.h
+++++ linux-5.4.179/include/net/netfilter/nf_conntrack_ecache.h
 +@@ -75,6 +75,8 @@ struct nf_ct_event {
 + #ifdef CONFIG_NF_CONNTRACK_CHAIN_EVENTS
 + extern int nf_conntrack_register_notifier(struct net *net, struct notifier_block *nb);
@@ -963,8 +971,10 @@ index 0000000000..57b4029298
 + #else
 + struct nf_ct_event_notifier {
 + 	int (*fcn)(unsigned int events, struct nf_ct_event *item);
-+--- a/net/bridge/br_if.c
-++++ b/net/bridge/br_if.c
++Index: linux-5.4.179/net/bridge/br_if.c
++===================================================================
++--- linux-5.4.179.orig/net/bridge/br_if.c
+++++ linux-5.4.179/net/bridge/br_if.c
 +@@ -763,6 +763,28 @@ void br_port_flags_change(struct net_bri
 + 		br_recalculate_neigh_suppress_enabled(br);
 + }
@@ -994,9 +1004,11 @@ index 0000000000..57b4029298
 + bool br_port_flag_is_set(const struct net_device *dev, unsigned long flag)
 + {
 + 	struct net_bridge_port *p;
-+--- a/net/core/dev.c
-++++ b/net/core/dev.c
-+@@ -3197,9 +3197,17 @@ static int xmit_one(struct sk_buff *skb,
++Index: linux-5.4.179/net/core/dev.c
++===================================================================
++--- linux-5.4.179.orig/net/core/dev.c
+++++ linux-5.4.179/net/core/dev.c
++@@ -3218,9 +3218,17 @@ static int xmit_one(struct sk_buff *skb,
 + 	unsigned int len;
 + 	int rc;
 + 
@@ -1015,34 +1027,45 @@ index 0000000000..57b4029298
 + #ifdef CONFIG_ETHERNET_PACKET_MANGLE
 + 	if (!dev->eth_mangle_tx ||
 + 	    (skb = dev->eth_mangle_tx(dev, skb)) != NULL)
-+@@ -4714,6 +4722,11 @@ void netdev_rx_handler_unregister(struct
++@@ -4753,6 +4761,13 @@ void netdev_rx_handler_unregister(struct
 + }
 + EXPORT_SYMBOL_GPL(netdev_rx_handler_unregister);
 + 
 ++#ifdef CONFIG_SHORTCUT_FE
 ++int (*athrs_fast_nat_recv)(struct sk_buff *skb) __rcu __read_mostly;
 ++EXPORT_SYMBOL_GPL(athrs_fast_nat_recv);
+++int (*gl_parental_control_handle)(struct sk_buff *skb) __rcu __read_mostly;
+++EXPORT_SYMBOL_GPL(gl_parental_control_handle);
 ++#endif
 ++
 + /*
 +  * Limit the use of PFMEMALLOC reserves to those protocols that implement
 +  * the special handling of PFMEMALLOC skbs.
-+@@ -4764,6 +4777,10 @@ static int __netif_receive_skb_core(stru
++@@ -4803,6 +4818,11 @@ static int __netif_receive_skb_core(stru
 + 	int ret = NET_RX_DROP;
 + 	__be16 type;
 + 
 ++#ifdef CONFIG_SHORTCUT_FE
 ++	int (*fast_recv)(struct sk_buff *skb);
+++	int (*gl_pc_recv)(struct sk_buff *skb);
 ++#endif
 ++
 + 	net_timestamp_check(!netdev_tstamp_prequeue, skb);
 + 
 + 	trace_netif_receive_skb(skb);
-+@@ -4803,6 +4820,16 @@ another_round:
++@@ -4842,6 +4862,24 @@ another_round:
 + 			goto out;
 + 	}
 + 
 ++#ifdef CONFIG_SHORTCUT_FE
+++	gl_pc_recv = rcu_dereference(gl_parental_control_handle);
+++	if(gl_pc_recv){
+++		if (gl_pc_recv(skb) == NET_RX_DROP){
+++			ret = NET_RX_DROP;
+++			goto out;
+++		}
+++	}
+++
 ++	fast_recv = rcu_dereference(athrs_fast_nat_recv);
 ++	if (fast_recv) {
 ++		if (fast_recv(skb)) {
@@ -1055,8 +1078,10 @@ index 0000000000..57b4029298
 + 	if (skb_skip_tc_classify(skb))
 + 		goto skip_classify;
 + 
-+--- a/net/Kconfig
-++++ b/net/Kconfig
++Index: linux-5.4.179/net/Kconfig
++===================================================================
++--- linux-5.4.179.orig/net/Kconfig
+++++ linux-5.4.179/net/Kconfig
 +@@ -473,3 +473,6 @@ config HAVE_CBPF_JIT
 + # Extended BPF JIT (eBPF)
 + config HAVE_EBPF_JIT
@@ -1064,8 +1089,10 @@ index 0000000000..57b4029298
 ++
 ++config SHORTCUT_FE
 ++	bool "Enables kernel network stack path for Shortcut  Forwarding Engine
-+--- a/net/netfilter/nf_conntrack_proto_tcp.c
-++++ b/net/netfilter/nf_conntrack_proto_tcp.c
++Index: linux-5.4.179/net/netfilter/nf_conntrack_proto_tcp.c
++===================================================================
++--- linux-5.4.179.orig/net/netfilter/nf_conntrack_proto_tcp.c
+++++ linux-5.4.179/net/netfilter/nf_conntrack_proto_tcp.c
 +@@ -34,11 +34,19 @@
 + /* Do not check the TCP window for incoming packets  */
 + static int nf_ct_tcp_no_window_check __read_mostly = 1;
@@ -1086,8 +1113,10 @@ index 0000000000..57b4029298
 + /* If it is set to zero, we disable picking up already established
 +    connections. */
 + static int nf_ct_tcp_loose __read_mostly = 1;
-+--- a/net/netfilter/nf_conntrack_ecache.c
-++++ b/net/netfilter/nf_conntrack_ecache.c
++Index: linux-5.4.179/net/netfilter/nf_conntrack_ecache.c
++===================================================================
++--- linux-5.4.179.orig/net/netfilter/nf_conntrack_ecache.c
+++++ linux-5.4.179/net/netfilter/nf_conntrack_ecache.c
 +@@ -158,7 +158,11 @@ int nf_conntrack_eventmask_report(unsign
 + 
 + 	rcu_read_lock();
@@ -1168,5 +1197,5 @@ index 0000000000..57b4029298
 + void nf_conntrack_unregister_notifier(struct net *net,
 + 				      struct nf_ct_event_notifier *new)
 -- 
-2.17.1
+2.25.1
 
