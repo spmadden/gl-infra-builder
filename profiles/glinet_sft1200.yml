@@ -3,13 +3,13 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    branch: v4.1.0_mt1300
+    branch: master
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 3736d7437fb9a57014bb779d495aa11700462959
+    branch: common
   - name: gl_feed_1806
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 1316311f43c7c30ad9b4173a5af0f5e492e28f03
+    revision: cebf0db47a424677a6bc1e74106498ea9042e69f
 
 packages:
   - kmod-ipt-offload
@@ -36,6 +36,7 @@ packages:
   - i2c-tools
   - tor:gl_feed_common
   - getdns:packages
+  - libtirpc:gl_feed_1806
   - dnscrypt-proxy2:gl_feed_1806
   - stubby
   - smstools3:packages
