@@ -1,4 +1,4 @@
-From 9db9b4b989953a8a7420acf9b4f6edb4cb885ef8 Mon Sep 17 00:00:00 2001
+From f4e7ce9e809f6fb3e623d261d15045151bfa3902 Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
 Date: Wed, 28 Dec 2022 20:28:15 -0800
 Subject: [PATCH] add x750 support
@@ -6,13 +6,15 @@ Subject: [PATCH] add x750 support
 ---
  .../ath79/dts/qca9531_glinet_gl-x750-nor.dts  | 182 ++++++++++++++++++
  target/linux/ath79/image/nand.mk              |  22 +++
+ .../ath79/nand/base-files/etc/board.d/01_leds |   5 +
+ .../nand/base-files/etc/board.d/02_network    |   1 +
  .../nand/base-files/lib/upgrade/platform.sh   |   1 +
- 3 files changed, 205 insertions(+)
+ 5 files changed, 211 insertions(+)
  create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
 
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
 new file mode 100644
-index 0000000000..37c96a7243
+index 0000000000..4afc4e1562
 --- /dev/null
 +++ b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
 @@ -0,0 +1,182 @@
@@ -175,13 +177,13 @@ index 0000000000..37c96a7243
 +        status = "okay";
 +        mtd-mac-address = <&art 0x0>;
 +        phy-handle = <&swphy4>;
-+        ifname = "eth1";
++        ifname = "eth0";
 +};
 +
 +&eth1 {
 +        mtd-mac-address = <&art 0x0>;
 +        mtd-mac-address-increment = <1>;
-+        ifname = "eth0";
++        ifname = "eth1";
 +};
 +
 +&wmac {
@@ -231,6 +233,34 @@ index c51e61d507..d5b9a78628 100644
  # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
  define Device/netgear_ath79_nand
    DEVICE_VENDOR := NETGEAR
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index 41454cd63d..23a0a612be 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -19,6 +19,11 @@ glinet,gl-ar750s-nor-nand)
+ 	ucidef_set_led_wlan "wlan2g" "WLAN2G" "gl-ar750s:green:wlan2g" "phy1tpt"
+ 	ucidef_set_led_wlan "wlan5g" "WLAN5G" "gl-ar750s:green:wlan5g" "phy0tpt"
+ 	;;
++glinet,gl-x750-nor|\
++glinet,gl-x750-nor-nand)
++	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth0"
++    ucidef_set_led_netdev "3gnet" "LTE" "green:lte" "wwan0"
++	;;
+ glinet,gl-xe300|\
+ glinet,gl-xe300-nor-nand)
+ 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index 522451e31e..72a99887fb 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -66,6 +66,7 @@ ath79_setup_interfaces()
+ 			"0@eth0" "1:lan" "2:lan" "3:lan" "4:lan" "5:wan" "6@eth1"
+ 		;;
+ 	glinet,gl-x300b-nor|\
++	glinet,gl-x750-nor|\
+ 	glinet,gl-x300b-nor-nand)
+ 		ucidef_set_interfaces_lan_wan "eth1" "eth0"
+ 		;;
 diff --git a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh b/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
 index b7b6b23b98..6caa30b637 100644
 --- a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
