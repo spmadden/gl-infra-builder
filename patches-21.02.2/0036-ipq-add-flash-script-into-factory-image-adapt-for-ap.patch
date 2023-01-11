@@ -1,0 +1,107 @@
+From 5a47cde273f90abd776b0bcd96b672db9c6ff586 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 7 Feb 2022 11:38:09 +0800
+Subject: [PATCH] ipq: add flash script into factory image; adapt for ap1300
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Signed-off-by: Dongming Han <handongming@gl-inet.com>
+---
+ scripts/mkits-qsdk-ipq-image.sh       | 13 +++++++------
+ scripts/qsdk-flash.scr                |  8 ++++++++
+ target/linux/ipq40xx/image/generic.mk | 10 +++++++++-
+ 3 files changed, 24 insertions(+), 7 deletions(-)
+ create mode 100644 scripts/qsdk-flash.scr
+
+diff --git a/scripts/mkits-qsdk-ipq-image.sh b/scripts/mkits-qsdk-ipq-image.sh
+index 066e8df579..959200d0ae 100755
+--- a/scripts/mkits-qsdk-ipq-image.sh
++++ b/scripts/mkits-qsdk-ipq-image.sh
+@@ -15,12 +15,12 @@
+ #
+ 
+ usage() {
+-	echo "Usage: `basename $0` output img0_name img0_file [[img1_name img1_file] ...]"
++	echo "Usage: `basename $0` output img0_name img0_type img0_file [[img1_name img1_type img1_file] ...]"
+ 	exit 1
+ }
+ 
+ # We need at least 3 arguments
+-[ "$#" -lt 3 ] && usage
++[ "$#" -lt 4 ] && usage
+ 
+ # Target output file
+ OUTPUT="$1"; shift
+@@ -30,22 +30,23 @@ echo "\
+ /dts-v1/;
+ 
+ / {
+-	description = \"OpenWrt factory image\";
++	description = \"Flashing factory image\";
+ 	#address-cells = <1>;
+ 
+ 	images {" > ${OUTPUT}
+ 
+-while [ -n "$1" -a -n "$2" ]; do
+-	[ -f "$2" ] || usage
++while [ -n "$1" -a -n "$2" -a -n "$3" ]; do
++	[ -f "$3" ] || usage
+ 
+ 	name="$1"; shift
++	type="$1"; shift
+ 	file="$1"; shift
+ 
+ 	echo \
+ "		${name} {
+ 			description = \"${name}\";
+ 			data = /incbin/(\"${file}\");
+-			type = \"Firmware\";
++			type = \"${type}\";
+ 			arch = \"ARM\";
+ 			compression = \"none\";
+ 			hash@1 {
+diff --git a/scripts/qsdk-flash.scr b/scripts/qsdk-flash.scr
+new file mode 100644
+index 0000000000..e90d9a330d
+--- /dev/null
++++ b/scripts/qsdk-flash.scr
+@@ -0,0 +1,8 @@
++echo '######################################## Flashing ubi: Started'
++setenv stdout nulldev
++imxtract $imgaddr ubi || setenv stdout serial && echo "invalid image" && exit 1
++setenv stdout serial
++nand erase 0 0x8000000
++nand write $fileaddr 0 $filesize
++echo '######################################## Flashing ubi: Done'
++exit 0
+\ No newline at end of file
+diff --git a/target/linux/ipq40xx/image/generic.mk b/target/linux/ipq40xx/image/generic.mk
+index 239b753ce4..94b7263035 100644
+--- a/target/linux/ipq40xx/image/generic.mk
++++ b/target/linux/ipq40xx/image/generic.mk
+@@ -71,6 +71,14 @@ define Build/qsdk-ipq-factory-nand-askey
+ 	@mv $@.new $@
+ endef
+ 
++define Build/qsdk-ipq-factory-nand-ap1300
++	$(TOPDIR)/scripts/mkits-qsdk-ipq-image.sh $@.its \
++		script script $(TOPDIR)/scripts/qsdk-flash.scr \
++		ubi firmware $@
++	PATH=$(LINUX_DIR)/scripts/dtc:$(PATH) mkimage -f $@.its $@.new
++	@mv $@.new $@
++endef
++
+ define Build/SenaoFW
+ 	-$(STAGING_DIR_HOST)/bin/mksenaofw \
+ 		-n $(BOARD_NAME) -r $(VENDOR_ID) -p $(1) \
+@@ -482,7 +490,7 @@ define Device/glinet_gl-ap1300
+ 	KERNEL_IN_UBI := 1
+ 	DEVICE_PACKAGE := ipq-wifi-glinet_gl-ap1300
+ 	IMAGES := nand-factory.img sysupgrade.tar
+-	IMAGE/nand-factory.img := append-ubi
++	IMAGE/nand-factory.img := append-ubi | qsdk-ipq-factory-nand-ap1300 | append-gl-metadata
+ 	IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-ap1300
+-- 
+2.25.1
+
