@@ -13,7 +13,7 @@ feeds:
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
   - name: gl_feed_mtk
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: f62e2944c70c746e869daf50b85802472254b8bf
+    revision: 3200b6580f6585edcf1cd7f7643ff481d67c587d
 
 packages:
   - ethtool
