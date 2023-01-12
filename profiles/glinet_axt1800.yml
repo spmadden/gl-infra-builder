@@ -7,7 +7,6 @@ feeds:
     revision: cdd5e917f28822810189966c9ab82d622979efbf
 
 packages:
-  - kmod-gl-sdk4-fan
   - gl-sdk4-led
   - gl-sdk4-adguardhome
   - gl-sdk4-ui-adguardhome

@@ -7,3 +7,4 @@ include:
 
 packages:
   - kmod-hwmon-pwmfan
+  - kmod-gl-sdk4-fan

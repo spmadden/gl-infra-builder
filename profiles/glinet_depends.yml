@@ -24,7 +24,6 @@ packages:
   - kmod-fs-exfat
   - kmod-gl-sdk4-hw-info
   - kmod-gl-sdk4-tertf
-  - kmod-gl-sdk4-fan
   - kmod-inet-diag
   - iptables-mod-tproxy
   - iptables-mod-filter
@@ -52,6 +51,7 @@ packages:
   - kmod-mtdoops
   - smstools3
   - comgt
+  - comgt-ncm
   - chat
   - uqmi
   - usb-modeswitch
