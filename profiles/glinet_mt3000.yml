@@ -16,6 +16,7 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
+  - gl-sdk4-ui-hwnat
   - 8021xd
   - fwdd
   - kmod-mtfwd
