@@ -3,10 +3,10 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    branch: v4.1.0_mt1300
+    branch: master
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 3736d7437fb9a57014bb779d495aa11700462959
+    branch: common
 
 packages:
   - kmod-ipt-offload
