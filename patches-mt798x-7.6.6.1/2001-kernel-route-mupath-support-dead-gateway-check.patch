@@ -1,0 +1,964 @@
+From c8f43b7f2fa8fddb59decac0191ab410f65d2a16 Mon Sep 17 00:00:00 2001
+From: Luo Chongjun <luochongjun@gl-inet.com>
+Date: Thu, 19 Jan 2023 15:00:47 +0800
+Subject: [PATCH] kernel route mupath support dead gateway check
+
+---
+ .../0001-support-route-failover.patch         | 945 ++++++++++++++++++
+ 1 file changed, 945 insertions(+)
+ create mode 100644 target/linux/generic/pending-5.4/0001-support-route-failover.patch
+
+diff --git a/target/linux/generic/pending-5.4/0001-support-route-failover.patch b/target/linux/generic/pending-5.4/0001-support-route-failover.patch
+new file mode 100644
+index 0000000000..255c8434d0
+--- /dev/null
++++ b/target/linux/generic/pending-5.4/0001-support-route-failover.patch
+@@ -0,0 +1,945 @@
++Index: linux-5.4.211/include/net/flow.h
++===================================================================
++--- linux-5.4.211.orig/include/net/flow.h
+++++ linux-5.4.211/include/net/flow.h
++@@ -93,6 +93,7 @@ struct flowi4 {
++ #define fl4_ipsec_spi		uli.spi
++ #define fl4_mh_type		uli.mht.type
++ #define fl4_gre_key		uli.gre_key
+++	__be32			fl4_gw;
++ } __attribute__((__aligned__(BITS_PER_LONG/8)));
++ 
++ static inline void flowi4_init_output(struct flowi4 *fl4, int oif,
++@@ -117,6 +118,7 @@ static inline void flowi4_init_output(st
++ 	fl4->fl4_dport = dport;
++ 	fl4->fl4_sport = sport;
++ 	fl4->flowi4_multipath_hash = 0;
+++	fl4->fl4_gw = 0;
++ }
++ 
++ /* Reset some input parameters after previous lookup */
++Index: linux-5.4.211/include/net/ip_fib.h
++===================================================================
++--- linux-5.4.211.orig/include/net/ip_fib.h
+++++ linux-5.4.211/include/net/ip_fib.h
++@@ -397,6 +397,8 @@ static inline bool fib4_rules_early_flow
++ 	return true;
++ }
++ 
+++u32 fib_result_table(struct fib_result *res);
+++
++ #endif /* CONFIG_IP_MULTIPLE_TABLES */
++ 
++ /* Exported by fib_frontend.c */
++@@ -409,6 +411,7 @@ bool fib_info_nh_uses_dev(struct fib_inf
++ int fib_validate_source(struct sk_buff *skb, __be32 src, __be32 dst,
++ 			u8 tos, int oif, struct net_device *dev,
++ 			struct in_device *idev, u32 *itag);
+++void fib_select_default(const struct flowi4 *flp, struct fib_result *res);
++ #ifdef CONFIG_IP_ROUTE_CLASSID
++ static inline int fib_num_tclassid_users(struct net *net)
++ {
++Index: linux-5.4.211/include/net/netfilter/nf_nat.h
++===================================================================
++--- linux-5.4.211.orig/include/net/netfilter/nf_nat.h
+++++ linux-5.4.211/include/net/netfilter/nf_nat.h
++@@ -35,6 +35,11 @@ struct nf_conn_nat {
++ #endif
++ };
++ 
+++/* Call input routing for SNAT-ed traffic */
+++unsigned int ip_nat_route_input(void *priv,
+++				struct sk_buff *skb,
+++				const struct nf_hook_state *state);
+++
++ /* Set up the info structure to map into this range. */
++ unsigned int nf_nat_setup_info(struct nf_conn *ct,
++ 			       const struct nf_nat_range2 *range,
++Index: linux-5.4.211/include/net/route.h
++===================================================================
++--- linux-5.4.211.orig/include/net/route.h
+++++ linux-5.4.211/include/net/route.h
++@@ -184,6 +184,9 @@ int ip_route_input_noref(struct sk_buff
++ int ip_route_input_rcu(struct sk_buff *skb, __be32 dst, __be32 src,
++ 		       u8 tos, struct net_device *devin,
++ 		       struct fib_result *res);
+++int ip_route_input_common_rcu(struct sk_buff *skb, __be32 dst, __be32 src,
+++			      u8 tos, struct net_device *devin, __be32 lsrc,
+++			      struct fib_result *res);
++ 
++ static inline int ip_route_input(struct sk_buff *skb, __be32 dst, __be32 src,
++ 				 u8 tos, struct net_device *devin)
++@@ -219,6 +222,8 @@ unsigned int inet_addr_type_dev_table(st
++ void ip_rt_multicast_event(struct in_device *);
++ int ip_rt_ioctl(struct net *, unsigned int cmd, struct rtentry *rt);
++ void ip_rt_get_source(u8 *src, struct sk_buff *skb, struct rtable *rt);
+++int ip_route_input_lookup(struct sk_buff*, __be32 dst, __be32 src, u8 tos,
+++			  struct net_device *devin, __be32 lsrc);
++ struct rtable *rt_dst_alloc(struct net_device *dev,
++ 			     unsigned int flags, u16 type,
++ 			     bool nopolicy, bool noxfrm, bool will_cache);
++Index: linux-5.4.211/include/uapi/linux/rtnetlink.h
++===================================================================
++--- linux-5.4.211.orig/include/uapi/linux/rtnetlink.h
+++++ linux-5.4.211/include/uapi/linux/rtnetlink.h
++@@ -382,8 +382,11 @@ struct rtnexthop {
++ #define RTNH_F_OFFLOAD		8	/* offloaded route */
++ #define RTNH_F_LINKDOWN		16	/* carrier-down on nexthop */
++ #define RTNH_F_UNRESOLVED	32	/* The entry is unresolved (ipmr) */
+++#define RTNH_F_SUSPECT		64	/* We don't know the real state	*/
+++#define RTNH_F_BADSTATE		(RTNH_F_DEAD | RTNH_F_SUSPECT)
++ 
++-#define RTNH_COMPARE_MASK	(RTNH_F_DEAD | RTNH_F_LINKDOWN | RTNH_F_OFFLOAD)
+++#define RTNH_COMPARE_MASK	(RTNH_F_DEAD | RTNH_F_LINKDOWN | \
+++				 RTNH_F_OFFLOAD | RTNH_F_SUSPECT)
++ 
++ /* Macros to handle hexthops */
++ 
++Index: linux-5.4.211/net/bridge/br_netfilter_hooks.c
++===================================================================
++--- linux-5.4.211.orig/net/bridge/br_netfilter_hooks.c
+++++ linux-5.4.211/net/bridge/br_netfilter_hooks.c
++@@ -359,6 +359,9 @@ static int br_nf_pre_routing_finish(stru
++ 
++ 	nf_bridge->frag_max_size = IPCB(skb)->frag_max_size;
++ 
+++	/* Old skb->dst is not expected, it is lost in all cases */
+++	skb_dst_drop(skb);
+++
++ 	if (nf_bridge->pkt_otherhost) {
++ 		skb->pkt_type = PACKET_OTHERHOST;
++ 		nf_bridge->pkt_otherhost = false;
++Index: linux-5.4.211/net/ipv4/fib_frontend.c
++===================================================================
++--- linux-5.4.211.orig/net/ipv4/fib_frontend.c
+++++ linux-5.4.211/net/ipv4/fib_frontend.c
++@@ -48,6 +48,8 @@
++ 
++ #ifndef CONFIG_IP_MULTIPLE_TABLES
++ 
+++#define FIB_RES_TABLE(r) (RT_TABLE_MAIN)
+++
++ static int __net_init fib4_rules_init(struct net *net)
++ {
++ 	struct fib_table *local_table, *main_table;
++@@ -77,6 +79,8 @@ static bool fib4_has_custom_rules(struct
++ }
++ #else
++ 
+++#define FIB_RES_TABLE(r) (fib_result_table(r))
+++
++ struct fib_table *fib_new_table(struct net *net, u32 id)
++ {
++ 	struct fib_table *tb, *alias = NULL;
++@@ -355,6 +359,9 @@ static int __fib_validate_source(struct
++ 				 int rpf, struct in_device *idev, u32 *itag)
++ {
++ 	struct net *net = dev_net(dev);
+++	u32 table;
+++	unsigned char prefixlen;
+++	unsigned char scope;
++ 	struct flow_keys flkeys;
++ 	int ret, no_addr;
++ 	struct fib_result res;
++@@ -373,6 +380,7 @@ static int __fib_validate_source(struct
++ 	fl4.flowi4_flags = 0;
++ 	fl4.flowi4_uid = sock_net_uid(net, NULL);
++ 	fl4.flowi4_multipath_hash = 0;
+++	fl4.fl4_gw = 0;
++ 
++ 	no_addr = idev->ifa_list == NULL;
++ 
++@@ -404,15 +412,23 @@ static int __fib_validate_source(struct
++ 	}
++ 	if (no_addr)
++ 		goto last_resort;
++-	if (rpf == 1)
++-		goto e_rpf;
+++	table = FIB_RES_TABLE(&res);
+++	prefixlen = res.prefixlen;
+++	scope = res.scope;
++ 	fl4.flowi4_oif = dev->ifindex;
++ 
++ 	ret = 0;
++ 	if (fib_lookup(net, &fl4, &res, FIB_LOOKUP_IGNORE_LINKSTATE) == 0) {
++-		if (res.type == RTN_UNICAST)
+++		if (res.type == RTN_UNICAST &&
+++		    ((table == FIB_RES_TABLE(&res) &&
+++		      res.prefixlen >= prefixlen && res.scope >= scope) ||
+++		     !rpf)) {
++ 			ret = FIB_RES_NHC(res)->nhc_scope >= RT_SCOPE_HOST;
+++			return ret;
+++		}
++ 	}
+++	if (rpf == 1)
+++		goto e_rpf;
++ 	return ret;
++ 
++ last_resort:
++@@ -1433,9 +1449,7 @@ static int fib_inetaddr_event(struct not
++ 	switch (event) {
++ 	case NETDEV_UP:
++ 		fib_add_ifaddr(ifa);
++-#ifdef CONFIG_IP_ROUTE_MULTIPATH
++ 		fib_sync_up(dev, RTNH_F_DEAD);
++-#endif
++ 		atomic_inc(&net->ipv4.dev_addr_genid);
++ 		rt_cache_flush(dev_net(dev));
++ 		break;
++@@ -1480,9 +1494,7 @@ static int fib_netdev_event(struct notif
++ 		in_dev_for_each_ifa_rtnl(ifa, in_dev) {
++ 			fib_add_ifaddr(ifa);
++ 		}
++-#ifdef CONFIG_IP_ROUTE_MULTIPATH
++ 		fib_sync_up(dev, RTNH_F_DEAD);
++-#endif
++ 		atomic_inc(&net->ipv4.dev_addr_genid);
++ 		rt_cache_flush(net);
++ 		break;
++Index: linux-5.4.211/net/ipv4/fib_rules.c
++===================================================================
++--- linux-5.4.211.orig/net/ipv4/fib_rules.c
+++++ linux-5.4.211/net/ipv4/fib_rules.c
++@@ -75,6 +75,11 @@ unsigned int fib4_rules_seq_read(struct
++ 	return fib_rules_seq_read(net, AF_INET);
++ }
++ 
+++u32 fib_result_table(struct fib_result *res)
+++{
+++	return res->table ? res->table->tb_id : RT_TABLE_UNSPEC;
+++}
+++
++ int __fib_lookup(struct net *net, struct flowi4 *flp,
++ 		 struct fib_result *res, unsigned int flags)
++ {
++Index: linux-5.4.211/net/ipv4/fib_semantics.c
++===================================================================
++--- linux-5.4.211.orig/net/ipv4/fib_semantics.c
+++++ linux-5.4.211/net/ipv4/fib_semantics.c
++@@ -53,6 +53,7 @@ static struct hlist_head *fib_info_hash;
++ static struct hlist_head *fib_info_laddrhash;
++ static unsigned int fib_info_hash_size;
++ static unsigned int fib_info_cnt;
+++DEFINE_RWLOCK(fib_nhflags_lock);
++ 
++ #define DEVINDEX_HASHBITS 8
++ #define DEVINDEX_HASHSIZE (1U << DEVINDEX_HASHBITS)
++@@ -535,36 +536,77 @@ errout:
++ 
++ static int fib_detect_death(struct fib_info *fi, int order,
++ 			    struct fib_info **last_resort, int *last_idx,
++-			    int dflt)
+++			    int dflt, int *last_nhsel,
+++			    const struct flowi4 *flp)
++ {
++-	const struct fib_nh_common *nhc = fib_info_nhc(fi, 0);
+++	struct fib_nh_common *nhc;
++ 	struct neighbour *n;
++-	int state = NUD_NONE;
++-
++-	if (likely(nhc->nhc_gw_family == AF_INET))
++-		n = neigh_lookup(&arp_tbl, &nhc->nhc_gw.ipv4, nhc->nhc_dev);
++-	else if (nhc->nhc_gw_family == AF_INET6)
++-		n = neigh_lookup(ipv6_stub->nd_tbl, &nhc->nhc_gw.ipv6,
++-				 nhc->nhc_dev);
++-	else
++-		n = NULL;
+++	int nhsel;
+++	int state;
+++	int flag, dead = 1;
+++
+++	/* change_nexthops(fi) { */
+++	for (nhsel = 0; nhsel < fib_info_num_path(fi); nhsel++) {
+++		nhc = fib_info_nhc(fi, nhsel);
+++		if (flp->flowi4_oif && flp->flowi4_oif != nhc->nhc_oif &&
+++		    !(flp->flowi4_flags & FLOWI_FLAG_SKIP_NH_OIF))
+++			continue;
+++		if (flp->fl4_gw && flp->fl4_gw != nhc->nhc_gw.ipv4 &&
+++		    nhc->nhc_gw.ipv4 && nhc->nhc_scope == RT_SCOPE_LINK)
+++			continue;
+++		if (nhc->nhc_flags & RTNH_F_DEAD)
+++			continue;
++ 
++-	if (n) {
++-		state = n->nud_state;
++-		neigh_release(n);
++-	} else {
++-		return 0;
++-	}
++-	if (state == NUD_REACHABLE)
++-		return 0;
++-	if ((state & NUD_VALID) && order != dflt)
++-		return 0;
++-	if ((state & NUD_VALID) ||
++-	    (*last_idx < 0 && order > dflt && state != NUD_INCOMPLETE)) {
++-		*last_resort = fi;
++-		*last_idx = order;
+++		flag = 0;
+++		if (nhc->nhc_dev->flags & IFF_NOARP) {
+++			dead = 0;
+++			goto setfl;
+++		}
+++
+++		state = NUD_NONE;
+++		if (!nhc->nhc_gw_family || nhc->nhc_scope != RT_SCOPE_LINK ||
+++		    (nhc->nhc_gw_family == AF_INET && !nhc->nhc_gw.ipv4))
+++			n = neigh_lookup(&arp_tbl, &flp->daddr,
+++					 nhc->nhc_dev);
+++		else if (likely(nhc->nhc_gw_family == AF_INET))
+++			n = neigh_lookup(&arp_tbl, &nhc->nhc_gw.ipv4,
+++					 nhc->nhc_dev);
+++		else if (nhc->nhc_gw_family == AF_INET6)
+++			n = neigh_lookup(ipv6_stub->nd_tbl, &nhc->nhc_gw.ipv6,
+++					 nhc->nhc_dev);
+++		else
+++			n = NULL;
+++		if (n) {
+++			state = n->nud_state;
+++			neigh_release(n);
+++		}
+++		if (state == NUD_REACHABLE ||
+++		    ((state & NUD_VALID) && order != dflt)) {
+++			dead = 0;
+++			goto setfl;
+++		}
+++		if (!(state & NUD_VALID))
+++			flag = 1;
+++		if (!dead)
+++			goto setfl;
+++		if ((state & NUD_VALID) ||
+++		    (*last_idx < 0 && order >= dflt)) {
+++			*last_resort = fi;
+++			*last_idx = order;
+++			*last_nhsel = nhsel;
+++		}
+++
+++setfl:
+++		read_lock_bh(&fib_nhflags_lock);
+++		if (flag)
+++			nhc->nhc_flags |= RTNH_F_SUSPECT;
+++		else
+++			nhc->nhc_flags &= ~RTNH_F_SUSPECT;
+++		read_unlock_bh(&fib_nhflags_lock);
++ 	}
++-	return 1;
+++	/* } endfor_nexthops(fi) */
+++
+++	return dead;
++ }
++ 
++ int fib_nh_common_init(struct fib_nh_common *nhc, struct nlattr *encap,
++@@ -1100,6 +1142,7 @@ static int fib_check_nh_v6_gw(struct net
++ static int fib_check_nh_v4_gw(struct net *net, struct fib_nh *nh, u32 table,
++ 			      u8 scope, struct netlink_ext_ack *extack)
++ {
+++	struct fib_info *fi = nh->nh_parent;
++ 	struct net_device *dev;
++ 	struct fib_result res;
++ 	int err = 0;
++@@ -1117,8 +1160,12 @@ static int fib_check_nh_v4_gw(struct net
++ 			return -ENODEV;
++ 		}
++ 		if (!(dev->flags & IFF_UP)) {
++-			NL_SET_ERR_MSG(extack, "Nexthop device is not up");
++-			return -ENETDOWN;
+++			if (fi->fib_protocol != RTPROT_STATIC) {
+++				NL_SET_ERR_MSG(extack,
+++					       "Nexthop device is not up");
+++				return -ENETDOWN;
+++			}
+++			nh->fib_nh_flags |= RTNH_F_DEAD;
++ 		}
++ 		addr_type = inet_addr_type_dev_table(net, dev, nh->fib_nh_gw4);
++ 		if (addr_type != RTN_UNICAST) {
++@@ -1162,11 +1209,29 @@ static int fib_check_nh_v4_gw(struct net
++ 			err = fib_lookup(net, &fl4, &res,
++ 					 FIB_LOOKUP_IGNORE_LINKSTATE);
++ 		}
+++	}
++ 
++-		if (err) {
+++	if (err) {
+++		struct in_device *in_dev;
+++
+++		if (err != -ENETUNREACH ||
+++		    fi->fib_protocol != RTPROT_STATIC) {
++ 			NL_SET_ERR_MSG(extack, "Nexthop has invalid gateway");
++ 			goto out;
++ 		}
+++		in_dev = inetdev_by_index(net, nh->fib_nh_oif);
+++		if (in_dev == NULL ||
+++		    in_dev->dev->flags & IFF_UP) {
+++			NL_SET_ERR_MSG(extack,
+++				       "Nexthop has invalid gateway");
+++			goto out;
+++		}
+++		nh->fib_nh_flags |= RTNH_F_DEAD;
+++		nh->fib_nh_scope = RT_SCOPE_LINK;
+++		nh->fib_nh_dev = in_dev->dev;
+++		dev_hold(nh->fib_nh_dev);
+++		err = 0;
+++		goto out;
++ 	}
++ 
++ 	err = -EINVAL;
++@@ -1185,7 +1250,16 @@ static int fib_check_nh_v4_gw(struct net
++ 	dev_hold(dev);
++ 	if (!netif_carrier_ok(dev))
++ 		nh->fib_nh_flags |= RTNH_F_LINKDOWN;
++-	err = (dev->flags & IFF_UP) ? 0 : -ENETDOWN;
+++	if (!(dev->flags & IFF_UP)) {
+++		if (fi->fib_protocol != RTPROT_STATIC) {
+++			err = -ENETDOWN;
+++			NL_SET_ERR_MSG(extack,
+++				       "Device for nexthop is not up");
+++			goto out;
+++		}
+++		nh->fib_nh_flags |= RTNH_F_DEAD;
+++	}
+++	err = 0;
++ out:
++ 	rcu_read_unlock();
++ 	return err;
++@@ -1194,6 +1268,7 @@ out:
++ static int fib_check_nh_nongw(struct net *net, struct fib_nh *nh,
++ 			      struct netlink_ext_ack *extack)
++ {
+++	struct fib_info *fi = nh->nh_parent;
++ 	struct in_device *in_dev;
++ 	int err;
++ 
++@@ -1211,8 +1286,11 @@ static int fib_check_nh_nongw(struct net
++ 		goto out;
++ 	err = -ENETDOWN;
++ 	if (!(in_dev->dev->flags & IFF_UP)) {
++-		NL_SET_ERR_MSG(extack, "Device for nexthop is not up");
++-		goto out;
+++		if (fi->fib_protocol != RTPROT_STATIC) {
+++			NL_SET_ERR_MSG(extack, "Device for nexthop is not up");
+++			goto out;
+++		}
+++		nh->fib_nh_flags |= RTNH_F_DEAD;
++ 	}
++ 
++ 	nh->fib_nh_dev = in_dev->dev;
++@@ -1985,10 +2063,15 @@ int fib_sync_down_dev(struct net_device
++ 		prev_fi = fi;
++ 		dead = 0;
++ 		change_nexthops(fi) {
++-			if (nexthop_nh->fib_nh_flags & RTNH_F_DEAD)
++-				dead++;
++-			else if (nexthop_nh->fib_nh_dev == dev &&
++-				 nexthop_nh->fib_nh_scope != scope) {
+++			if (nexthop_nh->fib_nh_flags & RTNH_F_DEAD) {
+++				if (fi->fib_protocol != RTPROT_STATIC ||
+++				    !nexthop_nh->fib_nh_dev ||
+++				    !__in_dev_get_rtnl(nexthop_nh->fib_nh_dev) ||
+++				    nexthop_nh->fib_nh_dev->flags&IFF_UP)
+++					dead++;
+++			} else if (nexthop_nh->fib_nh_dev == dev &&
+++				   nexthop_nh->fib_nh_scope != scope) {
+++				write_lock_bh(&fib_nhflags_lock);
++ 				switch (event) {
++ 				case NETDEV_DOWN:
++ 				case NETDEV_UNREGISTER:
++@@ -2000,7 +2083,11 @@ int fib_sync_down_dev(struct net_device
++ 				}
++ 				call_fib_nh_notifiers(nexthop_nh,
++ 						      FIB_EVENT_NH_DEL);
++-				dead++;
+++				write_unlock_bh(&fib_nhflags_lock);
+++				if (fi->fib_protocol != RTPROT_STATIC ||
+++				    force ||
+++				    !__in_dev_get_rtnl(dev))
+++					dead++;
++ 			}
++ #ifdef CONFIG_IP_ROUTE_MULTIPATH
++ 			if (event == NETDEV_UNREGISTER &&
++@@ -2030,20 +2117,19 @@ int fib_sync_down_dev(struct net_device
++ }
++ 
++ /* Must be invoked inside of an RCU protected region.  */
++-static void fib_select_default(const struct flowi4 *flp, struct fib_result *res)
+++void fib_select_default(const struct flowi4 *flp, struct fib_result *res)
++ {
++ 	struct fib_info *fi = NULL, *last_resort = NULL;
++ 	struct hlist_head *fa_head = res->fa_head;
++ 	struct fib_table *tb = res->table;
++ 	u8 slen = 32 - res->prefixlen;
++-	int order = -1, last_idx = -1;
+++	int order = -1, last_idx = -1, last_nhsel = 0;
++ 	struct fib_alias *fa, *fa1 = NULL;
++ 	u32 last_prio = res->fi->fib_priority;
++ 	u8 last_tos = 0;
++ 
++ 	hlist_for_each_entry_rcu(fa, fa_head, fa_list) {
++ 		struct fib_info *next_fi = fa->fa_info;
++-		struct fib_nh_common *nhc;
++ 
++ 		if (fa->fa_slen != slen)
++ 			continue;
++@@ -2066,10 +2152,6 @@ static void fib_select_default(const str
++ 		    fa->fa_type != RTN_UNICAST)
++ 			continue;
++ 
++-		nhc = fib_info_nhc(next_fi, 0);
++-		if (!nhc->nhc_gw_family || nhc->nhc_scope != RT_SCOPE_LINK)
++-			continue;
++-
++ 		fib_alias_accessed(fa);
++ 
++ 		if (!fi) {
++@@ -2077,7 +2159,8 @@ static void fib_select_default(const str
++ 				break;
++ 			fa1 = fa;
++ 		} else if (!fib_detect_death(fi, order, &last_resort,
++-					     &last_idx, fa1->fa_default)) {
+++					     &last_idx, fa1->fa_default,
+++					     &last_nhsel, flp)) {
++ 			fib_result_assign(res, fi);
++ 			fa1->fa_default = order;
++ 			goto out;
++@@ -2087,28 +2170,39 @@ static void fib_select_default(const str
++ 	}
++ 
++ 	if (order <= 0 || !fi) {
+++		if (fi && fib_info_num_path(fi) > 1 &&
+++		    fib_detect_death(fi, order, &last_resort, &last_idx,
+++				     fa1->fa_default, &last_nhsel, flp) &&
+++		    last_resort == fi) {
+++			read_lock_bh(&fib_nhflags_lock);
+++			fi->fib_nh[last_nhsel].fib_nh_flags &= ~RTNH_F_SUSPECT;
+++			read_unlock_bh(&fib_nhflags_lock);
+++		}
++ 		if (fa1)
++ 			fa1->fa_default = -1;
++ 		goto out;
++ 	}
++ 
++ 	if (!fib_detect_death(fi, order, &last_resort, &last_idx,
++-			      fa1->fa_default)) {
+++			      fa1->fa_default, &last_nhsel, flp)) {
++ 		fib_result_assign(res, fi);
++ 		fa1->fa_default = order;
++ 		goto out;
++ 	}
++ 
++-	if (last_idx >= 0)
+++	if (last_idx >= 0) {
++ 		fib_result_assign(res, last_resort);
+++		read_lock_bh(&fib_nhflags_lock);
+++		last_resort->fib_nh[last_nhsel].fib_nh_flags &= ~RTNH_F_SUSPECT;
+++		read_unlock_bh(&fib_nhflags_lock);
+++	}
++ 	fa1->fa_default = last_idx;
++ out:
++ 	return;
++ }
++ 
++ /*
++- * Dead device goes up. We wake up dead nexthops.
++- * It takes sense only on multipath routes.
+++ * Dead device goes up or new address is added. We wake up dead nexthops.
++  *
++  * only used when fib_nh is built into fib_info
++  */
++@@ -2117,8 +2211,10 @@ int fib_sync_up(struct net_device *dev,
++ 	struct fib_info *prev_fi;
++ 	struct hlist_head *head;
++ 	struct fib_nh *nh;
++-	int ret;
+++	struct fib_result res;
+++	int ret, rep;
++ 
+++repeat:
++ 	if (!(dev->flags & IFF_UP))
++ 		return 0;
++ 
++@@ -2132,6 +2228,7 @@ int fib_sync_up(struct net_device *dev,
++ 	prev_fi = NULL;
++ 	head = fib_info_devhash_bucket(dev);
++ 	ret = 0;
+++	rep = 0;
++ 
++ 	hlist_for_each_entry(nh, head, nh_hash) {
++ 		struct fib_info *fi = nh->nh_parent;
++@@ -2144,16 +2241,39 @@ int fib_sync_up(struct net_device *dev,
++ 		prev_fi = fi;
++ 		alive = 0;
++ 		change_nexthops(fi) {
++-			if (!(nexthop_nh->fib_nh_flags & nh_flags)) {
++-				alive++;
+++			if (!(nexthop_nh->fib_nh_flags & nh_flags))
++ 				continue;
++-			}
++ 			if (!nexthop_nh->fib_nh_dev ||
++ 			    !(nexthop_nh->fib_nh_dev->flags & IFF_UP))
++ 				continue;
++ 			if (nexthop_nh->fib_nh_dev != dev ||
++ 			    !__in_dev_get_rtnl(dev))
++ 				continue;
+++			if ((nh_flags & RTNH_F_DEAD) &&
+++			    nexthop_nh->fib_nh_gw4 &&
+++			    nexthop_nh->fib_nh_gw_family == AF_INET &&
+++			    fi->fib_protocol == RTPROT_STATIC) {
+++				struct flowi4 fl4 = {
+++					.daddr = nexthop_nh->fib_nh_gw4,
+++					.flowi4_scope = nexthop_nh->fib_nh_scope,
+++					.flowi4_oif = nexthop_nh->fib_nh_oif,
+++				};
+++
+++				rcu_read_lock();
+++				if (fib_lookup(dev_net(dev), &fl4, &res,
+++					FIB_LOOKUP_IGNORE_LINKSTATE) != 0) {
+++					rcu_read_unlock();
+++					continue;
+++				}
+++				if (res.type != RTN_UNICAST &&
+++				    res.type != RTN_LOCAL) {
+++					rcu_read_unlock();
+++					continue;
+++				}
+++				nexthop_nh->fib_nh_scope = res.scope;
+++				rcu_read_unlock();
+++				rep = 1;
+++			}
++ 			alive++;
++ 			nexthop_nh->fib_nh_flags &= ~nh_flags;
++ 			call_fib_nh_notifiers(nexthop_nh, FIB_EVENT_NH_ADD);
++@@ -2166,6 +2286,8 @@ int fib_sync_up(struct net_device *dev,
++ 
++ 		fib_rebalance(fi);
++ 	}
+++	if (rep)
+++		goto repeat;
++ 
++ 	return ret;
++ }
++@@ -2232,23 +2354,16 @@ void fib_select_multipath(struct fib_res
++ void fib_select_path(struct net *net, struct fib_result *res,
++ 		     struct flowi4 *fl4, const struct sk_buff *skb)
++ {
++-	if (fl4->flowi4_oif && !(fl4->flowi4_flags & FLOWI_FLAG_SKIP_NH_OIF))
++-		goto check_saddr;
++-
+++	if (res->type == RTN_UNICAST)
+++		fib_select_default(fl4, res);
++ #ifdef CONFIG_IP_ROUTE_MULTIPATH
++ 	if (fib_info_num_path(res->fi) > 1) {
++ 		int h = fib_multipath_hash(net, fl4, skb, NULL);
++ 
++ 		fib_select_multipath(res, h);
++ 	}
++-	else
++ #endif
++-	if (!res->prefixlen &&
++-	    res->table->tb_num_default > 1 &&
++-	    res->type == RTN_UNICAST)
++-		fib_select_default(fl4, res);
++ 
++-check_saddr:
++ 	if (!fl4->saddr)
++ 		fl4->saddr = fib_result_prefsrc(net, res);
++ }
++Index: linux-5.4.211/net/ipv4/fib_trie.c
++===================================================================
++--- linux-5.4.211.orig/net/ipv4/fib_trie.c
+++++ linux-5.4.211/net/ipv4/fib_trie.c
++@@ -1483,6 +1483,11 @@ out_reject:
++ 				if (flp->flowi4_oif &&
++ 				    flp->flowi4_oif != nhc->nhc_oif)
++ 					continue;
+++				if (flp->fl4_gw &&
+++				    flp->fl4_gw != nhc->nhc_gw.ipv4 &&
+++				    nhc->nhc_gw.ipv4 &&
+++				    nhc->nhc_scope == RT_SCOPE_LINK)
+++					continue;
++ 			}
++ 
++ 			if (!(fib_flags & FIB_LOOKUP_NOREF))
++Index: linux-5.4.211/net/ipv4/netfilter/iptable_nat.c
++===================================================================
++--- linux-5.4.211.orig/net/ipv4/netfilter/iptable_nat.c
+++++ linux-5.4.211/net/ipv4/netfilter/iptable_nat.c
++@@ -40,6 +40,13 @@ static const struct nf_hook_ops nf_nat_i
++ 		.hooknum	= NF_INET_PRE_ROUTING,
++ 		.priority	= NF_IP_PRI_NAT_DST,
++ 	},
+++	/* Before routing, route before mangling */
+++	{
+++		.hook		= ip_nat_route_input,
+++		.pf		= NFPROTO_IPV4,
+++		.hooknum	= NF_INET_PRE_ROUTING,
+++		.priority	= NF_IP_PRI_LAST-1,
+++	},
++ 	{
++ 		.hook		= iptable_nat_do_chain,
++ 		.pf		= NFPROTO_IPV4,
++Index: linux-5.4.211/net/ipv4/route.c
++===================================================================
++--- linux-5.4.211.orig/net/ipv4/route.c
+++++ linux-5.4.211/net/ipv4/route.c
++@@ -1810,7 +1810,7 @@ static void ip_handle_martian_source(str
++ static int __mkroute_input(struct sk_buff *skb,
++ 			   const struct fib_result *res,
++ 			   struct in_device *in_dev,
++-			   __be32 daddr, __be32 saddr, u32 tos)
+++			   __be32 daddr, __be32 saddr, u32 tos, __be32 lsrc)
++ {
++ 	struct fib_nh_common *nhc = FIB_RES_NHC(*res);
++ 	struct net_device *dev = nhc->nhc_dev;
++@@ -1839,7 +1839,7 @@ static int __mkroute_input(struct sk_buf
++ 
++ 	do_cache = res->fi && !itag;
++ 	if (out_dev == in_dev && err && IN_DEV_TX_REDIRECTS(out_dev) &&
++-	    skb->protocol == htons(ETH_P_IP)) {
+++	    skb->protocol == htons(ETH_P_IP) && !lsrc) {
++ 		__be32 gw;
++ 
++ 		gw = nhc->nhc_gw_family == AF_INET ? nhc->nhc_gw.ipv4 : 0;
++@@ -2035,10 +2035,12 @@ int fib_multipath_hash(const struct net
++ 
++ static int ip_mkroute_input(struct sk_buff *skb,
++ 			    struct fib_result *res,
+++			    const struct flowi4 *fl4,
++ 			    struct in_device *in_dev,
++ 			    __be32 daddr, __be32 saddr, u32 tos,
++-			    struct flow_keys *hkeys)
+++			    struct flow_keys *hkeys, __be32 lsrc)
++ {
+++	fib_select_default(fl4, res);
++ #ifdef CONFIG_IP_ROUTE_MULTIPATH
++ 	if (res->fi && fib_info_num_path(res->fi) > 1) {
++ 		int h = fib_multipath_hash(res->fi->fib_net, NULL, skb, hkeys);
++@@ -2048,7 +2050,7 @@ static int ip_mkroute_input(struct sk_bu
++ #endif
++ 
++ 	/* create a routing cache entry */
++-	return __mkroute_input(skb, res, in_dev, daddr, saddr, tos);
+++	return __mkroute_input(skb, res, in_dev, daddr, saddr, tos, lsrc);
++ }
++ 
++ /*
++@@ -2063,7 +2065,7 @@ static int ip_mkroute_input(struct sk_bu
++  */
++ 
++ static int ip_route_input_slow(struct sk_buff *skb, __be32 daddr, __be32 saddr,
++-			       u8 tos, struct net_device *dev,
+++			       u8 tos, struct net_device *dev, __be32 lsrc,
++ 			       struct fib_result *res)
++ {
++ 	struct in_device *in_dev = __in_dev_get_rcu(dev);
++@@ -2121,19 +2123,26 @@ static int ip_route_input_slow(struct sk
++ 			goto martian_source;
++ 	}
++ 
+++	if (lsrc) {
+++		if (ipv4_is_multicast(lsrc) || ipv4_is_lbcast(lsrc) ||
+++		    ipv4_is_zeronet(lsrc) || ipv4_is_loopback(lsrc))
+++			goto martian_source;
+++	}
+++
++ 	/*
++ 	 *	Now we are ready to route packet.
++ 	 */
++ 	fl4.flowi4_oif = 0;
++-	fl4.flowi4_iif = dev->ifindex;
+++	fl4.flowi4_iif = lsrc ? LOOPBACK_IFINDEX : dev->ifindex;
++ 	fl4.flowi4_mark = skb->mark;
++ 	fl4.flowi4_tos = tos;
++ 	fl4.flowi4_scope = RT_SCOPE_UNIVERSE;
++ 	fl4.flowi4_flags = 0;
++ 	fl4.daddr = daddr;
++-	fl4.saddr = saddr;
+++	fl4.saddr = lsrc? : saddr;
++ 	fl4.flowi4_uid = sock_net_uid(net, NULL);
++ 	fl4.flowi4_multipath_hash = 0;
+++	fl4.fl4_gw = 0;
++ 
++ 	if (fib4_rules_early_flow_dissect(net, skb, &fl4, &_flkeys)) {
++ 		flkeys = &_flkeys;
++@@ -2144,6 +2153,8 @@ static int ip_route_input_slow(struct sk
++ 	}
++ 
++ 	err = fib_lookup(net, &fl4, res, 0);
+++	fl4.flowi4_iif = dev->ifindex;
+++	fl4.saddr = saddr;
++ 	if (err != 0) {
++ 		if (!IN_DEV_FORWARD(in_dev))
++ 			err = -EHOSTUNREACH;
++@@ -2175,12 +2186,15 @@ static int ip_route_input_slow(struct sk
++ 		goto martian_destination;
++ 
++ make_route:
++-	err = ip_mkroute_input(skb, res, in_dev, daddr, saddr, tos, flkeys);
+++	err = ip_mkroute_input(skb, res, &fl4, in_dev, daddr, saddr, tos,
+++			       flkeys, lsrc);
++ out:	return err;
++ 
++ brd_input:
++ 	if (skb->protocol != htons(ETH_P_IP))
++ 		goto e_inval;
+++	if (lsrc)
+++		goto e_inval;
++ 
++ 	if (!ipv4_is_zeronet(saddr)) {
++ 		err = fib_validate_source(skb, saddr, 0, tos, 0, dev,
++@@ -2287,9 +2301,26 @@ int ip_route_input_noref(struct sk_buff
++ }
++ EXPORT_SYMBOL(ip_route_input_noref);
++ 
+++int ip_route_input_lookup(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+++			  u8 tos, struct net_device *dev, __be32 lsrc)
+++{
+++	struct fib_result res;
+++	int err;
+++
+++	tos &= IPTOS_RT_MASK;
+++	rcu_read_lock();
+++	err = ip_route_input_common_rcu(skb, daddr, saddr, tos, dev, lsrc,
+++					&res);
+++	rcu_read_unlock();
+++
+++	return err;
+++}
+++EXPORT_SYMBOL(ip_route_input_lookup);
+++
++ /* called with rcu_read_lock held */
++-int ip_route_input_rcu(struct sk_buff *skb, __be32 daddr, __be32 saddr,
++-		       u8 tos, struct net_device *dev, struct fib_result *res)
+++int ip_route_input_common_rcu(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+++			      u8 tos, struct net_device *dev, __be32 lsrc,
+++			      struct fib_result *res)
++ {
++ 	/* Multicast recognition logic is moved from route cache to here.
++ 	   The problem was that too many Ethernet cards have broken/missing
++@@ -2335,7 +2366,13 @@ int ip_route_input_rcu(struct sk_buff *s
++ 		return err;
++ 	}
++ 
++-	return ip_route_input_slow(skb, daddr, saddr, tos, dev, res);
+++	return ip_route_input_slow(skb, daddr, saddr, tos, dev, lsrc, res);
+++}
+++
+++int ip_route_input_rcu(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+++		       u8 tos, struct net_device *dev, struct fib_result *res)
+++{
+++	return ip_route_input_common_rcu(skb, daddr, saddr, tos, dev, 0, res);
++ }
++ 
++ /* called with rcu_read_lock() */
++@@ -2590,6 +2627,7 @@ struct rtable *ip_route_output_key_hash_
++ 			fl4->daddr = fl4->saddr = htonl(INADDR_LOOPBACK);
++ 		dev_out = net->loopback_dev;
++ 		fl4->flowi4_oif = LOOPBACK_IFINDEX;
+++		fl4->fl4_gw = 0;
++ 		res->type = RTN_LOCAL;
++ 		flags |= RTCF_LOCAL;
++ 		goto make_route;
++@@ -2648,6 +2686,7 @@ struct rtable *ip_route_output_key_hash_
++ 		orig_oif = FIB_RES_OIF(*res);
++ 
++ 		fl4->flowi4_oif = dev_out->ifindex;
+++		fl4->fl4_gw = 0;
++ 		flags |= RTCF_LOCAL;
++ 		goto make_route;
++ 	}
++Index: linux-5.4.211/net/netfilter/nf_nat_core.c
++===================================================================
++--- linux-5.4.211.orig/net/netfilter/nf_nat_core.c
+++++ linux-5.4.211/net/netfilter/nf_nat_core.c
++@@ -1148,6 +1148,49 @@ static struct nf_nat_hook nat_hook = {
++ 	.manip_pkt		= nf_nat_manip_pkt,
++ };
++ 
+++unsigned int ip_nat_route_input(void *priv,
+++				struct sk_buff *skb,
+++				const struct nf_hook_state *state)
+++{
+++	struct iphdr *iph;
+++	struct nf_conn *conn;
+++	enum ip_conntrack_info ctinfo;
+++	enum ip_conntrack_dir dir;
+++	unsigned long statusbit;
+++	__be32 saddr;
+++
+++	if (!(conn = nf_ct_get(skb, &ctinfo)))
+++		return NF_ACCEPT;
+++
+++	if (!(conn->status & IPS_NAT_DONE_MASK))
+++		return NF_ACCEPT;
+++	dir = CTINFO2DIR(ctinfo);
+++	statusbit = IPS_SRC_NAT;
+++	if (dir == IP_CT_DIR_REPLY)
+++		statusbit ^= IPS_NAT_MASK;
+++	if (!(conn->status & statusbit))
+++		return NF_ACCEPT;
+++
+++	if (skb_dst(skb))
+++		return NF_ACCEPT;
+++
+++	if (skb->len < sizeof(struct iphdr))
+++		return NF_ACCEPT;
+++
+++	/* use daddr in other direction as masquerade address (lsrc) */
+++	iph = ip_hdr(skb);
+++	saddr = conn->tuplehash[!dir].tuple.dst.u3.ip;
+++	if (saddr == iph->saddr)
+++		return NF_ACCEPT;
+++
+++	if (ip_route_input_lookup(skb, iph->daddr, iph->saddr, iph->tos,
+++	    skb->dev, saddr))
+++		return NF_DROP;
+++
+++	return NF_ACCEPT;
+++}
+++EXPORT_SYMBOL_GPL(ip_nat_route_input);
+++
++ static int __init nf_nat_init(void)
++ {
++ 	int ret, i;
++Index: linux-5.4.211/net/netfilter/nf_nat_masquerade.c
++===================================================================
++--- linux-5.4.211.orig/net/netfilter/nf_nat_masquerade.c
+++++ linux-5.4.211/net/netfilter/nf_nat_masquerade.c
++@@ -32,8 +32,8 @@ nf_nat_masquerade_ipv4(struct sk_buff *s
++ 	struct nf_conn_nat *nat;
++ 	enum ip_conntrack_info ctinfo;
++ 	struct nf_nat_range2 newrange;
++-	const struct rtable *rt;
++-	__be32 newsrc, nh;
+++	struct rtable *rt;
+++	__be32 newsrc;
++ 
++ 	WARN_ON(hooknum != NF_INET_POST_ROUTING);
++ 
++@@ -48,12 +48,23 @@ nf_nat_masquerade_ipv4(struct sk_buff *s
++ 	if (ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.ip == 0)
++ 		return NF_ACCEPT;
++ 
++-	rt = skb_rtable(skb);
++-	nh = rt_nexthop(rt, ip_hdr(skb)->daddr);
++-	newsrc = inet_select_addr(out, nh, RT_SCOPE_UNIVERSE);
++-	if (!newsrc) {
++-		pr_info("%s ate my IP address\n", out->name);
++-		return NF_DROP;
+++	{
+++		struct flowi4 fl4 = { .flowi4_tos = RT_TOS(ip_hdr(skb)->tos),
+++				      .flowi4_mark = skb->mark,
+++				      .flowi4_oif = out->ifindex,
+++				      .daddr = ip_hdr(skb)->daddr,
+++				      .fl4_gw = skb_rtable(skb)->rt_gw4 };
+++		rt = ip_route_output_key(dev_net(out), &fl4);
+++		if (IS_ERR(rt)) {
+++			/* Funky routing can do this. */
+++			if (net_ratelimit())
+++				pr_info("%s:"
+++				       " No route: Rusty's brain broke!\n",
+++				       out->name);
+++			return NF_DROP;
+++		}
+++		newsrc = fl4.saddr;
+++		ip_rt_put(rt);
++ 	}
++ 
++ 	nat = nf_ct_nat_ext_add(ct);
+-- 
+2.25.1
+
