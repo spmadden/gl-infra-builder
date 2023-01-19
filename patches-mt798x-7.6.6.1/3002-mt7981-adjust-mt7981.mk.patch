@@ -1,0 +1,53 @@
+From f1d953f946c496b60469f9d36244f9c8c502f50a Mon Sep 17 00:00:00 2001
+From: Luo Chongjun <luochongjun@gl-inet.com>
+Date: Thu, 19 Jan 2023 12:19:11 +0800
+Subject: [PATCH 2/2] mt7981 adjust mt7981.mk
+
+---
+ target/linux/mediatek/image/mt7981.mk | 33 +++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
+index a798034da9..b7f1f6d437 100755
+--- a/target/linux/mediatek/image/mt7981.mk
++++ b/target/linux/mediatek/image/mt7981.mk
+@@ -189,3 +189,36 @@ define Device/glinet_gl-mt3000
+   IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-mt3000
++
++define Device/glinet_gl-x3000
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-X3000
++  DEVICE_DTS := mt7981-gl-x3000
++  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
++  SUPPORTED_DEVICES := glinet,x3000-emmc
++  DEVICE_PACKAGES := kmod-hwmon-pwmfan mkf2fs kmod-mmc kmod-fs-f2fs gdisk
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-x3000
++
++define Device/glinet_gl-xe3000
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE3000
++  DEVICE_DTS := mt7981-gl-xe3000
++  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
++  SUPPORTED_DEVICES := glinet,xe3000-emmc
++  DEVICE_PACKAGES := kmod-hwmon-pwmfan mkf2fs kmod-mmc kmod-fs-f2fs gdisk
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-xe3000
++
++define Device/glinet_gl-mt2500
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-MT2500
++  DEVICE_DTS := mt7981-gl-mt2500
++  SUPPORTED_DEVICES := glinet,mt2500-emmc
++  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
++  DEVICE_PACKAGES := mkf2fs kmod-mmc kmod-fs-f2fs gdisk
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-mt2500
+-- 
+2.25.1
+

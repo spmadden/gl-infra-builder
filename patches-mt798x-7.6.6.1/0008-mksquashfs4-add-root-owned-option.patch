@@ -1,0 +1,25 @@
+From 1944b5065a88da93ec59ac36a50d8512fcc4c3ef Mon Sep 17 00:00:00 2001
+From: Luo Chongjun <luochongjun@gl-inet.com>
+Date: Thu, 19 Jan 2023 10:02:53 +0800
+Subject: [PATCH] mksquashfs4 add root-owned option
+
+---
+ include/image.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/image.mk b/include/image.mk
+index 6c356d25c9..cae8cf1a87 100644
+--- a/include/image.mk
++++ b/include/image.mk
+@@ -226,7 +226,7 @@ $(eval $(foreach S,$(NAND_BLOCKSIZE),$(call Image/mkfs/jffs2-nand/template,$(S))
+ 
+ define Image/mkfs/squashfs-common
+ 	$(STAGING_DIR_HOST)/bin/mksquashfs4 $(call mkfs_target_dir,$(1)) $@ \
+-		-nopad -noappend -root-owned \
++		-nopad -no-exports -noappend -root-owned \
+ 		-comp $(SQUASHFSCOMP) $(SQUASHFSOPT) \
+ 		-processors 1
+ endef
+-- 
+2.25.1
+

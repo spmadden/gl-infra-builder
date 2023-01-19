@@ -1,0 +1,40 @@
+From e50477baeb6edb590fce64cb505988fd5b4b49ef Mon Sep 17 00:00:00 2001
+From: Luo Chongjun <luochongjun@gl-inet.com>
+Date: Thu, 19 Jan 2023 12:17:10 +0800
+Subject: [PATCH 1/2] mt7981 adjust 01_leds
+
+---
+ .../mt7981/base-files/etc/board.d/01_leds     | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+ create mode 100755 target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
+
+diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds b/target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
+new file mode 100755
+index 0000000000..e5e5aca029
+--- /dev/null
++++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/01_leds
+@@ -0,0 +1,21 @@
++
++. /lib/functions/uci-defaults.sh
++
++board_config_update
++
++board=$(board_name)
++
++case "$board" in
++glinet,xe3000-emmc |\
++glinet,x3000-emmc)
++        ucidef_set_led_netdev  "wlan2g" "WLAN2G" "wifi:2g"  "ra0"
++        ucidef_set_led_netdev  "wlan5g" "WLAN5G" "wifi:5g"  "rax0"
++        ucidef_set_led_netdev  "wan"    "WAN"    "internet" "eth0"
++	ucidef_set_led_default "power"  "POWER"  "power"    "1"
++        ;;
++esac
++
++board_config_flush
++
++exit 0
++
+-- 
+2.25.1
+
