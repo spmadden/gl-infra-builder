@@ -303,7 +303,7 @@ index 0000000000..8d3902d418
 +	uart1_pins: uart1-pins-g1 {
 +		mux {
 +                        function = "uart";
-+                        groups = "uart1_1";
++                        groups = "uart1_1_no_cts_rts";
 +		};
 +	};
 +};

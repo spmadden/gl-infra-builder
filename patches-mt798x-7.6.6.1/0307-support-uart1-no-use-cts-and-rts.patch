@@ -1,0 +1,50 @@
+From 8b0de1b52e911da082f864854d5b4e498e01bf60 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Sat, 28 Jan 2023 16:38:53 +0800
+Subject: [PATCH] support uart1 no cts and rts
+
+---
+ ...404-pinctrl-uart1-no-use-cts-and-rts.patch | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+ create mode 100644 target/linux/mediatek/patches-5.4/404-pinctrl-uart1-no-use-cts-and-rts.patch
+
+diff --git a/target/linux/mediatek/patches-5.4/404-pinctrl-uart1-no-use-cts-and-rts.patch b/target/linux/mediatek/patches-5.4/404-pinctrl-uart1-no-use-cts-and-rts.patch
+new file mode 100644
+index 0000000000..bc754e99d5
+--- /dev/null
++++ b/target/linux/mediatek/patches-5.4/404-pinctrl-uart1-no-use-cts-and-rts.patch
+@@ -0,0 +1,31 @@
++Index: linux-5.4.211/drivers/pinctrl/mediatek/pinctrl-mt7981.c
++===================================================================
++--- linux-5.4.211.orig/drivers/pinctrl/mediatek/pinctrl-mt7981.c
+++++ linux-5.4.211/drivers/pinctrl/mediatek/pinctrl-mt7981.c
++@@ -702,6 +702,8 @@ static int mt7981_uart1_0_funcs[] = { 4,
++ static int mt7981_uart1_1_pins[] = { 26, 27, 28, 29, };
++ static int mt7981_uart1_1_funcs[] = { 2, 2, 2, 2, };
++ 
+++static int mt7981_uart1_1_no_cts_rts_pins[] = { 26, 27, };
+++static int mt7981_uart1_1_no_cts_rts_funcs[] = { 2, 2, };
++ /* UART2 */
++ static int mt7981_uart2_1_pins[] = { 22, 23, 24, 25, };
++ static int mt7981_uart2_1_funcs[] = { 3, 3, 3, 3, };
++@@ -834,6 +836,8 @@ static const struct group_desc mt7981_gr
++         PINCTRL_PIN_GROUP("uart1_0", mt7981_uart1_0),
++     /*  @GPIO(26,29): UART1(2) */
++         PINCTRL_PIN_GROUP("uart1_1", mt7981_uart1_1),
+++    /*  @GPIO(26,27): UART1(2) */
+++        PINCTRL_PIN_GROUP("uart1_1_no_cts_rts", mt7981_uart1_1_no_cts_rts),
++     /*  @GPIO(22,25): UART1(3) */
++         PINCTRL_PIN_GROUP("uart2_1", mt7981_uart2_1),
++     /*  @GPIO(22,24) PTA_EXT(4) */
++@@ -897,7 +901,7 @@ static const char *mt7981_wa_aice_groups
++ 	"wa_aice3", "wm_aice1_2", };
++ static const char *mt7981_uart_groups[] = { "wm_uart_0", "uart2_0",
++ 	"net_wo0_uart_txd_0", "net_wo0_uart_txd_1", "net_wo0_uart_txd_2",
++-	"uart1_0", "uart1_1", "uart2_1", "wm_aurt_1", "wm_aurt_2", "uart0", };
+++	"uart1_0", "uart1_1", "uart2_1", "wm_aurt_1", "wm_aurt_2", "uart0", "uart1_1_no_cts_rts",};
++ static const char *mt7981_dfd_groups[] = { "dfd", "dfd_ntrst", };
++ static const char *mt7981_wdt_groups[] = { "watchdog", "watchdog1", };
++ static const char *mt7981_pcie_groups[] = { "pcie_pereset", "pcie_clk", "pcie_wake", };
+-- 
+2.34.1
+
