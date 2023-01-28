@@ -4,8 +4,8 @@ Date: Thu, 19 Jan 2023 12:09:45 +0800
 Subject: [PATCH] support XE3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 309 ++++++++++++++++++
- 1 file changed, 309 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 310 ++++++++++++++++++
+ 1 file changed, 310 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
@@ -49,6 +49,7 @@ index 0000000000..8d3902d418
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
 +		reset-button = "gpio-456";
 +		radio = "mt798111 mt798112";
++		mcu = "/dev/ttyS1,9600";
 +		cfg-partition = "/dev/mmcblk0p5";
 +		dfs;
 +		factory_data {
