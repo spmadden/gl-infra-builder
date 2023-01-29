@@ -1,26 +1,18 @@
-From e87a37af8288ad2faab7dd00e059e56c8f1d3ee4 Mon Sep 17 00:00:00 2001
-From: lincolnzh <hongjian.zhang@gl-inet.com>
-Date: Tue, 1 Nov 2022 17:05:03 +0800
-Subject: [PATCH] add gl-x300b support
+From a1ad78a863fc9673a802688ff4ae48f7c95d124c Mon Sep 17 00:00:00 2001
+From: niyin <yin.ni@gl-inet.com>
+Date: Sat, 28 Jan 2023 00:26:02 -0800
+Subject: [PATCH] support x300b target
 
 ---
  .../dts/qca9531_glinet_gl-x300b-nor-nand.dts  |  25 +++
  .../ath79/dts/qca9531_glinet_gl-x300b-nor.dts |  18 ++
  .../ath79/dts/qca9531_glinet_gl-x300b.dts     | 152 -------------
- .../ath79/dts/qca9531_glinet_gl-x300b.dtsi    | 205 ++++++++++++++++++
- .../generic/base-files/etc/board.d/01_leds    |   1 -
- .../generic/base-files/etc/board.d/02_network |   5 -
- target/linux/ath79/image/generic.mk           |   9 -
- target/linux/ath79/image/nand.mk              |  28 +++
- .../ath79/nand/base-files/etc/board.d/01_leds |   6 +
- .../nand/base-files/etc/board.d/02_network    |   9 +
- .../etc/uci-defaults/04_led_migration         |   2 +-
- .../nand/base-files/lib/upgrade/platform.sh   |   1 +
- 12 files changed, 293 insertions(+), 168 deletions(-)
+ .../ath79/dts/qca9531_glinet_gl-x300b.dtsi    | 206 ++++++++++++++++++
+ 4 files changed, 249 insertions(+), 152 deletions(-)
  create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor-nand.dts
  create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor.dts
  delete mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x300b.dts
- create mode 100755 target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
 
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x300b-nor-nand.dts
 new file mode 100644
@@ -236,11 +228,11 @@ index 5f5646b3e0..0000000000
 -	};
 -};
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi b/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
-new file mode 100755
-index 0000000000..5b308c8754
+new file mode 100644
+index 0000000000..cf2735cb6b
 --- /dev/null
 +++ b/target/linux/ath79/dts/qca9531_glinet_gl-x300b.dtsi
-@@ -0,0 +1,205 @@
+@@ -0,0 +1,206 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 +/dts-v1/;
 +
@@ -261,6 +253,8 @@ index 0000000000..5b308c8754
 +		model = "x300b";
 +		wan = "eth0";
 +		lan = "eth1";
++		flash_size = <16>;
++		radio = "mac80211";
 +		build-in-modem = "1-1";
 +		reset-button = "gpio-3";
 +		factory_data {
@@ -305,7 +299,7 @@ index 0000000000..5b308c8754
 +			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
 +		};
 +	};
-+    gpio-export {
++     gpio-export {
 +		compatible = "gpio-export";
 +
 +		minocie {
@@ -445,163 +439,6 @@ index 0000000000..5b308c8754
 +	mtd-cal-data = <&art 0x1000>;
 +	mtd-mac-address = <&art 0x1002>;
 +};
-+
-diff --git a/target/linux/ath79/generic/base-files/etc/board.d/01_leds b/target/linux/ath79/generic/base-files/etc/board.d/01_leds
-index 8b4c83fd2c..46f343b0d6 100644
---- a/target/linux/ath79/generic/base-files/etc/board.d/01_leds
-+++ b/target/linux/ath79/generic/base-files/etc/board.d/01_leds
-@@ -239,7 +239,6 @@ qxwlan,e750a-v4-16m)
- 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x02"
- 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
- 	;;
--glinet,gl-x300b|\
- glinet,gl-x750)
- 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
- 	;;
-diff --git a/target/linux/ath79/generic/base-files/etc/board.d/02_network b/target/linux/ath79/generic/base-files/etc/board.d/02_network
-index 4d3296c0af..ee5f4daa7f 100644
---- a/target/linux/ath79/generic/base-files/etc/board.d/02_network
-+++ b/target/linux/ath79/generic/base-files/etc/board.d/02_network
-@@ -297,11 +297,6 @@ ath79_setup_interfaces()
- 		ucidef_add_switch "switch0" \
- 			"0@eth0" "1:lan" "2:lan"
- 		;;
--	glinet,gl-x300b)
--		ucidef_set_interface_wan "eth1"
--		ucidef_add_switch "switch0" \
--			"0@eth0" "4:lan"
--		;;
- 	iodata,etg3-r|\
- 	iodata,wn-ac1167dgr|\
- 	iodata,wn-ac1600dgr|\
-diff --git a/target/linux/ath79/image/generic.mk b/target/linux/ath79/image/generic.mk
-index d9aa600410..67cb4d3995 100644
---- a/target/linux/ath79/image/generic.mk
-+++ b/target/linux/ath79/image/generic.mk
-@@ -1342,15 +1342,6 @@ define Device/glinet_gl-usb150
- endef
- TARGET_DEVICES += glinet_gl-usb150
- 
--define Device/glinet_gl-x300b
--  SOC := qca9531
--  DEVICE_VENDOR := GL.iNet
--  DEVICE_MODEL := GL-X300B
--  DEVICE_PACKAGES := kmod-usb2
--  IMAGE_SIZE := 16000k
--endef
--TARGET_DEVICES += glinet_gl-x300b
--
- define Device/glinet_gl-x750
-   SOC := qca9531
-   DEVICE_VENDOR := GL.iNet
-diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 1d086b1918..fc1054f19a 100644
---- a/target/linux/ath79/image/nand.mk
-+++ b/target/linux/ath79/image/nand.mk
-@@ -153,6 +153,34 @@ define Device/glinet_gl-ar300m-nor
- endef
- TARGET_DEVICES += glinet_gl-ar300m-nor
- 
-+define Device/glinet_gl-x300b-common
-+  SOC := qca9531
-+  DEVICE_VENDOR := GL.iNet
-+  DEVICE_MODEL := GL-X300B
-+  DEVICE_PACKAGES := kmod-usb2 block-mount
-+  SUPPORTED_DEVICES += gl-x300b glinet,gl-x300b
-+endef
-+
-+define Device/glinet_gl-x300b-nor
-+  $(Device/glinet_gl-x300b-common)
-+  DEVICE_VARIANT := NOR
-+  IMAGE_SIZE := 16000k
-+endef
-+TARGET_DEVICES += glinet_gl-x300b-nor
-+
-+define Device/glinet_gl-x300b-nor-nand
-+  $(Device/glinet_gl-x300b-common)
-+  DEVICE_VARIANT := NOR/NAND
-+  KERNEL_SIZE := 4096k
-+  BLOCKSIZE := 128k
-+  PAGESIZE := 2048
-+  VID_HDR_OFFSET := 2048
-+  IMAGES := factory.img sysupgrade.tar
-+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
-+  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
-+endef
-+TARGET_DEVICES += glinet_gl-x300b-nor-nand
-+
- define Device/glinet_gl-ar750s-common
-   SOC := qca9563
-   DEVICE_VENDOR := GL.iNet
-diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-index e493298457..a7fb509137 100644
---- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-+++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-@@ -18,6 +18,12 @@ glinet,gl-xe300)
- 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
- 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x10"
- 	;;
-+glinet,gl-x300b-nor|\
-+glinet,gl-x300b-nor-nand)
-+        ucidef_set_led_netdev "wlan2g" "WLAN2G" "gl-x300b:green:wlan2g" "wlan0"
-+        ucidef_set_led_netdev "wan"    "WAN"    "gl-x300b:green:wan"    "eth0"
-+        ucidef_set_led_netdev "3gnet"  "3GNET"  "gl-x300b:green:lte"    "3g-wan"
-+        ;;
- netgear,r6100)
- 	ucidef_set_led_netdev "wan-green" "WAN (green)" "green:wan" "eth1"
- 	;;
-diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
-index b533e5be6c..3f1ae6d7b2 100644
---- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
-+++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
-@@ -65,6 +65,10 @@ ath79_setup_interfaces()
- 		ucidef_add_switch "switch0" \
- 			"0@eth0" "1:lan" "2:lan" "3:lan" "4:lan" "5:wan" "6@eth1"
- 		;;
-+	glinet,gl-x300b-nor|\
-+	glinet,gl-x300b-nor-nand)
-+		ucidef_set_interfaces_lan_wan "eth1" "eth0"
-+		;;
- 	*)
- 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
- 		;;
-@@ -88,6 +92,11 @@ ath79_setup_macs()
- 	netgear,wndr4500-v3)
- 		wan_mac=$(mtd_get_mac_binary caldata 0x6)
- 		;;
-+	glinet,gl-x300b-nor|\
-+	glinet,gl-x300b-nor-nand)
-+		wan_mac=$(mtd_get_mac_binary art 0x0)
-+		lan_mac=$(macaddr_add "$wan_mac" 1)
-+		;;
- 	esac
- 
- 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
-diff --git a/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration b/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration
-index 281d6ac0bc..0d20953919 100644
---- a/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration
-+++ b/target/linux/ath79/nand/base-files/etc/uci-defaults/04_led_migration
-@@ -6,7 +6,7 @@ board=$(board_name)
- case "$board" in
- esac
- 
--remove_devicename_leds
-+#remove_devicename_leds
- 
- migrations_apply system
- 
-diff --git a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh b/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
-index ea77345b06..b7b6b23b98 100644
---- a/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
-+++ b/target/linux/ath79/nand/base-files/lib/upgrade/platform.sh
-@@ -19,6 +19,7 @@ platform_do_upgrade() {
- 		glinet_nand_nor_do_upgrade "$1"
- 		;;
- 	glinet,gl-ar750s-nor|\
-+	glinet,gl-x300b-nor-nand|\
- 	glinet,gl-ar750s-nor-nand)
- 		nand_nor_do_upgrade "$1"
- 		;;
 -- 
-2.17.1
+2.25.1
 

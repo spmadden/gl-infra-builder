@@ -1,0 +1,47 @@
+From e1beb66a5e7e522d860ecdb210ddca2cb75c403f Mon Sep 17 00:00:00 2001
+From: niyin <yin.ni@gl-inet.com>
+Date: Sat, 28 Jan 2023 22:20:18 -0800
+Subject: [PATCH] ath79 adjust 01_leds
+
+---
+ .../ath79/nand/base-files/etc/board.d/01_leds | 24 ++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+index e493298457..af28c77f3e 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
++++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
+@@ -14,9 +14,27 @@ glinet,gl-ar300m-nand|\
+ glinet,gl-ar300m-nor)
+ 	ucidef_set_led_netdev "lan" "LAN" "green:lan" "eth0"
+ 	;;
+-glinet,gl-xe300)
+-	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
+-	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x10"
++glinet,gl-ar750s-nor|\
++glinet,gl-ar750s-nor-nand)
++	ucidef_set_led_wlan "wlan2g" "WLAN2G" "gl-ar750s:green:wlan2g" "phy1tpt"
++	ucidef_set_led_wlan "wlan5g" "WLAN5G" "gl-ar750s:green:wlan5g" "phy0tpt"
++	;;
++glinet,gl-xe300|\
++glinet,gl-xe300-nor-nand)
++	ucidef_set_led_netdev "wan" "WAN" "gl-xe300:green:wan" "eth1"
++	ucidef_set_led_switch "lan" "LAN" "gl-xe300:green:lan" "switch0" "0x10"
++	ucidef_set_led_netdev "3gnet" "LTE" "gl-xe300:green:lte" "wwan0"
++	;;
++glinet,gl-x750-nor|\
++glinet,gl-x750-nor-nand)
++	ucidef_set_led_netdev "wan" "WAN" "gl-x750:green:wan" "eth0"
++	ucidef_set_led_netdev "3gnet" "LTE" "gl-x750:green:lte" "wwan0"
++	;;
++glinet,gl-x300b-nor|\
++glinet,gl-x300b-nor-nand)
++	ucidef_set_led_netdev "wlan2g" "WLAN2G" "gl-x300b:green:wlan2g" "wlan0"
++	ucidef_set_led_netdev "wan"    "WAN"    "gl-x300b:green:wan"    "eth0"
++	ucidef_set_led_netdev "3gnet"  "3GNET"  "gl-x300b:green:lte"    "3g-wan"
+ 	;;
+ netgear,r6100)
+ 	ucidef_set_led_netdev "wan-green" "WAN (green)" "green:wan" "eth1"
+-- 
+2.25.1
+

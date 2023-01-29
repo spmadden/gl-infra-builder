@@ -1,13 +1,11 @@
-From 78f1f12572faa76b7bc65c8a1bff68ba2a428aa3 Mon Sep 17 00:00:00 2001
+From a9e608d23ddc98113ddeaf9f69d903e78f1b455d Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
-Date: Fri, 16 Dec 2022 00:40:14 -0800
-Subject: [PATCH] add xe300 support
+Date: Sat, 28 Jan 2023 20:00:40 -0800
+Subject: [PATCH] support xe300 target
 
 ---
  .../dts/qca9531_glinet_gl-xe300-nor-nand.dts  | 193 ++++++++++++++++++
- target/linux/ath79/image/nand.mk              |  17 ++
- .../ath79/nand/base-files/etc/board.d/01_leds |   9 +-
- 3 files changed, 216 insertions(+), 3 deletions(-)
+ 1 file changed, 193 insertions(+)
  create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
 
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts b/target/linux/ath79/dts/qca9531_glinet_gl-xe300-nor-nand.dts
@@ -209,55 +207,6 @@ index 0000000000..7c703c7c81
 +		reg = <0x0 0x6>;
 +	};
 +};
-diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 583d70ccbe..c51e61d507 100644
---- a/target/linux/ath79/image/nand.mk
-+++ b/target/linux/ath79/image/nand.mk
-@@ -245,6 +245,23 @@ define Device/glinet_gl-xe300
- endef
- TARGET_DEVICES += glinet_gl-xe300
- 
-+define Device/glinet_gl-xe300-nor-nand
-+  SOC := qca9531
-+  DEVICE_VENDOR := GL.iNet
-+  DEVICE_MODEL := GL-XE300-NOR-NAND
-+  DEVICE_TITLE := GL.iNet GL-XE300 (NOR/NAND)
-+  DEVICE_PACKAGES := kmod-usb2 block-mount kmod-usb-serial-ch341
-+  KERNEL_SIZE := 4096k
-+  BLOCKSIZE := 128k
-+  PAGESIZE := 2048
-+  VID_HDR_OFFSET := 2048
-+  IMAGES := factory.img sysupgrade.tar
-+  IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
-+  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-metadata
-+  SUPPORTED_DEVICES += gl-xe300 glinet,gl-xe300
-+endef
-+TARGET_DEVICES += glinet_gl-xe300-nor-nand
-+
- # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
- define Device/netgear_ath79_nand
-   DEVICE_VENDOR := NETGEAR
-diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-index 8507425aaf..5c452c4b9f 100644
---- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-+++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-@@ -19,10 +19,13 @@ glinet,gl-ar750s-nor-nand)
- 	ucidef_set_led_wlan "wlan2g" "WLAN2G" "gl-ar750s:green:wlan2g" "phy1tpt"
- 	ucidef_set_led_wlan "wlan5g" "WLAN5G" "gl-ar750s:green:wlan5g" "phy0tpt"
- 	;;
--glinet,gl-xe300)
--	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
--	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x10"
-+glinet,gl-xe300|\
-+glinet,gl-xe300-nor-nand)
-+	ucidef_set_led_netdev "wan" "WAN" "gl-xe300:green:wan" "eth1"
-+	ucidef_set_led_switch "lan" "LAN" "gl-xe300:green:lan" "switch0" "0x10"
-+	ucidef_set_led_netdev "3gnet" "LTE" "gl-xe300:green:lte" "wwan0"
- 	;;
-+
- glinet,gl-x300b-nor|\
- glinet,gl-x300b-nor-nand)
-         ucidef_set_led_netdev "wlan2g" "WLAN2G" "gl-x300b:green:wlan2g" "wlan0"
 -- 
 2.25.1
 
