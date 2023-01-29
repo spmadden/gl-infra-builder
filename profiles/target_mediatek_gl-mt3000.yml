@@ -24,8 +24,12 @@ packages:
   - kmod-mt-wifi-mt7981-ko
   - kmod-warp-mt7981-ko
   - kmod-mediatek_hnat
+  - kmod-gl-sdk4-fan
   - mii_mgr
   - mtkhnat_util
   - regs
   - luci
-  
+  - 8021xd
+  - fwdd
+  - kmod-mtfwd
+  - kmod-mtqos

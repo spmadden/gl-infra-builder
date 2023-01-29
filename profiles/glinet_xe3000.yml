@@ -10,7 +10,6 @@ feeds:
     revision: 32782821e35c98df5503b261db98b8f0a089f16e
 
 packages:
-  - kmod-gl-sdk4-fan
   - kmod-gl-pcie-modem
   - gl-sdk4-led
   - gl-sdk4-adguardhome
@@ -18,10 +17,6 @@ packages:
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
   - gl-sdk4-ui-hwnat
-  - 8021xd
-  - fwdd
-  - kmod-mtfwd
-  - kmod-mtqos
 
 diffconfig: |
   CONFIG_PACKAGE_gl-sdk4-ui-btnsettings=n
