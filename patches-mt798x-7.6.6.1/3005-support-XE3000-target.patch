@@ -13,7 +13,7 @@ new file mode 100755
 index 0000000000..8d3902d418
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
-@@ -0,0 +1,309 @@
+@@ -0,0 +1,310 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
