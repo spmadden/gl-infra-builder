@@ -12,6 +12,7 @@ packages:
   - mwan3
   - arp-scan
   - iwinfo
+  - wireless-regdb
   - httping
   - ssmtp
   - block-mount
