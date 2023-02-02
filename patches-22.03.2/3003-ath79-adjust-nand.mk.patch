@@ -1,14 +1,14 @@
-From 333a676598b8718e10432f2d6c47edb2068e2abb Mon Sep 17 00:00:00 2001
+From 219c47a7c53f45a6f597df9e101e1f287e37747c Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
 Date: Sat, 28 Jan 2023 00:38:13 -0800
 Subject: [PATCH] ath79 adjust nand.mk
 
 ---
- target/linux/ath79/image/nand.mk | 36 +++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ target/linux/ath79/image/nand.mk | 76 +++++++++++++++++++++++++++++++-
+ 1 file changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 1d086b1918..583d70ccbe 100644
+index 1d086b1918..49420596bb 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
 @@ -153,6 +153,34 @@ define Device/glinet_gl-ar300m-nor
@@ -68,6 +68,53 @@ index 1d086b1918..583d70ccbe 100644
    SUPPORTED_DEVICES += gl-ar750s glinet,gl-ar750s glinet,gl-ar750s-nor-nand
  endef
  TARGET_DEVICES += glinet_gl-ar750s-nor
+@@ -211,6 +245,46 @@ define Device/glinet_gl-xe300
+ endef
+ TARGET_DEVICES += glinet_gl-xe300
+ 
++define Device/glinet_gl-xe300-nor-nand
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE300-NOR-NAND
++  DEVICE_TITLE := GL.iNet GL-XE300 (NOR/NAND)
++  DEVICE_PACKAGES := kmod-usb2 block-mount kmod-usb-serial-ch341
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-metadata
++  SUPPORTED_DEVICES += gl-xe300 glinet,gl-xe300
++endef
++TARGET_DEVICES += glinet_gl-xe300-nor-nand
++
++
++define Device/glinet_gl-x750-common
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-X750
++  DEVICE_PACKAGES := kmod-usb2 kmod-ath10k ath10k-firmware-qca9887 block-mount PCI_SUPPORT kmod-usb-storage
++  SUPPORTED_DEVICES += gl-x750 glinet,gl-x750
++endef
++
++define Device/glinet_gl-x750-nor
++  $(Device/glinet_gl-x750-common)
++  DEVICE_VARIANT := NOR
++  KERNEL_SIZE := 4096k
++  IMAGE_SIZE := 16064k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.bin
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-x750-nor
++
+ # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
+ define Device/netgear_ath79_nand
+   DEVICE_VENDOR := NETGEAR
 -- 
 2.25.1
 
