@@ -115,7 +115,7 @@ packages:
   - gl-sdk4-ui-bluetoothsettings
   - gl-sdk4-ui-bridge
   - gl-sdk4-ui-sms
-
+  - gl-sdk4-ui-edgerouter
 diffconfig: |
   CONFIG_PACKAGE_kmod-shortcut-fe-cm=n
   CONFIG_SIGNATURE_CHECK=n
