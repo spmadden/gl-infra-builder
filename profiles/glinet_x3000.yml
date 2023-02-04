@@ -6,8 +6,8 @@ feeds:
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: 049c6981a82a30df8d9facfd8f25e8e62163362d
   - name: glinet
-    uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: d6a7706ebeccf32cb77732ce861f61e90902390b
+    uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    branch: v4.3.0_x3000
 
 packages:
   - kmod-gl-pcie-modem
@@ -16,6 +16,7 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
+  - gl-sdk4-passthrough
   - gl-sdk4-ui-hwnat
 
 diffconfig: |

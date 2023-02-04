@@ -10,7 +10,7 @@ feeds:
     revision: 48f24795ff7eb3c1285caddf89f8079a1646c195
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
+    revision: 581563a214d313c367d7ffe5a1e9038fc18292ed
   - name: gl_feed_mtk
     uri: https://github.com/gl-inet/gl-feeds.git
     branch: mtk
@@ -30,6 +30,8 @@ packages:
   - kmod-warp-mt7981-ko
   - kmod-mediatek_hnat
   - kmod-gl-sdk4-fan
+  - kmod-shortcut-fe
+  - kmod-shortcut-fe-cm
   - mii_mgr
   - mtkhnat_util
   - regs
