@@ -1,20 +1,39 @@
-From f1d953f946c496b60469f9d36244f9c8c502f50a Mon Sep 17 00:00:00 2001
-From: Luo Chongjun <luochongjun@gl-inet.com>
-Date: Thu, 19 Jan 2023 12:19:11 +0800
-Subject: [PATCH 2/2] mt7981 adjust mt7981.mk
+From 01f3ce65ca808f04b3ee73f2728b12bdef15c0f5 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Sat, 4 Feb 2023 14:41:31 +0800
+Subject: [PATCH] mt7981 adjust mt7981.mk
 
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- target/linux/mediatek/image/mt7981.mk | 33 +++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ target/linux/mediatek/image/mt7981.mk | 51 +++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index a798034da9..b7f1f6d437 100755
+index ab3ed5b42f..b7f1f6d437 100755
 --- a/target/linux/mediatek/image/mt7981.mk
 +++ b/target/linux/mediatek/image/mt7981.mk
-@@ -189,3 +189,36 @@ define Device/glinet_gl-mt3000
-   IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+@@ -171,3 +171,54 @@ define Device/mt7981-fpga-sd
+   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
  endef
- TARGET_DEVICES += glinet_gl-mt3000
+ TARGET_DEVICES += mt7981-fpga-sd
++
++define Device/glinet_gl-mt3000
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-MT3000
++  DEVICE_DTS := mt7981-gl-mt3000
++  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
++  SUPPORTED_DEVICES := glinet,mt3000-snand
++  DEVICE_PACKAGES := kmod-hwmon-pwmfan
++  UBINIZE_OPTS := -E 5
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  IMAGE_SIZE := 65536k
++  KERNEL_IN_UBI := 1
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/factory.img := append-ubi | check-size $$$$(IMAGE_SIZE)
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-mt3000
 +
 +define Device/glinet_gl-x3000
 +  DEVICE_VENDOR := GL.iNet
@@ -49,5 +68,5 @@ index a798034da9..b7f1f6d437 100755
 +endef
 +TARGET_DEVICES += glinet_gl-mt2500
 -- 
-2.25.1
+2.34.1
 

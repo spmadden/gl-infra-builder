@@ -1,32 +1,45 @@
-From 7e13024b85dc4c07521e4a4ccf71a93ee8b3c89b Mon Sep 17 00:00:00 2001
-From: Luo Chongjun <luochongjun@gl-inet.com>
-Date: Thu, 19 Jan 2023 12:16:26 +0800
+From adf9a739eaef91caff4d488d12a4823102a67652 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Sat, 4 Feb 2023 14:39:02 +0800
 Subject: [PATCH] mt7981 adjust 02_network
 
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../mt7981/base-files/etc/board.d/02_network       | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ .../mt7981/base-files/etc/board.d/02_network  | 43 +++++++++----------
+ 1 file changed, 20 insertions(+), 23 deletions(-)
 
 diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
-index 6865f52bb8..c2a22e425b 100755
+index 0d35a2207a..c2a22e425b 100755
 --- a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
 +++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
-@@ -22,7 +22,10 @@ mediatek_setup_interfaces()
+@@ -22,6 +22,12 @@ mediatek_setup_interfaces()
  	*2500wan-p5*)
  		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" wan
  		;;
--	*mt3000*)
 +	*mt3000*|\
 +	*x3000*|\
 +	*xe3000*|\
 +	*mt2500*)
- 		ucidef_set_interfaces_lan_wan eth1 eth0
- 		;;
++		ucidef_set_interfaces_lan_wan eth1 eth0
++		;;
  	*)
-@@ -43,6 +46,15 @@ mediatek_setup_macs()
- 		wan_mac=$(mtd_get_mac_binary $part_name 0x0a)
- 		lan_mac=$(macaddr_add "$wan_mac" 1)
+ 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" eth1
  		;;
+@@ -34,34 +40,25 @@ mediatek_setup_macs()
+ 	local part_name="Factory"
+ 	local lan_mac=""
+ 	local wan_mac=""
+-	local lan_mac_offset=""
+-	local wan_mac_offset=""
+ 
+ 	case $board in
+-	*)
+-		lan_mac_offset="0x2A"
+-		wan_mac_offset="0x24"
++	*mt3000*)
++		wan_mac=$(mtd_get_mac_binary $part_name 0x0a)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
 +	*mt2500*)
 +		wan_mac=$(get_mac_binary /dev/mmcblk0boot1 0x0a)
 +		lan_mac=$(macaddr_add "$wan_mac" 1)
@@ -35,10 +48,32 @@ index 6865f52bb8..c2a22e425b 100755
 +	*x3000*)
 +		wan_mac=$(get_mac_binary /dev/mmcblk0p3 0x0a)
 +		lan_mac=$(macaddr_add "$wan_mac" 1)
-+		;;
+ 		;;
  	esac
  
- 	[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
+-	lan_mac=$(mtd_get_mac_binary $part_name $lan_mac_offset)
+-	wan_mac=$(mtd_get_mac_binary $part_name $wan_mac_offset)
+-
+-	case "$lan_mac" in
+-		00:00:00:00:00:00);;
+-		ff:ff:ff:ff:ff:ff);;
+-		*)
+-		[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" "$lan_mac"
+-	;;
+-	esac
+-
+-	case "$wan_mac" in
+-		00:00:00:00:00:00);;
+-		ff:ff:ff:ff:ff:ff);;
+-		*)
+-		[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
+-	;;
+-	esac
++	[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
++	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" "$lan_mac"
+ }
+ 
+ board_config_update
 -- 
-2.25.1
+2.34.1
 

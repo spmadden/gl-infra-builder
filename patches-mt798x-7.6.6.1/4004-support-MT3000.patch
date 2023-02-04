@@ -1,13 +1,12 @@
-From bb9b133dfafc7fdbe3d147a23a5e0f665cd1e04e Mon Sep 17 00:00:00 2001
+From 55f1cf3172e9b813757d60d652aa6f66e47177b4 Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
 Date: Thu, 29 Dec 2022 16:19:53 +0800
-Subject: [PATCH] target/mediatek: add board for GL.iNet GL-MT3000
+Subject: [PATCH] support MT3000 target
 
 ---
  .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 282 ++++++++++++++++++
- target/linux/mediatek/image/mt7981.mk         |  18 ++
  .../mt7981/base-files/etc/board.d/02_network  |  31 +-
- 3 files changed, 308 insertions(+), 23 deletions(-)
+ 2 files changed, 290 insertions(+), 23 deletions(-)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
@@ -298,86 +297,6 @@ index 0000000000..e69dac67f4
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pwm0_pin>;
 +};
-diff --git a/target/linux/mediatek/image/mt7981.mk b/target/linux/mediatek/image/mt7981.mk
-index ab3ed5b42f..a798034da9 100755
---- a/target/linux/mediatek/image/mt7981.mk
-+++ b/target/linux/mediatek/image/mt7981.mk
-@@ -171,3 +171,21 @@ define Device/mt7981-fpga-sd
-   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
- endef
- TARGET_DEVICES += mt7981-fpga-sd
-+
-+define Device/glinet_gl-mt3000
-+  DEVICE_VENDOR := GL.iNet
-+  DEVICE_MODEL := GL-MT3000
-+  DEVICE_DTS := mt7981-gl-mt3000
-+  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
-+  SUPPORTED_DEVICES := glinet,mt3000-snand
-+  DEVICE_PACKAGES := kmod-hwmon-pwmfan
-+  UBINIZE_OPTS := -E 5
-+  BLOCKSIZE := 128k
-+  PAGESIZE := 2048
-+  IMAGE_SIZE := 65536k
-+  KERNEL_IN_UBI := 1
-+  IMAGES := factory.img sysupgrade.tar
-+  IMAGE/factory.img := append-ubi | check-size $$$$(IMAGE_SIZE)
-+  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
-+endef
-+TARGET_DEVICES += glinet_gl-mt3000
-diff --git a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
-index 0d35a2207a..6865f52bb8 100755
---- a/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
-+++ b/target/linux/mediatek/mt7981/base-files/etc/board.d/02_network
-@@ -22,6 +22,9 @@ mediatek_setup_interfaces()
- 	*2500wan-p5*)
- 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" wan
- 		;;
-+	*mt3000*)
-+		ucidef_set_interfaces_lan_wan eth1 eth0
-+		;;
- 	*)
- 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" eth1
- 		;;
-@@ -34,34 +37,16 @@ mediatek_setup_macs()
- 	local part_name="Factory"
- 	local lan_mac=""
- 	local wan_mac=""
--	local lan_mac_offset=""
--	local wan_mac_offset=""
- 
- 	case $board in
--	*)
--		lan_mac_offset="0x2A"
--		wan_mac_offset="0x24"
-+	*mt3000*)
-+		wan_mac=$(mtd_get_mac_binary $part_name 0x0a)
-+		lan_mac=$(macaddr_add "$wan_mac" 1)
- 		;;
- 	esac
- 
--	lan_mac=$(mtd_get_mac_binary $part_name $lan_mac_offset)
--	wan_mac=$(mtd_get_mac_binary $part_name $wan_mac_offset)
--
--	case "$lan_mac" in
--		00:00:00:00:00:00);;
--		ff:ff:ff:ff:ff:ff);;
--		*)
--		[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" "$lan_mac"
--	;;
--	esac
--
--	case "$wan_mac" in
--		00:00:00:00:00:00);;
--		ff:ff:ff:ff:ff:ff);;
--		*)
--		[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
--	;;
--	esac
-+	[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" "$wan_mac"
-+	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" "$lan_mac"
- }
- 
- board_config_update
 -- 
 2.34.1
 
