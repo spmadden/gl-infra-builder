@@ -1,4 +1,4 @@
-From 1cfa64fe2229402be081ffdbec5f756f7bc016b0 Mon Sep 17 00:00:00 2001
+From 95c5ca06350bf6b32be6614cd56fd29c7fdfe0ea Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
 Date: Sat, 28 Jan 2023 00:38:13 -0800
 Subject: [PATCH] ath79 adjust nand.mk
@@ -8,7 +8,7 @@ Subject: [PATCH] ath79 adjust nand.mk
  1 file changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 1d086b1918..b67a66c5bd 100644
+index 1d086b1918..57d137eb87 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
 @@ -153,6 +153,34 @@ define Device/glinet_gl-ar300m-nor
@@ -55,7 +55,7 @@ index 1d086b1918..b67a66c5bd 100644
 +  PAGESIZE := 2048
 +  VID_HDR_OFFSET := 2048
 +  IMAGES := factory.img sysupgrade.tar
-+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
 +  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
    SUPPORTED_DEVICES += glinet,gl-ar750s-nor
  endef
@@ -116,5 +116,5 @@ index 1d086b1918..b67a66c5bd 100644
  define Device/netgear_ath79_nand
    DEVICE_VENDOR := NETGEAR
 -- 
-2.25.1
+2.17.1
 
