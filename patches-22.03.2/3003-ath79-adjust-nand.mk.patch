@@ -1,17 +1,17 @@
-From 95c5ca06350bf6b32be6614cd56fd29c7fdfe0ea Mon Sep 17 00:00:00 2001
+From 0cd4f16c755f034222ce145c707195d6ca5a91d0 Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
 Date: Sat, 28 Jan 2023 00:38:13 -0800
 Subject: [PATCH] ath79 adjust nand.mk
 
 ---
- target/linux/ath79/image/nand.mk | 76 +++++++++++++++++++++++++++++++-
- 1 file changed, 75 insertions(+), 1 deletion(-)
+ target/linux/ath79/image/nand.mk | 78 +++++++++++++++++++++++++++++++-
+ 1 file changed, 77 insertions(+), 1 deletion(-)
 
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 1d086b1918..57d137eb87 100644
+index 1d086b1918..751076920b 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
-@@ -153,6 +153,34 @@ define Device/glinet_gl-ar300m-nor
+@@ -153,6 +153,36 @@ define Device/glinet_gl-ar300m-nor
  endef
  TARGET_DEVICES += glinet_gl-ar300m-nor
  
@@ -27,6 +27,8 @@ index 1d086b1918..57d137eb87 100644
 +  $(Device/glinet_gl-x300b-common)
 +  DEVICE_VARIANT := NOR
 +  IMAGE_SIZE := 16000k
++  IMAGES := sysupgrade.bin
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
 +endef
 +TARGET_DEVICES += glinet_gl-x300b-nor
 +
@@ -46,7 +48,7 @@ index 1d086b1918..57d137eb87 100644
  define Device/glinet_gl-ar750s-common
    SOC := qca9563
    DEVICE_VENDOR := GL.iNet
-@@ -166,7 +194,12 @@ define Device/glinet_gl-ar750s-nor-nand
+@@ -166,7 +196,12 @@ define Device/glinet_gl-ar750s-nor-nand
    $(Device/glinet_gl-ar750s-common)
    DEVICE_VARIANT := NOR/NAND
    KERNEL_SIZE := 4096k
@@ -60,7 +62,7 @@ index 1d086b1918..57d137eb87 100644
    SUPPORTED_DEVICES += glinet,gl-ar750s-nor
  endef
  TARGET_DEVICES += glinet_gl-ar750s-nor-nand
-@@ -174,6 +207,7 @@ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
+@@ -174,6 +209,7 @@ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
  define Device/glinet_gl-ar750s-nor
    $(Device/glinet_gl-ar750s-common)
    DEVICE_VARIANT := NOR
@@ -68,7 +70,7 @@ index 1d086b1918..57d137eb87 100644
    SUPPORTED_DEVICES += gl-ar750s glinet,gl-ar750s glinet,gl-ar750s-nor-nand
  endef
  TARGET_DEVICES += glinet_gl-ar750s-nor
-@@ -211,6 +245,46 @@ define Device/glinet_gl-xe300
+@@ -211,6 +247,46 @@ define Device/glinet_gl-xe300
  endef
  TARGET_DEVICES += glinet_gl-xe300
  
@@ -116,5 +118,5 @@ index 1d086b1918..57d137eb87 100644
  define Device/netgear_ath79_nand
    DEVICE_VENDOR := NETGEAR
 -- 
-2.17.1
+2.25.1
 
