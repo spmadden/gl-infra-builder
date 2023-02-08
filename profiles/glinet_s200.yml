@@ -17,6 +17,11 @@ packages:
   - dnsmasq-full
   - mwan3
   - iwinfo
+  - lua-eco
+  - lua-eco-log
+  - lua-eco-socket
+  - lua-eco-sys
+  - lua-eco-ubus
   - gl-oui-rpc
   - ot-br-posix
   - gl-iot-otbr-gw
