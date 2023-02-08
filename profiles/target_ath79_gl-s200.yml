@@ -6,7 +6,7 @@ description: Build image for the GL.iNET S200
 feeds:
   - name: gl_feeds_commmon
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 33f74f14f1298833e3a0f2f5480d5f560187d6fa
+    revision: 8e5ed3d11d4ce704590b8cb133b06a5768390293
   - name: gl_feeds
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 6b4d34ac72719c22de6e2c365b476e5e9bef18ca
