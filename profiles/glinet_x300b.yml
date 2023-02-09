@@ -70,6 +70,7 @@ packages:
   - gl-ble-sdk
   - gl-sdk4-edgerouter
   - gl-sdk4-netmode
+  - gl-sdk4-keepcfg
   - gl-sdk4-ui-adminpw
   - gl-sdk4-ui-advanced
   - gl-sdk4-ui-backbonerouters
