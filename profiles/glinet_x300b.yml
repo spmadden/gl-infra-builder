@@ -158,6 +158,5 @@ diffconfig: |
   CONFIG_PACKAGE_wpad-basic-wolfssl=n
   CONFIG_PACKAGE_nginx-ssl-util=n
   CONFIG_PACKAGE_kmod-crypto-hash=n
-  CONFIG_PACKAGE_kmod-crypto-kpp=n
   CONFIG_PACKAGE_kmod-usb-serial-ch341=n
   CONFIG_PACKAGE_libustream-wolfssl=n
