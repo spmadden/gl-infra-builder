@@ -17,8 +17,16 @@ packages:
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
   - gl-sdk4-passthrough
+  - gl-sdk4-sms-forward
   - gl-sdk4-ui-hwnat
+  - gl-sdk4-ui-netnat
 
 diffconfig: |
   CONFIG_PACKAGE_gl-sdk4-ui-btnsettings=n
   CONFIG_PACKAGE_gl-sdk4-switch-button=n
+  CONFIG_BUSYBOX_CUSTOM=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_INTERACTIVE=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_SMP_CPU=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_DECIMALS=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_SMP_PROCESS=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_TOPMEM=y
