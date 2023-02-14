@@ -1,0 +1,155 @@
+From b2b317c3eb5876c8a98f098bbdc9cff4d72b7eb9 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 14 Feb 2023 11:50:53 +0800
+Subject: [PATCH] fix: mt798x hnat no support nat6
+
+The ipv6 hnat is disabled in nat6 or static mode.
+The ipv6 hnat enabled in other modes.
+However,the hnat of guest (rax1/ra1) are disabled,
+because guest is always nat6 mode.
+
+Signed-off-by: gl-dengxinfa <xinfa.deng@gl-inet.com>
+---
+ .../net/ethernet/mediatek/mtk_hnat/hnat.h     |  2 +
+ .../ethernet/mediatek/mtk_hnat/hnat_debugfs.c | 51 +++++++++++++++++++
+ .../ethernet/mediatek/mtk_hnat/hnat_nf_hook.c | 14 +++++
+ 3 files changed, 67 insertions(+)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat.h b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat.h
+index 9a601db326..a23b071f7a 100644
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat.h
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat.h
+@@ -681,6 +681,8 @@ struct mtk_hnat {
+ 	struct timer_list hnat_reset_timestamp_timer;
+ 	struct timer_list hnat_mcast_check_timer;
+ 	bool nf_stat_en;
++	bool ipv6_en;
++	bool guest_en;
+ };
+ 
+ struct extdev_entry {
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_debugfs.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_debugfs.c
+index 73607b95cc..d7856be76d 100644
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_debugfs.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_debugfs.c
+@@ -571,6 +571,8 @@ int cr_set_usage(int level)
+ 	pr_info("              5     0~255      Set TCP keep alive interval\n");
+ 	pr_info("              6     0~255      Set UDP keep alive interval\n");
+ 	pr_info("              7     0~1        Set hnat counter update to nf_conntrack\n");
++	pr_info("              8     0~1        Set hnat disable/enable ipv6\n");
++	pr_info("              9     0~1        Set hnat disable/enable guest (rax1/ra1)\n");
+ 
+ 	return 0;
+ }
+@@ -682,6 +684,52 @@ int set_nf_update_toggle(int toggle)
+ 	return 0;
+ }
+ 
++int set_ipv6_toggle(int toggle)
++{
++	struct mtk_hnat *h = hnat_priv;
++
++	if (toggle == 1)
++		pr_info("Enable hnat ipv6\n");
++	else if (toggle == 0)
++		pr_info("Disable hnat ipv6\n");
++	else
++		pr_info("input error\n");
++	h->ipv6_en = toggle;
++
++	return 0;
++}
++
++void mtk_ppe_dev_hook(const char *name, int toggle)
++{
++	struct net_device *dev;
++	dev = dev_get_by_name(&init_net, name);
++	if (dev) {
++		if (toggle) {
++			mtk_ppe_dev_register_hook(dev);
++		} else {
++			mtk_ppe_dev_unregister_hook(dev);
++		}
++	}
++	return;
++}
++
++int set_guest_toggle(int toggle)
++{
++	struct mtk_hnat *h = hnat_priv;
++
++	if (toggle == 1)
++		pr_info("Enable hnat guest interface\n");
++	else if (toggle == 0)
++		pr_info("Disable hnat guest interface\n");
++	else
++		pr_info("input error\n");
++	h->guest_en = toggle;
++
++	mtk_ppe_dev_hook("ra1", toggle);
++	mtk_ppe_dev_hook("rax1", toggle);
++	return 0;
++}
++
+ static const debugfs_write_func hnat_set_func[] = {
+ 	[0] = hnat_set_usage,
+ 	[1] = hnat_cpu_reason,
+@@ -701,6 +749,7 @@ static const debugfs_write_func cr_set_func[] = {
+ 	[2] = tcp_bind_lifetime, [3] = fin_bind_lifetime,
+ 	[4] = udp_bind_lifetime, [5] = tcp_keep_alive,
+ 	[6] = udp_keep_alive,    [7] = set_nf_update_toggle,
++	[8] = set_ipv6_toggle,   [9] = set_guest_toggle,
+ };
+ 
+ int read_mib(struct mtk_hnat *h, u32 ppe_id,
+@@ -1475,6 +1524,8 @@ ssize_t hnat_setting_write(struct file *file, const char __user *buffer,
+ 	case 5:
+ 	case 6:
+ 	case 7:
++	case 8:
++	case 9:
+ 		p_token = strsep(&p_buf, p_delimiter);
+ 		if (!p_token)
+ 			arg1 = 0;
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
+index db2919a360..1041579f16 100644
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
+@@ -231,6 +231,11 @@ int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
+ 
+ 	switch (event) {
+ 	case NETDEV_UP:
++		if (!hnat_priv->guest_en && dev->name) {
++			if (!strcmp(dev->name, "ra1") || !strcmp(dev->name, "rax1"))
++				break;
++		}
++
+ 		gmac_ppe_fwd_enable(dev);
+ 
+ 		extif_set_dev(dev);
+@@ -1862,6 +1867,11 @@ void mtk_ppe_dev_register_hook(struct net_device *dev)
+ 	int i, number = 0;
+ 	struct extdev_entry *ext_entry;
+ 
++	if (!hnat_priv->guest_en && dev->name) {
++		if (!strcmp(dev->name, "ra1") || !strcmp(dev->name, "rax1"))
++			return;
++	}
++
+ 	for (i = 1; i < MAX_IF_NUM; i++) {
+ 		if (hnat_priv->wifi_hook_if[i] == dev) {
+ 			pr_info("%s : %s has been registered in wifi_hook_if table[%d]\n",
+@@ -2009,6 +2019,10 @@ static unsigned int mtk_hnat_nf_post_routing(
+ 						.virt_dev = (struct net_device*)out };
+ 	const struct net_device *arp_dev = out;
+ 
++	if (skb->protocol == htons(ETH_P_IPV6) && !hnat_priv->ipv6_en) {
++		return 0;
++	}
++
+ 	if (skb_hnat_alg(skb) || unlikely(!is_magic_tag_valid(skb) ||
+ 					  !IS_SPACE_AVAILABLE_HEAD(skb)))
+ 		return 0;
+-- 
+2.34.1
+
