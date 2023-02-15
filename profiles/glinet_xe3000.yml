@@ -20,6 +20,7 @@ packages:
   - gl-sdk4-sms-forward
   - gl-sdk4-ui-hwnat
   - gl-sdk4-ui-netnat
+  - gl-sdk4-mcu
 
 diffconfig: |
   CONFIG_PACKAGE_gl-sdk4-ui-btnsettings=n
