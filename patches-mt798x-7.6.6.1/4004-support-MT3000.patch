@@ -1,20 +1,19 @@
-From 55f1cf3172e9b813757d60d652aa6f66e47177b4 Mon Sep 17 00:00:00 2001
+From 6fcb012c50a3d24975e172968e20e28d1a22e294 Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
 Date: Thu, 29 Dec 2022 16:19:53 +0800
 Subject: [PATCH] support MT3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 282 ++++++++++++++++++
- .../mt7981/base-files/etc/board.d/02_network  |  31 +-
- 2 files changed, 290 insertions(+), 23 deletions(-)
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 276 ++++++++++++++++++
+ 1 file changed, 276 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..e69dac67f4
+index 0000000000..fb22ab705f
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,282 @@
+@@ -0,0 +1,276 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -107,13 +106,7 @@ index 0000000000..e69dac67f4
 +
 +			partition@5c0000 {
 +				label = "ubi";
-+				reg = <0x5c0000 0xf5c0000>;
-+			};
-+
-+			partition@fb80000 {
-+				label = "cfg";
-+				reg = <0xfb80000 0x0080000>;
-+				read-only;
++				reg = <0x5c0000 0>;
 +			};
 +		};
 +	};
