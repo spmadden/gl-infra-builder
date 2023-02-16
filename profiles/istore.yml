@@ -1,0 +1,22 @@
+---
+description: Add the istore dependencies
+
+feeds:
+  - name: istore_core
+    uri: https://github.com/luochongjun/istore.git
+    branch: main
+  - name: istore_ui
+    uri: https://github.com/linkease/nas-packages-luci.git
+    branch: main
+  - name: istore_feeds
+    uri: https://github.com/luochongjun/istore_feeds.git
+    branch: main
+
+packages:
+  - luci-app-istorex
+  - luci-app-linkease
+  - luci-app-ttyd
+  - bash
+
+diffconfig: |
+  CONFIG_BUSYBOX_CONFIG_CHPASSWD=n
