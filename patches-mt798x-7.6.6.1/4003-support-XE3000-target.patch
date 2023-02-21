@@ -95,7 +95,7 @@ index 0000000000..8d3902d418
 +
 +		5G_reset {
 +			gpio-export,name = "5G_reset";
-+			gpio-export,output = <1>;
++			gpio-export,output = <0>;
 +			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 +		};
 +
