@@ -42,7 +42,7 @@ packages:
   - gl-sdk4-luci
   - gl-sdk4-macclone
   - gl-sdk4-modem
-#  - gl-sdk4-sms-forward
+  - gl-sdk4-sms-forward
   - gl-sdk4-mqtt
   - gl-sdk4-network
   - gl-sdk4-network-diag
