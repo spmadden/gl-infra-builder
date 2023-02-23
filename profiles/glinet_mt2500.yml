@@ -7,7 +7,7 @@ feeds:
     revision: 9c86db861b855492d478794a68c2bb41472f6aca
   - name: mt7981
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: 1c7ace232434b298cd8bab40c392a056763ca76f
+    revision: ab1974a9b9986836099a429baf45742fd2945f00
 
 packages:
   - kmod-usb-storage
