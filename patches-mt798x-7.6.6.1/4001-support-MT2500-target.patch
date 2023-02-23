@@ -1,14 +1,14 @@
-From a4bee43ccb771e7cef3feac8023b7d963063911a Mon Sep 17 00:00:00 2001
+From bca84f2939cbe1abcba1845433ab6ae45092a35d Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 19 Jan 2023 10:37:12 +0800
 Subject: [PATCH] support MT2500 target
 
 ---
  .../boot/dts/mediatek/mt7981-gl-mt2500.dts    | 183 +++++++++++++++++
- target/linux/mediatek/mt7981/config-5.4       |   6 +-
+ target/linux/mediatek/mt7981/config-5.4       |   7 +-
  .../9999-block2mtd-support-partline.patch     | 139 +++++++++++++
  .../9999-support-partition-split.patch        | 186 ++++++++++++++++++
- 4 files changed, 512 insertions(+), 2 deletions(-)
+ 4 files changed, 513 insertions(+), 2 deletions(-)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
  create mode 100644 target/linux/mediatek/patches-5.4/9999-block2mtd-support-partline.patch
  create mode 100644 target/linux/mediatek/patches-5.4/9999-support-partition-split.patch
@@ -203,7 +203,7 @@ index 0000000000..e5d793cd1f
 +	status = "okay";
 +};
 diff --git a/target/linux/mediatek/mt7981/config-5.4 b/target/linux/mediatek/mt7981/config-5.4
-index 219c62fca8..9eea3ad35f 100644
+index 219c62fca8..d79d4ff221 100644
 --- a/target/linux/mediatek/mt7981/config-5.4
 +++ b/target/linux/mediatek/mt7981/config-5.4
 @@ -264,6 +264,8 @@ CONFIG_MMC_MTK=y
@@ -223,7 +223,7 @@ index 219c62fca8..9eea3ad35f 100644
  CONFIG_PCI=y
  # CONFIG_PCIE_MEDIATEK is not set
  CONFIG_PCIE_MEDIATEK_GEN3=y
-@@ -467,7 +470,6 @@ CONFIG_XPS=y
+@@ -467,7 +470,7 @@ CONFIG_XPS=y
  CONFIG_ZLIB_DEFLATE=y
  CONFIG_ZLIB_INFLATE=y
  CONFIG_ZONE_DMA32=y
@@ -232,6 +232,7 @@ index 219c62fca8..9eea3ad35f 100644
  # CONFIG_MTD_SPI_NAND_W25N01KV is not set
  # CONFIG_MAXLINEAR_GPHY is not set
 +# CONFIG_SHORTCUT_FE is not set
++# CONFIG_NF_CONNTRACK_CHAIN_EVENTS is not set
 diff --git a/target/linux/mediatek/patches-5.4/9999-block2mtd-support-partline.patch b/target/linux/mediatek/patches-5.4/9999-block2mtd-support-partline.patch
 new file mode 100644
 index 0000000000..2e4c2555da
