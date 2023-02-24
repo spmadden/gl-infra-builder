@@ -216,7 +216,7 @@ $ ls -l /usr/bin/python3*
  python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
 ```
 ```
- ./scripts/gen_config.py target_ath79-gl-s200 luci
+ ./scripts/gen_config.py target_ath79_gl-s200 luci
 ```
 ```
  make V=s -j5
@@ -226,7 +226,7 @@ $ ls -l /usr/bin/python3*
  git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
- ./scripts/gen_config.py target_ath79-gl-s200
+ ./scripts/gen_config.py target_ath79_gl-s200 glinet_depends
 ```
 ```
  make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
