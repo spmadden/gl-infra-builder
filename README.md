@@ -230,6 +230,7 @@ $ ls -l /usr/bin/python3*
 ```
 ```
  make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
+```
 
 # Note
 1. If you gcc version is 10, you will encounter some error, like this:
