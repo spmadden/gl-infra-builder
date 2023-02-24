@@ -86,7 +86,7 @@ $ ls -l /usr/bin/python3*
 ```
  make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
-## 2. Compile MT300(2023.02.22)
+## 2. Compile MT3000(2023.02.22)
 
 2.1 Compile MT3000 OpenWrt firmware(No GL.iNet packages)
 ```
@@ -205,6 +205,31 @@ $ ls -l /usr/bin/python3*
 ```
  make V=s -j5
 ```
+
+## 7. Compile S200(2023.02.24)
+
+4.1 Compile S200 OpenWrt firmware(No GL.iNet packages)
+```
+ git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+ python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
+```
+```
+ ./scripts/gen_config.py target_ath79-gl-s200 luci
+```
+```
+ make V=s -j5
+```
+4.2 Compile S200 GL.iNet standard firmware
+```
+ git clone https://github.com/gl-inet/glinet4.x.git
+```
+```
+ ./scripts/gen_config.py target_ath79-gl-s200
+```
+```
+ make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
 
 # Note
 1. If you gcc version is 10, you will encounter some error, like this:
