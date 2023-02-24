@@ -1,24 +1,24 @@
-From bca84f2939cbe1abcba1845433ab6ae45092a35d Mon Sep 17 00:00:00 2001
+From d6957948ef99f0d6c28bce715013557f433f07e2 Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 19 Jan 2023 10:37:12 +0800
 Subject: [PATCH] support MT2500 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-mt2500.dts    | 183 +++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-mt2500.dts    | 184 +++++++++++++++++
  target/linux/mediatek/mt7981/config-5.4       |   7 +-
  .../9999-block2mtd-support-partline.patch     | 139 +++++++++++++
  .../9999-support-partition-split.patch        | 186 ++++++++++++++++++
- 4 files changed, 513 insertions(+), 2 deletions(-)
+ 4 files changed, 514 insertions(+), 2 deletions(-)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
  create mode 100644 target/linux/mediatek/patches-5.4/9999-block2mtd-support-partline.patch
  create mode 100644 target/linux/mediatek/patches-5.4/9999-support-partition-split.patch
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
 new file mode 100755
-index 0000000000..e5d793cd1f
+index 0000000000..2b673e74cc
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt2500.dts
-@@ -0,0 +1,183 @@
+@@ -0,0 +1,184 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -54,6 +54,7 @@ index 0000000000..e5d793cd1f
 +			device_ddns = "/dev/mmcblk0boot1", "0x10";
 +			device_sn_bak = "/dev/mmcblk0boot1", "0x20";
 +			device_sn = "/dev/mmcblk0boot1", "0x30";
++			country_code = "/dev/mmcblk0boot1", "0x88";
 +		};
 +	};
 +
