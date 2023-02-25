@@ -21,6 +21,7 @@ packages:
   - gl-ble-daemon
   - gl-ble-to-remote
   - gl-ble-sdk
+  - kmod-usb-serial-ch343
   - gl-sdk4-2b
   - gl-sdk4-ui-hwnat
   - gl-sdk4-ui-netnat
