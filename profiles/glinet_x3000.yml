@@ -18,12 +18,22 @@ packages:
   - gl-sdk4-mwan3
   - gl-sdk4-passthrough
   - gl-sdk4-sms-forward
+  - gl-ble-daemon
+  - gl-ble-to-remote
+  - gl-ble-sdk
+  - gl-sdk4-2b
   - gl-sdk4-ui-hwnat
   - gl-sdk4-ui-netnat
+  - gl-sdk4-ui-bluetoothdevices
+  - gl-sdk4-ui-bluetoothremotemanage
+  - gl-sdk4-ui-bluetoothreport
+  - gl-sdk4-ui-bluetoothsettings
 
 diffconfig: |
   CONFIG_PACKAGE_gl-sdk4-ui-btnsettings=n
   CONFIG_PACKAGE_gl-sdk4-switch-button=n
+  CONFIG_PACKAGE_gl-sdk4-mqtt=n
+  CONFIG_PACKAGE_gl-sdk4-cloud-batch-manage=n
   CONFIG_BUSYBOX_CUSTOM=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_INTERACTIVE=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_SMP_CPU=y
