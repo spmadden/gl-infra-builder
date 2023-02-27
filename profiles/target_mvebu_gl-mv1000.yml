@@ -1,0 +1,16 @@
+---
+profile: gl-mv1000-emmc
+target: mvebu
+subtarget: cortexa53
+description: Build image for the GL.iNET MV1000
+feeds:
+  - name: gl_feeds_commmon
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: a23ceec734ed37e829273ff986c888b58e5850bc
+  - name: gl_feeds_22_03
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: 195dca0e10af66665aa59e33dc17edb784379732
+
+packages:
+  - tor:gl_feeds_common
+  - smstools3:gl_feeds_common
