@@ -1,0 +1,26 @@
+From 25f925b53c5c772a125b89b373b04a3e982ec422 Mon Sep 17 00:00:00 2001
+From: Weiping Yang <weiping.yang@gl-inet.com>
+Date: Sun, 26 Feb 2023 23:31:47 -0500
+Subject: [PATCH] add mv1000 uboot-envtools
+
+---
+ package/boot/uboot-envtools/files/mvebu | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/package/boot/uboot-envtools/files/mvebu b/package/boot/uboot-envtools/files/mvebu
+index cffd396ae1..757b69779b 100644
+--- a/package/boot/uboot-envtools/files/mvebu
++++ b/package/boot/uboot-envtools/files/mvebu
+@@ -26,7 +26,8 @@ cznic,turris-omnia)
+ 		ubootenv_add_uci_config "/dev/mtd0" "0xf0000" "0x10000" "0x10000"
+ 	fi
+ 	;;
+-glinet,gl-mv1000)
++glinet,gl-mv1000|\
++gl-mv1000)
+ 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x8000" "0x8000" "1"
+ 	;;
+ globalscale,espressobin|\
+-- 
+2.17.1
+
