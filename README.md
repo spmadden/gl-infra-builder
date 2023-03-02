@@ -33,27 +33,71 @@ $ ls -l /usr/bin/python3*
 
 1. Run `git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder` to clone repository
 
-2. Run `ls configs -hl` to list the openwrt verizon
+2. Run `git checkout xxx` to switch gl-infra-builder tag(please refer to the table below about xxx tag), the purpose of this step is to switch to the source code used by different GL.iNet firmware versions.
 
-3. Chose your want version, for example, if you want to use openwrt-21.02.2, Run `python3 setup.py -c configs/config-21.02.2.yml` to download openwrt-21.02.2 source code
+3. Run `ls configs -hl` to list the openwrt verizon
 
-4. Run `cd openwrt-21.02/openwrt-21.02.2` to enter openwrt-21.02.2 directory
+4. Chose your want version, for example, if you want to use openwrt-21.02.2, Run `python3 setup.py -c configs/config-21.02.2.yml` to download openwrt-21.02.2 source code
 
-5. Run `./scripts/gen_config.py list` to get target_xxx and glinet_xxx files. target_xxx is you want to compile products, don't modify. glinet_xxx is you want to add/delete packages, you can modify. Those files in the **profiles** directory.
+5. Run `cd openwrt-21.02/openwrt-21.02.2` to enter openwrt-21.02.2 directory
 
-6. Run `./scripts/gen_config.py <target_profile> <function_profile>` to chose the product target and add some packages. <target_profile> is you want to compile products. <function_profile> is you want to add/delete packages. 
+6. Run `./scripts/gen_config.py list` to get target_xxx and glinet_xxx files. target_xxx is you want to compile products, don't modify. glinet_xxx is you want to add/delete packages, you can modify. Those files in the **profiles** directory.
 
-7. For example, If you want to compile GL-A1300 product and add luci, you can run `./scripts/gen_config.py target_ipq40xx_gl-a1300 luci`. You can run `make menuconfig` to chose other packages
+7. Run `./scripts/gen_config.py <target_profile> <function_profile>` to chose the product target and add some packages. <target_profile> is you want to compile products. <function_profile> is you want to add/delete packages.
 
-8. Run `make` to build your firmware.
+8. For example, If you want to compile GL-A1300 product and add luci, you can run `./scripts/gen_config.py target_ipq40xx_gl-a1300 luci`. You can run `make menuconfig` to chose other packages
+
+9. Run `make` to build your firmware.
 
 # Compile GL.iNet standard firmware
 
-9. Base on the steps above, at openwrt-21.02/openwrt-21.02.2 directory, run `git clone https://github.com/gl-inet/glinet4.x.git` to get GL.iNet packages.
+10. Base on the steps above, at openwrt-21.02/openwrt-21.02.2 directory, run `git clone https://github.com/gl-inet/glinet4.x.git` to get GL.iNet packages.
 
-10. Run `./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends` to add A1300 GL.iNet packages
+12. Run `git checkout xxx` to switch glinet4.x packages tag(please refer to the table below about xxx tag), the purpose of this step is to switch to the packages used by different GL.iNet firmware versions.
 
-11. Run ` make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/`  to compile GL.iNet standard firmware.
+13. Run `./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends` to add A1300 GL.iNet packages
+
+14. Run ` make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/`  to compile GL.iNet standard firmware.
+
+# The tag of the released version is as follows
+
+AX1800
+
+| Firmware version | gl-infra-builder tag   | glinet4.x tag |
+| ---------------- | ---------------------- | ------------- |
+| 4.1.0            | v4.1.0_ax1800_release6 | no record     |
+
+AXT1800
+
+| Firmware version | gl-infra-builder tag    | glinet4.x tag |
+| ---------------- | ----------------------- | ------------- |
+| 4.0.0            | v4.0.0_release3         | no record     |
+| 4.0.2            | v4.0.2_release1         | no record     |
+| 4.0.3            | v4.0.3_release1         | no record     |
+| 4.1.0            | v4.1.0_axt1800_release7 | no record     |
+
+MT3000
+
+| Firmware version | gl-infra-builder tag   | glinet4.x tag |
+| ---------------- | ---------------------- | ------------- |
+| 4.1.2            | v4.1.2_mt3000_release3 | no record     |
+| 4.1.3            | v4.1.3_mt3000_release3 | v4.1.3        |
+
+MT2500
+
+| Firmware version | gl-infra-builder tag   | glinet4.x tag |
+| ---------------- | ---------------------- | ------------- |
+| 4.1.1            | v4.1.1_mt2500_release2 | no record     |
+
+
+A1300
+
+| Firmware version | gl-infra-builder tag  | glinet4.x tag |
+| ---------------- | --------------------- | ------------- |
+| 4.0.0            | v4.0.0_a1300_release1 | no record     |
+| 4.1.0            | v4.1.0_a1300_release8 | no record     |
+| 4.1.2            | v4.1.2_a1300_release3 | no record     |
+
 
 # Example compile firmware
 
@@ -86,11 +130,14 @@ $ ls -l /usr/bin/python3*
 ```
  make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
-## 2. Compile MT3000(2023.02.22)
+## 2. Compile MT3000 V4.1.3 firmware(2023.03.02)
 
 2.1 Compile MT3000 OpenWrt firmware(No GL.iNet packages)
 ```
  git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+ git checkout v4.1.3
 ```
 ```
  python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
@@ -105,6 +152,9 @@ $ ls -l /usr/bin/python3*
 2.2 Compile MT3000 GL.iNet standard firmware(Base on the steps above)
 ```
  git clone https://github.com/gl-inet/glinet4.x.git
+```
+```
+ git checkout v4.1.3_mt3000_release3
 ```
 ```
  cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
@@ -230,6 +280,73 @@ $ ls -l /usr/bin/python3*
 ```
 ```
  make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
+```
+
+# How to add own files
+
+In the openwrt system, we can add our own files through the files directory. All files including paths in the files directory will be copied to the file system at the last step of compilation. This feature can be used to add our own files or replace files.
+
+Here is an example of setting the version number from the files directory.
+
+```
+mkdir -p files/etc
+echo "4.2.0" > files/etc/glversion
+echo "release1" > files/etc/version.type
+echo "$(date '+%Y-%m-%d %H:%M:%S')" > files/etc/version.date
+```
+
+Here is an example of setting a repository address
+
+```
+mkdir -p files/etc/opkg/
+cat > files/etc/opkg/distfeeds.conf << EOF
+src/gz glinet_core https://fw.gl-inet.com/releases/v21.02.3/kmod-4.0/aarch64_cortex-a53/mediatek/mt7981
+src/gz glinet_gli_pub https://fw.gl-inet.com/releases/v21.02.3/packages-4.0/aarch64_cortex-a53/glinet
+src/gz glinet_gli_packages https://fw.gl-inet.com/releases/v21.02.3/packages-4.0/aarch64_cortex-a53/packages
+EOF
+
+```
+
+# How to add own packages
+
+Under openwrt, in order to solve the dependency problem between packages, we add our own packages to the source tree in the form of feeds.
+
+Let's say we have a directory called /home/mypackages where we can store our packages, and we have two packages called package1 and package2.
+
+First, we create a new profile in which we reference the package we want to compile.
+
+```shell
+cat > profiles/myprofile.yml  << EOF
+feeds:
+  - name: myfeeds
+    path: /home/mypackages
+
+packages:
+  - package1
+  - package2
+EOF
+```
+
+myprofile.yml is our file name, note that the suffix must be .yml.
+
+In the object set of feeds, we specify the source code path through the path parameter.
+In the object set of packages, we add the name of the package that needs to be selected for compilation
+
+And then, we can use this profile in the configuration generation step
+
+```shell
+./scripts/gen_config.py target_mt7981_gl-mt2500 luci myprofile
+```
+
+Compile firmware
+```
+make V=s
+```
+
+or compile signal package
+
+```
+make package/feeds/myfeeds/package1 V=s
 ```
 
 # Note
