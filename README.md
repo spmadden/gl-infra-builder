@@ -3,13 +3,13 @@
 You need the following tools to compile OpenWrt, the package names vary between distributions. A complete list with distribution specific packages is found in the [Build System Setup](https://openwrt.org/docs/guide-developer/build-system/install-buildsystem) documentation.
 
 ```
-$ sudo apt install binutils bzip2 diff find flex gawk gcc-6+ getopt grep install libc-dev libz-dev make4.1+ perl python3.6+ rsync subversion unzip which libncurses5-dev zlib1g-dev gawk gcc-multilib g++-multilib flex git-core gettext libssl-dev ocaml sharutils re2c -y
+sudo apt install binutils bzip2 diff find flex gawk gcc-6+ getopt grep install libc-dev libz-dev make4.1+ perl python3.6+ rsync subversion unzip which libncurses5-dev zlib1g-dev gawk gcc-multilib g++-multilib flex git-core gettext libssl-dev ocaml sharutils re2c -y
 ```
 
 And This development tools requires Python 3.6 or higher! Please use the following command to check,
 
 ```
-$ python3 --version
+python3 --version
 Python 3.6.13
 
 $ ls -l /usr/bin/python3*
@@ -105,183 +105,183 @@ A1300
 
   1.1  Compile MT2500 OpenWrt firmware(No GL.iNet packages)
 ```
- git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
+python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
 ```
 ```
- ./scripts/gen_config.py target_mt7981_gl-mt2500 luci
+./scripts/gen_config.py target_mt7981_gl-mt2500 luci
 ```
 ```
- make V=s -j5
+make V=s -j5
 ```
 
 1.2 Compile MT2500 GL.iNet standard firmware
 ```
- git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
- cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt2500.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt2500.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
 ```
 ```
- ./scripts/gen_config.py target_mt7981_gl-mt2500 glinet_depends
+./scripts/gen_config.py target_mt7981_gl-mt2500 glinet_depends
 ```
 ```
- make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
+make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
 ## 2. Compile MT3000 V4.1.3 firmware(2023.03.02)
 
 2.1 Compile MT3000 OpenWrt firmware(No GL.iNet packages)
 ```
- git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- git checkout v4.1.3_mt3000_release3
+git checkout v4.1.3_mt3000_release3
 ```
 ```
- python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
+python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
 ```
 ```
- ./scripts/gen_config.py target_mediatek_gl-mt3000 luci
+./scripts/gen_config.py target_mediatek_gl-mt3000 luci
 ```
 ```
- make V=s -j5
+make V=s -j5
 ```
 
 2.2 Compile MT3000 GL.iNet standard firmware(Base on the steps above)
 ```
- git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
 git checkout v4.1.3
 ```
 ```
- cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
 ```
 ```
- ./scripts/gen_config.py target_mediatek_gl-mt3000 glinet_depends
+./scripts/gen_config.py target_mediatek_gl-mt3000 glinet_depends
 ```
 ```
- make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
+make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
 
 ## 3. Compile AXT1800(2023.02.22)
 
 3.1 Compile AXT1800 OpenWrt firmware(No GL.iNet packages)
 ```
- git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- python3 setup.py -c configs/config-wlan-ap.yml && cd wlan-ap/openwrt
+python3 setup.py -c configs/config-wlan-ap.yml && cd wlan-ap/openwrt
 ```
 ```
- ./scripts/gen_config.py target_wlan_ap-gl-axt1800 luci
+./scripts/gen_config.py target_wlan_ap-gl-axt1800 luci
 ```
 ```
- make V=s -j5
+make V=s -j5
 ```
 3.2 Compile AXT1800 GL.iNet standard firmware(Base on the steps above)
 ```
- git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
- ./scripts/gen_config.py target_wlan_ap-gl-axt1800 glinet_depends
+./scripts/gen_config.py target_wlan_ap-gl-axt1800 glinet_depends
 ```
 ```
- make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
+make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
 ```
 ## 4. Compile AX1800(2023.02.22)
 
 4.1 Compile AX1800 OpenWrt firmware(No GL.iNet packages)
 ```
- git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- python3 setup.py -c configs/config-wlan-ap.yml && cd wlan-ap/openwrt
+python3 setup.py -c configs/config-wlan-ap.yml && cd wlan-ap/openwrt
 ```
 ```
- ./scripts/gen_config.py target_wlan_ap-gl-ax1800 luci
+./scripts/gen_config.py target_wlan_ap-gl-ax1800 luci
 ```
 ```
- make V=s -j5
+make V=s -j5
 ```
 4.2 Compile AX1800 GL.iNet standard firmware
 ```
- git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
- ./scripts/gen_config.py target_wlan_ap-gl-ax1800 glinet_depends
+./scripts/gen_config.py target_wlan_ap-gl-ax1800 glinet_depends
 ```
 ```
- make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
+make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
 ```
 ## 5. Compile A1300(2023.02.22)
 
 5.1 Compile A1300 OpenWrt firmware(No GL.iNet packages)
 ```
- git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
+python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
 ```
 ```
- ./scripts/gen_config.py target_ipq40xx_gl-a1300 luci
+./scripts/gen_config.py target_ipq40xx_gl-a1300 luci
 ```
 ```
- make V=s -j5
+make V=s -j5
 ```
 5.2 Compile A1300 GL.iNet standard firmware
 ```
- git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
- ./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends
+./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends
 ```
 ```
- make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/
+make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/
 ```
 
 ## 6. Compile SFT1200(2022.11.23)
 ```
- git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- python3 setup.py -c config-siflower-18.x.yml && cd openwrt-18.06/siflower/openwrt-18.06
+python3 setup.py -c config-siflower-18.x.yml && cd openwrt-18.06/siflower/openwrt-18.06
 ```
 ```
- ./scripts/gen_config.py target_siflower_gl-sft1200 luci
+./scripts/gen_config.py target_siflower_gl-sft1200 luci
 ```
 ```
- make V=s -j5
+make V=s -j5
 ```
 
 ## 7. Compile S200(2023.02.24)
 
 4.1 Compile S200 OpenWrt firmware(No GL.iNet packages)
 ```
- git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
+python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
 ```
 ```
- ./scripts/gen_config.py target_ath79_gl-s200 luci
+./scripts/gen_config.py target_ath79_gl-s200 luci
 ```
 ```
- make V=s -j5
+make V=s -j5
 ```
-Note: Some customers may encounter mDNSResponder-1310.80.1.tar.gz download failed error, please click [Here](https://glinet-hoff-temp-file.oss-cn-shenzhen.aliyuncs.com/mDNSResponder-1310.80.1.tar.gz) to download mDNSResponder-1310.80.1.tar.gz file, and then put it in openwrt-21.02/openwrt-21.02.2/dl directory.
 4.2 Compile S200 GL.iNet standard firmware
 ```
- git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
- ./scripts/gen_config.py target_ath79_gl-s200 glinet_depends_s200
+./scripts/gen_config.py target_ath79_gl-s200 glinet_depends_s200
 ```
 ```
- make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
+make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
 ```
+Note: Some customers may encounter mDNSResponder-1310.80.1.tar.gz download failed error, please click [Here](https://glinet-hoff-temp-file.oss-cn-shenzhen.aliyuncs.com/mDNSResponder-1310.80.1.tar.gz) to download mDNSResponder-1310.80.1.tar.gz file, and then put it in openwrt-21.02/openwrt-21.02.2/dl directory.
 
 # How to add own files
 
@@ -305,7 +305,6 @@ src/gz glinet_core https://fw.gl-inet.com/releases/v21.02.3/kmod-4.0/aarch64_cor
 src/gz glinet_gli_pub https://fw.gl-inet.com/releases/v21.02.3/packages-4.0/aarch64_cortex-a53/glinet
 src/gz glinet_gli_packages https://fw.gl-inet.com/releases/v21.02.3/packages-4.0/aarch64_cortex-a53/packages
 EOF
-
 ```
 
 # How to add own packages
@@ -358,6 +357,6 @@ collect2: error：ld returned 1 exit status.
 ```
 You should execute the following command to reduce the gcc version:
 ```
-$ update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
-$ update-alternatives --config gcc
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+update-alternatives --config gcc
 ```
