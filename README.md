@@ -137,13 +137,13 @@ A1300
  git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
- git checkout v4.1.3
+ git checkout v4.1.3_mt3000_release3
 ```
 ```
  python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
 ```
 ```
- ./scripts/gen_config.py target_mt7981_gl-mt3000 luci
+ ./scripts/gen_config.py target_mediatek_gl-mt3000 luci
 ```
 ```
  make V=s -j5
@@ -154,13 +154,13 @@ A1300
  git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
- git checkout v4.1.3_mt3000_release3
+git checkout v4.1.3
 ```
 ```
  cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
 ```
 ```
- ./scripts/gen_config.py target_mt7981_gl-mt3000 glinet_depends
+ ./scripts/gen_config.py target_mediatek_gl-mt3000 glinet_depends
 ```
 ```
  make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
@@ -271,6 +271,7 @@ A1300
 ```
  make V=s -j5
 ```
+Note: Some customers may encounter mDNSResponder-1310.80.1.tar.gz download failed error, please click [Here](https://glinet-hoff-temp-file.oss-cn-shenzhen.aliyuncs.com/mDNSResponder-1310.80.1.tar.gz) to download mDNSResponder-1310.80.1.tar.gz file, and then put it in openwrt-21.02/openwrt-21.02.2/dl directory.
 4.2 Compile S200 GL.iNet standard firmware
 ```
  git clone https://github.com/gl-inet/glinet4.x.git
