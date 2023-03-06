@@ -82,6 +82,7 @@ MT3000
 | ---------------- | ---------------------- | ------------- |
 | 4.1.2            | v4.1.2_mt3000_release3 | no record     |
 | 4.1.3            | v4.1.3_mt3000_release3 | v4.1.3        |
+| 4.2.0            | v4.2.0_mt3000_release1 | V4.2.0_MT3000_release1 |
 
 MT2500
 
@@ -130,14 +131,15 @@ cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt2500.mk  ./glinet4.x/mt7981/gl_
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
-## 2. Compile MT3000 V4.1.3 firmware(2023.03.02)
+## 2. Compile MT3000 V4.2.0 firmware(2023.03.06)
 
 2.1 Compile MT3000 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
-git checkout v4.1.3_mt3000_release3
+git checkout v4.2.0_mt3000_release1
+
 ```
 ```
 python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
@@ -154,7 +156,7 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-git checkout v4.1.3
+git checkout V4.2.0_MT3000_release1
 ```
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
