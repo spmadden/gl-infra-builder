@@ -55,7 +55,7 @@ $ ls -l /usr/bin/python3*
 
 12. Run `git checkout xxx` to switch glinet4.x packages tag(please refer to the table below about xxx tag), the purpose of this step is to switch to the packages used by different GL.iNet firmware versions.
 
-13. Run `./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends` to add A1300 GL.iNet packages
+13. Run `./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends glinet_nas` to add A1300 GL.iNet packages
 
 14. Run ` make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/`  to compile GL.iNet standard firmware.
 
@@ -125,7 +125,7 @@ git clone https://github.com/gl-inet/glinet4.x.git
 cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt2500.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
 ```
 ```
-./scripts/gen_config.py target_mt7981_gl-mt2500 glinet_depends
+./scripts/gen_config.py target_mt7981_gl-mt2500 glinet_depends glinet_nas
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
@@ -160,7 +160,7 @@ git checkout v4.1.3
 cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
 ```
 ```
-./scripts/gen_config.py target_mediatek_gl-mt3000 glinet_depends
+./scripts/gen_config.py target_mediatek_gl-mt3000 glinet_depends glinet_nas
 ```
 ```
 make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
@@ -186,7 +186,7 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-./scripts/gen_config.py target_wlan_ap-gl-axt1800 glinet_depends
+./scripts/gen_config.py target_wlan_ap-gl-axt1800 glinet_depends glinet_nas
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
@@ -211,7 +211,7 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-./scripts/gen_config.py target_wlan_ap-gl-ax1800 glinet_depends
+./scripts/gen_config.py target_wlan_ap-gl-ax1800 glinet_depends glinet_nas
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
@@ -236,7 +236,7 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends
+./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends glinet_nas
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/
