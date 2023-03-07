@@ -2,6 +2,9 @@
 target: ipq807x
 subtarget: ipq60xx
 feeds:
+  - name: wlan_ap
+    uri:  https://github.com/gl-inet/gl-feeds.git
+    revision: 5df1bae20bf4f2bd39168707e6363bcf8bdf5f29
   - name: ipq807x
     path: ../../feeds/ipq807x
   - name: wifi_ax
