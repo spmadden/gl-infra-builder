@@ -39,3 +39,4 @@ packages:
   - fwdd
   - kmod-mtfwd
   - kmod-mtqos
+  - coreutils-sleep
