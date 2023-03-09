@@ -99,6 +99,11 @@ A1300
 | 4.1.0            | v4.1.0_a1300_release8 | no record     |
 | 4.1.2            | v4.1.2_a1300_release3 | no record     |
 
+S200
+
+| Firmware version | gl-infra-builder tag | glinet4.x tag        |
+| ---------------- | -------------------- | -------------------- |
+| 4.1.3            | v4.1.3_s200_release7 | v4.1.3_s200_release7 |
 
 # Example compile firmware
 
@@ -263,6 +268,7 @@ make V=s -j5
 4.1 Compile S200 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+git checkout v4.1.3_s200_release7
 ```
 ```
 python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
@@ -275,10 +281,14 @@ make V=s -j5
 ```
 4.2 Compile S200 GL.iNet standard firmware
 ```
-git clone https://github.com/gl-inet/glinet4.x.git
+git clone -b v4.1.3_s200_release7 https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-./scripts/gen_config.py target_ath79_gl-s200 glinet_depends_s200
+cp glinet4.x/pkg_config/gl_pkg_config_ath79_s200.mk glinet4.x/ath79/gl_pkg_config.mk
+cp glinet4.x/pkg_config/gl_pkg_config_ath79_s200.yml profiles/
+```
+```
+./scripts/gen_config.py target_ath79_gl-s200 gl_pkg_config_ath79_s200
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
