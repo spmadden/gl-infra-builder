@@ -4,7 +4,7 @@ description: Add the glinet dependencies for the GL.iNET XE3000
 feeds:
   - name: mt7981_private
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: 18afb99eca55f497de2824701253b0662dffecc7
+    revision: ec23e925453d722d7c23de7976fafcc8fedc3ca6
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
     branch: v4.3.0_x3000
