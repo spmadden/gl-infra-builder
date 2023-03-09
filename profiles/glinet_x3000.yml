@@ -21,6 +21,14 @@ packages:
   - gl-sdk4-2b
   - gl-sdk4-ui-hwnat
   - gl-sdk4-ui-netnat
+  - gl-ble-daemon
+  - gl-ble-to-remote
+  - gl-ble-sdk
+  - kmod-usb-serial-ch343
+  - gl-sdk4-ui-bluetoothdevices
+  - gl-sdk4-ui-bluetoothremotemanage
+  - gl-sdk4-ui-bluetoothreport
+  - gl-sdk4-ui-bluetoothsettings
 
 diffconfig: |
   CONFIG_PACKAGE_gl-sdk4-ui-btnsettings=n
@@ -33,3 +41,6 @@ diffconfig: |
   CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_DECIMALS=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_SMP_PROCESS=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_TOPMEM=y
+  CONFIG_PACKAGE_coreutils=y
+  CONFIG_PACKAGE_coreutils-sleep=y
+
