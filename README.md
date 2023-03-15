@@ -150,7 +150,7 @@ git checkout v4.2.0_mt3000_release1
 python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
 ```
 ```
-./scripts/gen_config.py target_mediatek_gl-mt3000 luci
+./scripts/gen_config.py target_mt7981_gl-mt3000 luci
 ```
 ```
 make V=s -j5
@@ -161,13 +161,13 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-git checkout V4.2.0_MT3000_release1
+cd glinet4.x && git checkout V4.2.0_MT3000_release1 && cd ../
 ```
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
 ```
 ```
-./scripts/gen_config.py target_mediatek_gl-mt3000 glinet_depends glinet_nas
+./scripts/gen_config.py target_mt7981_gl-mt3000 glinet_depends glinet_nas
 ```
 ```
 make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
@@ -268,6 +268,8 @@ make V=s -j5
 4.1 Compile S200 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
 git checkout v4.1.3_s200_release7
 ```
 ```
@@ -285,6 +287,8 @@ git clone -b v4.1.3_s200_release7 https://github.com/gl-inet/glinet4.x.git
 ```
 ```
 cp glinet4.x/pkg_config/gl_pkg_config_ath79_s200.mk glinet4.x/ath79/gl_pkg_config.mk
+```
+```
 cp glinet4.x/pkg_config/gl_pkg_config_ath79_s200.yml profiles/
 ```
 ```
