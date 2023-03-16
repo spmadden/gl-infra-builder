@@ -1,14 +1,14 @@
-From bed4afcb1059f8b292b3bea941735b505e6aeddf Mon Sep 17 00:00:00 2001
+From 311b902284e4d61fdb9ee58f3b954fdda344963b Mon Sep 17 00:00:00 2001
 From: niyin <yin.ni@gl-inet.com>
 Date: Sat, 28 Jan 2023 00:38:13 -0800
 Subject: [PATCH] ath79 adjust nand.mk
 
 ---
- target/linux/ath79/image/nand.mk | 73 +++++++++++++++++++++++++++++++-
- 1 file changed, 72 insertions(+), 1 deletion(-)
+ target/linux/ath79/image/nand.mk | 79 ++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 4 deletions(-)
 
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 1d086b1918..d8ca51a359 100644
+index 1d086b1918..9b5ea5daf7 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
 @@ -153,6 +153,36 @@ define Device/glinet_gl-ar300m-nor
@@ -70,6 +70,19 @@ index 1d086b1918..d8ca51a359 100644
    SUPPORTED_DEVICES += gl-ar750s glinet,gl-ar750s glinet,gl-ar750s-nor-nand
  endef
  TARGET_DEVICES += glinet_gl-ar750s-nor
+@@ -189,9 +225,9 @@ define Device/glinet_gl-e750
+   PAGESIZE := 2048
+   VID_HDR_OFFSET := 2048
+   BLOCKSIZE := 128k
+-  IMAGES += factory.img
+-  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
+-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
++  IMAGES += factory.img sysupgrade.tar
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-e750
+ 
 @@ -211,6 +247,41 @@ define Device/glinet_gl-xe300
  endef
  TARGET_DEVICES += glinet_gl-xe300
