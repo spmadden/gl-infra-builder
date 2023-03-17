@@ -63,18 +63,20 @@ $ ls -l /usr/bin/python3*
 
 AX1800
 
-| Firmware version | gl-infra-builder tag   | glinet4.x tag |
-| ---------------- | ---------------------- | ------------- |
-| 4.1.0            | v4.1.0_ax1800_release6 | no record     |
+| Firmware version | gl-infra-builder tag   | glinet4.x tag   |
+| ---------------- | ---------------------- | --------------- |
+| 4.1.0            | v4.1.0_ax1800_release6 | no record       |
+| 4.2.0            | v4.2.0_release3        | v4.2.0_release3 |
 
 AXT1800
 
-| Firmware version | gl-infra-builder tag    | glinet4.x tag |
-| ---------------- | ----------------------- | ------------- |
-| 4.0.0            | v4.0.0_release3         | no record     |
-| 4.0.2            | v4.0.2_release1         | no record     |
-| 4.0.3            | v4.0.3_release1         | no record     |
-| 4.1.0            | v4.1.0_axt1800_release7 | no record     |
+| Firmware version | gl-infra-builder tag    | glinet4.x tag   |
+| ---------------- | ----------------------- | --------------- |
+| 4.0.0            | v4.0.0_release3         | no record       |
+| 4.0.2            | v4.0.2_release1         | no record       |
+| 4.0.3            | v4.0.3_release1         | no record       |
+| 4.1.0            | v4.1.0_axt1800_release7 | no record       |
+| 4.2.0            | v4.2.0_release3         | v4.2.0_release3 |
 
 MT3000
 
@@ -86,18 +88,20 @@ MT3000
 
 MT2500
 
-| Firmware version | gl-infra-builder tag   | glinet4.x tag |
-| ---------------- | ---------------------- | ------------- |
-| 4.1.1            | v4.1.1_mt2500_release2 | no record     |
+| Firmware version | gl-infra-builder tag   | glinet4.x tag   |
+| ---------------- | ---------------------- | --------------- |
+| 4.1.1            | v4.1.1_mt2500_release2 | no record       |
+| 4.2.0            | v4.2.0_release3        | v4.2.0_release3 |
 
 
-A1300
 
-| Firmware version | gl-infra-builder tag  | glinet4.x tag |
-| ---------------- | --------------------- | ------------- |
-| 4.0.0            | v4.0.0_a1300_release1 | no record     |
-| 4.1.0            | v4.1.0_a1300_release8 | no record     |
-| 4.1.2            | v4.1.2_a1300_release3 | no record     |
+
+| Firmware version | gl-infra-builder tag  | glinet4.x tag   |
+| ---------------- | --------------------- | --------------- |
+| 4.0.0            | v4.0.0_a1300_release1 | no record       |
+| 4.1.0            | v4.1.0_a1300_release8 | no record       |
+| 4.1.2            | v4.1.2_a1300_release3 | no record       |
+| 4.2.0            | v4.2.0_release3       | v4.2.0_release3 |
 
 S200
 
@@ -107,7 +111,7 @@ S200
 
 # Example compile firmware
 
-## 1. Compile MT2500(2023.02.22)
+## 1. Compile MT2500(2023.03.17)
 
   1.1  Compile MT2500 OpenWrt firmware(No GL.iNet packages)
 ```
@@ -124,14 +128,16 @@ make V=s -j5
 ```
 
 1.2 Compile MT2500 GL.iNet standard firmware
+
 ```
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt2500.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/gl_pkg_config_mt2500.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/glinet_depends_mt2500.yml  ./profiles/glinet_depends.yml
 ```
 ```
-./scripts/gen_config.py target_mt7981_gl-mt2500 glinet_depends glinet_nas
+./scripts/gen_config.py glinet_depends
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
@@ -157,6 +163,7 @@ make V=s -j5
 ```
 
 2.2 Compile MT3000 GL.iNet standard firmware(Base on the steps above)
+
 ```
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
@@ -173,7 +180,7 @@ cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_p
 make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
 
-## 3. Compile AXT1800(2023.02.22)
+## 3. Compile AXT1800(2023.03.17)
 
 3.1 Compile AXT1800 OpenWrt firmware(No GL.iNet packages)
 ```
@@ -193,12 +200,14 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-./scripts/gen_config.py target_wlan_ap-gl-axt1800 glinet_depends glinet_nas
+cp ./glinet4.x/pkg_config/gl_pkg_config_axt1800.mk  ./glinet4.x/ipq60xx/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/glinet_depends_axt1800.yml  ./profiles/glinet_depends.yml
+./scripts/gen_config.py glinet_depends
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
 ```
-## 4. Compile AX1800(2023.02.22)
+## 4. Compile AX1800(2023.03.17)
 
 4.1 Compile AX1800 OpenWrt firmware(No GL.iNet packages)
 ```
@@ -218,12 +227,14 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-./scripts/gen_config.py target_wlan_ap-gl-ax1800 glinet_depends glinet_nas
+cp ./glinet4.x/pkg_config/gl_pkg_config_ax1800.mk  ./glinet4.x/ipq60xx/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/glinet_depends_ax1800.yml  ./profiles/glinet_depends.yml
+./scripts/gen_config.py glinet_depends
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
 ```
-## 5. Compile A1300(2023.02.22)
+## 5. Compile A1300(2023.03.17)
 
 5.1 Compile A1300 OpenWrt firmware(No GL.iNet packages)
 ```
@@ -243,7 +254,9 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-./scripts/gen_config.py target_ipq40xx_gl-a1300 glinet_depends glinet_nas
+cp ./glinet4.x/pkg_config/gl_pkg_config_a1300.mk  ./glinet4.x/ipq40xx/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/glinet_depends_a1300.yml  ./profiles/glinet_depends.yml
+./scripts/gen_config.py glinet_depends
 ```
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/
