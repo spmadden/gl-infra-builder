@@ -46,7 +46,7 @@ index 0000000000..2b673e74cc
 +		model = "mt2500";
 +		wan = "eth0";
 +		lan = "eth1";
-+		usb-port = "1-1";
++		usb-port = "1-1,2-1";
 +		flash_size = <8192>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
 +		factory_data {

@@ -1,0 +1,44 @@
+From 34cbc8265452f9ac701c28bee14b44d47df65545 Mon Sep 17 00:00:00 2001
+From: Yin Ni <yin.ni@gl-inet.com>
+Date: Wed, 15 Mar 2023 07:55:22 -0700
+Subject: [PATCH] e750: support E750 target
+
+Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
+---
+ .../ath79/dts/qca9531_glinet_gl-e750.dts      | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
+index ca0784e6bf..96d0c7c992 100644
+--- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
+@@ -13,6 +13,26 @@
+ 		label-mac-device = &eth0;
+ 	};
+ 
++	gl_hw {
++                compatible = "gl-hw-info";
++
++                #address-cells = <1>;
++                #size-cells = <1>;
++                model = "e750";
++                lan = "eth0";
++                flash_size = <128>;
++                radio = "mac80211";
++                build-in-modem = "1-1";
++                reset-button = "gpio-3";
++                factory_data {
++                        device_mac = "art";
++                        device_ddns = "art", "0x10";
++                        device_sn_bak = "art", "0x20";
++                        device_sn = "art", "0x30";
++                        country_code = "art", "0x88";
++                };
++        };
++
+ 	keys {
+ 		compatible = "gpio-keys";
+ 
+-- 
+2.25.1
+

@@ -1,0 +1,30 @@
+From f87ccbaa34ff52acf7c8fab6504c6d1d743bd519 Mon Sep 17 00:00:00 2001
+From: Yin Ni <yin.ni@gl-inet.com>
+Date: Thu, 16 Mar 2023 21:26:19 -0700
+Subject: [PATCH] ath79: e750 crash after restart 5g wifi
+
+---
+ .../patches/ath/999-fix-e750-reset-5g-crash.patch     | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 package/kernel/mac80211/patches/ath/999-fix-e750-reset-5g-crash.patch
+
+diff --git a/package/kernel/mac80211/patches/ath/999-fix-e750-reset-5g-crash.patch b/package/kernel/mac80211/patches/ath/999-fix-e750-reset-5g-crash.patch
+new file mode 100644
+index 0000000000..0e85944cda
+--- /dev/null
++++ b/package/kernel/mac80211/patches/ath/999-fix-e750-reset-5g-crash.patch
+@@ -0,0 +1,11 @@
++--- a/drivers/net/wireless/ath/ath10k/pci.c
+++++ b/drivers/net/wireless/ath/ath10k/pci.c
++@@ -2237,7 +2237,7 @@ static int ath10k_pci_bmi_wait(struct at
++ 			goto out;
++ 		}
++ 
++-		schedule();
+++		//schedule();
++ 	}
++ 
++ 	ret = -ETIMEDOUT;
+-- 
+2.25.1
+
