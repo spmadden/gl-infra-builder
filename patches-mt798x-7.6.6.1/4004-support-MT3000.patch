@@ -116,7 +116,7 @@ index 0000000000..fb22ab705f
 +		model = "mt3000";
 +		wan = "eth0";
 +		lan = "eth1";
-+		usb-port = "1-1";
++		usb-port = "1-1,2-1";
 +		fan = "pwmchip0";
 +		flash_size = <256>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
