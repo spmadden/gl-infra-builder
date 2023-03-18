@@ -7,10 +7,10 @@ description: Build image for the GL.iNET X3000
 feeds:
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 16d4e89ddfc13ab8551959c3c17dfe7699c709bf
+    revision: 64e5a038fbfe8d7155888ebc1b28d3134e76044f
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: df7519534b8afd2e0ab69db7d0c716ef4e6f21f3
+    revision: 3c1d2e79c757b78f3b4c53bd09e516c6e980da1b
   - name: gl_feed_mtk
     uri: https://github.com/gl-inet/gl-feeds.git
     branch: mtk
