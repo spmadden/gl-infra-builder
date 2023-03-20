@@ -7,7 +7,7 @@ description: Build image for the GL.iNET XE3000
 feeds:
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 64e5a038fbfe8d7155888ebc1b28d3134e76044f
+    revision: a837720a070fc445282da7fcd6295b97d15419b2
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 581563a214d313c367d7ffe5a1e9038fc18292ed
