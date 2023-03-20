@@ -17,10 +17,8 @@ packages:
   - dnsmasq-full
   - mwan3
   - iwinfo
+  - lua-rs232
   - gl-oui-rpc
-#  - ot-br-posix
-#  - gl-iot-otbr-gw
-#  - gl-iot-otbr-mgmt
   - gl-silabs-dfu
   - gl-sdk4-acl
   - gl-sdk4-base-files
@@ -69,9 +67,9 @@ packages:
   - gl-ble-daemon
   - gl-ble-to-remote
   - gl-ble-sdk
-  - gl-sdk4-edgerouter
   - gl-sdk4-netmode
   - gl-sdk4-keepcfg
+
   - gl-sdk4-ui-adminpw
   - gl-sdk4-ui-advanced
   - gl-sdk4-ui-backbonerouters
@@ -95,9 +93,6 @@ packages:
   - gl-sdk4-ui-process
   - gl-sdk4-ui-reset
   - gl-sdk4-ui-snooping
-#  - gl-sdk4-ui-threaddevices
-#  - gl-sdk4-ui-threadnetwork
-#  - gl-sdk4-ui-threadtopologies
   - gl-sdk4-ui-timezone
   - gl-sdk4-ui-upgrade
   - gl-sdk4-ui-vpndashboard
@@ -108,7 +103,6 @@ packages:
   - gl-sdk4-ui-timedtask
   - gl-sdk4-ui-multiwan
   - gl-sdk4-ui-igmp
-#  - gl-sdk4-ui-btnsettings
   - gl-sdk4-ui-overview
   - gl-sdk4-ui-sensors
   - gl-sdk4-ui-bluetoothdevices
@@ -117,7 +111,6 @@ packages:
   - gl-sdk4-ui-bluetoothsettings
   - gl-sdk4-ui-bridge
   - gl-sdk4-ui-sms
-  - gl-sdk4-ui-edgerouter
 diffconfig: |
   CONFIG_PACKAGE_kmod-shortcut-fe-cm=n
   CONFIG_SIGNATURE_CHECK=n
