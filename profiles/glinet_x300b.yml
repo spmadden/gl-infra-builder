@@ -161,3 +161,5 @@ diffconfig: |
   CONFIG_PACKAGE_kmod-crypto-hash=n
   CONFIG_PACKAGE_kmod-usb-serial-ch341=n
   CONFIG_PACKAGE_libustream-wolfssl=n
+  CONFIG_TARGET_INITRAMFS_COMPRESSION_LZMA=y
+  CONFIG_GL_SDK4_DNS_USE_DNSCRYPT_PROXY=y
