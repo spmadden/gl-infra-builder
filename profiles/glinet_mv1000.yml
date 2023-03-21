@@ -17,13 +17,6 @@ packages:
   - curl
   - iwinfo
   - block-mount
-  - blkid
-  - ntfs-3g
-  - ntfs-3g-utils
-  - kmod-fs-ext4
-  - kmod-fs-ntfs
-  - kmod-fs-vfat
-  - kmod-fs-exfat
   - kmod-inet-diag
   - iptables-mod-tproxy
   - iptables-mod-filter
@@ -41,6 +34,7 @@ packages:
   - gl-sdk4-switch-button
   - gl-sdk4-netmode
   - gl-sdk4-base-files
+  - gl-mv1000-base-files
   - gl-sdk4-tethering
   - gl-sdk4-upgrade
   - gl-sdk4-ovpn-client
@@ -114,15 +108,11 @@ packages:
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-parentalcontrol
   - gl-sdk4-ui-zerotierview
-  - gl-sdk4-nas-utils
-  - gl-sdk4-nas-web
-  - gl-sdk4-exfat-utils
-  - gl-sdk4-webdav
-  - kmod-usb-storage-uas
+  - gl-sdk4-tailscale
+  - gl-sdk4-ui-tailscale
+  - gl-sdk4-ui-adguardhome
+  - gl-sdk4-adguardhome
   - kmod-usb-storage-extras
-  - dosfstools
-  - e2fsprogs
-  - minidlna
 
 diffconfig: |
   CONFIG_PACKAGE_kmod-usb-gadget-eth=y
@@ -164,11 +154,4 @@ diffconfig: |
   CONFIG_OPENSSL_OPTIMIZE_SPEED=y
   CONFIG_LUCI_LANG_zh_Hans=y
   CONFIG_PACKAGE_wpad-basic-wolfssl=n
-  CONFIG_BUSYBOX_CONFIG_ADDGROUP=y
-  CONFIG_BUSYBOX_CONFIG_FEATURE_ADDUSER_TO_GROUP=y
-  CONFIG_BUSYBOX_CONFIG_ADDUSER=y
-  CONFIG_BUSYBOX_CONFIG_CHPASSWD=y
-  CONFIG_BUSYBOX_CONFIG_DELUSER=y
-  CONFIG_BUSYBOX_CONFIG_DELGROUP=y
-  CONFIG_BUSYBOX_CONFIG_FEATURE_DEL_USER_FROM_GROUP=y
-  TARGET_INITRAMFS_COMPRESSION_LZMA=y
+  CONFIG_TARGET_INITRAMFS_COMPRESSION_LZMA=y
