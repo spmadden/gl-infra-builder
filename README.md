@@ -84,7 +84,7 @@ MT3000
 | ---------------- | ---------------------- | ------------- |
 | 4.1.2            | v4.1.2_mt3000_release3 | no record     |
 | 4.1.3            | v4.1.3_mt3000_release3 | v4.1.3        |
-| 4.2.0            | v4.2.0_mt3000_release1 | V4.2.0_MT3000_release1 |
+| 4.2.0            | v4.2.0_mt3000_release1 | v4.2.0_MT3000_release1 |
 
 MT2500
 
@@ -135,14 +135,10 @@ git clone https://github.com/gl-inet/glinet4.x.git
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_mt2500.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
 cp ./glinet4.x/pkg_config/glinet_depends_mt2500.yml  ./profiles/glinet_depends.yml
-```
-```
 ./scripts/gen_config.py glinet_depends
-```
-```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
-## 2. Compile MT3000 V4.2.0 firmware(2023.03.06)
+## 2. Compile MT3000 V4.2.0 firmware(2023.03.21)
 
 2.1 Compile MT3000 OpenWrt firmware(No GL.iNet packages)
 ```
@@ -168,17 +164,12 @@ make V=s -j5
 git clone https://github.com/gl-inet/glinet4.x.git
 ```
 ```
-cd glinet4.x && git checkout V4.2.0_MT3000_release1 && cd ../
-```
-```
-cp ./glinet4.x/pkg_config/gl_pkg_config_mt7981_mt3000.mk ./glinet4.x/mt7981/gl_pkg_config.mk
-```
-```
-./scripts/gen_config.py target_mt7981_gl-mt3000 glinet_depends glinet_nas
-```
-```
+cp ./glinet4.x/pkg_config/gl_pkg_config_mt3000.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
+cp ./glinet4.x/pkg_config/glinet_depends_mt3000.yml  ./profiles/glinet_depends.yml
+./scripts/gen_config.py glinet_depends
 make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
+
 
 ## 3. Compile AXT1800(2023.03.17)
 
@@ -257,10 +248,9 @@ git clone https://github.com/gl-inet/glinet4.x.git
 cp ./glinet4.x/pkg_config/gl_pkg_config_a1300.mk  ./glinet4.x/ipq40xx/gl_pkg_config.mk
 cp ./glinet4.x/pkg_config/glinet_depends_a1300.yml  ./profiles/glinet_depends.yml
 ./scripts/gen_config.py glinet_depends
-```
-```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq40xx/
 ```
+
 
 ## 6. Compile SFT1200(2022.11.23)
 ```
