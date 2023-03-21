@@ -108,8 +108,8 @@ packages:
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-parentalcontrol
   - gl-sdk4-ui-zerotierview
+  - gl-sdk4-ui-tailscaleview
   - gl-sdk4-tailscale
-  - gl-sdk4-ui-tailscale
   - gl-sdk4-ui-adguardhome
   - gl-sdk4-adguardhome
   - kmod-usb-storage-extras
