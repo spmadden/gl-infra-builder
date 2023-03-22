@@ -1,21 +1,23 @@
-From ed71a23132bac937335d787203415b01dbc89d2d Mon Sep 17 00:00:00 2001
+From f97272d7f7aa9aac944ef225d3652791e9ab9512 Mon Sep 17 00:00:00 2001
 From: Weiping Yang <weiping.yang@gl-inet.com>
 Date: Tue, 21 Mar 2023 05:26:55 -0400
 Subject: [PATCH] fix-ar8337-remove-wan-port-network-cable-clear-ip
 
 ---
- ...move-wan-port-network-cable-clear-ip.patch | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ ...move-wan-port-network-cable-clear-ip.patch | 32 +++++++++++++++++++
+ 1 file changed, 32 insertions(+)
  create mode 100644 target/linux/ath79/patches-5.10/943-fix-ar8337-remove-wan-port-network-cable-clear-ip.patch
 
 diff --git a/target/linux/ath79/patches-5.10/943-fix-ar8337-remove-wan-port-network-cable-clear-ip.patch b/target/linux/ath79/patches-5.10/943-fix-ar8337-remove-wan-port-network-cable-clear-ip.patch
 new file mode 100644
-index 0000000000..ef0cc8badf
+index 0000000000..f77b0eab11
 --- /dev/null
 +++ b/target/linux/ath79/patches-5.10/943-fix-ar8337-remove-wan-port-network-cable-clear-ip.patch
-@@ -0,0 +1,33 @@
-+--- a/drivers/net/phy/ar8216.c
-++++ b/drivers/net/phy/ar8216.c
+@@ -0,0 +1,32 @@
++Index: linux-5.10.146/drivers/net/phy/ar8216.c
++===================================================================
++--- linux-5.10.146.orig/drivers/net/phy/ar8216.c
+++++ linux-5.10.146/drivers/net/phy/ar8216.c
 +@@ -2545,6 +2545,8 @@ ar8xxx_phy_read_status(struct phy_device
 + {
 + 	struct ar8xxx_priv *priv = phydev->priv;
@@ -25,13 +27,12 @@ index 0000000000..ef0cc8badf
 + 
 + 	/* check for switch port link changes */
 + 	ar8xxx_check_link_states(priv);
-+@@ -2570,10 +2572,18 @@ ar8xxx_phy_read_status(struct phy_device
-+ 	default:
-+ 		phydev->speed = 0;
++@@ -2572,8 +2574,16 @@ ar8xxx_phy_read_status(struct phy_device
 + 	}
-+-	phydev->duplex = link.duplex ? DUPLEX_FULL : DUPLEX_HALF;
-++	phydev->duplex = link.duplex ? DUPLEX_FULL : DUPLEX_HALF
-++
++ 	phydev->duplex = link.duplex ? DUPLEX_FULL : DUPLEX_HALF;
++ 
++-	phydev->state = PHY_RUNNING;
++-	netif_carrier_on(phydev->attached_dev);
 ++	//Execute only when the wan port is down
 ++	if(port1_status && port1_status != priv->link_up[1]){
 ++		phydev->link = 0;
@@ -41,9 +42,7 @@ index 0000000000..ef0cc8badf
 ++		phydev->state = PHY_RUNNING;
 ++		netif_carrier_on(phydev->attached_dev);
 ++	}
-+ 
-+-	phydev->state = PHY_RUNNING;
-+-	netif_carrier_on(phydev->attached_dev);
+++
 + 	if (phydev->adjust_link)
 + 		phydev->adjust_link(phydev->attached_dev);
 + 
