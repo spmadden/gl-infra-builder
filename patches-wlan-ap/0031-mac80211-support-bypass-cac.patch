@@ -1,0 +1,73 @@
+From e602938214b1c140a898c61959a6fa1c043d3dfb Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 22 Mar 2023 09:51:49 +0800
+Subject: [PATCH] mac80211: support bypass cac
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../pending/303-support-bypass-cac.patch      | 53 +++++++++++++++++++
+ 1 file changed, 53 insertions(+)
+ create mode 100644 feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch
+
+diff --git a/feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch b/feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch
+new file mode 100644
+index 00000000..acc7815c
+--- /dev/null
++++ b/feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch
+@@ -0,0 +1,53 @@
++Index: backports-20210222_001-4.4.60-b157d2276/net/mac80211/debugfs.c
++===================================================================
++--- backports-20210222_001-4.4.60-b157d2276.orig/net/mac80211/debugfs.c
+++++ backports-20210222_001-4.4.60-b157d2276/net/mac80211/debugfs.c
++@@ -605,6 +605,42 @@ static const struct file_operations scan
++ 	.llseek = default_llseek,
++ };
++ 
+++static ssize_t bypass_cac_write(struct file *file, const char __user *ptr,
+++			size_t len, loff_t *off)
+++{
+++	struct ieee80211_local *local = file->private_data;
+++	struct ieee80211_sub_if_data *sdata;
+++
+++	rtnl_lock();
+++	wiphy_lock(local->hw.wiphy);
+++	mutex_lock(&local->mtx);
+++
+++	list_for_each_entry(sdata, &local->interfaces, list) {
+++		struct wireless_dev *wdev = &sdata->wdev;
+++
+++		cancel_delayed_work_sync(&sdata->dfs_cac_timer_work);
+++
+++		if (wdev->cac_started) {
+++			pr_info("bypass cac for %s\n", sdata->name);
+++			wdev->cac_time_ms = 0;
+++			ieee80211_queue_delayed_work(&sdata->local->hw,
+++					&sdata->dfs_cac_timer_work, 0);
+++		}
+++	}
+++
+++	mutex_unlock(&local->mtx);
+++	wiphy_unlock(local->hw.wiphy);
+++	rtnl_unlock();
+++
+++	return len;
+++}
+++
+++static const struct file_operations bypass_cac_ops = {
+++	.write = bypass_cac_write,
+++	.open = simple_open,
+++	.llseek = noop_llseek,
+++};
+++
++ void debugfs_hw_add(struct ieee80211_local *local)
++ {
++ 	struct dentry *phyd = local->hw.wiphy->debugfsdir;
++@@ -678,4 +714,5 @@ void debugfs_hw_add(struct ieee80211_loc
++ 	DEBUGFS_DEVSTATS_ADD(dot11RTSSuccessCount);
++ 
++ 	DEBUGFS_ADD(scanning);
+++	DEBUGFS_ADD_MODE(bypass_cac, 0200);
++ }
+-- 
+2.34.1
+
