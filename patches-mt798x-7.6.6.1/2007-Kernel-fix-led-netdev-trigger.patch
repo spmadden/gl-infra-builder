@@ -1,0 +1,45 @@
+From 04b8b791664f77178d48756a67a3bf10636bc49f Mon Sep 17 00:00:00 2001
+From: Hongjian Zhang <hongjian.zhang@gl-inet.com>
+Date: Thu, 23 Mar 2023 09:26:29 +0800
+Subject: [PATCH] Kernel: fix led netdev trigger
+
+---
+ .../hack-5.4/931-fix-led-netdev-trigger.patch | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+ create mode 100644 target/linux/generic/hack-5.4/931-fix-led-netdev-trigger.patch
+
+diff --git a/target/linux/generic/hack-5.4/931-fix-led-netdev-trigger.patch b/target/linux/generic/hack-5.4/931-fix-led-netdev-trigger.patch
+new file mode 100644
+index 0000000000..e4b5950faf
+--- /dev/null
++++ b/target/linux/generic/hack-5.4/931-fix-led-netdev-trigger.patch
+@@ -0,0 +1,26 @@
++Index: b/drivers/leds/trigger/ledtrig-netdev.c
++===================================================================
++--- a/drivers/leds/trigger/ledtrig-netdev.c	2021-08-26 20:55:22.000000000 +0800
+++++ b/drivers/leds/trigger/ledtrig-netdev.c	2021-09-18 16:00:16.427666394 +0800
++@@ -109,6 +109,7 @@ static ssize_t device_name_store(struct
++ 				 size_t size)
++ {
++ 	struct led_netdev_data *trigger_data = led_trigger_get_drvdata(dev);
+++	unsigned int flags;
++ 
++ 	if (size >= IFNAMSIZ)
++ 		return -EINVAL;
++@@ -132,9 +133,11 @@ static ssize_t device_name_store(struct
++ 		    dev_get_by_name(&init_net, trigger_data->device_name);
++ 
++ 	clear_bit(NETDEV_LED_MODE_LINKUP, &trigger_data->mode);
++-	if (trigger_data->net_dev != NULL)
++-		if (netif_carrier_ok(trigger_data->net_dev))
+++	if (trigger_data->net_dev != NULL){
+++		flags = dev_get_flags(trigger_data->net_dev);
+++		if (flags & IFF_LOWER_UP)
++ 			set_bit(NETDEV_LED_MODE_LINKUP, &trigger_data->mode);
+++    }
++ 
++ 	trigger_data->last_activity = 0;
++ 
+-- 
+2.17.1
+
