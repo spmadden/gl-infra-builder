@@ -24,6 +24,7 @@ packages:
   - blockdev
   - gdisk
   - wireless-tools
+  - luci-app-mtkwifi
   - gl-sdk4-mtk-wifi-v2
   - kmod-conninfra-mt7981-ko
   - kmod-mt-wifi-mt7981-ko

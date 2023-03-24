@@ -13,13 +13,14 @@ feeds:
     revision: 581563a214d313c367d7ffe5a1e9038fc18292ed
   - name: gl_feed_mtk
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 5e48f72b4020fca612bedc480231c9081a00efa4
+    revision: d3ec066db27b32e4fb3799ca5ff6e3fcea941150
 
 packages:
   - ethtool
   - iwinfo
   - wireless-tools
   - gl-sdk4-mtk-wifi-v2
+  - luci-app-mtkwifi
   - kmod-conninfra-mt7981-ko
   - kmod-mt-wifi-mt7981-ko
   - kmod-warp-mt7981-ko
