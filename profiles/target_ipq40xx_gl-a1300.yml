@@ -4,9 +4,9 @@ target: ipq40xx
 subtarget: generic
 description: Build image for the GL.iNET A1300
 feeds:
-  - name: gl_feeds_commmon
+  - name: gl_feeds_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 341ee97aaa761c0fc93a0d28fc8634d42f7f7c4c
+    revision: c6eabb97a774dc4305fd624c833464cfb6ffef7e
   - name: gl_feeds_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 581563a214d313c367d7ffe5a1e9038fc18292ed
