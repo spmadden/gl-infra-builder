@@ -6,10 +6,10 @@ description: Build image for the GL.iNET S200
 feeds:
   - name: gl_feeds_commmon
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 9433a1ce2cc6d4cce70c30f977c1a32ed17c8131
-  - name: gl_feeds
+    revision: 0ad264d13baf410a7d7012615346d059c340148d
+  - name: gl_feeds_21_02_2
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 6b4d34ac72719c22de6e2c365b476e5e9bef18ca
+    revision: 27ffb11de6f86f593bc74ec8c7fb28c8433c14ae
 
 packages:
   - kmod-gl-sdk4-hw-info
