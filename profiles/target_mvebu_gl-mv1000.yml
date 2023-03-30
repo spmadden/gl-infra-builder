@@ -6,7 +6,7 @@ description: Build image for the GL.iNET MV1000
 feeds:
   - name: gl_feeds_commmon
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 807fbe19559ccbcbdb73e4373bd8b15b0d61da92
+    revision: eace3976ffc38aaa3e3cd8d4bba9053dbb9bf8d7
   - name: gl_feeds_22_03
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 195dca0e10af66665aa59e33dc17edb784379732
