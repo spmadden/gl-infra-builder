@@ -1,21 +1,21 @@
-From 12482b59735bff2e48ae427eb166db22b45118d3 Mon Sep 17 00:00:00 2001
+From cb2294f8ae2fa5ab0977ee6eed58884d81ae6b45 Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 19 Jan 2023 11:51:21 +0800
 Subject: [PATCH] support X3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-x3000.dts     | 314 ++++++++++++++++++
+ .../boot/dts/mediatek/mt7981-gl-x3000.dts     | 315 ++++++++++++++++++
  .../patches-5.4/403-support-x3000-emmc.patch  |  30 ++
- 2 files changed, 344 insertions(+)
+ 2 files changed, 345 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
  create mode 100644 target/linux/mediatek/patches-5.4/403-support-x3000-emmc.patch
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
 new file mode 100755
-index 0000000000..457b67fc7d
+index 0000000000..d61a790b03
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-x3000.dts
-@@ -0,0 +1,314 @@
+@@ -0,0 +1,315 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -59,6 +59,7 @@ index 0000000000..457b67fc7d
 +			device_sn_bak = "/dev/mmcblk0p3", "0x20";
 +			device_sn = "/dev/mmcblk0p3", "0x30";
 +			country_code = "/dev/mmcblk0p3", "0x88";
++			device_cert = "/dev/mmcblk0p3", "0x1000";
 +		};
 +	};
 +
@@ -367,5 +368,5 @@ index 0000000000..afa8309b2a
 + 	"wf0_mode1", "wf0_mode3", "mt7531_int", };
 + static const char *mt7981_ant_groups[] = { "ant_sel", };
 -- 
-2.25.1
+2.34.1
 

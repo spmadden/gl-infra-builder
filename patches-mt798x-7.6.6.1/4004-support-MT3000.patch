@@ -1,19 +1,19 @@
-From 6fcb012c50a3d24975e172968e20e28d1a22e294 Mon Sep 17 00:00:00 2001
+From 517cbcf8c2237998b23f09257d356edc5dabc3b7 Mon Sep 17 00:00:00 2001
 From: lincolnzh <hongjian.zhang@gl-inet.com>
 Date: Thu, 29 Dec 2022 16:19:53 +0800
 Subject: [PATCH] support MT3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 276 ++++++++++++++++++
- 1 file changed, 276 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 277 ++++++++++++++++++
+ 1 file changed, 277 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..fb22ab705f
+index 0000000000..a464609a82
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,276 @@
+@@ -0,0 +1,277 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -131,6 +131,7 @@ index 0000000000..fb22ab705f
 +			device_sn_bak = "Factory", "0x20";
 +			device_sn = "Factory", "0x30";
 +			country_code = "Factory", "0x88";
++			device_cert = "Factory", "0x1000";
 +		};
 +	};
 +

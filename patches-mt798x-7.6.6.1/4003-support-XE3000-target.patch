@@ -1,19 +1,19 @@
-From fca1366343c83ce58628a2d0a1199b84b222d1a3 Mon Sep 17 00:00:00 2001
+From be29f17fac5f6f38cdda15c2f5f476af1e68ce7c Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 19 Jan 2023 12:09:45 +0800
 Subject: [PATCH] support XE3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 310 ++++++++++++++++++
- 1 file changed, 310 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-xe3000.dts    | 311 ++++++++++++++++++
+ 1 file changed, 311 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 new file mode 100755
-index 0000000000..8d3902d418
+index 0000000000..5cbba7f7ba
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
-@@ -0,0 +1,310 @@
+@@ -0,0 +1,311 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -58,6 +58,7 @@ index 0000000000..8d3902d418
 +			device_sn_bak = "/dev/mmcblk0p3", "0x20";
 +			device_sn = "/dev/mmcblk0p3", "0x30";
 +			country_code = "/dev/mmcblk0p3", "0x88";
++			device_cert = "/dev/mmcblk0p3", "0x1000";
 +		};
 +	};
 +
@@ -325,5 +326,5 @@ index 0000000000..8d3902d418
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 -- 
-2.25.1
+2.34.1
 
