@@ -1,13 +1,18 @@
-From 916a1e5f3f467b96962ad78ab989df2ed3406c30 Mon Sep 17 00:00:00 2001
+From c4ee9cab4988cae63615dd4f5f935899f4502fec Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 7 Jul 2022 15:18:12 +0800
 Subject: [PATCH] wireguard: support hotplug for gl
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Signed-off-by: Dongming Han <handongming@gl-inet.com>
 ---
  .../950-wireguard-support-hotplug.patch       | 166 ++++++++++++++++++
- 1 file changed, 166 insertions(+)
+ ...d-server-not-do-handshake-initiation.patch |  26 +++
+ ...MEOUT-hotplug-after-3-consecutive-fa.patch |  30 ++++
+ 3 files changed, 222 insertions(+)
  create mode 100644 target/linux/generic/hack-5.4/950-wireguard-support-hotplug.patch
+ create mode 100644 target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch
+ create mode 100644 target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
 
 diff --git a/target/linux/generic/hack-5.4/950-wireguard-support-hotplug.patch b/target/linux/generic/hack-5.4/950-wireguard-support-hotplug.patch
 new file mode 100644
@@ -181,6 +186,74 @@ index 0000000000..740b300e5b
 + 	}
 + }
 + 
+diff --git a/target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch b/target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch
+new file mode 100644
+index 0000000000..950e97713d
+--- /dev/null
++++ b/target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch
+@@ -0,0 +1,26 @@
++From 8bfdfc1e0546835e25ae011053ae4e52583d8220 Mon Sep 17 00:00:00 2001
++From: Dongming Han <handongming@gl-inet.com>
++Date: Wed, 1 Feb 2023 19:14:16 +0800
++Subject: [PATCH] make wireguard server not do handshake initiation
++
++---
++ drivers/net/wireguard/send.c | 3 +++
++ 1 file changed, 3 insertions(+)
++
++diff --git a/drivers/net/wireguard/send.c b/drivers/net/wireguard/send.c
++index 55bb0c9..9860e3f 100644
++--- a/drivers/net/wireguard/send.c
+++++ b/drivers/net/wireguard/send.c
++@@ -23,6 +23,9 @@ static void wg_packet_send_handshake_initiation(struct wg_peer *peer)
++ {
++ 	struct message_handshake_initiation packet;
++ 
+++	if (!strncmp(peer->device->dev->name, "wgs", 3))
+++		return;
+++
++ 	if (!wg_birthdate_has_expired(atomic64_read(&peer->last_sent_handshake),
++ 				      REKEY_TIMEOUT))
++ 		return; /* This function is rate limited. */
++-- 
++2.25.1
++
+diff --git a/target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch b/target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
+new file mode 100644
+index 0000000000..a92ae819a5
+--- /dev/null
++++ b/target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
+@@ -0,0 +1,30 @@
++From 82d7f8de2a1b640b5545976e495b16911a105fa2 Mon Sep 17 00:00:00 2001
++From: Dongming Han <handongming@gl-inet.com>
++Date: Wed, 1 Feb 2023 19:11:20 +0800
++Subject: [PATCH] trigger REKEY_TIMEOUT hotplug after 3 consecutive failure of
++ handshake initiation
++
++detect disconnect time change from 0 ~ 2min to 15s ~ 2min15s
++Optimize the stability in packet loss environment
++---
++ drivers/net/wireguard/timers.c | 4 ++--
++ 1 file changed, 2 insertions(+), 2 deletions(-)
++
++diff --git a/drivers/net/wireguard/timers.c b/drivers/net/wireguard/timers.c
++index 7f0716c..a90addf 100644
++--- a/drivers/net/wireguard/timers.c
+++++ b/drivers/net/wireguard/timers.c
++@@ -76,8 +76,8 @@ static void wg_expired_retransmit_handshake(struct timer_list *timer)
++ 		wg_socket_clear_peer_endpoint_src(peer);
++ 
++ 		wg_packet_send_queued_handshake_initiation(peer, true);
++-
++-		wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
+++		if(peer->timer_handshake_attempts > 3)
+++			wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
++ 	}
++ }
++ 
++-- 
++2.25.1
++
 -- 
 2.25.1
 
