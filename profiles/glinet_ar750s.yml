@@ -178,3 +178,4 @@ diffconfig: |
   CONFIG_PACKAGE_kmod-ath10k=y
   CONFIG_PACKAGE_ath10k-firmware-qca9887-ct=n
   CONFIG_PACKAGE_ath10k-firmware-qca9887=y
+  CONFIG_ATH10K_THERMAL=y
