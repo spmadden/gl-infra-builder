@@ -118,11 +118,14 @@ S200
 
 # Example compile firmware
 
-## 1. Compile MT2500(2023.03.17)
+## 1. Compile MT2500 V4.2.1 firmware
 
   1.1  Compile MT2500 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+git checkout v4.2.1_release2
 ```
 ```
 python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
@@ -137,7 +140,10 @@ make V=s -j5
 1.2 Compile MT2500 GL.iNet standard firmware
 
 ```
-git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git && cd glinet4.x/
+```
+```
+git checkout v4.2.1_release2 && cd ../
 ```
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_mt2500.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
@@ -145,11 +151,15 @@ cp ./glinet4.x/pkg_config/glinet_depends_mt2500.yml  ./profiles/glinet_depends.y
 ./scripts/gen_config.py glinet_depends
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
-## 2. Compile MT3000 firmware(2023.03.21)
+
+## 2. Compile MT3000 V4.2.1 firmware
 
 2.1 Compile MT3000 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+git checkout v4.2.1_mt3000_release1
 ```
 ```
 python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt7981
@@ -164,7 +174,10 @@ make V=s -j5
 2.2 Compile MT3000 GL.iNet standard firmware(Base on the steps above)
 
 ```
-git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git && cd glinet4.x/
+```
+```
+git checkout v4.2.1_release2 && cd ../
 ```
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_mt3000.mk  ./glinet4.x/mt7981/gl_pkg_config.mk
@@ -173,12 +186,14 @@ cp ./glinet4.x/pkg_config/glinet_depends_mt3000.yml  ./profiles/glinet_depends.y
 make -j5 V=s GL_PKGDIR=`pwd`/glinet4.x/mt7981/
 ```
 
-
-## 3. Compile AXT1800(2023.03.17)
+## 3. Compile AXT1800 V4.2.1 firmware
 
 3.1 Compile AXT1800 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+git checkout v4.2.1_release2
 ```
 ```
 python3 setup.py -c configs/config-wlan-ap.yml && cd wlan-ap/openwrt
@@ -191,7 +206,10 @@ make V=s -j5
 ```
 3.2 Compile AXT1800 GL.iNet standard firmware(Base on the steps above)
 ```
-git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git && cd glinet4.x/
+```
+```
+git checkout v4.2.1_release2 && cd ../
 ```
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_axt1800.mk  ./glinet4.x/ipq60xx/gl_pkg_config.mk
@@ -201,11 +219,14 @@ cp ./glinet4.x/pkg_config/glinet_depends_axt1800.yml  ./profiles/glinet_depends.
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
 ```
-## 4. Compile AX1800(2023.03.17)
+## 4. Compile AX1800 V4.2.1 firmware
 
 4.1 Compile AX1800 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+git checkout v4.2.1_release2
 ```
 ```
 python3 setup.py -c configs/config-wlan-ap.yml && cd wlan-ap/openwrt
@@ -218,7 +239,10 @@ make V=s -j5
 ```
 4.2 Compile AX1800 GL.iNet standard firmware
 ```
-git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git && cd glinet4.x/
+```
+```
+git checkout v4.2.1_release2 && cd ../
 ```
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_ax1800.mk  ./glinet4.x/ipq60xx/gl_pkg_config.mk
@@ -228,11 +252,15 @@ cp ./glinet4.x/pkg_config/glinet_depends_ax1800.yml  ./profiles/glinet_depends.y
 ```
 make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ipq60xx/
 ```
-## 5. Compile A1300(2023.03.17)
+
+## 5. Compile A1300 V4.2.1 firmware
 
 5.1 Compile A1300 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+git checkout v4.2.1_a1300_release2
 ```
 ```
 python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02.2
@@ -245,7 +273,10 @@ make V=s -j5
 ```
 5.2 Compile A1300 GL.iNet standard firmware
 ```
-git clone https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glinet4.x.git && cd glinet4.x/
+```
+```
+git checkout v4.2.1_release2 && cd ../
 ```
 ```
 cp ./glinet4.x/pkg_config/gl_pkg_config_a1300.mk  ./glinet4.x/ipq40xx/gl_pkg_config.mk
