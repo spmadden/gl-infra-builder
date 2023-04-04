@@ -12,7 +12,7 @@ diff --git a/include/image-commands.mk b/include/image-commands.mk
 index 541ec4f575..aaf550c749 100644
 --- a/include/image-commands.mk
 +++ b/include/image-commands.mk
-@@ -64,6 +64,36 @@ define Build/append-metadata
+@@ -64,6 +64,37 @@ define Build/append-metadata
  	}
  endef
  
