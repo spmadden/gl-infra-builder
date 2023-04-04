@@ -10,7 +10,7 @@ feeds:
     revision: eace3976ffc38aaa3e3cd8d4bba9053dbb9bf8d7
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 27ffb11de6f86f593bc74ec8c7fb28c8433c14ae
+    revision: 89ce97cc8288f4723f948675e303759619c0cd85
   - name: gl_feed_mtk
     uri: https://github.com/gl-inet/gl-feeds.git
     branch: mtk
