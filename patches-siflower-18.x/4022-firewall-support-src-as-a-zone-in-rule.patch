@@ -1,0 +1,154 @@
+From 33204bcf34f17c0ac365a5834823cb17c29bc541 Mon Sep 17 00:00:00 2001
+From: Xinfa Deng <xinfa.deng@gl-inet.com>
+Date: Thu, 6 Apr 2023 11:13:42 +0800
+Subject: [PATCH] firewall: support src as a zone in rule
+
+---
+ .../patches/003-rule-support-src-dst.patch    | 135 ++++++++++++++++++
+ 1 file changed, 135 insertions(+)
+ create mode 100644 openwrt-18.06/package/network/config/firewall/patches/003-rule-support-src-dst.patch
+
+diff --git a/openwrt-18.06/package/network/config/firewall/patches/003-rule-support-src-dst.patch b/openwrt-18.06/package/network/config/firewall/patches/003-rule-support-src-dst.patch
+new file mode 100644
+index 000000000..0d613a1e9
+--- /dev/null
++++ b/openwrt-18.06/package/network/config/firewall/patches/003-rule-support-src-dst.patch
+@@ -0,0 +1,135 @@
++Index: firewall-2019-11-22-8174814a/rules.c
++===================================================================
++--- firewall-2019-11-22-8174814a.orig/rules.c
+++++ firewall-2019-11-22-8174814a/rules.c
++@@ -170,13 +170,6 @@ check_rule(struct fw3_state *state, stru
++ 		return false;
++ 	}
++ 
++-	if (r->_dest && (r->target == FW3_FLAG_MARK || r->target == FW3_FLAG_DSCP))
++-	{
++-		warn_section("rule", r, e, "must not specify 'dest' for %s target",
++-		             fw3_flag_names[r->target]);
++-		return false;
++-	}
++-
++ 	if (r->set_mark.invert || r->set_xmark.invert || r->set_dscp.invert)
++ 	{
++ 		warn_section("rule", r, e, "must not have inverted 'set_mark', "
++@@ -200,7 +193,7 @@ check_rule(struct fw3_state *state, stru
++ 	if (!r->_src && !r->_dest && !r->src.any && !r->dest.any)
++ 	{
++ 		warn_section("rule", r, e, "has neither a source nor a destination zone assigned "
++-		                "- assuming an output r");
+++		                "- assuming an output rule");
++ 	}
++ 
++ 	if (list_empty(&r->proto))
++@@ -309,10 +302,19 @@ append_chain(struct fw3_ipt_rule *r, str
++ 	{
++ 		snprintf(chain, sizeof(chain), "zone_%s_helper", rule->src.name);
++ 	}
++-	else if ((rule->target == FW3_FLAG_MARK || rule->target == FW3_FLAG_DSCP) &&
++-	         (rule->_src || rule->src.any))
+++	else if (rule->target == FW3_FLAG_MARK || rule->target == FW3_FLAG_DSCP)
++ 	{
++-		snprintf(chain, sizeof(chain), "PREROUTING");
+++		if ((rule->_dest && rule->_src) ||
+++		    (rule->dest.any && rule->src.any))
+++			snprintf(chain, sizeof(chain), "FORWARD");
+++		else if (rule->src.any && rule->_dest)
+++			snprintf(chain, sizeof(chain), "POSTROUTING");
+++		else if (rule->dest.any && rule->_src)
+++			snprintf(chain, sizeof(chain), "PREROUTING");
+++		else if (!rule->dest.set && rule->src.set)
+++			snprintf(chain, sizeof(chain), "INPUT");
+++		else /* if (!rule->src.set) */
+++			snprintf(chain, sizeof(chain), "OUTPUT");
++ 	}
++ 	else
++ 	{
++@@ -353,21 +355,21 @@ static void set_target(struct fw3_ipt_ru
++ {
++ 	const char *name;
++ 	struct fw3_mark *mark;
++-	char buf[sizeof("0xFFFFFFFF/0xFFFFFFFF\0")];
+++	char buf[sizeof("0xFFFFFFFF/0xFFFFFFFF")];
++ 
++ 	switch(rule->target)
++ 	{
++ 	case FW3_FLAG_MARK:
++ 		name = rule->set_mark.set ? "--set-mark" : "--set-xmark";
++ 		mark = rule->set_mark.set ? &rule->set_mark : &rule->set_xmark;
++-		sprintf(buf, "0x%x/0x%x", mark->mark, mark->mask);
+++		snprintf(buf, sizeof(buf), "0x%x/0x%x", mark->mark, mark->mask);
++ 
++ 		fw3_ipt_rule_target(r, "MARK");
++ 		fw3_ipt_rule_addarg(r, false, name, buf);
++ 		return;
++ 
++ 	case FW3_FLAG_DSCP:
++-		sprintf(buf, "0x%x", rule->set_dscp.dscp);
+++		snprintf(buf, sizeof(buf), "0x%x", rule->set_dscp.dscp);
++ 
++ 		fw3_ipt_rule_target(r, "DSCP");
++ 		fw3_ipt_rule_addarg(r, false, "--set-dscp", buf);
++@@ -420,6 +422,10 @@ print_rule(struct fw3_ipt_handle *handle
++            struct fw3_mac *mac, struct fw3_icmptype *icmptype)
++ {
++ 	struct fw3_ipt_rule *r;
+++	struct fw3_device *idev, *odev;
+++	struct list_head empty, *idevices, *odevices;
+++	INIT_LIST_HEAD(&empty);
+++	idevices = odevices = &empty;
++ 
++ 	if (!fw3_is_family(sip, handle->family) ||
++ 	    !fw3_is_family(dip, handle->family))
++@@ -471,21 +477,33 @@ print_rule(struct fw3_ipt_handle *handle
++ 		return;
++ 	}
++ 
++-	r = fw3_ipt_rule_create(handle, proto, NULL, NULL, sip, dip);
++-	fw3_ipt_rule_sport_dport(r, sport, dport);
++-	fw3_ipt_rule_device(r, rule->device, rule->direction_out);
++-	fw3_ipt_rule_icmptype(r, icmptype);
++-	fw3_ipt_rule_mac(r, mac);
++-	fw3_ipt_rule_ipset(r, &rule->ipset);
++-	fw3_ipt_rule_helper(r, &rule->helper);
++-	fw3_ipt_rule_limit(r, &rule->limit);
++-	fw3_ipt_rule_time(r, &rule->time);
++-	fw3_ipt_rule_mark(r, &rule->mark);
++-	fw3_ipt_rule_dscp(r, &rule->dscp);
++-	set_target(r, rule);
++-	fw3_ipt_rule_extra(r, rule->extra);
++-	set_comment(r, rule->name, num);
++-	append_chain(r, rule);
+++	if (rule->target == FW3_FLAG_DSCP || rule->target == FW3_FLAG_MARK)
+++	{
+++		if (rule->_src)
+++			idevices = &rule->_src->devices;
+++		if (rule->_dest)
+++			odevices = &rule->_dest->devices;
+++	}
+++
+++	fw3_foreach(idev, idevices)
+++	fw3_foreach(odev, odevices)
+++	{
+++		r = fw3_ipt_rule_create(handle, proto, idev, odev, sip, dip);
+++		fw3_ipt_rule_sport_dport(r, sport, dport);
+++		fw3_ipt_rule_device(r, rule->device, rule->direction_out);
+++		fw3_ipt_rule_icmptype(r, icmptype);
+++		fw3_ipt_rule_mac(r, mac);
+++		fw3_ipt_rule_ipset(r, &rule->ipset);
+++		fw3_ipt_rule_helper(r, &rule->helper);
+++		fw3_ipt_rule_limit(r, &rule->limit);
+++		fw3_ipt_rule_time(r, &rule->time);
+++		fw3_ipt_rule_mark(r, &rule->mark);
+++		fw3_ipt_rule_dscp(r, &rule->dscp);
+++		set_target(r, rule);
+++		fw3_ipt_rule_extra(r, rule->extra);
+++		set_comment(r, rule->name, num);
+++		append_chain(r, rule);
+++	}
++ }
++ 
++ static void
+-- 
+2.34.1
+
