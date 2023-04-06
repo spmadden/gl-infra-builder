@@ -4,4 +4,5 @@ description: Add the glinet imagebuilder
 diffconfig: |
         CONFIG_IB=y
         CONFIG_IB_STANDALONE=y
+        CONFIG_SDK=y
         CONFIG_ALL_NONSHARED=y
