@@ -4,10 +4,10 @@ description: Add the glinet dependencies for the GL.iNET X3000
 feeds:
   - name: mt7981_private
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: 429ad7722b2b3d73bfaec078390a47f22bdcc175
+    revision: ebc8d5c447e1d2e0e13c0568a8514da68f8aa618
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: e0640e491f3257fb9b7db97b1bb5ea43a95e548f
+    revision: 0feff4e7e7dafb4d396108c7c5b683209de30dde
 
 packages:
   - kmod-gl-pcie-modem
