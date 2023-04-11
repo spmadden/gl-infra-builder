@@ -116,7 +116,6 @@ packages:
   - gl-sdk4-ui-timedtask
   - gl-sdk4-ui-torview
   - gl-sdk4-ui-multiwan
-  - gl-sdk4-ui-btnsettings
   - gl-sdk4-ui-edgerouter
   - gl-sdk4-ui-nasview
   - gl-sdk4-ui-parentalcontrol
