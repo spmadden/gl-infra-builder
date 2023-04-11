@@ -20,3 +20,9 @@ packages:
   - wireless-regdb
   - wget-ssl
   - kmod-wireguard-backport
+  - wpad-openssl
+  - wireless-regdb
+
+diffconfig: |
+  CONFIG_PACKAGE_wpad-basic=n
+  CONFIG_PACKAGE_wpad=n
