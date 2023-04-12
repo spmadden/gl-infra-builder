@@ -47,6 +47,7 @@ packages:
   - gl-sdk4-plugins 
   - gl-sdk4-repeater
   - gl-sdk4-rtty 
+  - gl-sdk4-qos
   - gl-sdk4-sms-forward 
   - gl-sdk4-vpn-policy
   - gl-sdk4-tethering 
