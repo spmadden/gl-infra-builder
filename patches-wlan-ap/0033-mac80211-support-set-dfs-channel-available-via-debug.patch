@@ -1,0 +1,109 @@
+From 3bd305f31fdb0870e32f8d30cbc25d41fd392d3d Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 17 Apr 2023 16:14:18 +0800
+Subject: [PATCH] mac80211: support set dfs channel available via debugfs
+
+This is used to support dynamically switch to dfs channel.
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../304-support-set-dfs-available.patch       | 87 +++++++++++++++++++
+ 1 file changed, 87 insertions(+)
+ create mode 100644 feeds/wifi-ax/mac80211/patches/pending/304-support-set-dfs-available.patch
+
+diff --git a/feeds/wifi-ax/mac80211/patches/pending/304-support-set-dfs-available.patch b/feeds/wifi-ax/mac80211/patches/pending/304-support-set-dfs-available.patch
+new file mode 100644
+index 00000000..c3084ae3
+--- /dev/null
++++ b/feeds/wifi-ax/mac80211/patches/pending/304-support-set-dfs-available.patch
+@@ -0,0 +1,87 @@
++Index: backports-20210222_001-4.4.60-b157d2276/net/wireless/debugfs.c
++===================================================================
++--- backports-20210222_001-4.4.60-b157d2276.orig/net/wireless/debugfs.c
+++++ backports-20210222_001-4.4.60-b157d2276/net/wireless/debugfs.c
++@@ -95,9 +95,76 @@ static const struct file_operations ht40
++ 	.llseek = default_llseek,
++ };
++ 
+++static ssize_t set_dfs_available_write(struct file *file, const char __user *ptr,
+++			size_t len, loff_t *off)
+++{
+++	struct wiphy *wiphy = file->private_data;
+++	struct cfg80211_chan_def chandef = {};
+++	u32 freq, width, center_freq1;
+++	char buf[256] = "";
+++
+++	if (copy_from_user(buf, ptr, min(len, sizeof(buf) - 1)))
+++		return -EFAULT;
+++
+++    if (sscanf(buf, "%u %u %u", &freq, &center_freq1, &width) != 3)
+++		return -EINVAL;
+++
+++	dev_info(&wiphy->dev, "set dfs available: %u(%u) %d MHz\n", freq, center_freq1, width);
+++
+++	chandef.chan = ieee80211_get_channel(wiphy, freq);
+++	chandef.center_freq1 = center_freq1;
+++
+++	switch (width) {
+++	case 0:
+++		chandef.width = NL80211_CHAN_WIDTH_20_NOHT;
+++		break;
+++	case 20:
+++		chandef.width = NL80211_CHAN_WIDTH_20;
+++		break;
+++	case 40:
+++		chandef.width = NL80211_CHAN_WIDTH_40;
+++		break;
+++	case 80:
+++		chandef.width = NL80211_CHAN_WIDTH_80;
+++		break;
+++	case 160:
+++		chandef.width = NL80211_CHAN_WIDTH_160;
+++		break;
+++	default:
+++		dev_err(&wiphy->dev, "invalid channel width\n");
+++		return -EINVAL;
+++	}
+++
+++	if (!cfg80211_chandef_valid(&chandef)) {
+++		dev_err(&wiphy->dev, "invalid channel definition\n");
+++		return -EINVAL;
+++	}
+++
+++	rtnl_lock();
+++	wiphy_lock(wiphy);
+++	__release(&wiphy->mtx);
+++
+++	cfg80211_set_dfs_state(wiphy, &chandef, NL80211_DFS_AVAILABLE);
+++
+++	__acquire(&wiphy->mtx);
+++	wiphy_unlock(wiphy);
+++	rtnl_unlock();
+++
+++	return len;
+++}
+++
+++static const struct file_operations set_dfs_available_ops = {
+++	.write = set_dfs_available_write,
+++	.open = simple_open,
+++	.llseek = noop_llseek,
+++};
+++
++ #define DEBUGFS_ADD(name)						\
++ 	debugfs_create_file(#name, 0444, phyd, &rdev->wiphy, &name## _ops)
++ 
+++#define DEBUGFS_ADD_MODE(name, mode)					\
+++	debugfs_create_file(#name, mode, phyd, &rdev->wiphy, &name## _ops)
+++
++ void cfg80211_debugfs_rdev_add(struct cfg80211_registered_device *rdev)
++ {
++ 	struct dentry *phyd = rdev->wiphy.debugfsdir;
++@@ -107,4 +174,5 @@ void cfg80211_debugfs_rdev_add(struct cf
++ 	DEBUGFS_ADD(short_retry_limit);
++ 	DEBUGFS_ADD(long_retry_limit);
++ 	DEBUGFS_ADD(ht40allow_map);
+++	DEBUGFS_ADD_MODE(set_dfs_available, 0200);
++ }
+-- 
+2.34.1
+
