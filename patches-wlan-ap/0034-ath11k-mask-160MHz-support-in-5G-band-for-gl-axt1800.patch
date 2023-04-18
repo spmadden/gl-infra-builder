@@ -1,0 +1,36 @@
+From 5f10420558c68f612e2c7139dcd2f01c6d86428b Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 18 Apr 2023 17:52:14 +0800
+Subject: [PATCH] ath11k: mask 160MHz support in 5G band for gl-axt1800
+
+gl-axt1800 actually dose not support 160MHz
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../400-mask-160mhz-support-for-gl-axt1800.patch   | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 feeds/wifi-ax/mac80211/patches/qca/400-mask-160mhz-support-for-gl-axt1800.patch
+
+diff --git a/feeds/wifi-ax/mac80211/patches/qca/400-mask-160mhz-support-for-gl-axt1800.patch b/feeds/wifi-ax/mac80211/patches/qca/400-mask-160mhz-support-for-gl-axt1800.patch
+new file mode 100644
+index 00000000..58675316
+--- /dev/null
++++ b/feeds/wifi-ax/mac80211/patches/qca/400-mask-160mhz-support-for-gl-axt1800.patch
+@@ -0,0 +1,14 @@
++Index: backports-20210222_001-4.4.60-b157d2276/drivers/net/wireless/ath/ath11k/wmi.c
++===================================================================
++--- backports-20210222_001-4.4.60-b157d2276.orig/drivers/net/wireless/ath/ath11k/wmi.c
+++++ backports-20210222_001-4.4.60-b157d2276/drivers/net/wireless/ath/ath11k/wmi.c
++@@ -444,6 +444,9 @@ ath11k_pull_mac_phy_cap_svc_ready_ext(st
++ 		       sizeof(u32) * PSOC_HOST_MAX_PHY_SIZE);
++ 		memcpy(&cap_band->he_ppet, &mac_phy_caps->he_ppet5g,
++ 		       sizeof(struct ath11k_ppe_threshold));
+++
+++		cap_band->he_cap_phy_info[0] &= ~IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_160MHZ_IN_5G;
+++		cap_band->he_cap_phy_info[0] &= ~IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_80PLUS80_MHZ_IN_5G;
++ 	}
++ 
++ 	cap_band = &pdev_cap->band[NL80211_BAND_6GHZ];
+-- 
+2.34.1
+
