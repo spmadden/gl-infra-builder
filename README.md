@@ -324,6 +324,21 @@ make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
 ```
 Note: Some customers may encounter mDNSResponder-1310.80.1.tar.gz download failed error, please click [Here](https://glinet-hoff-temp-file.oss-cn-shenzhen.aliyuncs.com/mDNSResponder-1310.80.1.tar.gz) to download mDNSResponder-1310.80.1.tar.gz file, and then put it in openwrt-21.02/openwrt-21.02.2/dl directory.
 
+## 8. Compile x300b(2023.04.20)
+8.1 Compile x300b OpenWrt firmware(No GL.iNet packages)
+```
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+python3 setup.py -c ./configs/config-22.03.2.yml && cd openwrt-22.03/openwrt-22.03.2/
+```
+```
+./scripts/gen_config.py target_ath79_gl-x300b-nor luci
+```
+```
+make V=s -j5
+```
+
 # How to add own files
 
 In the openwrt system, we can add our own files through the files directory. All files including paths in the files directory will be copied to the file system at the last step of compilation. This feature can be used to add our own files or replace files.
