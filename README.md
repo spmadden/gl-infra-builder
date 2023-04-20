@@ -109,6 +109,12 @@ S200
 | ---------------- | -------------------- | -------------------- |
 | 4.1.3            | v4.1.3_s200_release7 | v4.1.3_s200_release7 |
 
+x300b
+
+| Firmware version | gl-infra-builder tag  | glinet4.x tag        |
+| ---------------- | --------------------  | -------------------- |
+| 4.2.0            | v4.2.0_x300b_release3 | no record            |
+
 # Example compile firmware
 
 ## 1. Compile MT2500(2023.03.17)
