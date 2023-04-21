@@ -336,6 +336,9 @@ Note: Some customers may encounter mDNSResponder-1310.80.1.tar.gz download faile
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
 ```
+git checkout v4.2.0_x300b_release3
+```
+```
 python3 setup.py -c ./configs/config-22.03.2.yml && cd openwrt-22.03/openwrt-22.03.2/
 ```
 ```
