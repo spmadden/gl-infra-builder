@@ -1,0 +1,180 @@
+From e143d19401fb421105a811984e631db9b80f3a0f Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 18 Oct 2022 11:20:01 +0800
+Subject: [PATCH] feat: enable 2.4g vht
+
+---
+ .../files/lib/netifd/wireless/mac80211.sh     |  7 ++-
+ .../subsys/783-mac80211-allow-vht-on-2g.patch | 42 +++++++++++++++++
+ .../001-allow-VHT-rate-on-2.4GHz.patch        | 47 +++++++++++++++++++
+ .../network/services/hostapd/files/hostapd.sh |  5 +-
+ 4 files changed, 97 insertions(+), 4 deletions(-)
+ create mode 100644 package/kernel/mac80211/patches/subsys/783-mac80211-allow-vht-on-2g.patch
+ create mode 100644 package/kernel/mt76/patches/001-allow-VHT-rate-on-2.4GHz.patch
+
+diff --git a/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh b/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh
+index daa54949a0..90fd553aeb 100644
+--- a/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh
++++ b/package/kernel/mac80211/files/lib/netifd/wireless/mac80211.sh
+@@ -137,7 +137,7 @@ mac80211_hostapd_setup_base() {
+ 	[ -n "$acs_exclude_dfs" ] && [ "$acs_exclude_dfs" -gt 0 ] &&
+ 		append base_cfg "acs_exclude_dfs=1" "$N"
+ 
+-	json_get_vars noscan ht_coex
++	json_get_vars noscan ht_coex vendor_vht
+ 	json_get_values ht_capab_list ht_capab tx_burst
+ 	json_get_values channel_list channels
+ 
+@@ -283,7 +283,7 @@ mac80211_hostapd_setup_base() {
+ 	}
+ 	[ "$hwmode" = "a" ] || enable_ac=0
+ 
+-	if [ "$enable_ac" != "0" ]; then
++	if [ "$enable_ac" != "0" -o "$vendor_vht" = "1" ]; then
+ 		json_get_vars \
+ 			rxldpc:1 \
+ 			short_gi_80:1 \
+@@ -310,6 +310,9 @@ mac80211_hostapd_setup_base() {
+ 		vht_cap=0
+ 		for cap in $(iw phy "$phy" info | awk -F "[()]" '/VHT Capabilities/ { print $2 }'); do
+ 			vht_cap="$(($vht_cap | $cap))"
++
++			# mt7615 dbdc vendor_vht work for 2.4g only
++			[ "$vendor_vht" == "1" -a -e /sys/kernel/debug/ieee80211/$phy/mt76/dbdc ] && break
+ 		done
+ 
+ 		append base_cfg "vht_oper_chwidth=$vht_oper_chwidth" "$N"
+diff --git a/package/kernel/mac80211/patches/subsys/783-mac80211-allow-vht-on-2g.patch b/package/kernel/mac80211/patches/subsys/783-mac80211-allow-vht-on-2g.patch
+new file mode 100644
+index 0000000000..0c8bd53db7
+--- /dev/null
++++ b/package/kernel/mac80211/patches/subsys/783-mac80211-allow-vht-on-2g.patch
+@@ -0,0 +1,42 @@
++Index: backports-5.15.58-1/net/mac80211/mlme.c
++===================================================================
++--- backports-5.15.58-1.orig/net/mac80211/mlme.c
+++++ backports-5.15.58-1/net/mac80211/mlme.c
++@@ -5096,7 +5096,8 @@ static int ieee80211_prep_channel(struct
++ 	have_80mhz = false;
++ 	for (i = 0; i < sband->n_channels; i++) {
++ 		if (sband->channels[i].flags & (IEEE80211_CHAN_DISABLED |
++-						IEEE80211_CHAN_NO_80MHZ))
+++						IEEE80211_CHAN_NO_80MHZ) &&
+++						(sband->band != NL80211_BAND_2GHZ))
++ 			continue;
++ 
++ 		have_80mhz = true;
++Index: backports-5.15.58-1/net/mac80211/util.c
++===================================================================
++--- backports-5.15.58-1.orig/net/mac80211/util.c
+++++ backports-5.15.58-1/net/mac80211/util.c
++@@ -1919,7 +1919,8 @@ static int ieee80211_build_preq_ies_band
++ 	/* Check if any channel in this sband supports at least 80 MHz */
++ 	for (i = 0; i < sband->n_channels; i++) {
++ 		if (sband->channels[i].flags & (IEEE80211_CHAN_DISABLED |
++-						IEEE80211_CHAN_NO_80MHZ))
+++						IEEE80211_CHAN_NO_80MHZ) &&
+++						(sband->band != NL80211_BAND_2GHZ))
++ 			continue;
++ 
++ 		have_80mhz = true;
++Index: backports-5.15.58-1/net/mac80211/vht.c
++===================================================================
++--- backports-5.15.58-1.orig/net/mac80211/vht.c
+++++ backports-5.15.58-1/net/mac80211/vht.c
++@@ -135,7 +135,8 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(stru
++ 	have_80mhz = false;
++ 	for (i = 0; i < sband->n_channels; i++) {
++ 		if (sband->channels[i].flags & (IEEE80211_CHAN_DISABLED |
++-						IEEE80211_CHAN_NO_80MHZ))
+++						IEEE80211_CHAN_NO_80MHZ) &&
+++						(sband->band != NL80211_BAND_2GHZ))
++ 			continue;
++ 
++ 		have_80mhz = true;
+diff --git a/package/kernel/mt76/patches/001-allow-VHT-rate-on-2.4GHz.patch b/package/kernel/mt76/patches/001-allow-VHT-rate-on-2.4GHz.patch
+new file mode 100644
+index 0000000000..a334e98550
+--- /dev/null
++++ b/package/kernel/mt76/patches/001-allow-VHT-rate-on-2.4GHz.patch
+@@ -0,0 +1,47 @@
++Index: mt76-2022-09-06-d7054646/mac80211.c
++===================================================================
++--- mt76-2022-09-06-d7054646.orig/mac80211.c
+++++ mt76-2022-09-06-d7054646/mac80211.c
++@@ -275,7 +275,7 @@ static void mt76_init_stream_cap(struct
++ void mt76_set_stream_caps(struct mt76_phy *phy, bool vht)
++ {
++ 	if (phy->cap.has_2ghz)
++-		mt76_init_stream_cap(phy, &phy->sband_2g.sband, false);
+++		mt76_init_stream_cap(phy, &phy->sband_2g.sband, vht);
++ 	if (phy->cap.has_5ghz)
++ 		mt76_init_stream_cap(phy, &phy->sband_5g.sband, vht);
++ 	if (phy->cap.has_6ghz)
++@@ -342,13 +342,13 @@ mt76_init_sband(struct mt76_phy *phy, st
++ 
++ static int
++ mt76_init_sband_2g(struct mt76_phy *phy, struct ieee80211_rate *rates,
++-		   int n_rates)
+++		   int n_rates, bool vht)
++ {
++ 	phy->hw->wiphy->bands[NL80211_BAND_2GHZ] = &phy->sband_2g.sband;
++ 
++ 	return mt76_init_sband(phy, &phy->sband_2g, mt76_channels_2ghz,
++ 			       ARRAY_SIZE(mt76_channels_2ghz), rates,
++-			       n_rates, true, false);
+++			       n_rates, true, vht);
++ }
++ 
++ static int
++@@ -496,7 +496,7 @@ int mt76_register_phy(struct mt76_phy *p
++ 		return ret;
++ 
++ 	if (phy->cap.has_2ghz) {
++-		ret = mt76_init_sband_2g(phy, rates, n_rates);
+++		ret = mt76_init_sband_2g(phy, rates, n_rates, vht);
++ 		if (ret)
++ 			return ret;
++ 	}
++@@ -621,7 +621,7 @@ int mt76_register_device(struct mt76_dev
++ 		return ret;
++ 
++ 	if (phy->cap.has_2ghz) {
++-		ret = mt76_init_sband_2g(phy, rates, n_rates);
+++		ret = mt76_init_sband_2g(phy, rates, n_rates, vht);
++ 		if (ret)
++ 			return ret;
++ 	}
+diff --git a/package/network/services/hostapd/files/hostapd.sh b/package/network/services/hostapd/files/hostapd.sh
+index e32ed5846d..2e27e28e8a 100644
+--- a/package/network/services/hostapd/files/hostapd.sh
++++ b/package/network/services/hostapd/files/hostapd.sh
+@@ -104,7 +104,7 @@ hostapd_common_add_device_config() {
+ 	config_add_array basic_rate
+ 	config_add_array supported_rates
+ 	config_add_string beacon_rate
+-
++	config_add_boolean vendor_vht
+ 	config_add_string country country3
+ 	config_add_boolean country_ie doth
+ 	config_add_boolean spectrum_mgmt_required
+@@ -133,7 +133,7 @@ hostapd_prepare_device_config() {
+ 
+ 	json_get_vars country country3 country_ie beacon_int:100 dtim_period:2 doth require_mode legacy_rates \
+ 		acs_chan_bias local_pwr_constraint spectrum_mgmt_required airtime_mode cell_density \
+-		rts_threshold beacon_rate rssi_reject_assoc_rssi rssi_ignore_probe_request maxassoc
++		rts_threshold beacon_rate rssi_reject_assoc_rssi rssi_ignore_probe_request maxassoc vendor_vht
+ 
+ 	hostapd_set_log_options base_cfg
+ 
+@@ -235,6 +235,7 @@ hostapd_prepare_device_config() {
+ 	append base_cfg "dtim_period=$dtim_period" "$N"
+ 	[ "$airtime_mode" -gt 0 ] && append base_cfg "airtime_mode=$airtime_mode" "$N"
+ 	[ -n "$maxassoc" ] && append base_cfg "iface_max_num_sta=$maxassoc" "$N"
++	[ -n "$vendor_vht" ] && append base_cfg "vendor_vht=$vendor_vht" "$N"
+ 
+ 	json_get_values opts hostapd_options
+ 	for val in $opts; do
+-- 
+2.34.1
+

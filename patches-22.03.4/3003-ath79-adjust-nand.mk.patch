@@ -1,0 +1,165 @@
+From acd620f51e767cc297451a2724639eb6c2ebcc25 Mon Sep 17 00:00:00 2001
+From: niyin <yin.ni@gl-inet.com>
+Date: Sat, 28 Jan 2023 22:24:55 -0800
+Subject: [PATCH] ath79 adjust 02_network
+
+---
+ target/linux/ath79/image/nand.mk              | 79 ++++++++++++++++++-
+ .../nand/base-files/etc/board.d/02_network    | 16 ++++
+ 2 files changed, 91 insertions(+), 4 deletions(-)
+
+diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
+index 0f5b07225c..618083a8e9 100644
+--- a/target/linux/ath79/image/nand.mk
++++ b/target/linux/ath79/image/nand.mk
+@@ -153,6 +153,36 @@ define Device/glinet_gl-ar300m-nor
+ endef
+ TARGET_DEVICES += glinet_gl-ar300m-nor
+ 
++define Device/glinet_gl-x300b-common
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-X300B
++  DEVICE_PACKAGES := kmod-usb2 block-mount
++  SUPPORTED_DEVICES += gl-x300b glinet,gl-x300b
++endef
++
++define Device/glinet_gl-x300b-nor
++  $(Device/glinet_gl-x300b-common)
++  DEVICE_VARIANT := NOR
++  IMAGE_SIZE := 16000k
++  IMAGES := sysupgrade.bin
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
++endef
++TARGET_DEVICES += glinet_gl-x300b-nor
++
++define Device/glinet_gl-x300b-nor-nand
++  $(Device/glinet_gl-x300b-common)
++  DEVICE_VARIANT := NOR/NAND
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-x300b-nor-nand
++
+ define Device/glinet_gl-ar750s-common
+   SOC := qca9563
+   DEVICE_VENDOR := GL.iNet
+@@ -166,7 +196,12 @@ define Device/glinet_gl-ar750s-nor-nand
+   $(Device/glinet_gl-ar750s-common)
+   DEVICE_VARIANT := NOR/NAND
+   KERNEL_SIZE := 4096k
+-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
+   SUPPORTED_DEVICES += glinet,gl-ar750s-nor
+ endef
+ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
+@@ -174,6 +209,7 @@ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
+ define Device/glinet_gl-ar750s-nor
+   $(Device/glinet_gl-ar750s-common)
+   DEVICE_VARIANT := NOR
++  BLOCKSIZE := 64k
+   SUPPORTED_DEVICES += gl-ar750s glinet,gl-ar750s glinet,gl-ar750s-nor-nand
+ endef
+ TARGET_DEVICES += glinet_gl-ar750s-nor
+@@ -189,9 +225,9 @@ define Device/glinet_gl-e750
+   PAGESIZE := 2048
+   VID_HDR_OFFSET := 2048
+   BLOCKSIZE := 128k
+-  IMAGES += factory.img
+-  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
+-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
++  IMAGES += factory.img sysupgrade.tar
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-e750
+ 
+@@ -231,6 +267,41 @@ define Device/linksys_ea4500-v3
+ endef
+ TARGET_DEVICES += linksys_ea4500-v3
+ 
++define Device/glinet_gl-xe300-nor-nand
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE300-NOR-NAND
++  DEVICE_TITLE := GL.iNet GL-XE300 (NOR/NAND)
++  DEVICE_PACKAGES := kmod-usb2 block-mount kmod-usb-serial-ch341
++  KERNEL_SIZE := 4096k
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  VID_HDR_OFFSET := 2048
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
++  SUPPORTED_DEVICES += gl-xe300 glinet,gl-xe300
++endef
++TARGET_DEVICES += glinet_gl-xe300-nor-nand
++
++
++define Device/glinet_gl-x750-common
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-X750
++  DEVICE_PACKAGES := kmod-usb2 kmod-ath10k ath10k-firmware-qca9887 block-mount PCI_SUPPORT kmod-usb-storage
++  SUPPORTED_DEVICES += gl-x750 glinet,gl-x750
++endef
++
++define Device/glinet_gl-x750-nor
++  $(Device/glinet_gl-x750-common)
++  DEVICE_VARIANT := NOR
++  IMAGE_SIZE := 16064k
++  IMAGES := sysupgrade.bin
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
++endef
++TARGET_DEVICES += glinet_gl-x750-nor
++
+ # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + 0xff)
+ define Device/netgear_ath79_nand
+   DEVICE_VENDOR := NETGEAR
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index 3c5627e2a4..6a1a5a7970 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -69,6 +69,11 @@ ath79_setup_interfaces()
+ 		ucidef_add_switch "switch0" \
+ 			"0@eth0" "1:lan" "2:lan" "3:lan" "4:lan" "5:wan" "6@eth1"
+ 		;;
++	glinet,gl-x750-nor|\
++	glinet,gl-x300b-nor|\
++	glinet,gl-x300b-nor-nand)
++		ucidef_set_interfaces_lan_wan "eth1" "eth0"
++		;;
+ 	*)
+ 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
+ 		;;
+@@ -92,6 +97,17 @@ ath79_setup_macs()
+ 	netgear,wndr4500-v3)
+ 		wan_mac=$(mtd_get_mac_binary caldata 0x6)
+ 		;;
++	glinet,gl-x300b-nor|\
++	glinet,gl-x300b-nor-nand)
++		wan_mac=$(mtd_get_mac_binary art 0x0)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
++	glinet,gl-x750-nor|\
++	glinet,gl-ar750s-nor|\
++	glinet,gl-ar750s-nor-nand)
++		wan_mac=$(mtd_get_mac_binary art 0x0)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
+ 	esac
+ 
+ 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
+-- 
+2.25.1
+

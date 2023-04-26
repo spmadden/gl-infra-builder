@@ -1,0 +1,201 @@
+From 01ff4f79b4109678264d8a0328f3956b4857ef0b Mon Sep 17 00:00:00 2001
+From: niyin <yin.ni@gl-inet.com>
+Date: Sat, 28 Jan 2023 22:09:24 -0800
+Subject: [PATCH] support x750 target
+
+---
+ .../ath79/dts/qca9531_glinet_gl-x750-nor.dts  | 182 ++++++++++++++++++
+ 1 file changed, 182 insertions(+)
+ create mode 100644 target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+
+diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+new file mode 100644
+index 0000000000..2bb4547c5c
+--- /dev/null
++++ b/target/linux/ath79/dts/qca9531_glinet_gl-x750-nor.dts
+@@ -0,0 +1,182 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++
++#include "qca953x.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	compatible = "glinet,gl-x750-nor", "qca,qca9531";
++	model = "GL.iNet GL-X750";
++
++	gl_hw {
++	            compatible = "gl-hw-info";
++                #address-cells = <1>;
++                #size-cells = <1>;
++    	        model = "x750";
++                wan = "eth0";
++                lan = "eth1";
++                build-in-modem = "1-1.2";
++                reset-button = "gpio-3";
++                usb-port = "1-1.3";
++				flash_size = <16>;
++				radio = "mac80211";
++               microsd = "1-1.1";
++                factory_data {
++                        device_mac = "art";
++                        device_ddns = "art", "0x10";
++                        device_sn_bak = "art", "0x20";
++                        device_sn = "art", "0x30";
++                        country_code = "art", "0x88";
++                };
++        };
++
++	keys {
++		compatible = "gpio-keys-polled";
++		poll-interval = <20>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&jtag_disable_pins>;
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		power {
++			label = "gl-x750:green:power";
++			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
++			default-state = "on";
++		};
++
++		wlan2g {
++			label = "gl-x750:green:wlan2g";
++			gpios = <&gpio 4 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "phy1tpt";
++		};
++
++		wlan5g {
++			label = "gl-x750:green:wlan5g";
++			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "phy0tpt";
++		};
++
++		wan {
++			label = "gl-x750:green:wan";
++			gpios = <&gpio 14 GPIO_ACTIVE_LOW>;
++		};
++
++		lte {
++			label = "gl-x750:green:lte";
++			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
++		};
++	};
++	gpio-export {
++                compatible = "gpio-export";
++
++                gpio_pci_power {
++                        gpio-export,name = "pci_power";
++                        gpio-export,output = <0>;
++                        gpios = <&gpio 0 GPIO_ACTIVE_LOW>;
++                };
++
++                gpio_usb_power {
++                        gpio-export,name = "usb_power";
++                        gpio-export,output = <0>;
++                        gpios = <&gpio 2 GPIO_ACTIVE_LOW>;
++                };
++
++                gpio_ble_reset {
++                        //set name as gpio1 to compat 1806 gpio name
++                        gpio-export,name = "gpio1";
++                        gpio-export,output = <0>;
++                        gpios = <&gpio 1 GPIO_ACTIVE_HIGH>;
++                };
++    };
++};
++
++&pcie0 {
++	status = "okay";
++};
++
++&uart {
++        status = "okay";
++};
++
++&usb0 {
++	status = "okay";
++};
++
++&usb_phy {
++	status = "okay";
++};
++
++&spi {
++	status = "okay";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <25000000>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x000000 0x040000>;
++				read-only;
++			};
++
++			partition@40000 {
++				label = "u-boot-env";
++				reg = <0x040000 0x010000>;
++			};
++
++			art: partition@50000 {
++				label = "art";
++				reg = <0x050000 0x010000>;
++				read-only;
++			};
++			partition@60000 {
++				compatible = "denx,uimage";
++				label = "firmware";
++				reg = <0x060000 0xfa0000>;
++			};
++		};
++	};
++};
++
++&eth0 {
++        status = "okay";
++        mtd-mac-address = <&art 0x0>;
++        phy-handle = <&swphy4>;
++        ifname = "eth0";
++};
++
++&eth1 {
++        mtd-mac-address = <&art 0x0>;
++        mtd-mac-address-increment = <1>;
++        ifname = "eth1";
++};
++
++&wmac {
++        status = "okay";
++        mtd-cal-data = <&art 0x1000>;
++        mtd-mac-address = <&art 0x1002>;
++};
++&art {
++        compatible = "nvmem-cells";
++        #address-cells = <1>;
++        #size-cells = <1>;
++
++        macaddr_art_0: macaddr@0 {
++                reg = <0x0 0x6>;
++        };
++};
+-- 
+2.25.1
+

@@ -1,0 +1,46 @@
+From 8f348fffc8390e3a93b591ff9bd9783fe2f154df Mon Sep 17 00:00:00 2001
+From: niyin <yin.ni@gl-inet.com>
+Date: Sat, 28 Jan 2023 22:24:55 -0800
+Subject: [PATCH] ath79 adjust 02_network
+
+---
+ .../ath79/nand/base-files/etc/board.d/02_network | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+index b533e5be6c..99e6ce7f6c 100644
+--- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
++++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
+@@ -65,6 +65,11 @@ ath79_setup_interfaces()
+ 		ucidef_add_switch "switch0" \
+ 			"0@eth0" "1:lan" "2:lan" "3:lan" "4:lan" "5:wan" "6@eth1"
+ 		;;
++	glinet,gl-x750-nor|\
++	glinet,gl-x300b-nor|\
++	glinet,gl-x300b-nor-nand)
++		ucidef_set_interfaces_lan_wan "eth1" "eth0"
++		;;
+ 	*)
+ 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
+ 		;;
+@@ -88,6 +93,17 @@ ath79_setup_macs()
+ 	netgear,wndr4500-v3)
+ 		wan_mac=$(mtd_get_mac_binary caldata 0x6)
+ 		;;
++	glinet,gl-x300b-nor|\
++	glinet,gl-x300b-nor-nand)
++		wan_mac=$(mtd_get_mac_binary art 0x0)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
++	glinet,gl-x750-nor|\
++	glinet,gl-ar750s-nor|\
++	glinet,gl-ar750s-nor-nand)
++		wan_mac=$(mtd_get_mac_binary art 0x0)
++		lan_mac=$(macaddr_add "$wan_mac" 1)
++		;;
+ 	esac
+ 
+ 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
+-- 
+2.17.1
+

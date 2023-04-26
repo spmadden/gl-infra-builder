@@ -1,0 +1,33 @@
+From 61725b10deb08c3e39dd239164a436c999675543 Mon Sep 17 00:00:00 2001
+From: Weiping Yang <weiping.yang@gl-inet.com>
+Date: Mon, 27 Feb 2023 01:42:57 -0500
+Subject: [PATCH] mvebu-adjust-cortexa53
+
+---
+ target/linux/mvebu/image/cortexa53.mk | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/target/linux/mvebu/image/cortexa53.mk b/target/linux/mvebu/image/cortexa53.mk
+index bfaa597d9a..6f560f728e 100644
+--- a/target/linux/mvebu/image/cortexa53.mk
++++ b/target/linux/mvebu/image/cortexa53.mk
+@@ -1,10 +1,11 @@
+-define Device/glinet_gl-mv1000
+-  $(call Device/Default-arm64)
+-  DEVICE_VENDOR := GL.iNet
+-  DEVICE_MODEL := GL-MV1000
++define Device/gl-mv1000-emmc
++  $(call Device/Default-arm64-emmc)
++  DEVICE_TITLE := GL.iNet GL-MV1000 EMMC
+   SOC := armada-3720
++  DEVICE_DTS := armada-gl-mv1000-emmc
++  SUPPORTED_DEVICES := gl-mv1000-emmc
+ endef
+-TARGET_DEVICES += glinet_gl-mv1000
++TARGET_DEVICES += gl-mv1000-emmc
+ 
+ define Device/globalscale_espressobin
+   $(call Device/Default-arm64)
+-- 
+2.17.1
+

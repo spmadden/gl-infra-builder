@@ -1,0 +1,25 @@
+From d9a02dfb7e3589f813ccb9f0508af2111db81f6d Mon Sep 17 00:00:00 2001
+From: Weiping Yang <weiping.yang@gl-inet.com>
+Date: Sun, 26 Feb 2023 23:29:38 -0500
+Subject: [PATCH] modify image rootfs size to 512M
+
+---
+ config/Config-images.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/Config-images.in b/config/Config-images.in
+index dcd7575c3e..b676e0f018 100644
+--- a/config/Config-images.in
++++ b/config/Config-images.in
+@@ -297,7 +297,7 @@ menu "Target Images"
+ 	config TARGET_ROOTFS_PARTSIZE
+ 		int "Root filesystem partition size (in MiB)"
+ 		depends on USES_ROOTFS_PART || TARGET_ROOTFS_EXT4FS
+-		default 104
++		default 512
+ 		help
+ 		  Select the root filesystem partition size.
+ 
+-- 
+2.17.1
+

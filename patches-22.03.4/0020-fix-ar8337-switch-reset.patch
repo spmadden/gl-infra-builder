@@ -1,0 +1,87 @@
+From 8a6a2792ff555aa5cd52a03d8285bb475c0e616c Mon Sep 17 00:00:00 2001
+From: lincolnzh <hongjian.zhang@gl-inet.com>
+Date: Fri, 11 Nov 2022 15:26:07 +0800
+Subject: [PATCH] fix ar8337 switch reset
+
+---
+ .../933-fix-ar8337-switch-reset.patch         | 68 +++++++++++++++++++
+ 1 file changed, 68 insertions(+)
+ create mode 100755 target/linux/ath79/patches-5.10/933-fix-ar8337-switch-reset.patch
+
+diff --git a/target/linux/ath79/patches-5.10/933-fix-ar8337-switch-reset.patch b/target/linux/ath79/patches-5.10/933-fix-ar8337-switch-reset.patch
+new file mode 100755
+index 0000000000..bb72b0b274
+--- /dev/null
++++ b/target/linux/ath79/patches-5.10/933-fix-ar8337-switch-reset.patch
+@@ -0,0 +1,68 @@
++Index: b/drivers/net/phy/ar8216.c
++===================================================================
++--- a/drivers/net/phy/ar8216.c	2022-11-09 11:40:36.561091957 +0800
+++++ b/drivers/net/phy/ar8216.c	2022-11-09 11:44:31.302181666 +0800
++@@ -1458,6 +1458,37 @@ ar8xxx_sw_reset_switch(struct switch_dev
++ }
++ 
++ int
+++ar8337_sw_reset_switch(struct switch_dev *dev)
+++{
+++	struct ar8xxx_priv *priv = swdev_to_ar8xxx(dev);
+++	const struct ar8xxx_chip *chip = priv->chip;
+++	int i;
+++
+++	mutex_lock(&priv->reg_mutex);
+++
+++	for (i = 0; i < dev->vlans; i++)
+++		priv->vlan_id[i] = i;
+++
+++	/* Configure all ports */
+++	for (i = 0; i < dev->ports; i++)
+++		chip->init_port(priv, i);
+++
+++	priv->mirror_rx = false;
+++	priv->mirror_tx = false;
+++	priv->source_port = 0;
+++	priv->monitor_port = 0;
+++	priv->arl_age_time = AR8XXX_DEFAULT_ARL_AGE_TIME;
+++
+++	chip->init_globals(priv);
+++	chip->atu_flush(priv);
+++	chip->hw_init(priv);
+++
+++	mutex_unlock(&priv->reg_mutex);
+++
+++	return chip->sw_hw_apply(dev);
+++}
+++
+++int
++ ar8xxx_sw_set_reset_mibs(struct switch_dev *dev,
++ 			 const struct switch_attr *attr,
++ 			 struct switch_val *val)
++Index: b/drivers/net/phy/ar8216.h
++===================================================================
++--- a/drivers/net/phy/ar8216.h	2022-10-25 17:33:02.801308434 +0800
+++++ b/drivers/net/phy/ar8216.h	2022-11-09 11:45:34.441403342 +0800
++@@ -612,6 +612,8 @@ ar8xxx_sw_hw_apply(struct switch_dev *de
++ int
++ ar8xxx_sw_reset_switch(struct switch_dev *dev);
++ int
+++ar8337_sw_reset_switch(struct switch_dev *dev);
+++int
++ ar8xxx_sw_get_port_link(struct switch_dev *dev, int port,
++ 			struct switch_port_link *link);
++ int
++Index: b/drivers/net/phy/ar8327.c
++===================================================================
++--- a/drivers/net/phy/ar8327.c	2022-10-25 17:33:05.313293262 +0800
+++++ b/drivers/net/phy/ar8327.c	2022-11-09 11:47:08.308248938 +0800
++@@ -1469,7 +1469,7 @@ static const struct switch_dev_ops ar832
++ 	.get_vlan_ports = ar8327_sw_get_ports,
++ 	.set_vlan_ports = ar8327_sw_set_ports,
++ 	.apply_config = ar8327_sw_hw_apply,
++-	.reset_switch = ar8xxx_sw_reset_switch,
+++	.reset_switch = ar8337_sw_reset_switch,
++ 	.get_port_link = ar8xxx_sw_get_port_link,
++ 	.get_port_stats = ar8xxx_sw_get_port_stats,
++ };
+-- 
+2.17.1
+

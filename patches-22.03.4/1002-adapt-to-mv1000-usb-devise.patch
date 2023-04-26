@@ -1,0 +1,25 @@
+From b8b39a3904c5b686b3ff3b5808459d608f46aec5 Mon Sep 17 00:00:00 2001
+From: Weiping Yang <weiping.yang@gl-inet.com>
+Date: Mon, 27 Feb 2023 01:22:07 -0500
+Subject: [PATCH] adapt-to-mv1000-usb-devise
+
+---
+ package/kernel/linux/modules/usb.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/usb.mk b/package/kernel/linux/modules/usb.mk
+index 1fc3541f10..763b6fced3 100644
+--- a/package/kernel/linux/modules/usb.mk
++++ b/package/kernel/linux/modules/usb.mk
+@@ -169,7 +169,7 @@ define KernelPackage/usb-gadget-eth
+ 	$(LINUX_DIR)/drivers/usb/gadget/function/usb_f_ecm_subset.ko \
+ 	$(LINUX_DIR)/drivers/usb/gadget/function/usb_f_rndis.ko \
+ 	$(LINUX_DIR)/drivers/usb/gadget/legacy/g_ether.ko
+-  AUTOLOAD:=$(call AutoLoad,52,usb_f_ecm)
++  AUTOLOAD:=$(call AutoLoad,52,usb_f_ecm g_ether)
+   $(call AddDepends/usb)
+ endef
+ 
+-- 
+2.17.1
+

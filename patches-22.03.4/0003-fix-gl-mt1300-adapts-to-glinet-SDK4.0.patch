@@ -1,0 +1,71 @@
+From b493ef55dfe0a03374ef6cb7b7934336c9cdc603 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Tue, 27 Sep 2022 12:15:27 +0800
+Subject: [PATCH] fix:gl mt1300 adapts to glinet SDK4.0
+
+---
+ .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 30 ++++++++++++++++---
+ target/linux/ramips/image/mt7621.mk           |  2 ++
+ 2 files changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
+index 384da1bfa9..23c5be89c8 100644
+--- a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
++++ b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
+@@ -10,13 +10,35 @@
+ 	model = "GL.iNet GL-MT1300";
+ 
+ 	aliases {
+-		led-boot = &led_run;
+-		led-failsafe = &led_run;
+-		led-running = &led_run;
+-		led-upgrade = &led_run;
++		//led-boot = &led_run;
++		//led-failsafe = &led_run;
++		//led-running = &led_run;
++		//led-upgrade = &led_run;
+ 		label-mac-device = &wan;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "mt1300";
++		wan = "wan";
++		lan = "lan1 lan2";
++		reset-button = "gpio-18";
++		flash_size = <32>;
++		switch-button = "gpio-16";
++		radio = "radio0";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = "factory", "0x4000";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4048";
++		};
++	};
++
+ 	chosen {
+ 		bootargs = "console=ttyS0,115200";
+ 	};
+diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7621.mk
+index 7f903485aa..6c937a2409 100644
+--- a/target/linux/ramips/image/mt7621.mk
++++ b/target/linux/ramips/image/mt7621.mk
+@@ -691,7 +691,9 @@ define Device/glinet_gl-mt1300
+   IMAGE_SIZE := 32448k
+   DEVICE_VENDOR := GL.iNet
+   DEVICE_MODEL := GL-MT1300
++  OLD_SUPPORTED_DEVICES := gl-mt1300
+   DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | check-size | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-mt1300
+ 
+-- 
+2.34.1
+

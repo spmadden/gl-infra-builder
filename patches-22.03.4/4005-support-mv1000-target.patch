@@ -1,0 +1,112 @@
+From 384c05eb480ae34d5fa59435330682470747e68c Mon Sep 17 00:00:00 2001
+From: Weiping Yang <weiping.yang@gl-inet.com>
+Date: Mon, 27 Feb 2023 01:44:01 -0500
+Subject: [PATCH] support-mv1000-target
+
+---
+ ...l-mv1000.dts => armada-gl-mv1000-emmc.dts} | 48 ++++++++++++++-----
+ 1 file changed, 37 insertions(+), 11 deletions(-)
+ rename target/linux/mvebu/files/arch/arm64/boot/dts/marvell/{armada-3720-gl-mv1000.dts => armada-gl-mv1000-emmc.dts} (78%)
+
+diff --git a/target/linux/mvebu/files/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts b/target/linux/mvebu/files/arch/arm64/boot/dts/marvell/armada-gl-mv1000-emmc.dts
+similarity index 78%
+rename from target/linux/mvebu/files/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts
+rename to target/linux/mvebu/files/arch/arm64/boot/dts/marvell/armada-gl-mv1000-emmc.dts
+index acf15e8ca9..3701b238f4 100644
+--- a/target/linux/mvebu/files/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts
++++ b/target/linux/mvebu/files/arch/arm64/boot/dts/marvell/armada-gl-mv1000-emmc.dts
+@@ -7,13 +7,34 @@
+ 
+ / {
+ 	model = "GL.iNet GL-MV1000";
+-	compatible = "glinet,gl-mv1000", "marvell,armada3720";
++	compatible = "gl-mv1000", "marvell,armada3720";
+ 
+ 	aliases {
+-		led-boot = &led_power;
+-		led-failsafe = &led_power;
+-		led-running = &led_power;
+-		led-upgrade = &led_power;
++		//led-boot = &led_power;
++		//led-failsafe = &led_power;
++		//led-running = &led_power;
++		//led-upgrade = &led_power;
++	};
++	
++	gl_hw {
++		compatible = "gl-hw-info";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "mv1000";
++		wan = "wan";
++		lan = "lan0 lan1 usb0";
++		flash_size = <7456>;
++		switch-button = "gpio-22";
++		reset-button = "gpio-14";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = "factory";
++			device_ddns = "factory", "0x10";
++			device_sn_bak = "factory", "0x20";
++			device_sn = "factory", "0x30";
++			country_code = "factory", "0x88";
++		};
+ 	};
+ 
+ 	chosen {
+@@ -49,7 +70,7 @@
+ 
+ 		switch {
+ 			label = "switch";
+-			linux,code = <BTN_0>;
++			linux,code = <KEY_SETUP>;
+ 			gpios = <&gpiosb 22 GPIO_ACTIVE_LOW>;
+ 		};
+ 	};
+@@ -58,17 +79,17 @@
+ 		compatible = "gpio-leds";
+ 
+ 		vpn {
+-			label = "green:vpn";
++			label = "gl-mv1000:white:vpn";
+ 			gpios = <&gpionb 11 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+ 		wan {
+-			label = "green:wan";
++			label = "gl-mv1000:white:wan";
+ 			gpios = <&gpionb 12 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+ 		led_power: power {
+-			label = "green:power";
++			label = "gl-mv1000:white:power";
+ 			gpios = <&gpionb 13 GPIO_ACTIVE_LOW>;
+ 			default-state = "on";
+ 		};
+@@ -97,14 +118,19 @@
+ 			partition@f0000 {
+ 				label = "u-boot-env";
+ 				reg = <0Xf0000 0x8000>;
+-				read-only;
++				//read-only;
+ 			};
+ 
+ 			factory: partition@f8000 {
+ 				label = "factory";
+ 				reg = <0xf8000 0x8000>;
+-				read-only;
++				//read-only;
+ 			};
++			
++			partition@100000 {
++                                label = "log";
++                                reg = <0x100000 0x20000>;
++                        };
+ 		};
+ 	};
+ };
+-- 
+2.17.1
+
