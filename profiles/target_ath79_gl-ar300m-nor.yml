@@ -1,8 +1,8 @@
 ---
-profile: glinet_gl-ar300m-nand
+profile: glinet_gl-ar300m-nor
 target: ath79
 subtarget: nand
-description: Build image for the GL.iNET AR300M NAND Flash
+description: Build image for the GL.iNET AR300M NOR Flash
 feeds:
   - name: gl_feeds_commmon
     uri: https://github.com/gl-inet/gl-feeds.git

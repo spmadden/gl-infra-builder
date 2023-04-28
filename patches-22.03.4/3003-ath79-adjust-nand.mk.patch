@@ -1,17 +1,36 @@
-From 228ac127c439ab509a4341d9bbd962ba93b85928 Mon Sep 17 00:00:00 2001
-From: niyin <yin.ni@gl-inet.com>
-Date: Sat, 28 Jan 2023 22:24:55 -0800
+From c7f914f2791da7884eddcf40538b57302e816395 Mon Sep 17 00:00:00 2001
+From: Luo Chongjun <luochongjun@gl-inet.com>
+Date: Fri, 28 Apr 2023 11:59:55 +0800
 Subject: [PATCH] ath79 adjust nand.mk
 
 ---
- target/linux/ath79/image/nand.mk | 79 ++++++++++++++++++++++++++++++--
- 1 file changed, 75 insertions(+), 4 deletions(-)
+ target/linux/ath79/image/nand.mk | 87 +++++++++++++++++++++++++++++---
+ 1 file changed, 80 insertions(+), 7 deletions(-)
 
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 0f5b07225c..618083a8e9 100644
+index 0f5b07225c..5284eae0b5 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
-@@ -153,6 +153,36 @@ define Device/glinet_gl-ar300m-nor
+@@ -139,10 +139,10 @@ define Device/glinet_gl-ar300m-nand
+   $(Device/glinet_gl-ar300m-common-nand)
+   DEVICE_VARIANT := NAND
+   BLOCKSIZE := 128k
+-  IMAGES += factory.img
+-  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
+-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+   SUPPORTED_DEVICES += glinet,gl-ar300m-nor
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-ar300m-nand
+ 
+@@ -150,9 +150,41 @@ define Device/glinet_gl-ar300m-nor
+   $(Device/glinet_gl-ar300m-common-nand)
+   DEVICE_VARIANT := NOR
+   SUPPORTED_DEVICES += glinet,gl-ar300m-nand gl-ar300m
++  IMAGES := sysupgrade.bin
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
  endef
  TARGET_DEVICES += glinet_gl-ar300m-nor
  
@@ -48,7 +67,7 @@ index 0f5b07225c..618083a8e9 100644
  define Device/glinet_gl-ar750s-common
    SOC := qca9563
    DEVICE_VENDOR := GL.iNet
-@@ -166,7 +196,12 @@ define Device/glinet_gl-ar750s-nor-nand
+@@ -166,7 +198,12 @@ define Device/glinet_gl-ar750s-nor-nand
    $(Device/glinet_gl-ar750s-common)
    DEVICE_VARIANT := NOR/NAND
    KERNEL_SIZE := 4096k
@@ -62,7 +81,7 @@ index 0f5b07225c..618083a8e9 100644
    SUPPORTED_DEVICES += glinet,gl-ar750s-nor
  endef
  TARGET_DEVICES += glinet_gl-ar750s-nor-nand
-@@ -174,6 +209,7 @@ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
+@@ -174,6 +211,7 @@ TARGET_DEVICES += glinet_gl-ar750s-nor-nand
  define Device/glinet_gl-ar750s-nor
    $(Device/glinet_gl-ar750s-common)
    DEVICE_VARIANT := NOR
@@ -70,7 +89,7 @@ index 0f5b07225c..618083a8e9 100644
    SUPPORTED_DEVICES += gl-ar750s glinet,gl-ar750s glinet,gl-ar750s-nor-nand
  endef
  TARGET_DEVICES += glinet_gl-ar750s-nor
-@@ -189,9 +225,9 @@ define Device/glinet_gl-e750
+@@ -189,9 +227,9 @@ define Device/glinet_gl-e750
    PAGESIZE := 2048
    VID_HDR_OFFSET := 2048
    BLOCKSIZE := 128k
@@ -83,7 +102,7 @@ index 0f5b07225c..618083a8e9 100644
  endef
  TARGET_DEVICES += glinet_gl-e750
  
-@@ -231,6 +267,41 @@ define Device/linksys_ea4500-v3
+@@ -231,6 +269,41 @@ define Device/linksys_ea4500-v3
  endef
  TARGET_DEVICES += linksys_ea4500-v3
  

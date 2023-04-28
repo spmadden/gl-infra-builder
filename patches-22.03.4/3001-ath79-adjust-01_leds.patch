@@ -1,19 +1,22 @@
-From fbf1d60d64f87dbc700dc23bf4f9a3b30b3ae6d4 Mon Sep 17 00:00:00 2001
+From 0061eee4e7abd48c6e990a3b0d8acbce8529c817 Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
-Date: Wed, 26 Apr 2023 15:45:37 +0800
+Date: Fri, 28 Apr 2023 10:59:00 +0800
 Subject: [PATCH] ath79 adjust 01_led
 
 ---
- .../ath79/nand/base-files/etc/board.d/01_leds | 25 ++++++++++++++++---
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ .../ath79/nand/base-files/etc/board.d/01_leds | 27 +++++++++++++++----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
 diff --git a/target/linux/ath79/nand/base-files/etc/board.d/01_leds b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-index 8b5df624a4..af28c77f3e 100644
+index 8b5df624a4..f7db42be66 100644
 --- a/target/linux/ath79/nand/base-files/etc/board.d/01_leds
 +++ b/target/linux/ath79/nand/base-files/etc/board.d/01_leds
-@@ -14,10 +14,27 @@ glinet,gl-ar300m-nand|\
+@@ -12,12 +12,29 @@ dongwon,dw02-412h-128m)
+ 	;;
+ glinet,gl-ar300m-nand|\
  glinet,gl-ar300m-nor)
- 	ucidef_set_led_netdev "lan" "LAN" "green:lan" "eth0"
+-	ucidef_set_led_netdev "lan" "LAN" "green:lan" "eth0"
++	ucidef_set_led_switch "lan" "LAN" "gl-ar300m:green:lan" "switch0" "0x02"
  	;;
 -glinet,gl-xe300)
 -	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
