@@ -1,25 +1,25 @@
-From dc72742a570787fd2a78ffdac2f6ff861519eabf Mon Sep 17 00:00:00 2001
+From f09b1cb8f95e96e278dd49e1e4dd45a71dbbf14e Mon Sep 17 00:00:00 2001
 From: Yin Ni <yin.ni@gl-inet.com>
-Date: Mon, 20 Mar 2023 02:26:50 -0700
-Subject: [PATCH] ath79: e750 crash after restart 5g wifi
+Date: Wed, 3 May 2023 21:05:36 -0700
+Subject: [PATCH] ath10k: e750 crash after restart 5g wifi
 
 Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
 ---
- .../patches/970-crash-after-restart-5g-wifi.patch   | 13 +++++++++++++
+ .../ath10k/992-ath79-adjust-ath10k-caldata.patch    | 13 +++++++++++++
  1 file changed, 13 insertions(+)
- create mode 100644 package/kernel/ath10k-ct/patches/970-crash-after-restart-5g-wifi.patch
+ create mode 100644 package/kernel/mac80211/patches/ath10k/992-ath79-adjust-ath10k-caldata.patch
 
-diff --git a/package/kernel/ath10k-ct/patches/970-crash-after-restart-5g-wifi.patch b/package/kernel/ath10k-ct/patches/970-crash-after-restart-5g-wifi.patch
+diff --git a/package/kernel/mac80211/patches/ath10k/992-ath79-adjust-ath10k-caldata.patch b/package/kernel/mac80211/patches/ath10k/992-ath79-adjust-ath10k-caldata.patch
 new file mode 100644
-index 0000000000..32ed8ede53
+index 0000000000..df37efad10
 --- /dev/null
-+++ b/package/kernel/ath10k-ct/patches/970-crash-after-restart-5g-wifi.patch
++++ b/package/kernel/mac80211/patches/ath10k/992-ath79-adjust-ath10k-caldata.patch
 @@ -0,0 +1,13 @@
-+Index: b/ath10k-5.15/pci.c
++Index: b/drivers/net/wireless/ath/ath10k/pci.c
 +===================================================================
-+--- a/ath10k-5.15/pci.c
-++++ b/ath10k-5.15/pci.c
-+@@ -2571,7 +2571,7 @@ static int ath10k_pci_bmi_wait(struct at
++--- a/drivers/net/wireless/ath/ath10k/pci.c
+++++ b/drivers/net/wireless/ath/ath10k/pci.c
++@@ -2261,7 +2261,7 @@ static int ath10k_pci_bmi_wait(struct at
 + 			goto out;
 + 		}
 + 

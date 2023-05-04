@@ -1,0 +1,64 @@
+From 8404078ef760047909e4df50d75d70cda333c633 Mon Sep 17 00:00:00 2001
+From: Yin Ni <yin.ni@gl-inet.com>
+Date: Fri, 28 Apr 2023 01:10:44 -0700
+Subject: [PATCH] ath10k: Read eeprom data preferentially
+
+Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
+---
+ .../991-ath10k-priority-read-cal-eeprom.patch | 44 +++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+ create mode 100644 package/kernel/mac80211/patches/ath10k/991-ath10k-priority-read-cal-eeprom.patch
+
+diff --git a/package/kernel/mac80211/patches/ath10k/991-ath10k-priority-read-cal-eeprom.patch b/package/kernel/mac80211/patches/ath10k/991-ath10k-priority-read-cal-eeprom.patch
+new file mode 100644
+index 0000000000..0adff3e520
+--- /dev/null
++++ b/package/kernel/mac80211/patches/ath10k/991-ath10k-priority-read-cal-eeprom.patch
+@@ -0,0 +1,44 @@
++Index: b/drivers/net/wireless/ath/ath10k/core.c
++===================================================================
++--- a/drivers/net/wireless/ath/ath10k/core.c
+++++ b/drivers/net/wireless/ath/ath10k/core.c
++@@ -2233,9 +2233,19 @@ static int ath10k_download_cal_data(stru
++ 		return 0;
++ 
++ 	ath10k_dbg(ar, ATH10K_DBG_BOOT,
++-		   "pre cal download procedure failed, try cal file: %d\n",
+++		   "pre cal download procedure failed, try target EEPROM next: %d\n",
++ 		   ret);
++ 
+++	ret = ath10k_download_cal_eeprom(ar);
+++	if (ret == 0) {
+++		ar->cal_mode = ATH10K_CAL_MODE_EEPROM;
+++		goto done;
+++	}
+++
+++	ath10k_dbg(ar, ATH10K_DBG_BOOT,
+++			"boot did not find target EEPROM entry,try cal file: %d\n",
+++			ret);
+++
++ 	ret = ath10k_download_cal_nvmem(ar, "calibration");
++ 	if (ret == 0) {
++ 		ar->cal_mode = ATH10K_CAL_MODE_NVMEM;
++@@ -2265,17 +2275,7 @@ static int ath10k_download_cal_data(stru
++ 	}
++ 
++ 	ath10k_dbg(ar, ATH10K_DBG_BOOT,
++-		   "boot did not find DT entry, try target EEPROM next: %d\n",
++-		   ret);
++-
++-	ret = ath10k_download_cal_eeprom(ar);
++-	if (ret == 0) {
++-		ar->cal_mode = ATH10K_CAL_MODE_EEPROM;
++-		goto done;
++-	}
++-
++-	ath10k_dbg(ar, ATH10K_DBG_BOOT,
++-		   "boot did not find target EEPROM entry, try OTP next: %d\n",
+++		   "boot did not find DT entry, try OTP next: %d\n",
++ 		   ret);
++ 
++ 	ret = ath10k_download_and_run_otp(ar);
+-- 
+2.25.1
+
