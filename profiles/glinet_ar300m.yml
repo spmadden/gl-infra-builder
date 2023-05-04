@@ -72,7 +72,6 @@ packages:
   - gl-sdk4-mwan3
   - gl-sdk4-timer
   - gl-sdk4-igmp
-  - gl-sdk4-zerotier
   - gl-sdk4-ui-adminpw
   - gl-sdk4-ui-advanced
   - gl-sdk4-ui-bridge
@@ -118,7 +117,6 @@ packages:
   - kmod-usb-storage-extras
   - dosfstools
   - e2fsprogs
-  - minidlna
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n
@@ -170,4 +168,3 @@ diffconfig: |
   CONFIG_BUSYBOX_CONFIG_FEATURE_DEL_USER_FROM_GROUP=y
   CONFIG_TARGET_INITRAMFS_COMPRESSION_LZMA=y
   CONFIG_GL_SDK4_DNS_USE_DNSCRYPT_PROXY=y
-  CONFIG_ATH10K_THERMAL=y

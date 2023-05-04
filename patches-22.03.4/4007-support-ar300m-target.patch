@@ -80,7 +80,7 @@ index b6ea1080a4..5560d5a9df 100644
 +                flash_size = <128>;
 +                radio = "mac80211";
 +                reset-button = "gpio-3";
-+				usb-port = "1-1.3";
++				usb-port = "1-1";
 +				usb-reset = "usb_power,1";
 +				switch-button = "gpio-1";
 +                factory_data {

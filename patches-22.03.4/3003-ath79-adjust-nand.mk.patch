@@ -1,14 +1,14 @@
-From c7f914f2791da7884eddcf40538b57302e816395 Mon Sep 17 00:00:00 2001
+From ca5e7281b6ae65592e028d807acd4fb24dc346af Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
-Date: Fri, 28 Apr 2023 11:59:55 +0800
+Date: Thu, 4 May 2023 19:14:42 +0800
 Subject: [PATCH] ath79 adjust nand.mk
 
 ---
- target/linux/ath79/image/nand.mk | 87 +++++++++++++++++++++++++++++---
- 1 file changed, 80 insertions(+), 7 deletions(-)
+ target/linux/ath79/image/nand.mk | 98 +++++++++++++++++++++++++++++---
+ 1 file changed, 91 insertions(+), 7 deletions(-)
 
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 0f5b07225c..5284eae0b5 100644
+index 0f5b07225c..adb9601096 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
 @@ -139,10 +139,10 @@ define Device/glinet_gl-ar300m-nand
@@ -102,7 +102,7 @@ index 0f5b07225c..5284eae0b5 100644
  endef
  TARGET_DEVICES += glinet_gl-e750
  
-@@ -231,6 +269,41 @@ define Device/linksys_ea4500-v3
+@@ -231,6 +269,52 @@ define Device/linksys_ea4500-v3
  endef
  TARGET_DEVICES += linksys_ea4500-v3
  
@@ -123,6 +123,17 @@ index 0f5b07225c..5284eae0b5 100644
 +endef
 +TARGET_DEVICES += glinet_gl-xe300-nor-nand
 +
++define Device/glinet_gl-ar750
++  SOC := qca9531
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-AR750
++  DEVICE_PACKAGES := kmod-usb2 kmod-ath10k ath10k-firmware-qca9887 block-mount PCI_SUPPORT kmod-usb-storage
++  SUPPORTED_DEVICES += gl-ar750 glinet,gl-ar750
++  IMAGE_SIZE := 16064k
++  IMAGES := sysupgrade.bin
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-gl-metadata | check-size $$$$(IMAGE_SIZE)
++endef
++TARGET_DEVICES += glinet_gl-ar750
 +
 +define Device/glinet_gl-x750-common
 +  SOC := qca9531

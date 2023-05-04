@@ -90,6 +90,8 @@ diffconfig: |
   CONFIG_PACKAGE_dnsmasq=n
   CONFIG_PACKAGE_wpad-basic=n
   CONFIG_PACKAGE_wpad-basic-wolfssl=n
+  CONFIG_PACKAGE_libustream-wolfssl=n
+  CONFIG_PACKAGE_libustream-openssl=y
   CONFIG_PACKAGE_wpad=n
   CONFIG_BUSYBOX_CUSTOM=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
