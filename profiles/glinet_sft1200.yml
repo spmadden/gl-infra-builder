@@ -39,7 +39,6 @@ packages:
   - libtirpc:gl_feed_1806
   - dnscrypt-proxy2:gl_feed_1806
   - stubby
-  - smstools3:packages
   - wireguard
   - gl-oui-rpc
   - gl-sdk4-luci
@@ -106,7 +105,6 @@ packages:
   - gl-sdk4-ui-macclone
   - gl-sdk4-ui-modemmanage
   - gl-sdk4-ui-multiwan
-  - gl-sdk4-ui-nasview
   - gl-sdk4-ui-overview
   - gl-sdk4-ui-ovpnclient
   - gl-sdk4-ui-ovpnserver
