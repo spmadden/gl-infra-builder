@@ -1,14 +1,14 @@
-From ca5e7281b6ae65592e028d807acd4fb24dc346af Mon Sep 17 00:00:00 2001
+From 726f583704a92493e472e1564f795817edefda82 Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 4 May 2023 19:14:42 +0800
 Subject: [PATCH] ath79 adjust nand.mk
 
 ---
- target/linux/ath79/image/nand.mk | 98 +++++++++++++++++++++++++++++---
- 1 file changed, 91 insertions(+), 7 deletions(-)
+ target/linux/ath79/image/nand.mk | 100 ++++++++++++++++++++++++++++---
+ 1 file changed, 92 insertions(+), 8 deletions(-)
 
 diff --git a/target/linux/ath79/image/nand.mk b/target/linux/ath79/image/nand.mk
-index 0f5b07225c..adb9601096 100644
+index 0f5b07225c..78847e6ea3 100644
 --- a/target/linux/ath79/image/nand.mk
 +++ b/target/linux/ath79/image/nand.mk
 @@ -139,10 +139,10 @@ define Device/glinet_gl-ar300m-nand
@@ -89,7 +89,15 @@ index 0f5b07225c..adb9601096 100644
    SUPPORTED_DEVICES += gl-ar750s glinet,gl-ar750s glinet,gl-ar750s-nor-nand
  endef
  TARGET_DEVICES += glinet_gl-ar750s-nor
-@@ -189,9 +227,9 @@ define Device/glinet_gl-e750
+@@ -182,16 +220,16 @@ define Device/glinet_gl-e750
+   SOC := qca9531
+   DEVICE_VENDOR := GL.iNet
+   DEVICE_MODEL := GL-E750
+-  DEVICE_PACKAGES := kmod-ath10k-ct ath10k-firmware-qca9887-ct kmod-usb2
++  DEVICE_PACKAGES := kmod-ath10k ath10k-firmware-qca9887 kmod-usb2
+   SUPPORTED_DEVICES += gl-e750
+   KERNEL_SIZE := 4096k
+   IMAGE_SIZE := 131072k
    PAGESIZE := 2048
    VID_HDR_OFFSET := 2048
    BLOCKSIZE := 128k
