@@ -37,7 +37,7 @@ index 4d54a14ba4..6908f5b5c1 100644
 +		"metadata_version": "1.0", \
 +		"supported_devices":[$(call metadata_devices,$(1))], \
 +		"version": { \
-+			"release": "$(shell sed ':a;N;s/\n/\\\\n/g;s/\r/\\\\r/g;ta' $(TOPDIR)/gl_release_note | sed "s/'/\\\047/g")", \
++			"release": "$(shell cat $(TOPDIR)/release)", \
 +			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
 +			"dist": "$(call json_quote,$(VERSION_DIST))", \
 +			"version": "$(call json_quote,$(VERSION_NUMBER))", \
