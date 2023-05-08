@@ -4,12 +4,12 @@ target: ipq40xx
 subtarget: generic
 description: Build image for the GL.iNET B1300
 feeds:
-  - name: gl_feeds_commmon
+  - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
     branch: common
-  - name: gl_feeds
+  - name: gl_feeds_22_03
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: b0b2d6c2a563be5787bde3acb7b5cf4e83ddc0ce
+    branch: 22.03.2
 
 packages:
   - wireless-regdb

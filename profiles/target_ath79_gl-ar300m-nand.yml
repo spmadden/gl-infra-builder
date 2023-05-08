@@ -4,9 +4,9 @@ target: ath79
 subtarget: nand
 description: Build image for the GL.iNET AR300M NAND Flash
 feeds:
-  - name: gl_feeds_commmon
+  - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 341ee97aaa761c0fc93a0d28fc8634d42f7f7c4c
+    branch: common
   - name: gl_feeds_22_03
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 195dca0e10af66665aa59e33dc17edb784379732
+    branch: 22.03.2

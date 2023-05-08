@@ -3,3 +3,11 @@ profile: glinet_gl-mt300n-v2
 target: ramips
 subtarget: mt76x8
 description: Build image for the GL.iNET MT300N-V2
+
+feeds:
+  - name: gl_feed_common
+    uri: https://github.com/gl-inet/gl-feeds.git
+    branch: common
+  - name: gl_feeds_22_03
+    uri: https://github.com/gl-inet/gl-feeds.git
+    branch: 22.03.2
