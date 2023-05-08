@@ -1,0 +1,85 @@
+From fba4523f78948efe7fdfc4ac464e4a3150fa2baa Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 8 May 2023 09:07:27 +0800
+Subject: [PATCH] target/ramips: gl-mt3000n-v2 adapt to glinet sdk4
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../dts/mt7628an_glinet_gl-mt300n-v2.dts      | 36 ++++++++++++++++---
+ target/linux/ramips/image/mt76x8.mk           |  3 +-
+ 2 files changed, 33 insertions(+), 6 deletions(-)
+
+diff --git a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
+index 48f0fbd92b..e275d3841f 100644
+--- a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
++++ b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
+@@ -8,13 +8,34 @@
+ 	model = "GL-MT300N-V2";
+ 
+ 	aliases {
+-		led-boot = &led_power;
+-		led-failsafe = &led_power;
+-		led-running = &led_power;
+-		led-upgrade = &led_power;
++		//led-boot = &led_power;
++		//led-failsafe = &led_power;
++		//led-running = &led_power;
++		//led-upgrade = &led_power;
+ 		label-mac-device = &ethernet;
+ 	};
+ 
++	gl_hw {
++		compatible = "gl-hw-info";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		model = "mt300n-v2";
++		wan = "wan";
++		lan = "lan1 lan2";
++		reset-button = "gpio-38";
++		switch-button = "gpio-0";
++		flash_size = <16>;
++		radio = "radio0";
++		usb-port = "1-1";
++		factory_data {
++			device_mac = "factory", "0x4000";
++			device_ddns = "factory", "0x4010";
++			device_sn_bak = "factory", "0x4020";
++			device_sn = "factory", "0x4030";
++			country_code = "factory", "0x4048";
++		};
++	};
++
+ 	chosen {
+ 		bootargs = "console=ttyS0,115200";
+ 	};
+@@ -125,7 +146,12 @@
+ 			partition@50000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x50000 0xfb0000>;
++				reg = <0x50000 0xf90000>;
++			};
++
++			partition@fe0000 {
++				label = "log";
++				reg = <0xfe0000 0x20000>;
+ 			};
+ 		};
+ 	};
+diff --git a/target/linux/ramips/image/mt76x8.mk b/target/linux/ramips/image/mt76x8.mk
+index 2106324684..4d12c9aee8 100644
+--- a/target/linux/ramips/image/mt76x8.mk
++++ b/target/linux/ramips/image/mt76x8.mk
+@@ -182,7 +182,8 @@ define Device/glinet_gl-mt300n-v2
+   DEVICE_MODEL := GL-MT300N
+   DEVICE_VARIANT := V2
+   DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci
+-  SUPPORTED_DEVICES += gl-mt300n-v2
++  OLD_SUPPORTED_DEVICES += gl-mt300n-v2
++  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | check-size | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-mt300n-v2
+ 
+-- 
+2.34.1
+
