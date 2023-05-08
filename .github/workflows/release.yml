@@ -20,27 +20,14 @@ jobs:
           echo "COMPILE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
           cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR release
 
-      - name: Create Release   
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body_path: |
-            /home/glinet/work/_github/gl_release_note
-          draft: false
-          prerelease: true
-          
-      - name: Upload Release Assets
-        id: upload-release-assets
-        uses: dwenegar/upload-release-assets@v1
+      - name: Release
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_id: ${{ steps.create_release.outputs.id }}
-          assets_path: /home/glinet/work/_github/assets
+          body_path: |
+            /home/glinet/work/_github/gl_release_note
+          prerelease: true
 
       - name: notify
         run: |
