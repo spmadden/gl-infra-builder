@@ -3,7 +3,7 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 67d2c9944ca81944eda6337deca80b1f59d7edec
+    revision: 8b7b31322fb83cfd6322b7f759ea8592a4b3a883
 
 packages:
   - kmod-usb2
@@ -63,6 +63,7 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
+  - gl-sdk4-mcu
 #  - gl-led-daemon
   - gl-ble-daemon
   - gl-ble-to-remote
@@ -154,3 +155,4 @@ diffconfig: |
   CONFIG_PACKAGE_kmod-crypto-hash=n
   CONFIG_PACKAGE_kmod-usb-serial-ch341=n
   CONFIG_PACKAGE_libustream-wolfssl=n
+  CONFIG_GL_SDK4_MCU_TX_BUF512=y
