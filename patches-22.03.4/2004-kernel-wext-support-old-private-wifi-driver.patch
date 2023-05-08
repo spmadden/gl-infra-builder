@@ -1,0 +1,36 @@
+From 2ad56b0b05a81acbc6087adc3c488edcc85ff919 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 8 May 2023 11:32:35 +0800
+Subject: [PATCH] kernel: wext: support old private wifi driver
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ ...22-wext-support-old-private-wifi-driver.patch | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+ create mode 100644 target/linux/generic/hack-5.10/922-wext-support-old-private-wifi-driver.patch
+
+diff --git a/target/linux/generic/hack-5.10/922-wext-support-old-private-wifi-driver.patch b/target/linux/generic/hack-5.10/922-wext-support-old-private-wifi-driver.patch
+new file mode 100644
+index 0000000000..76f2837dcb
+--- /dev/null
++++ b/target/linux/generic/hack-5.10/922-wext-support-old-private-wifi-driver.patch
+@@ -0,0 +1,16 @@
++Index: linux-5.10.176/net/wireless/wext-core.c
++===================================================================
++--- linux-5.10.176.orig/net/wireless/wext-core.c
+++++ linux-5.10.176/net/wireless/wext-core.c
++@@ -956,6 +956,11 @@ static int wireless_process_ioctl(struct
++ 		else if (private)
++ 			return private(dev, iwr, cmd, info, handler);
++ 	}
+++
+++	/* Old driver API : call driver ioctl handler */
+++	if (dev->netdev_ops->ndo_do_ioctl)
+++		return dev->netdev_ops->ndo_do_ioctl(dev, (struct ifreq *)iwr, cmd);
+++
++ 	return -EOPNOTSUPP;
++ }
++ 
+-- 
+2.34.1
+
