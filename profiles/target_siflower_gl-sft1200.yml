@@ -10,7 +10,7 @@ feeds:
     branch: common
   - name: gl_feed_1806
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: cebf0db47a424677a6bc1e74106498ea9042e69f
+    revision: 7f87411fe26bc83290c54d927cd64d86b254371b
 
 diffconfig: |
   CONFIG_SOFT_FLOAT=n
