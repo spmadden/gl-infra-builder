@@ -1,4 +1,4 @@
-From dc8030e7d40a71a205202e959eeceb601de25e2d Mon Sep 17 00:00:00 2001
+From 9eb3cd1aa23ddca3547684b22596c87564cfae6b Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -6,10 +6,10 @@ Subject: [PATCH] iwinfo: support mtk private wifi driver
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/network/utils/iwinfo/Makefile         |   2 +-
- .../iwinfo/patches/0001-fix-wext-h.patch      |  32 ++
+ .../iwinfo/patches/0001-fix-wext-h.patch      |  32 +
  .../iwinfo/patches/0100-support-mtk.patch     | 113 ++++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 521 ++++++++++++++++++
- 4 files changed, 667 insertions(+), 1 deletion(-)
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 568 ++++++++++++++++++
+ 4 files changed, 714 insertions(+), 1 deletion(-)
  create mode 100644 package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
@@ -186,12 +186,14 @@ index 0000000000..892e750d00
 + 	luaL_register(L, NULL, R_wext);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..0c22aa9f71
+index 0000000000..46375bf065
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,521 @@
+@@ -0,0 +1,568 @@
 +#include "iwinfo.h"
 +#include "iwinfo_wext.h"
++
++#include <inttypes.h>
 +
 +typedef union _MACHTTRANSMIT_SETTING {
 +	struct  {
@@ -240,35 +242,31 @@ index 0000000000..0c22aa9f71
 +#define RTPRIV_IOCTL_SET                 	(SIOCIWFIRSTPRIV + 0x02)
 +#define RTPRIV_IOCTL_GSITESURVEY            (SIOCIWFIRSTPRIV + 0x0D)
 +
++struct mtk_phy_feature {
++	const char *name;
++	int hwmodelist;
++	int htmodelist;
++};
++
++static struct mtk_phy_feature mtk_phy_feature[7] = {};
++
 +static inline int wext_ioctl(const char *ifname, int cmd, struct iwreq *wrq)
 +{
 +	strncpy(wrq->ifr_name, ifname, IFNAMSIZ);
 +	return iwinfo_ioctl(cmd, wrq);
 +}
 +
-+static int mtk_isap(const char *ifname)
-+{
-+    return !strncmp(ifname, "ra", 2);
-+}
-+
-+static int mtk_iscli(const char *ifname)
-+{
-+    return !strncmp(ifname, "apcli", 5);
-+}
-+
-+static int mtk_iswds(const char *ifname)
-+{
-+    return !strncmp(ifname, "wds", 3);
-+}
-+
-+static int mtk_isdev(const char *ifname)
-+{
-+    return !strcmp(ifname, "mt798111") || !strcmp(ifname, "mt798112");
-+}
-+
 +static int mtk_probe(const char *ifname)
 +{
-+	return mtk_isap(ifname) || mtk_iscli(ifname) || mtk_iswds(ifname) || mtk_isdev(ifname);
++	struct mtk_phy_feature *f = mtk_phy_feature;
++
++	while (f->name) {
++		if (strstr(ifname, f->name))
++			return true;
++		f++;
++	}
++
++	return false;
 +}
 +
 +static void mtk_close(void)
@@ -423,15 +421,15 @@ index 0000000000..0c22aa9f71
 +	return 0;
 +}
 +
-+static int mtk_get_scanlist_dump(const char *ifname, int index, char *data)
++static int mtk_get_scanlist_dump(const char *ifname, int index, char *data, size_t len)
 +{
 +	struct iwreq wrq = {};
 +
 +	snprintf(wrq.ifr_name, sizeof(wrq.ifr_name), "%s", ifname);
-+    snprintf(data, sizeof(data), "%d", index);
++    snprintf(data, len, "%d", index);
 +
 +	wrq.u.data.pointer = data;
-+    wrq.u.data.length = sizeof(data);
++    wrq.u.data.length = len;
 +
 +	return iwinfo_ioctl(RTPRIV_IOCTL_GSITESURVEY, &wrq);
 +}
@@ -464,7 +462,7 @@ index 0000000000..0c22aa9f71
 +
 +	*len = 0;
 +
-+	if (!strcmp(ifname, "mt798111"))
++	if (!strcmp(ifname, "mt798111") || !strcmp(ifname, "mt7628"))
 +		ifname = "ra0";
 +	else if (!strcmp(ifname, "mt798112"))
 +		ifname = "rax0";
@@ -475,7 +473,7 @@ index 0000000000..0c22aa9f71
 +	sleep(8);
 +
 +	while (1) {
-+		if (mtk_get_scanlist_dump(ifname, index, data))
++		if (mtk_get_scanlist_dump(ifname, index, data, sizeof(data)))
 +			return -1;
 +
 +		sscanf(data, "\nTotal=%d", &total);
@@ -534,11 +532,11 @@ index 0000000000..0c22aa9f71
 +
 +			e->mode = IWINFO_OPMODE_MASTER;
 +
-+			sscanf(pos + offsets[SCAN_DATA_CH], "%d", &e->channel);
++			sscanf(pos + offsets[SCAN_DATA_CH], "%"SCNu8, &e->channel);
 +			sscanf(pos + offsets[SCAN_DATA_RSSI] + 1, "%d", &signal);
 +			e->signal = -signal + 0x100;
 +
-+			sscanf(pos + offsets[SCAN_DATA_BSSID], "%02x:%02x:%02x:%02x:%02x:%02x",
++			sscanf(pos + offsets[SCAN_DATA_BSSID], "%02"SCNx8":%02"SCNx8":%02"SCNx8":%02"SCNx8":%02"SCNx8":%02"SCNx8"",
 +				mac + 0, mac + 1, mac + 2, mac + 3, mac + 4, mac + 5);
 +
 +			sscanf(pos + offsets[SCAN_DATA_SSID_LEN], "%d", &ssid_len);
@@ -560,7 +558,7 @@ index 0000000000..0c22aa9f71
 +
 +static int mtk_get_freqlist(const char *ifname, char *buf, int *len)
 +{
-+	if (!strcmp(ifname, "mt798111"))
++	if (!strcmp(ifname, "mt798111") || !strcmp(ifname, "mt7628"))
 +		ifname = "ra0";
 +	else if (!strcmp(ifname, "mt798112"))
 +		ifname = "rax0";
@@ -581,46 +579,32 @@ index 0000000000..0c22aa9f71
 +
 +static int mtk_get_hwmodelist(const char *ifname, int *buf)
 +{
-+	*buf = 0;
++	struct mtk_phy_feature *f = mtk_phy_feature;
 +
-+	if (!strncmp(ifname, "rax", 3)) {
-+		*buf |= IWINFO_80211_A;
-+		*buf |= IWINFO_80211_N;
-+		*buf |= IWINFO_80211_AC;
-+		*buf |= IWINFO_80211_AX;
-+	} else {
-+		*buf |= IWINFO_80211_B;
-+		*buf |= IWINFO_80211_G;
-+		*buf |= IWINFO_80211_N;
-+		*buf |= IWINFO_80211_AX;
++	while (f->name) {
++		if (strstr(ifname, f->name)) {
++			*buf = f->hwmodelist;
++			return 0;
++		}
++		f++;
 +	}
 +
-+	return 0;
++	return -1;
 +}
 +
 +static int mtk_get_htmodelist(const char *ifname, int *buf)
 +{
-+	*buf = 0;
++	struct mtk_phy_feature *f = mtk_phy_feature;
 +
-+	if (!strncmp(ifname, "rax", 3)) {
-+		*buf |= IWINFO_HTMODE_HT20;
-+		*buf |= IWINFO_HTMODE_HT40;
-+		*buf |= IWINFO_HTMODE_VHT20;
-+		*buf |= IWINFO_HTMODE_VHT40;
-+		*buf |= IWINFO_HTMODE_VHT80;
-+		*buf |= IWINFO_HTMODE_VHT160;
-+		*buf |= IWINFO_HTMODE_HE20;
-+		*buf |= IWINFO_HTMODE_HE40;
-+		*buf |= IWINFO_HTMODE_HE80;
-+		*buf |= IWINFO_HTMODE_HE160;
-+	} else {
-+		*buf |= IWINFO_HTMODE_HT20;
-+		*buf |= IWINFO_HTMODE_HT40;
-+		*buf |= IWINFO_HTMODE_HE20;
-+		*buf |= IWINFO_HTMODE_HE40;
++	while (f->name) {
++		if (strstr(ifname, f->name)) {
++			*buf = f->htmodelist;
++			return 0;
++		}
++		f++;
 +	}
 +
-+	return 0;
++	return -1;
 +}
 +
 +static int mtk_get_htmode(const char *ifname, int *buf)
@@ -636,10 +620,10 @@ index 0000000000..0c22aa9f71
 +
 +static int mtk_get_phyname(const char *ifname, char *buf)
 +{
-+	if (strstr(ifname, "ra"))
-+		strcpy(buf, "ra0");
-+	else if (strstr(ifname, "rax"))
++	if (strstr(ifname, "rax") || strstr(ifname, "apclix"))
 +		strcpy(buf, "rax0");
++	else if (strstr(ifname, "ra") || strstr(ifname, "apcli"))
++		strcpy(buf, "ra0");
 +	else
 +		return -1;
 +
@@ -711,6 +695,69 @@ index 0000000000..0c22aa9f71
 +	.countrylist      = mtk_get_countrylist,
 +	.close            = mtk_close
 +};
++
++static void __attribute__((constructor)) init()
++{
++	char buf[100] = "";
++	FILE *fp;
++
++	fp = fopen("/etc/config/wireless", "r");
++	if (!fp)
++		return;
++
++	fread(buf, 1, sizeof(buf) - 1, fp);
++	fclose(fp);
++
++	if (strstr(buf, "mt7628")) {
++		int hwmodelist = IWINFO_80211_B | IWINFO_80211_G | IWINFO_80211_N;
++		int htmodelist = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40;
++
++		mtk_phy_feature[0].name = "mt7628";
++		mtk_phy_feature[0].hwmodelist = hwmodelist;
++		mtk_phy_feature[0].htmodelist = htmodelist;
++
++		mtk_phy_feature[1].name = "ra";
++		mtk_phy_feature[1].hwmodelist = hwmodelist;
++		mtk_phy_feature[1].htmodelist = htmodelist;
++
++		mtk_phy_feature[2].name = "apcli";
++		mtk_phy_feature[2].hwmodelist = hwmodelist;
++		mtk_phy_feature[2].htmodelist = htmodelist;
++	} else if (strstr(buf, "mt798111")) {
++		int hwmodelist = IWINFO_80211_A | IWINFO_80211_N | IWINFO_80211_AC | IWINFO_80211_AX;
++		int htmodelist = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40
++					| IWINFO_HTMODE_VHT20 | IWINFO_HTMODE_VHT40 | IWINFO_HTMODE_VHT80 | IWINFO_HTMODE_VHT160
++					| IWINFO_HTMODE_HE20 | IWINFO_HTMODE_HE40 | IWINFO_HTMODE_HE80 | IWINFO_HTMODE_HE160;
++
++		mtk_phy_feature[0].name = "mt798112";
++		mtk_phy_feature[0].hwmodelist = hwmodelist;
++		mtk_phy_feature[0].htmodelist = htmodelist;
++
++		mtk_phy_feature[1].name = "rax";
++		mtk_phy_feature[1].hwmodelist = hwmodelist;
++		mtk_phy_feature[1].htmodelist = htmodelist;
++
++		mtk_phy_feature[2].name = "apclix";
++		mtk_phy_feature[2].hwmodelist = hwmodelist;
++		mtk_phy_feature[2].htmodelist = htmodelist;
++
++		hwmodelist = IWINFO_80211_B | IWINFO_80211_G | IWINFO_80211_N | IWINFO_80211_AX;
++		htmodelist = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40
++						| IWINFO_HTMODE_HE20 | IWINFO_HTMODE_HE40;
++
++		mtk_phy_feature[3].name = "mt798111";
++		mtk_phy_feature[3].hwmodelist = hwmodelist;
++		mtk_phy_feature[3].htmodelist = htmodelist;
++
++		mtk_phy_feature[4].name = "ra";
++		mtk_phy_feature[4].hwmodelist = hwmodelist;
++		mtk_phy_feature[4].htmodelist = htmodelist;
++
++		mtk_phy_feature[5].name = "apcli";
++		mtk_phy_feature[5].hwmodelist = hwmodelist;
++		mtk_phy_feature[5].htmodelist = htmodelist;
++	}
++}
 -- 
 2.34.1
 
