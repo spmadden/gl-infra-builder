@@ -1,4 +1,4 @@
-From 9eb3cd1aa23ddca3547684b22596c87564cfae6b Mon Sep 17 00:00:00 2001
+From 708c112895f13999a930470976b0459f2ce10944 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -8,8 +8,8 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  package/network/utils/iwinfo/Makefile         |   2 +-
  .../iwinfo/patches/0001-fix-wext-h.patch      |  32 +
  .../iwinfo/patches/0100-support-mtk.patch     | 113 ++++
- package/network/utils/iwinfo/src/iwinfo_mtk.c | 568 ++++++++++++++++++
- 4 files changed, 714 insertions(+), 1 deletion(-)
+ package/network/utils/iwinfo/src/iwinfo_mtk.c | 576 ++++++++++++++++++
+ 4 files changed, 722 insertions(+), 1 deletion(-)
  create mode 100644 package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
@@ -186,10 +186,10 @@ index 0000000000..892e750d00
 + 	luaL_register(L, NULL, R_wext);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..46375bf065
+index 0000000000..5d212000b7
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
-@@ -0,0 +1,568 @@
+@@ -0,0 +1,576 @@
 +#include "iwinfo.h"
 +#include "iwinfo_wext.h"
 +
@@ -723,13 +723,17 @@ index 0000000000..46375bf065
 +		mtk_phy_feature[2].name = "apcli";
 +		mtk_phy_feature[2].hwmodelist = hwmodelist;
 +		mtk_phy_feature[2].htmodelist = htmodelist;
-+	} else if (strstr(buf, "mt798111")) {
++	} else if (strstr(buf, "mt798111") || strstr(buf, "mt798611")) {
 +		int hwmodelist = IWINFO_80211_A | IWINFO_80211_N | IWINFO_80211_AC | IWINFO_80211_AX;
 +		int htmodelist = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40
 +					| IWINFO_HTMODE_VHT20 | IWINFO_HTMODE_VHT40 | IWINFO_HTMODE_VHT80 | IWINFO_HTMODE_VHT160
 +					| IWINFO_HTMODE_HE20 | IWINFO_HTMODE_HE40 | IWINFO_HTMODE_HE80 | IWINFO_HTMODE_HE160;
 +
-+		mtk_phy_feature[0].name = "mt798112";
++		if (strstr(buf, "mt798111"))
++			mtk_phy_feature[0].name = "mt798112";
++		else
++			mtk_phy_feature[0].name = "mt798612";
++
 +		mtk_phy_feature[0].hwmodelist = hwmodelist;
 +		mtk_phy_feature[0].htmodelist = htmodelist;
 +
@@ -745,7 +749,11 @@ index 0000000000..46375bf065
 +		htmodelist = IWINFO_HTMODE_HT20 | IWINFO_HTMODE_HT40
 +						| IWINFO_HTMODE_HE20 | IWINFO_HTMODE_HE40;
 +
-+		mtk_phy_feature[3].name = "mt798111";
++		if (strstr(buf, "mt798111"))
++			mtk_phy_feature[3].name = "mt798111";
++		else
++			mtk_phy_feature[3].name = "mt798611";
++
 +		mtk_phy_feature[3].hwmodelist = hwmodelist;
 +		mtk_phy_feature[3].htmodelist = htmodelist;
 +
