@@ -137,7 +137,8 @@ diffconfig: |
   CONFIG_GL_SDK4_DNS_USE_DNSCRYPT_PROXY=y
 
   CONFIG_PACKAGE_kmod-ath10k=m
-  CONFIG_PACKAGE_kmod-ath10k-ct=y
+  CONFIG_PACKAGE_kmod-ath10k-ct=n
+  CONFIG_PACKAGE_kmod-ath10k-ct-smallbuffers=y
   CONFIG_PACKAGE_ath10k-firmware-qca9887=m
   CONFIG_PACKAGE_ath10k-firmware-qca9887-ct=y
   CONFIG_ATH10K_THERMAL=y

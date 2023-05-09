@@ -663,7 +663,7 @@ index 0000000000..ef138df24c
 +	fp = fopen("/etc/config/wireless", "r");
 +	if (!fp)
 +		return;
-+	
++
 +	fread(buf, 1, sizeof(buf) - 1, fp);
 +	fclose(fp);
 +
