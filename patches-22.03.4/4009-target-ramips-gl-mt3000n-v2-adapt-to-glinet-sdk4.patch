@@ -33,12 +33,12 @@ index 48f0fbd92b..e275d3841f 100644
 +		#address-cells = <1>;
 +		#size-cells = <1>;
 +		model = "mt300n-v2";
-+		wan = "wan";
-+		lan = "lan1 lan2";
++		wan = "eth0.2";
++		lan = "eth0.1";
 +		reset-button = "gpio-38";
 +		switch-button = "gpio-0";
 +		flash_size = <16>;
-+		radio = "radio0";
++		radio = "mt7628";
 +		usb-port = "1-1";
 +		factory_data {
 +			device_mac = "factory", "0x4000";
