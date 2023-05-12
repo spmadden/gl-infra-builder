@@ -33,8 +33,6 @@ packages:
 diffconfig: |
   CONFIG_PACKAGE_gl-sdk4-ui-btnsettings=n
   CONFIG_PACKAGE_gl-sdk4-switch-button=n
-  CONFIG_PACKAGE_gl-sdk4-mqtt=n
-  CONFIG_PACKAGE_gl-sdk4-cloud-batch-manage=n
   CONFIG_BUSYBOX_CUSTOM=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_INTERACTIVE=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_TOP_SMP_CPU=y

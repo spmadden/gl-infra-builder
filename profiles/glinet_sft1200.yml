@@ -59,7 +59,6 @@ packages:
   - gl-sdk4-system
   - gl-sdk4-network
   - gl-sdk4-acl
-  - gl-sdk4-mqtt
   - gl-sdk4-cloud
   - gl-sdk4-lan
   - gl-sdk4-ipv6
@@ -67,7 +66,6 @@ packages:
   - gl-sdk4-vpn-policy
   - gl-sdk4-logread
   - gl-sdk4-qos
-  - gl-sdk4-cloud-batch-manage
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
   - gl-sdk4-init-portal
