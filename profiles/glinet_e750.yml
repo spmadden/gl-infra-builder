@@ -156,3 +156,4 @@ diffconfig: |
   CONFIG_PACKAGE_kmod-usb-serial-ch341=n
   CONFIG_PACKAGE_libustream-wolfssl=n
   CONFIG_GL_SDK4_MCU_TX_BUF512=y
+  CONFIG_LUA_ECO_OPENSSL=y

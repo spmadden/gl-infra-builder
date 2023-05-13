@@ -176,3 +176,4 @@ diffconfig: |
   CONFIG_PACKAGE_ath10k-firmware-qca9887=m
   CONFIG_PACKAGE_ath10k-firmware-qca9887-ct=y
   CONFIG_ATH10K_THERMAL=y
+  CONFIG_LUA_ECO_OPENSSL=y

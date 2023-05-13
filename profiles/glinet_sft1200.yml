@@ -799,3 +799,4 @@ diffconfig: |
   CONFIG_PACKAGE_uhttpd-mod-lua=m
   CONFIG_PACKAGE_uhttpd-mod-repeater=m
   CONFIG_PACKAGE_uhttpd-mod-ubus=m
+  CONFIG_LUA_ECO_OPENSSL=y

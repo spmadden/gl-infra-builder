@@ -163,3 +163,4 @@ diffconfig: |
   CONFIG_PACKAGE_dnscrypt-proxy2=y
   CONFIG_PACKAGE_badblocks=y
   CONFIG_PACKAGE_ip-tiny=y
+  CONFIG_LUA_ECO_OPENSSL=y
