@@ -45,7 +45,6 @@ packages:
   - gl-sdk4-network
   - gl-sdk4-acl
   - gl-sdk4-system
-  - gl-sdk4-mqtt
   - gl-sdk4-qos
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
@@ -58,7 +57,6 @@ packages:
   - gl-sdk4-mwan3
   - gl-sdk4-zerotier
   - kmod-gl-sdk4-parental-control
-  - gl-sdk4-cloud-batch-manage
   - gl-sdk4-repeater
   - gl-sdk4-wifi
 
