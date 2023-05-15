@@ -48,8 +48,6 @@ packages:
   - gl-sdk4-sms-forward 
   - gl-sdk4-vpn-policy
   - gl-sdk4-tethering 
-  - kmod-gl-sdk4-parental-control
-
   - gl-sdk4-ui-clients 
   - gl-sdk4-ui-adminpw 
   - gl-sdk4-ui-advanced 
@@ -70,7 +68,6 @@ packages:
   - gl-sdk4-ui-lanip 
   - gl-sdk4-ui-macclone
   - gl-sdk4-ui-multiwan
-  - gl-sdk4-ui-parentalcontrol
   - gl-sdk4-ui-plugins
   - gl-sdk4-ui-reset
   - gl-sdk4-ui-sms

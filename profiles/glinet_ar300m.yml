@@ -107,14 +107,6 @@ packages:
   - gl-sdk4-ui-wgclient
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
-  - gl-sdk4-nas-utils
-  - gl-sdk4-nas-web
-  - gl-sdk4-exfat-utils
-  - gl-sdk4-webdav
-  - kmod-usb-storage-uas
-  - kmod-usb-storage-extras
-  - dosfstools
-  - e2fsprogs
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n

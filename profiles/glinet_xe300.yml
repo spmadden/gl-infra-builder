@@ -51,32 +51,12 @@ packages:
   - gl-sdk4-s2s
   - gl-sdk4-utils
   - gl-sdk4-dns
-  - gl-sdk4-tor
   - gl-sdk4-mwan3
-  - kmod-gl-sdk4-parental-control
-  - gl-sdk4-dlna
   - gl-sdk4-keepcfg
   - gl-sdk4-mcu
   - gl-sdk4-edgerouter
   - gl-sdk4-nl80211-event
   - gl-sdk4-sms-forward
-  - gl-sdk4-zerotier
-
-  - gl-sdk4-nas-utils
-  - gl-sdk4-nas-web
-  - gl-sdk4-exfat-utils
-  - gl-sdk4-webdav
-  - minidlna
-  - blkid
-  - kmod-fs-ext4
-  - kmod-fs-ntfs
-  - kmod-fs-vfat
-  - kmod-fs-exfat
-  - kmod-usb-storage-uas
-  - ntfs-3g
-  - ntfs-3g-utils
-  - dosfstools
-  - e2fsprogs
 
   - gl-sdk4-ui-adguardhome
   - gl-sdk4-ui-adminpw
@@ -111,14 +91,10 @@ packages:
   - gl-sdk4-ui-igmp
   - gl-sdk4-ui-overview
   - gl-sdk4-ui-timedtask
-  - gl-sdk4-ui-torview
   - gl-sdk4-ui-multiwan
   - gl-sdk4-ui-edgerouter
-  - gl-sdk4-ui-nasview
-  - gl-sdk4-ui-parentalcontrol
   - gl-sdk4-ui-vlan
   - gl-sdk4-ui-wireless
-  - gl-sdk4-ui-zerotierview
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n

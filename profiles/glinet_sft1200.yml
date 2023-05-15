@@ -28,7 +28,6 @@ packages:
   - iptables-mod-tproxy
   - iptables-mod-filter
   - i2c-tools
-  - tor:gl_feed_common
   - getdns:packages
   - libtirpc:gl_feed_1806
   - dnscrypt-proxy2:gl_feed_1806
@@ -73,7 +72,6 @@ packages:
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3
   - gl-sdk4-timer
-  - gl-sdk4-tor
   - gl-sdk4-igmp
   - gl-sdk4-keepcfg
   - gl-sdk4-ui-adminpw
@@ -105,7 +103,6 @@ packages:
   - gl-sdk4-ui-reset
   - gl-sdk4-ui-timedtask
   - gl-sdk4-ui-timezone
-  - gl-sdk4-ui-torview
   - gl-sdk4-ui-upgrade
   - gl-sdk4-ui-vlan
   - gl-sdk4-ui-vpndashboard

@@ -29,8 +29,6 @@ packages:
   - iptables-mod-tproxy
   - iptables-mod-filter
   - i2c-tools
-  - tor:gl_feed_common
-  - smstools3:packages
   - gl-oui-rpc
   - gl-sdk4-luci
   - gl-sdk4-rtty
@@ -70,7 +68,6 @@ packages:
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3
   - gl-sdk4-timer
-  - gl-sdk4-tor
   - gl-sdk4-igmp
   - gl-sdk4-keepcfg
   - gl-sdk4-ui-adminpw
@@ -94,7 +91,6 @@ packages:
   - gl-sdk4-ui-macclone
   - gl-sdk4-ui-modemmanage
   - gl-sdk4-ui-multiwan
-  - gl-sdk4-ui-nasview
   - gl-sdk4-ui-overview
   - gl-sdk4-ui-ovpnclient
   - gl-sdk4-ui-ovpnserver
@@ -103,7 +99,6 @@ packages:
   - gl-sdk4-ui-reset
   - gl-sdk4-ui-timedtask
   - gl-sdk4-ui-timezone
-  - gl-sdk4-ui-torview
   - gl-sdk4-ui-upgrade
   - gl-sdk4-ui-vlan
   - gl-sdk4-ui-vpndashboard
@@ -112,14 +107,6 @@ packages:
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
   - gl-sdk4-ui-hwnat
-  - gl-sdk4-nas-utils
-  - gl-sdk4-nas-web
-  - gl-sdk4-exfat-utils
-  - gl-sdk4-webdav
-  - kmod-usb-storage-uas
-  - dosfstools
-  - e2fsprogs
-  - minidlna
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n

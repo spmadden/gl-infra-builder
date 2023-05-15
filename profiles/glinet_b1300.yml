@@ -64,7 +64,6 @@ packages:
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3
   - gl-sdk4-timer
-  - gl-sdk4-tor
   - gl-sdk4-igmp
   - gl-sdk4-ui-adminpw
   - gl-sdk4-ui-advanced
@@ -94,7 +93,6 @@ packages:
   - gl-sdk4-ui-reset
   - gl-sdk4-ui-timedtask
   - gl-sdk4-ui-timezone
-  - gl-sdk4-ui-torview
   - gl-sdk4-ui-upgrade
   - gl-sdk4-ui-vlan
   - gl-sdk4-ui-vpndashboard
@@ -102,7 +100,6 @@ packages:
   - gl-sdk4-ui-wgclient
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
-  - gl-sdk4-nas-web
   - gl-sdk4-keepcfg
 
 diffconfig: |
