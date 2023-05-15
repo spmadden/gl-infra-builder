@@ -136,8 +136,8 @@ diffconfig: |
   CONFIG_LUA_ECO_OPENSSL=y
 
   CONFIG_PACKAGE_kmod-ath10k=m
-  CONFIG_PACKAGE_kmod-ath10k-ct=n
-  CONFIG_PACKAGE_kmod-ath10k-ct-smallbuffers=y
-  CONFIG_PACKAGE_ath10k-firmware-qca9887=m
-  CONFIG_PACKAGE_ath10k-firmware-qca9887-ct=y
-  CONFIG_ATH10K_THERMAL=y
+  CONFIG_PACKAGE_kmod-ath10k-ct=m
+  CONFIG_PACKAGE_kmod-ath10k-smallbuffers=y
+  CONFIG_PACKAGE_ath10k-firmware-qca9887=y
+  CONFIG_PACKAGE_ath10k-firmware-qca9887-ct=m
+  CONFIG_ATH10K_THERMAL=n
