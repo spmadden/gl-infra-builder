@@ -13,6 +13,7 @@ packages:
   - gl-sdk4-firewall
   - gl-sdk4-clients 
   - gl-sdk4-lan 
+  - gl-sdk4-2b
   - gl-sdk4-system 
   - gl-sdk4-carrier-monitor  
   - gl-sdk4-wg-server

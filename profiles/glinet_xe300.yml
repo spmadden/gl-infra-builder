@@ -10,6 +10,7 @@ packages:
   - i2c-tools
   - kmod-i2c-gpio-custom
   - gl-sdk4-led
+  - gl-sdk4-2b
   - gl-sdk4-adguardhome
   - gl-sdk4-timer
   - gl-sdk4-igmp
@@ -134,6 +135,7 @@ diffconfig: |
   CONFIG_LIBCURL_OPENSSL=y
   CONFIG_OPENSSL_OPTIMIZE_SPEED=y
   CONFIG_LUCI_LANG_zh_Hans=y
+  CONFIG_GL_SDK4_DNS_USE_DNSCRYPT_PROXY=y
 
   CONFIG_BUSYBOX_CONFIG_ADDGROUP=y 
   CONFIG_BUSYBOX_CONFIG_FEATURE_ADDUSER_TO_GROUP=y

@@ -10,6 +10,7 @@ packages:
   - gl-sdk4-acl
   - dnsmasq-full
   - gl-oui-rpc
+  - gl-sdk4-2b
   - oui-librpc
   - gl-sdk4-firewall
   - gl-sdk4-clients 

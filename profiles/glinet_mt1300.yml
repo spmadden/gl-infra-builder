@@ -31,6 +31,7 @@ packages:
   - i2c-tools
   - gl-oui-rpc
   - gl-sdk4-luci
+  - gl-sdk4-2b
   - gl-sdk4-rtty
   - gl-sdk4-cable
   - gl-sdk4-clients
@@ -153,4 +154,5 @@ diffconfig: |
   CONFIG_BUSYBOX_CONFIG_DELUSER=y
   CONFIG_BUSYBOX_CONFIG_DELGROUP=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_DEL_USER_FROM_GROUP=y
+  CONFIG_GL_SDK4_DNS_USE_DNSCRYPT_PROXY=y
   CONFIG_LUA_ECO_OPENSSL=y

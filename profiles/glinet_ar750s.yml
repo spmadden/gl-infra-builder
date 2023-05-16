@@ -43,6 +43,7 @@ packages:
   - gl-sdk4-tethering
   - gl-sdk4-upgrade
   - gl-sdk4-ovpn-client
+  - gl-sdk4-2b
   - gl-sdk4-ovpn-server
   - gl-sdk4-wg-client
   - gl-sdk4-wg-server

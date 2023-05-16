@@ -35,6 +35,7 @@ packages:
   - wireguard
   - gl-oui-rpc
   - gl-sdk4-luci
+  - gl-sdk4-2b
   - gl-sdk4-rtty
   - gl-sdk4-cable
   - gl-sdk4-clients
