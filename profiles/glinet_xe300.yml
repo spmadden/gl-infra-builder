@@ -11,7 +11,6 @@ packages:
   - kmod-i2c-gpio-custom
   - gl-sdk4-led
   - gl-sdk4-2b
-  - gl-sdk4-adguardhome
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - kmod-usb-storage
@@ -59,7 +58,6 @@ packages:
   - gl-sdk4-nl80211-event
   - gl-sdk4-sms-forward
 
-  - gl-sdk4-ui-adguardhome
   - gl-sdk4-ui-adminpw
   - gl-sdk4-ui-advanced
   - gl-sdk4-ui-bridge
