@@ -1,15 +1,15 @@
-From 2302fdf696aa6a451423a9ad076471462735cf24 Mon Sep 17 00:00:00 2001
+From 392975cee1dba2fc33edcb7ac9ff3ccd067fb7e8 Mon Sep 17 00:00:00 2001
 From: Yin Ni <yin.ni@gl-inet.com>
 Date: Wed, 15 Mar 2023 07:55:22 -0700
 Subject: [PATCH] e750: support E750 target
 
 Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
 ---
- .../ath79/dts/qca9531_glinet_gl-e750.dts      | 22 +++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ .../ath79/dts/qca9531_glinet_gl-e750.dts      | 40 +++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
-index ca0784e6bf..66b36a90e3 100644
+index ca0784e6bf..a653d781a6 100644
 --- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
 +++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
 @@ -13,6 +13,28 @@
@@ -41,6 +41,31 @@ index ca0784e6bf..66b36a90e3 100644
  	keys {
  		compatible = "gpio-keys";
  
+@@ -40,6 +62,24 @@
+ 			gpio-export,output = <1>;
+ 			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
+ 		};
++
++		gpio13 {
++			gpio-export,name = "gpio13";
++			gpio-export,output = <1>;
++			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
++		};
++
++		gpio14 {
++			gpio-export,name = "gpio14";
++			gpio-export,output = <1>;
++			gpios = <&gpio 14 GPIO_ACTIVE_LOW>;
++		};
++
++		gpio17 {
++			gpio-export,name = "gpio17";
++			gpio-export,output = <1>;
++			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
++		};
+ 	 };
+ };
+ 
 -- 
-2.25.1
+2.17.1
 
