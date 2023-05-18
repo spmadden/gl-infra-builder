@@ -13,7 +13,7 @@ new file mode 100755
 index 0000000000..5cbba7f7ba
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
-@@ -0,0 +1,311 @@
+@@ -0,0 +1,312 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -52,6 +52,7 @@ index 0000000000..5cbba7f7ba
 +		mcu = "/dev/ttyS1,9600";
 +		cfg-partition = "/dev/mmcblk0p5";
 +		dfs;
++		sim = "dual";
 +		factory_data {
 +			device_mac = "/dev/mmcblk0p3", "0x0a";
 +			device_ddns = "/dev/mmcblk0p3", "0x10";
