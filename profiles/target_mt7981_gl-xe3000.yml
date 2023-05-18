@@ -7,13 +7,13 @@ description: Build image for the GL.iNET XE3000
 feeds:
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 7b116110f7b9dacdbdc3dcb9ac5b44c7c40a78be
+    revision: 8c1b4a9c3d13b640126d366f0a2b9f534af4cdc0
   - name: gl_feed_21_02
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 68dc5722d4dd9a2f8388998343590be0a8a20b99
   - name: gl_feed_mtk
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 870323b82e5f802096ed53fcb78cacecebd4b980
+    revision: 1629222c11f26bd3fd58da2a0ce827399ddcf53b
 
 packages:
   - ethtool
@@ -25,7 +25,6 @@ packages:
   - gdisk
   - wireless-tools
   - luci-app-mtkwifi
-  - gl-sdk4-mtk-wifi-v2
   - kmod-conninfra-mt7981-ko
   - kmod-mt-wifi-mt7981-ko
   - kmod-warp-mt7981-ko
