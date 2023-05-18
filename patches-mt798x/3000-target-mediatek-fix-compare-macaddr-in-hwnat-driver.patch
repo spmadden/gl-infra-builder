@@ -1,0 +1,28 @@
+From cbfde88afc04efa95e20802919e30260c457d560 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 28 Feb 2023 15:41:08 +0800
+Subject: [PATCH] target/mediatek: fix compare macaddr in hwnat driver
+
+Use ether_addr_equal to compare macaddr instead of strncmp
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c       | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
+index 1041579f16..8b48dbba29 100644
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_hnat/hnat_nf_hook.c
+@@ -298,7 +298,7 @@ void foe_clear_entry(struct neighbour *neigh)
+ 				*((u32 *)h_dest) = swab32(entry->ipv4_hnapt.dmac_hi);
+ 				*((u16 *)&h_dest[4]) =
+ 					swab16(entry->ipv4_hnapt.dmac_lo);
+-				if (strncmp(h_dest, neigh->ha, ETH_ALEN) != 0) {
++				if (!ether_addr_equal(h_dest, neigh->ha)) {
+ 					pr_info("%s: state=%d\n", __func__,
+ 						neigh->nud_state);
+ 					cr_set_field(hnat_priv->ppe_base[i] + PPE_TB_CFG,
+-- 
+2.34.1
+

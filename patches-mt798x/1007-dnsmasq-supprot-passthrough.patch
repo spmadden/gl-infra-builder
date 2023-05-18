@@ -1,0 +1,81 @@
+From 89f43c62bfe56dd1c82508c54af5498a560f68c4 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Po.Yang" <po.yang@gl-inet.com>
+Date: Sat, 4 Feb 2023 10:05:06 +0800
+Subject: [PATCH] dnsmasq supprot passthrough
+
+---
+ .../patches/301-passthrough-dhcp.patch        | 62 +++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+ create mode 100644 package/network/services/dnsmasq/patches/301-passthrough-dhcp.patch
+
+diff --git a/package/network/services/dnsmasq/patches/301-passthrough-dhcp.patch b/package/network/services/dnsmasq/patches/301-passthrough-dhcp.patch
+new file mode 100644
+index 0000000000..ab8ccc27f4
+--- /dev/null
++++ b/package/network/services/dnsmasq/patches/301-passthrough-dhcp.patch
+@@ -0,0 +1,62 @@
++diff -Nur dnsmasq-origin/src/dnsmasq.h dnsmasq/src/dnsmasq.h
++--- dnsmasq-origin/src/dnsmasq.h	2023-01-30 17:49:13.377459744 +0800
+++++ dnsmasq/src/dnsmasq.h	2023-01-30 17:56:57.036363102 +0800
++@@ -1183,6 +1183,7 @@
++   /* file for packet dumps. */
++   int dumpfd;
++ #endif
+++  char *mode;
++ } *daemon;
++ 
++ /* cache.c */
++diff -Nur dnsmasq-origin/src/lease.c dnsmasq/src/lease.c
++--- dnsmasq-origin/src/lease.c	2023-01-30 17:49:13.369460136 +0800
+++++ dnsmasq/src/lease.c	2023-01-30 17:56:57.032363215 +0800
++@@ -619,6 +619,10 @@
++ {
++   struct dhcp_lease *lease;
++ 
+++  if((NULL != daemon->mode) && (0 == strcmp(daemon->mode,"passthrough"))){
+++    return NULL;
+++  }
+++
++   for (lease = leases; lease; lease = lease->next)
++     {
++ #ifdef HAVE_DHCP6
++diff -Nur dnsmasq-origin/src/option.c dnsmasq/src/option.c
++--- dnsmasq-origin/src/option.c	2023-01-30 17:49:13.361460527 +0800
+++++ dnsmasq/src/option.c	2023-01-30 17:56:57.032363215 +0800
++@@ -170,6 +170,7 @@
++ #define LOPT_PXE_VENDOR    361
++ #define LOPT_DYNHOST       362
++ #define LOPT_LOG_DEBUG     363
+++#define LOPT_DHCP_MODE     364
++  
++ #ifdef HAVE_GETOPT_LONG
++ static const struct option opts[] =  
++@@ -345,6 +346,7 @@
++     { "dhcp-ignore-clid", 0, 0,  LOPT_IGNORE_CLID },
++     { "dynamic-host", 1, 0, LOPT_DYNHOST },
++     { "log-debug", 0, 0, LOPT_LOG_DEBUG },
+++    { "dhcp-mode", 1, 0, LOPT_DHCP_MODE },
++     { NULL, 0, 0, 0 }
++   };
++ 
++@@ -527,6 +529,7 @@
++   { LOPT_DUMPFILE, ARG_ONE, "<path>", gettext_noop("Path to debug packet dump file"), NULL },
++   { LOPT_DUMPMASK, ARG_ONE, "<hex>", gettext_noop("Mask which packets to dump"), NULL },
++   { LOPT_SCRIPT_TIME, OPT_LEASE_RENEW, NULL, gettext_noop("Call dhcp-script when lease expiry changes."), NULL },
+++  { LOPT_DHCP_MODE, ARG_ONE, "<mode>", gettext_noop("Router or passthrough"), NULL },
++   { 0, 0, NULL, NULL, NULL }
++ }; 
++ 
++@@ -1999,6 +2002,9 @@
++       daemon->dump_mask = strtol(arg, NULL, 0);
++       break;
++       
+++    case LOPT_DHCP_MODE:  /* --dhcp-mode */
+++      daemon->mode = opt_string_alloc(arg);
+++      break;
++ #ifdef HAVE_DHCP      
++     case 'l':  /* --dhcp-leasefile */
++       daemon->lease_file = opt_string_alloc(arg);
+-- 
+2.17.1
+

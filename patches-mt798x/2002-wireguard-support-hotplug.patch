@@ -1,0 +1,239 @@
+From e088178286775d64db5d297e233d4753c44dc6fb Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 7 Jul 2022 15:18:12 +0800
+Subject: [PATCH] wireguard: support hotplug for gl
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Signed-off-by: Dongming Han <handongming@gl-inet.com>
+---
+ .../950-wireguard-support-hotplug.patch       | 156 ++++++++++++++++++
+ ...d-server-not-do-handshake-initiation.patch |  21 +++
+ ...MEOUT-hotplug-after-3-consecutive-fa.patch |  25 +++
+ 3 files changed, 202 insertions(+)
+ create mode 100644 target/linux/generic/hack-5.4/950-wireguard-support-hotplug.patch
+ create mode 100644 target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch
+ create mode 100644 target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
+
+diff --git a/target/linux/generic/hack-5.4/950-wireguard-support-hotplug.patch b/target/linux/generic/hack-5.4/950-wireguard-support-hotplug.patch
+new file mode 100644
+index 0000000000..cadd51e9c8
+--- /dev/null
++++ b/target/linux/generic/hack-5.4/950-wireguard-support-hotplug.patch
+@@ -0,0 +1,156 @@
++--- a/drivers/net/wireguard/Makefile
+++++ b/drivers/net/wireguard/Makefile
++@@ -14,4 +14,5 @@ wireguard-y += allowedips.o
++ wireguard-y += ratelimiter.o
++ wireguard-y += cookie.o
++ wireguard-y += netlink.o
+++wireguard-y += hotplug.o
++ obj-$(CONFIG_WIREGUARD) := wireguard.o
++--- /dev/null
+++++ b/drivers/net/wireguard/hotplug.c
++@@ -0,0 +1,82 @@
+++#include <linux/workqueue.h>
+++#include <linux/netlink.h>
+++#include <linux/kobject.h>
+++#include <linux/skbuff.h>
+++#include <linux/if.h>
+++
+++#define SUBSYSTEM_NAME	"wireguard"
+++
+++#define EVENT_BUF_SIZE	2048
+++
+++struct wg_event {
+++	struct work_struct work;
+++	char ifname[IFNAMSIZ];
+++	const char *action;
+++};
+++
+++
+++/* -------------------------------------------------------------------------*/
+++static int bh_event_add_var(struct sk_buff *skb, int argv,
+++							const char *format, ...)
+++{
+++	static char buf[128];
+++	char *s;
+++	va_list args;
+++	int len;
+++
+++	if (argv)
+++		return 0;
+++
+++	va_start(args, format);
+++	len = vsnprintf(buf, sizeof(buf), format, args);
+++	va_end(args);
+++
+++	if (len >= sizeof(buf)) {
+++		//WARN(1, "buffer size too small\n");
+++		return -ENOMEM;
+++	}
+++
+++	s = skb_put(skb, len + 1);
+++	strcpy(s, buf);
+++
+++	return 0;
+++}
+++
+++static void hotplug_work(struct work_struct *work)
+++{
+++	struct wg_event *event = container_of(work, struct wg_event, work);
+++	struct sk_buff *skb;
+++
+++	skb = alloc_skb(EVENT_BUF_SIZE, GFP_KERNEL);
+++	if (!skb)
+++		goto out_free_event;
+++
+++	bh_event_add_var(skb, 0, "SUBSYSTEM=%s", SUBSYSTEM_NAME);
+++	bh_event_add_var(skb, 0, "ACTION=%s", event->action);
+++	bh_event_add_var(skb, 0, "ifname=%s", event->ifname);
+++
+++	NETLINK_CB(skb).dst_group = 1;
+++	broadcast_uevent(skb, 0, 1, GFP_KERNEL);
+++
+++out_free_event:
+++	kfree(event);
+++}
+++
+++void wireguard_hotplug(const char *ifname, const char *action)
+++{
+++	struct wg_event *event;
+++
+++	if (!strcmp(ifname, "wgserver"))
+++		return;
+++
+++	event = kzalloc(sizeof(struct wg_event), GFP_ATOMIC);
+++	if (!event)
+++		return;
+++
+++	memcpy(event->ifname, ifname, IFNAMSIZ);
+++
+++	event->action = action;
+++
+++	INIT_WORK(&event->work, hotplug_work);
+++	schedule_work(&event->work);
+++}
++--- /dev/null
+++++ b/drivers/net/wireguard/hotplug.h
++@@ -0,0 +1,13 @@
+++#ifndef __HOTPLUG_H__
+++#define __HOTPLUG_H__
+++
+++#define  REKEY_GIVEUP_EVENT "REKEY-GIVEUP"
+++#define  REKEY_TIMEOUT_EVENT "REKEY-TIMEOUT"
+++#define  KEYPAIR_CREATED_EVENT "KEYPAIR-CREATED"
+++
+++extern void wireguard_hotplug(const char *ifname, const char *action);
+++extern void wg_hotplug_init(void);
+++extern void wg_hotplug_free(void);
+++
+++#endif
+++
++--- a/drivers/net/wireguard/noise.c
+++++ b/drivers/net/wireguard/noise.c
++@@ -9,6 +9,7 @@
++ #include "messages.h"
++ #include "queueing.h"
++ #include "peerlookup.h"
+++#include "hotplug.h"
++ 
++ #include <linux/rcupdate.h>
++ #include <linux/slab.h>
++@@ -850,6 +851,8 @@ bool wg_noise_handshake_begin_session(st
++ 		ret = wg_index_hashtable_replace(
++ 			handshake->entry.peer->device->index_hashtable,
++ 			&handshake->entry, &new_keypair->entry);
+++
+++		wireguard_hotplug(handshake->entry.peer->device->dev->name, KEYPAIR_CREATED_EVENT);
++ 	} else {
++ 		kzfree(new_keypair);
++ 	}
++--- a/drivers/net/wireguard/timers.c
+++++ b/drivers/net/wireguard/timers.c
++@@ -8,6 +8,7 @@
++ #include "peer.h"
++ #include "queueing.h"
++ #include "socket.h"
+++#include "hotplug.h"
++ 
++ /*
++  * - Timer for retransmitting the handshake if we don't hear back after
++@@ -60,6 +61,8 @@ static void wg_expired_retransmit_handsh
++ 		if (!timer_pending(&peer->timer_zero_key_material))
++ 			mod_peer_timer(peer, &peer->timer_zero_key_material,
++ 				       jiffies + REJECT_AFTER_TIME * 3 * HZ);
+++
+++		wireguard_hotplug(peer->device->dev->name, REKEY_GIVEUP_EVENT);
++ 	} else {
++ 		++peer->timer_handshake_attempts;
++ 		pr_debug("%s: Handshake for peer %llu (%pISpfsc) did not complete after %d seconds, retrying (try %d)\n",
++@@ -73,6 +76,8 @@ static void wg_expired_retransmit_handsh
++ 		wg_socket_clear_peer_endpoint_src(peer);
++ 
++ 		wg_packet_send_queued_handshake_initiation(peer, true);
+++
+++		wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
++ 	}
++ }
++ 
+diff --git a/target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch b/target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch
+new file mode 100644
+index 0000000000..a3db60aada
+--- /dev/null
++++ b/target/linux/generic/hack-5.4/951-make-wireguard-server-not-do-handshake-initiation.patch
+@@ -0,0 +1,21 @@
++From 8bfdfc1e0546835e25ae011053ae4e52583d8220 Mon Sep 17 00:00:00 2001
++From: Dongming Han <handongming@gl-inet.com>
++Date: Wed, 1 Feb 2023 19:14:16 +0800
++Subject: [PATCH] make wireguard server not do handshake initiation
++
++---
++ drivers/net/wireguard/send.c | 3 +++
++ 1 file changed, 3 insertions(+)
++
++--- a/drivers/net/wireguard/send.c
+++++ b/drivers/net/wireguard/send.c
++@@ -22,6 +22,9 @@ static void wg_packet_send_handshake_ini
++ {
++ 	struct message_handshake_initiation packet;
++ 
+++	if (!strncmp(peer->device->dev->name, "wgs", 3))
+++		return;
+++
++ 	if (!wg_birthdate_has_expired(atomic64_read(&peer->last_sent_handshake),
++ 				      REKEY_TIMEOUT))
++ 		return; /* This function is rate limited. */
+diff --git a/target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch b/target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
+new file mode 100644
+index 0000000000..49a1301111
+--- /dev/null
++++ b/target/linux/generic/hack-5.4/951-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
+@@ -0,0 +1,25 @@
++From 82d7f8de2a1b640b5545976e495b16911a105fa2 Mon Sep 17 00:00:00 2001
++From: Dongming Han <handongming@gl-inet.com>
++Date: Wed, 1 Feb 2023 19:11:20 +0800
++Subject: [PATCH] trigger REKEY_TIMEOUT hotplug after 3 consecutive failure of
++ handshake initiation
++
++detect disconnect time change from 0 ~ 2min to 15s ~ 2min15s
++Optimize the stability in packet loss environment
++---
++ drivers/net/wireguard/timers.c | 4 ++--
++ 1 file changed, 2 insertions(+), 2 deletions(-)
++
++--- a/drivers/net/wireguard/timers.c
+++++ b/drivers/net/wireguard/timers.c
++@@ -76,8 +76,8 @@ static void wg_expired_retransmit_handsh
++ 		wg_socket_clear_peer_endpoint_src(peer);
++ 
++ 		wg_packet_send_queued_handshake_initiation(peer, true);
++-
++-		wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
+++		if(peer->timer_handshake_attempts > 3)
+++			wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
++ 	}
++ }
++ 
+-- 
+2.34.1
+
