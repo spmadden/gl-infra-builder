@@ -1,0 +1,50 @@
+From f0c18ddf8edfa8c38a2cc06cd3219fb9f6286084 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 13 Jul 2022 10:50:26 +0800
+Subject: [PATCH] packages: support append glinet private packages
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ include/glinet.mk | 7 +++++++
+ package/Makefile  | 4 +++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+ create mode 100644 include/glinet.mk
+
+diff --git a/include/glinet.mk b/include/glinet.mk
+new file mode 100644
+index 0000000000..7501d73cfc
+--- /dev/null
++++ b/include/glinet.mk
+@@ -0,0 +1,7 @@
++GL_APPEND_IPKS :=
++ifneq ($(GL_PKGDIR),)
++  include $(GL_PKGDIR)/gl_pkg_config.mk
++  PACKAGE_SUBDIRS += $(GL_PKGDIR)
++  GL_APPEND_IPKS := $(foreach p,$(GL_INSTALL_IPKS),\
++	$(foreach pkg,$(shell ls $(GL_PKGDIR)/$(p)_*.ipk),$(pkg)$(call GetABISuffix,$(pkg))))
++endif
+diff --git a/package/Makefile b/package/Makefile
+index 209be34674..3b7d7ea892 100644
+--- a/package/Makefile
++++ b/package/Makefile
+@@ -9,6 +9,7 @@ curdir:=package
+ 
+ include $(INCLUDE_DIR)/feeds.mk
+ include $(INCLUDE_DIR)/rootfs.mk
++include $(INCLUDE_DIR)/glinet.mk
+ 
+ -include $(TMP_DIR)/.packagedeps
+ package-y += kernel/linux
+@@ -69,7 +70,8 @@ $(curdir)/install: $(TMP_DIR)/.build $(curdir)/merge $(if $(CONFIG_TARGET_PER_DE
+ 	$(file >$(TMP_DIR)/opkg_install_list,\
+ 	  $(call opkg_package_files,\
+ 	    $(foreach pkg,$(shell cat $(PACKAGE_INSTALL_FILES) 2>/dev/null),$(pkg)$(call GetABISuffix,$(pkg)))))
+-	$(call opkg,$(TARGET_DIR)) install $$(cat $(TMP_DIR)/opkg_install_list)
++	$(call opkg,$(TARGET_DIR)) install $$(cat $(TMP_DIR)/opkg_install_list) \
++		$(GL_APPEND_IPKS)
+ 	@for file in $(PACKAGE_INSTALL_FILES); do \
+ 		[ -s $$file.flags ] || continue; \
+ 		for flag in `cat $$file.flags`; do \
+-- 
+2.25.1
+

@@ -1,0 +1,27 @@
+From 0ac3cc97752b56509bb5e08fdf4807f0eca3110b Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 17 May 2023 11:38:59 +0800
+Subject: [PATCH 1/9] feeds: lock hash from mtk-sdk-v7.6.7.0
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ feeds.conf.default | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/feeds.conf.default b/feeds.conf.default
+index f1827a3661..928317fae5 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,5 +1,4 @@
+-src-git-full packages https://git.openwrt.org/feed/packages.git;openwrt-21.02
+-src-git-full luci https://git.openwrt.org/project/luci.git;openwrt-21.02
+-src-git-full routing https://git.openwrt.org/feed/routing.git;openwrt-21.02
+-src-git-full telephony https://git.openwrt.org/feed/telephony.git;openwrt-21.02
+-#src-link custom /usr/src/openwrt/custom-feed
++src-git mtk_openwrt_feed https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds^91c043c
++src-git packages https://git.openwrt.org/feed/packages.git^c10f3e3
++src-git luci https://git.openwrt.org/project/luci.git^0ecaf74
++src-git routing https://git.openwrt.org/feed/routing.git^4e2bdb4
+-- 
+2.34.1
+

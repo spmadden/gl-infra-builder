@@ -1,0 +1,33 @@
+From f3a50d2b1d965abdd403c60c01fd5a89d188e37d Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 13 Jul 2022 10:56:49 +0800
+Subject: [PATCH] package/dnsmasq: remove limit hostname
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../dnsmasq/patches/300-remove-limit-hostname.patch | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
+
+diff --git a/package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch b/package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
+new file mode 100644
+index 0000000000..cf0086a19f
+--- /dev/null
++++ b/package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
+@@ -0,0 +1,13 @@
++Index: dnsmasq-2.85/src/rfc2131.c
++===================================================================
++--- dnsmasq-2.85.orig/src/rfc2131.c
+++++ dnsmasq-2.85/src/rfc2131.c
++@@ -724,7 +724,7 @@ size_t dhcp_reply(struct dhcp_context *c
++ 	borken_opt = 1;
++       else
++ 	daemon->dhcp_buff[len] = 0;
++-      if (legal_hostname(daemon->dhcp_buff))
+++    //  if (legal_hostname(daemon->dhcp_buff))
++ 	client_hostname = daemon->dhcp_buff;
++     }
++ 
+-- 
+2.25.1
+

@@ -1,0 +1,25 @@
+From b233038896c42288189b22525002350b29630c81 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 22 Jun 2022 18:30:11 +0800
+Subject: [PATCH] gpio-button-hotplug: add name 'switch'
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+index fcaf7f59de..d3657a3da9 100644
+--- a/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
++++ b/package/kernel/gpio-button-hotplug/src/gpio-button-hotplug.c
+@@ -100,6 +100,7 @@ static struct bh_map button_map[] = {
+ 	BH_MAP(KEY_WIMAX,		"wwan"),
+ 	BH_MAP(KEY_WLAN,		"wlan"),
+ 	BH_MAP(KEY_WPS_BUTTON,		"wps"),
++	BH_MAP(KEY_SETUP,		"switch"),
+ };
+ 
+ /* -------------------------------------------------------------------------*/
+-- 
+2.25.1
+

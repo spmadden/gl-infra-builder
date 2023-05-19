@@ -1,0 +1,60 @@
+From ceb0aacfff2e39e837aa737f804e13312fe6c9af Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Fri, 10 Feb 2023 09:44:32 +0800
+Subject: [PATCH] odhcpd add hotplug
+
+---
+ .../patches/00-add-hotplug-for-relay.patch    | 41 +++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+ create mode 100644 package/network/services/odhcpd/patches/00-add-hotplug-for-relay.patch
+
+diff --git a/package/network/services/odhcpd/patches/00-add-hotplug-for-relay.patch b/package/network/services/odhcpd/patches/00-add-hotplug-for-relay.patch
+new file mode 100644
+index 0000000000..68e5c6bbd7
+--- /dev/null
++++ b/package/network/services/odhcpd/patches/00-add-hotplug-for-relay.patch
+@@ -0,0 +1,41 @@
++Index: src/ndp.c
++===================================================================
++--- a/src/ndp.c
+++++ b/src/ndp.c
++@@ -322,6 +322,21 @@ static void send_na(struct in6_addr *to_
++ 	odhcpd_send(iface->ndp_ping_fd, &dest, &iov, 1, iface);
++ }
++ 
+++static void call_hotplug(const char *ifname, const char *ip, const char *master_ifname)
+++{
+++    pid_t pid = fork();
+++    if (pid < 0) {
+++        perror("fork");
+++        return;
+++    } else if (pid == 0) {
+++        setenv("ADDR", ip, 1);
+++        setenv("INTERFACE", ifname, 1);
+++        setenv("MASTER", master_ifname, 1);
+++        execl("/sbin/hotplug-call", "hotplug-call", "dhcpv6", (char *)NULL);
+++    }
+++    return;
+++}
+++
++ /* Handle solicitations */
++ static void handle_solicit(void *addr, void *data, size_t len,
++ 		struct interface *iface, _unused void *dest)
++@@ -359,8 +374,12 @@ static void handle_solicit(void *addr, v
++ 
++ 	avl_for_each_element(&interfaces, c, avl) {
++ 		if (iface != c && c->ndp == MODE_RELAY &&
++-				(ns_is_dad || !c->external))
++-			ping6(&req->nd_ns_target, c);
+++				(ns_is_dad || !c->external)) {
+++				ping6(&req->nd_ns_target, c);
+++				if (iface->ra == MODE_RELAY && !strcmp(iface->name, "lan")) {
+++					call_hotplug(iface->name, ipbuf, c->name);
+++				}
+++			}
++ 	}
++ 
++ 	/* Catch global-addressed NS and answer them manually.
+-- 
+2.34.1
+

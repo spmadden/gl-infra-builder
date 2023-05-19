@@ -1,0 +1,349 @@
+From 4d6aaa3f65eee6b55964f7917e2b8f062e09f2ed Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 9 May 2023 18:05:36 +0800
+Subject: [PATCH] support MT6000 target
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../boot/dts/mediatek/mt7986a-gl-mt6000.dts   | 290 ++++++++++++++++++
+ target/linux/mediatek/image/mt7986.mk         |  17 +
+ target/linux/mediatek/mt7986/config-5.4       |   1 +
+ 3 files changed, 308 insertions(+)
+ create mode 100644 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7986a-gl-mt6000.dts
+
+diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7986a-gl-mt6000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7986a-gl-mt6000.dts
+new file mode 100644
+index 0000000000..3513f4f125
+--- /dev/null
++++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7986a-gl-mt6000.dts
+@@ -0,0 +1,290 @@
++/dts-v1/;
++#include "mt7986a.dtsi"
++#include "mt7986a-pinctrl.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	model = "GL.iNet GL-MT6000";
++	compatible = "glinet,mt6000-snand", "mediatek,mt7986a";
++
++	chosen {
++		bootargs = "console=ttyS0,115200n1 loglevel=8  \
++				earlycon=uart8250,mmio32,0x11002000";
++	};
++
++	gl-hw {
++		compatible = "gl-hw-info";
++		model = "mt6000";
++		wan = "eth0";
++		lan = "eth1";
++		usb-port = "1-1,2-1";
++		flash_size = <256>;
++		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
++		switch-button = "gpio-455";
++		reset-button = "gpio-456";
++		radio = "mt798611 mt798612";
++		//cfg-partition = "/dev/mtd7";
++		dfs;
++		factory_data {
++			device_mac = "Factory", "0x0a";
++			device_ddns = "Factory", "0x10";
++			device_sn_bak = "Factory", "0x20";
++			device_sn = "Factory", "0x30";
++			country_code = "Factory", "0x88";
++			device_cert = "Factory", "0x1000";
++		};
++	};
++
++	nmbm_spim_nand {
++		compatible = "generic,nmbm";
++
++		#address-cells = <1>;
++		#size-cells = <1>;
++
++		lower-mtd-device = <&spi_nand>;
++		forced-create;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "BL2";
++				reg = <0x00000 0x0100000>;
++				read-only;
++			};
++
++			partition@100000 {
++				label = "u-boot-env";
++				reg = <0x0100000 0x0060000>;
++			};
++
++			factory: partition@160000 {
++				label = "Factory";
++				reg = <0x160000 0x0060000>;
++			};
++
++			partition@1c0000 {
++				label = "reserved";
++				reg = <0x1c0000 0x01c0000>;
++			};
++
++			partition@380000 {
++				label = "FIP";
++				reg = <0x380000 0x0200000>;
++			};
++
++			partition@580000 {
++				label = "ubi";
++				reg = <0x580000 0x7800000>;
++			};
++		};
++	};
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&watchdog {
++	status = "okay";
++};
++
++&eth {
++	status = "okay";
++
++	gmac0: mac@0 {
++		compatible = "mediatek,eth-mac";
++		reg = <0>;
++		phy-mode = "2500base-x";
++
++		fixed-link {
++			speed = <2500>;
++			full-duplex;
++			pause;
++		};
++	};
++
++	gmac1: mac@1 {
++		compatible = "mediatek,eth-mac";
++		reg = <1>;
++		phy-mode = "2500base-x";
++		phy-handle = <&phy7>;
++	};
++
++	mdio: mdio-bus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		phy5: phy@5 {
++			compatible = "ethernet-phy-ieee802.3-c45";
++			reg = <5>;
++			reset-assert-us = <100000>;
++			reset-deassert-us = <100000>;
++			reset-gpios = <&pio 13 GPIO_ACTIVE_LOW>;
++			realtek,aldps-enable;
++		};
++
++		phy7: phy@7 {
++			compatible = "ethernet-phy-ieee802.3-c45";
++			reg = <7>;
++			reset-assert-us = <100000>;
++			reset-deassert-us = <100000>;
++			reset-gpios = <&pio 17 GPIO_ACTIVE_LOW>;
++			realtek,aldps-enable;
++		};
++
++		switch@0 {
++			compatible = "mediatek,mt7531";
++			reg = <31>;
++			reset-gpios = <&pio 5 0>;
++
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					reg = <0>;
++					label = "lan0";
++				};
++
++				port@1 {
++					reg = <1>;
++					label = "lan1";
++				};
++
++				port@2 {
++					reg = <2>;
++					label = "lan2";
++				};
++
++				port@3 {
++					reg = <3>;
++					label = "lan3";
++				};
++
++				port@4 {
++					reg = <4>;
++					label = "lan4";
++				};
++
++				port@5 {
++					reg = <5>;
++					label = "lan5";
++					phy-mode = "2500base-x";
++					phy-handle = <&phy5>;
++				};
++
++				port@6 {
++					reg = <6>;
++					label = "cpu";
++					ethernet = <&gmac0>;
++					phy-mode = "2500base-x";
++
++					fixed-link {
++						speed = <2500>;
++						full-duplex;
++						pause;
++					};
++				};
++			};
++		};
++	};
++};
++
++&hnat {
++	mtketh-wan = "eth1";
++	mtketh-lan = "lan";
++	mtketh-max-gmac = <2>;
++	status = "okay";
++};
++
++&spi0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi_flash_pins>;
++	cs-gpios = <0>, <0>;
++	status = "okay";
++
++	spi_nor@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <52000000>;
++		spi-tx-buswidth = <4>;
++		spi-rx-buswidth = <4>;
++	};
++
++	spi_nand: spi_nand@1 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "spi-nand";
++		reg = <1>;
++		spi-max-frequency = <52000000>;
++		spi-tx-buswidth = <4>;
++		spi-rx-buswidth = <4>;
++	};
++};
++
++&wbsys {
++	mediatek,mtd-eeprom = <&factory 0x0000>;
++	status = "okay";
++	pinctrl-names = "default", "dbdc";
++	pinctrl-0 = <&wf_2g_5g_pins>;
++	pinctrl-1 = <&wf_dbdc_pins>;
++};
++
++&pio {
++	spi_flash_pins: spi-flash-pins-33-to-38 {
++		mux {
++			function = "flash";
++			groups = "spi0", "spi0_wp_hold";
++		};
++		conf-pu {
++			pins = "SPI2_CS", "SPI2_HOLD", "SPI2_WP";
++			drive-strength = <MTK_DRIVE_8mA>;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
++		};
++		conf-pd {
++			pins = "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
++			drive-strength = <MTK_DRIVE_8mA>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
++		};
++	};
++
++	wf_2g_5g_pins: wf_2g_5g-pins {
++		mux {
++			function = "wifi";
++			groups = "wf_2g", "wf_5g";
++		};
++		conf {
++			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
++			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
++			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
++			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
++			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
++			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
++			       "WF1_TOP_CLK", "WF1_TOP_DATA";
++			drive-strength = <MTK_DRIVE_4mA>;
++		};
++	};
++
++	wf_dbdc_pins: wf_dbdc-pins {
++		mux {
++			function = "wifi";
++			groups = "wf_dbdc";
++		};
++		conf {
++			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
++			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
++			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
++			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
++			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
++			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
++			       "WF1_TOP_CLK", "WF1_TOP_DATA";
++			drive-strength = <MTK_DRIVE_4mA>;
++		};
++	};
++};
+diff --git a/target/linux/mediatek/image/mt7986.mk b/target/linux/mediatek/image/mt7986.mk
+index 0c62ce559a..592e4d6026 100644
+--- a/target/linux/mediatek/image/mt7986.mk
++++ b/target/linux/mediatek/image/mt7986.mk
+@@ -413,3 +413,20 @@ define Device/mediatek_mt7986-fpga-ubi
+   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+ endef
+ TARGET_DEVICES += mediatek_mt7986-fpga-ubi
++
++define Device/glinet_gl-mt6000
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-MT6000
++  DEVICE_DTS := mt7986a-gl-mt6000
++  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
++  SUPPORTED_DEVICES := glinet,mt6000-snand
++  UBINIZE_OPTS := -E 5
++  BLOCKSIZE := 128k
++  PAGESIZE := 2048
++  IMAGE_SIZE := 65536k
++  KERNEL_IN_UBI := 1
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/factory.img := append-ubi | check-size $$$$(IMAGE_SIZE)
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-mt6000
+diff --git a/target/linux/mediatek/mt7986/config-5.4 b/target/linux/mediatek/mt7986/config-5.4
+index 63700ffe00..91c64cd21f 100644
+--- a/target/linux/mediatek/mt7986/config-5.4
++++ b/target/linux/mediatek/mt7986/config-5.4
+@@ -244,6 +244,7 @@ CONFIG_GENERIC_TIME_VSYSCALL=y
+ CONFIG_GLOB=y
+ CONFIG_GPIOLIB=y
+ CONFIG_GPY211_PHY=y
++CONFIG_REALTEK_PHY=y
+ CONFIG_GRO_CELLS=y
+ CONFIG_HANDLE_DOMAIN_IRQ=y
+ CONFIG_HARDEN_BRANCH_PREDICTOR=y
+-- 
+2.34.1
+
