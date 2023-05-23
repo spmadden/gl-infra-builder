@@ -1,24 +1,22 @@
-From 762b65d5b4771b7582834e65a1718aaa933349e2 Mon Sep 17 00:00:00 2001
+From df651072db79d2a92222f71711f5e3664e11af03 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Wed, 22 Mar 2023 09:42:24 +0800
 Subject: [PATCH] mac80211: support bypass cac
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../subsys/786-support-bypass-cac.patch       | 53 +++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ .../subsys/786-support-bypass-cac.patch       | 51 +++++++++++++++++++
+ 1 file changed, 51 insertions(+)
  create mode 100644 package/kernel/mac80211/patches/subsys/786-support-bypass-cac.patch
 
 diff --git a/package/kernel/mac80211/patches/subsys/786-support-bypass-cac.patch b/package/kernel/mac80211/patches/subsys/786-support-bypass-cac.patch
 new file mode 100644
-index 0000000000..8e3850e1f7
+index 0000000000..0364cb343b
 --- /dev/null
 +++ b/package/kernel/mac80211/patches/subsys/786-support-bypass-cac.patch
-@@ -0,0 +1,53 @@
-+Index: backports-5.15.58-1/net/mac80211/debugfs.c
-+===================================================================
-+--- backports-5.15.58-1.orig/net/mac80211/debugfs.c
-++++ backports-5.15.58-1/net/mac80211/debugfs.c
+@@ -0,0 +1,51 @@
++--- a/net/mac80211/debugfs.c
+++++ b/net/mac80211/debugfs.c
 +@@ -653,6 +653,42 @@ static const struct file_operations scan
 + 	.llseek = default_llseek,
 + };

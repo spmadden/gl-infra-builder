@@ -1,4 +1,4 @@
-From 03dd27bf3f788f09c8632b4d8c149b520529a20a Mon Sep 17 00:00:00 2001
+From e78f45843b74920e50eeac231e303c7f8664c0d8 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 8 May 2023 09:09:28 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -6,9 +6,9 @@ Subject: [PATCH] iwinfo: support mtk private wifi driver
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/network/utils/iwinfo/Makefile         |   2 +-
- .../iwinfo/patches/0100-support-mtk.patch     | 112 ++++
+ .../iwinfo/patches/0100-support-mtk.patch     | 102 ++++
  package/network/utils/iwinfo/src/iwinfo_mtk.c | 568 ++++++++++++++++++
- 3 files changed, 681 insertions(+), 1 deletion(-)
+ 3 files changed, 671 insertions(+), 1 deletion(-)
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
 
@@ -27,14 +27,12 @@ index 6263e47fc9..561582994a 100644
  define Build/InstallDev
 diff --git a/package/network/utils/iwinfo/patches/0100-support-mtk.patch b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
 new file mode 100644
-index 0000000000..ce07258bfb
+index 0000000000..52c15c25fe
 --- /dev/null
 +++ b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
-@@ -0,0 +1,112 @@
-+Index: libiwinfo-2022-12-15-8d158096/Makefile
-+===================================================================
-+--- libiwinfo-2022-12-15-8d158096.orig/Makefile
-++++ libiwinfo-2022-12-15-8d158096/Makefile
+@@ -0,0 +1,102 @@
++--- a/Makefile
+++++ b/Makefile
 +@@ -39,6 +39,10 @@ ifneq ($(filter nl80211,$(IWINFO_BACKEND
 + 	IWINFO_LIB_OBJ     += iwinfo_nl80211.o
 + endif
@@ -46,10 +44,8 @@ index 0000000000..ce07258bfb
 + 
 + compile: clean $(IWINFO_LIB) $(IWINFO_LUA) $(IWINFO_CLI)
 + 
-+Index: libiwinfo-2022-12-15-8d158096/include/iwinfo.h
-+===================================================================
-+--- libiwinfo-2022-12-15-8d158096.orig/include/iwinfo.h
-++++ libiwinfo-2022-12-15-8d158096/include/iwinfo.h
++--- a/include/iwinfo.h
+++++ b/include/iwinfo.h
 +@@ -309,6 +309,7 @@ extern const struct iwinfo_ops wext_ops;
 + extern const struct iwinfo_ops madwifi_ops;
 + extern const struct iwinfo_ops nl80211_ops;
@@ -58,10 +54,8 @@ index 0000000000..ce07258bfb
 + 
 + #include "iwinfo/utils.h"
 + 
-+Index: libiwinfo-2022-12-15-8d158096/include/iwinfo/lua.h
-+===================================================================
-+--- libiwinfo-2022-12-15-8d158096.orig/include/iwinfo/lua.h
-++++ libiwinfo-2022-12-15-8d158096/include/iwinfo/lua.h
++--- a/include/iwinfo/lua.h
+++++ b/include/iwinfo/lua.h
 +@@ -41,6 +41,9 @@
 + #define IWINFO_NL80211_META	"iwinfo.nl80211"
 + #endif
@@ -72,10 +66,8 @@ index 0000000000..ce07258bfb
 + 
 + #define LUA_REG(type,op) \
 + 	{ #op, iwinfo_L_##type##_##op }
-+Index: libiwinfo-2022-12-15-8d158096/iwinfo_lib.c
-+===================================================================
-+--- libiwinfo-2022-12-15-8d158096.orig/iwinfo_lib.c
-++++ libiwinfo-2022-12-15-8d158096/iwinfo_lib.c
++--- a/iwinfo_lib.c
+++++ b/iwinfo_lib.c
 +@@ -379,6 +379,9 @@ static const struct iwinfo_ops *backends
 + #ifdef USE_WL
 + 	&wl_ops,
@@ -86,10 +78,8 @@ index 0000000000..ce07258bfb
 + #ifdef USE_WEXT
 + 	&wext_ops,
 + #endif
-+Index: libiwinfo-2022-12-15-8d158096/iwinfo_lua.c
-+===================================================================
-+--- libiwinfo-2022-12-15-8d158096.orig/iwinfo_lua.c
-++++ libiwinfo-2022-12-15-8d158096/iwinfo_lua.c
++--- a/iwinfo_lua.c
+++++ b/iwinfo_lua.c
 +@@ -777,6 +777,16 @@ LUA_WRAP_STRUCT_OP(nl80211,mbssid_suppor
 + LUA_WRAP_STRUCT_OP(nl80211,hardware_id)
 + #endif
@@ -145,7 +135,7 @@ index 0000000000..ce07258bfb
 + 	luaL_register(L, NULL, R_common);
 diff --git a/package/network/utils/iwinfo/src/iwinfo_mtk.c b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 new file mode 100644
-index 0000000000..ef138df24c
+index 0000000000..46375bf065
 --- /dev/null
 +++ b/package/network/utils/iwinfo/src/iwinfo_mtk.c
 @@ -0,0 +1,568 @@

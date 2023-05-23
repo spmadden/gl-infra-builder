@@ -1,24 +1,22 @@
-From 69fb00d30e44f4ebf414b07297829ec2852d78c5 Mon Sep 17 00:00:00 2001
+From c2cfbcd3cf7a4ec3763898dcf36d1e3de0c6bc01 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Thu, 15 Dec 2022 09:55:09 +0800
 Subject: [PATCH] mac80211: indicate scanning state via debugfs
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- ...-indicate-scanning-state-via-debugfs.patch | 37 +++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ ...-indicate-scanning-state-via-debugfs.patch | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
  create mode 100644 package/kernel/mac80211/patches/subsys/785-indicate-scanning-state-via-debugfs.patch
 
 diff --git a/package/kernel/mac80211/patches/subsys/785-indicate-scanning-state-via-debugfs.patch b/package/kernel/mac80211/patches/subsys/785-indicate-scanning-state-via-debugfs.patch
 new file mode 100644
-index 0000000000..536bb3208b
+index 0000000000..6ce1a5d10b
 --- /dev/null
 +++ b/package/kernel/mac80211/patches/subsys/785-indicate-scanning-state-via-debugfs.patch
-@@ -0,0 +1,37 @@
-+Index: backports-5.15.58-1/net/mac80211/debugfs.c
-+===================================================================
-+--- backports-5.15.58-1.orig/net/mac80211/debugfs.c
-++++ backports-5.15.58-1/net/mac80211/debugfs.c
+@@ -0,0 +1,35 @@
++--- a/net/mac80211/debugfs.c
+++++ b/net/mac80211/debugfs.c
 +@@ -634,6 +634,25 @@ DEBUGFS_DEVSTATS_FILE(dot11RTSFailureCou
 + DEBUGFS_DEVSTATS_FILE(dot11FCSErrorCount);
 + DEBUGFS_DEVSTATS_FILE(dot11RTSSuccessCount);

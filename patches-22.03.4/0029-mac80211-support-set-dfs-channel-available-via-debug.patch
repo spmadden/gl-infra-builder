@@ -1,4 +1,4 @@
-From 73d11276efa767df774f021820ad8a4e1b464f56 Mon Sep 17 00:00:00 2001
+From bd9ced66371dbfc7d87d1362f62d7df80199c9d4 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 17 Apr 2023 16:31:59 +0800
 Subject: [PATCH] mac80211: support set dfs channel available via debugfs
@@ -7,21 +7,19 @@ This is used to support dynamically switch to dfs channel.
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../787-support-set-dfs-available.patch       | 87 +++++++++++++++++++
- 1 file changed, 87 insertions(+)
+ .../787-support-set-dfs-available.patch       | 85 +++++++++++++++++++
+ 1 file changed, 85 insertions(+)
  create mode 100644 package/kernel/mac80211/patches/subsys/787-support-set-dfs-available.patch
 
 diff --git a/package/kernel/mac80211/patches/subsys/787-support-set-dfs-available.patch b/package/kernel/mac80211/patches/subsys/787-support-set-dfs-available.patch
 new file mode 100644
-index 0000000000..b172f32a13
+index 0000000000..183e5142c4
 --- /dev/null
 +++ b/package/kernel/mac80211/patches/subsys/787-support-set-dfs-available.patch
-@@ -0,0 +1,87 @@
-+Index: backports-5.15.58-1/net/wireless/debugfs.c
-+===================================================================
-+--- backports-5.15.58-1.orig/net/wireless/debugfs.c
-++++ backports-5.15.58-1/net/wireless/debugfs.c
-+@@ -95,9 +95,76 @@ static const struct file_operations ht40
+@@ -0,0 +1,85 @@
++--- a/net/wireless/debugfs.c
+++++ b/net/wireless/debugfs.c
++@@ -96,9 +96,76 @@ static const struct file_operations ht40
 + 	.llseek = default_llseek,
 + };
 + 
@@ -98,7 +96,7 @@ index 0000000000..b172f32a13
 + void cfg80211_debugfs_rdev_add(struct cfg80211_registered_device *rdev)
 + {
 + 	struct dentry *phyd = rdev->wiphy.debugfsdir;
-+@@ -107,4 +174,5 @@ void cfg80211_debugfs_rdev_add(struct cf
++@@ -108,4 +175,5 @@ void cfg80211_debugfs_rdev_add(struct cf
 + 	DEBUGFS_ADD(short_retry_limit);
 + 	DEBUGFS_ADD(long_retry_limit);
 + 	DEBUGFS_ADD(ht40allow_map);
