@@ -3,10 +3,10 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 7c587c99d72b81056585ff5b9b53cb5019007ee9
+    revision: 480f9672019bccb02c9ff193f69e74146c4bbe05
   - name: glinet_iot
     uri: https://gitlab.com/gl.sdk4.0/gl.iot/gl-iot-sdk-collect.git
-    revision: e8210e0c5618087763d77b2a9364007fb8d0ab83
+    revision: 3e4c58d5593c1d288ca1c5a23731f1317782b8b8
     
 packages:
   - gl-iot-sdk-release
