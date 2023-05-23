@@ -115,6 +115,13 @@ x300b
 | ---------------- | --------------------  | -------------------- |
 | 4.2.0            | v4.2.0_x300b_release3 | no record            |
 
+X3000
+
+| Firmware version | gl-infra-builder tag   | glinet4.x tag   |
+| ---------------- | ---------------------- | --------------- |
+| 4.3.0            | v4.3.0_x3000_release2  | no record       |
+| 4.3.1            | v4.3.1_x3000_release1  | no record       |
+
 # Example compile firmware
 
 ## 1. Compile MT2500(2023.03.17)
@@ -296,7 +303,7 @@ make V=s -j5
 
 ## 7. Compile S200(2023.02.24)
 
-4.1 Compile S200 OpenWrt firmware(No GL.iNet packages)
+7.1 Compile S200 OpenWrt firmware(No GL.iNet packages)
 ```
 git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
 ```
@@ -312,7 +319,7 @@ python3 setup.py -c configs/config-21.02.2.yml && cd openwrt-21.02/openwrt-21.02
 ```
 make V=s -j5
 ```
-4.2 Compile S200 GL.iNet standard firmware
+7.2 Compile S200 GL.iNet standard firmware
 ```
 git clone -b v4.1.3_s200_release7 https://github.com/gl-inet/glinet4.x.git
 ```
@@ -347,6 +354,34 @@ python3 setup.py -c ./configs/config-22.03.2.yml && cd openwrt-22.03/openwrt-22.
 ```
 make V=s -j5
 ```
+## 9. Compile X3000 V4.3.1 firmware(2023.05.23)
+
+9.1 Compile X3000 OpenWrt firmware(No GL.iNet packages)
+```
+git clone https://github.com/gl-inet/gl-infra-builder.git && cd gl-infra-builder
+```
+```
+git checkout v4.3.1_x3000_release1
+```
+```
+python3 setup.py -c configs/config-mt798x-7.6.6.1.yml && cd mt798x
+```
+```
+./scripts/gen_config.py target_mt7981_gl-x3000 luci
+```
+```
+make V=s -j5
+```
+
+9.2 Compile X3000 GL.iNet standard firmware
+```
+git clone https://github.com/gl-inet/glbuilder && cd glbuilder
+make menuconfig
+--Select GL.iNet router model (GL.iNet x3000)
+--Select version for x3000 (x3000 version 4.3.1)
+make V=s
+```
+For more functions, please check https://github.com/gl-inet/glbuilder/blob/main/Readme.md
 
 # How to add own files
 
