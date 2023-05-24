@@ -13,7 +13,6 @@ feeds:
 
 packages:
   - kmod-gl-sdk4-hw-info
-  - kmod-gl-sdk4-tertf
   - wpad-openssl
   - wget-ssl
   - dnsmasq-full
