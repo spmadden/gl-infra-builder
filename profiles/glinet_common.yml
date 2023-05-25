@@ -1,7 +1,7 @@
 ---
 description: Add the glinet dependencies
 feeds:
-  - name: glinet
+  - name: local
     path: ../feeds_dir/glinet
 
 packages:
