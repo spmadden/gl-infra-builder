@@ -1,23 +1,21 @@
-From 79d7f61ede3e4e7d5621999c25715dac1cb57a8a Mon Sep 17 00:00:00 2001
+From c6464a3fb2b74767d54758639f647860c8aea6c6 Mon Sep 17 00:00:00 2001
 From: gl-dengxinfa <xinfa.deng@gl-inet.com>
 Date: Tue, 18 Oct 2022 16:00:38 +0800
 Subject: [PATCH] fix: opkg support db
 
 ---
- .../system/opkg/patches/001-support-db.patch  | 88 +++++++++++++++++++
- 1 file changed, 88 insertions(+)
+ .../system/opkg/patches/001-support-db.patch  | 82 +++++++++++++++++++
+ 1 file changed, 82 insertions(+)
  create mode 100644 package/system/opkg/patches/001-support-db.patch
 
 diff --git a/package/system/opkg/patches/001-support-db.patch b/package/system/opkg/patches/001-support-db.patch
 new file mode 100644
-index 0000000000..a38a272425
+index 0000000000..a7b9118a5d
 --- /dev/null
 +++ b/package/system/opkg/patches/001-support-db.patch
-@@ -0,0 +1,88 @@
-+Index: opkg-2022-02-24-d038e5b6/libopkg/opkg_cmd.c
-+===================================================================
-+--- opkg-2022-02-24-d038e5b6.orig/libopkg/opkg_cmd.c
-++++ opkg-2022-02-24-d038e5b6/libopkg/opkg_cmd.c
+@@ -0,0 +1,82 @@
++--- a/libopkg/opkg_cmd.c
+++++ b/libopkg/opkg_cmd.c
 +@@ -44,6 +44,29 @@
 + int opkg_cli_argc = 0;
 + const char **opkg_cli_argv = NULL;
@@ -76,10 +74,8 @@ index 0000000000..a38a272425
 + 	return err;
 + }
 + 
-+Index: opkg-2022-02-24-d038e5b6/libopkg/opkg_install.c
-+===================================================================
-+--- opkg-2022-02-24-d038e5b6.orig/libopkg/opkg_install.c
-++++ opkg-2022-02-24-d038e5b6/libopkg/opkg_install.c
++--- a/libopkg/opkg_install.c
+++++ b/libopkg/opkg_install.c
 +@@ -1151,7 +1151,7 @@ static int resolve_conffiles(pkg_t * pkg
 + 					char *new_conffile;
 + 					sprintf_alloc(&new_conffile, "%s-opkg",
@@ -89,10 +85,8 @@ index 0000000000..a38a272425
 + 						 "Existing conffile %s "
 + 						 "is different from the conffile in the new package."
 + 						 " The new conffile will be placed at %s.\n",
-+Index: opkg-2022-02-24-d038e5b6/libopkg/pkg.c
-+===================================================================
-+--- opkg-2022-02-24-d038e5b6.orig/libopkg/pkg.c
-++++ opkg-2022-02-24-d038e5b6/libopkg/pkg.c
++--- a/libopkg/pkg.c
+++++ b/libopkg/pkg.c
 +@@ -1409,7 +1409,7 @@ int pkg_run_script(pkg_t * pkg, const ch
 + 		return 0;
 + 	}

@@ -1,15 +1,15 @@
-From b493ef55dfe0a03374ef6cb7b7934336c9cdc603 Mon Sep 17 00:00:00 2001
+From 6c5c7e39d9a9767012610b2a836c3d6f54385657 Mon Sep 17 00:00:00 2001
 From: gl-dengxinfa <xinfa.deng@gl-inet.com>
 Date: Tue, 27 Sep 2022 12:15:27 +0800
 Subject: [PATCH] fix:gl mt1300 adapts to glinet SDK4.0
 
 ---
- .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 30 ++++++++++++++++---
- target/linux/ramips/image/mt7621.mk           |  2 ++
- 2 files changed, 28 insertions(+), 4 deletions(-)
+ .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 37 ++++++++++++++++---
+ target/linux/ramips/image/mt7621.mk           |  2 +
+ 2 files changed, 34 insertions(+), 5 deletions(-)
 
 diff --git a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
-index 384da1bfa9..23c5be89c8 100644
+index 7e3dc8cc03..621a010d3f 100644
 --- a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
 +++ b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
 @@ -10,13 +10,35 @@
@@ -52,11 +52,25 @@ index 384da1bfa9..23c5be89c8 100644
  	chosen {
  		bootargs = "console=ttyS0,115200";
  	};
+@@ -96,7 +118,12 @@
+ 			partition@50000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x50000 0x1fb0000>;
++				reg = <0x50000 0x1f90000>;
++			};
++
++			partition@1ff0000 {
++				label = "log";
++                                reg = <0x1fe0000 0x20000>;
+ 			};
+ 		};
+ 	};
 diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7621.mk
-index 7f903485aa..6c937a2409 100644
+index c3e2291a9d..8e45b0b676 100644
 --- a/target/linux/ramips/image/mt7621.mk
 +++ b/target/linux/ramips/image/mt7621.mk
-@@ -691,7 +691,9 @@ define Device/glinet_gl-mt1300
+@@ -721,7 +721,9 @@ define Device/glinet_gl-mt1300
    IMAGE_SIZE := 32448k
    DEVICE_VENDOR := GL.iNet
    DEVICE_MODEL := GL-MT1300
