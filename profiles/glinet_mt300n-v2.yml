@@ -4,6 +4,9 @@ feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
     branch: master
+  - name: mt76x8
+    uri: https://gitlab.com/gl.sdk4.0/gl.router/mt76x8-feed.git
+    branch: master
 
 packages:
   - kmod-usb-storage
