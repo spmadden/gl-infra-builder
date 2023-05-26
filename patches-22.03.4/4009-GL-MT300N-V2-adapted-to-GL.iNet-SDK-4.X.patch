@@ -1,16 +1,16 @@
-From 6c8030dafb6933a6ad090b543f2f04d741738f93 Mon Sep 17 00:00:00 2001
+From ed19188e2a150c9bcbac5457969a88fec56d1eef Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 8 May 2023 09:07:27 +0800
 Subject: [PATCH] GL-MT300N-V2: adapted to GL.iNet SDK 4.X
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../dts/mt7628an_glinet_gl-mt300n-v2.dts      | 36 ++++++++++++++++---
+ .../dts/mt7628an_glinet_gl-mt300n-v2.dts      | 42 +++++++++++++++----
  target/linux/ramips/image/mt76x8.mk           |  3 +-
- 2 files changed, 33 insertions(+), 6 deletions(-)
+ 2 files changed, 36 insertions(+), 9 deletions(-)
 
 diff --git a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
-index 48f0fbd92b..fbea7630e9 100644
+index 48f0fbd92b..22ae4b2df4 100644
 --- a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 +++ b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 @@ -8,13 +8,34 @@
@@ -52,6 +52,20 @@ index 48f0fbd92b..fbea7630e9 100644
  	chosen {
  		bootargs = "console=ttyS0,115200";
  	};
+@@ -48,10 +69,10 @@
+ 			linux,code = <KEY_RESTART>;
+ 		};
+ 
+-		BTN_0 {
+-			label = "BTN_0";
++		switch {
++			label = "switch";
+ 			gpios = <&gpio 0 GPIO_ACTIVE_LOW>;
+-			linux,code = <BTN_0>;
++			linux,code = <KEY_SETUP>;
+ 		};
+ 
+ 		BTN_1 {
 @@ -125,7 +146,12 @@
  			partition@50000 {
  				compatible = "denx,uimage";

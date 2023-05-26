@@ -1,15 +1,15 @@
-From 7ba9da2e4ecae3a768a4e4997f8806886993f9bf Mon Sep 17 00:00:00 2001
+From ab0df6104a7f267f9140774917c00565c4bcc0ea Mon Sep 17 00:00:00 2001
 From: gl-dengxinfa <xinfa.deng@gl-inet.com>
 Date: Tue, 27 Sep 2022 12:15:27 +0800
 Subject: [PATCH] GL-MT1300: adapted to GL.iNet SDK 4.x
 
 ---
- .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 38 ++++++++++++++++---
+ .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 40 ++++++++++++++++---
  target/linux/ramips/image/mt7621.mk           |  4 +-
- 2 files changed, 36 insertions(+), 6 deletions(-)
+ 2 files changed, 37 insertions(+), 7 deletions(-)
 
 diff --git a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
-index 7e3dc8cc03..9cc686c4d7 100644
+index 7e3dc8cc03..4b5e629c40 100644
 --- a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
 +++ b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
 @@ -10,13 +10,35 @@
@@ -51,6 +51,15 @@ index 7e3dc8cc03..9cc686c4d7 100644
 +
  	chosen {
  		bootargs = "console=ttyS0,115200";
+ 	};
+@@ -33,7 +55,7 @@
+ 		switch {
+ 			label = "switch";
+ 			gpios = <&gpio 16 GPIO_ACTIVE_LOW>;
+-			linux,code = <BTN_0>;
++			linux,code = <KEY_SETUP>;
+ 			linux,input-type = <EV_SW>;
+ 		};
  	};
 @@ -96,7 +118,12 @@
  			partition@50000 {
