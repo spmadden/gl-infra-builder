@@ -1,18 +1,18 @@
-From 0d2f4bdd2bb401ec0635321bfa033703e869ea10 Mon Sep 17 00:00:00 2001
-From: gl-dengxinfa <xinfa.deng@gl-inet.com>
-Date: Thu, 29 Sep 2022 11:45:43 +0800
+From 09f8d132d154b26ce2c16e125d3085a66fd58433 Mon Sep 17 00:00:00 2001
+From: Weiping Yang <weiping.yang@gl-inet.com>
+Date: Fri, 26 May 2023 02:57:11 -0400
 Subject: [PATCH] fix: wireguard support hotplug
 
 ---
  .../856-wireguard-support-hotplug.patch       | 222 ++++++++++++++++++
  1 file changed, 222 insertions(+)
- create mode 100644 target/linux/ramips/patches-5.10/856-wireguard-support-hotplug.patch
+ create mode 100644 target/linux/generic/hack-5.10/856-wireguard-support-hotplug.patch
 
-diff --git a/target/linux/ramips/patches-5.10/856-wireguard-support-hotplug.patch b/target/linux/ramips/patches-5.10/856-wireguard-support-hotplug.patch
+diff --git a/target/linux/generic/hack-5.10/856-wireguard-support-hotplug.patch b/target/linux/generic/hack-5.10/856-wireguard-support-hotplug.patch
 new file mode 100644
 index 0000000000..0de25b62ec
 --- /dev/null
-+++ b/target/linux/ramips/patches-5.10/856-wireguard-support-hotplug.patch
++++ b/target/linux/generic/hack-5.10/856-wireguard-support-hotplug.patch
 @@ -0,0 +1,222 @@
 +--- a/drivers/net/wireguard/Makefile
 ++++ b/drivers/net/wireguard/Makefile
@@ -237,5 +237,5 @@ index 0000000000..0de25b62ec
 + }
 + 
 -- 
-2.34.1
+2.17.1
 
