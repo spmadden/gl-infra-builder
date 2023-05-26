@@ -1,18 +1,18 @@
-From 392975cee1dba2fc33edcb7ac9ff3ccd067fb7e8 Mon Sep 17 00:00:00 2001
+From fe8082c097f9b2a707b5eb332779f2ab942b5718 Mon Sep 17 00:00:00 2001
 From: Yin Ni <yin.ni@gl-inet.com>
 Date: Wed, 15 Mar 2023 07:55:22 -0700
 Subject: [PATCH] e750: support E750 target
 
 Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
 ---
- .../ath79/dts/qca9531_glinet_gl-e750.dts      | 40 +++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ .../ath79/dts/qca9531_glinet_gl-e750.dts      | 53 ++++++++++++++++++-
+ 1 file changed, 51 insertions(+), 2 deletions(-)
 
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
-index ca0784e6bf..a653d781a6 100644
+index ca0784e6bf..ff42797843 100644
 --- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
 +++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
-@@ -13,6 +13,28 @@
+@@ -13,6 +13,32 @@
  		label-mac-device = &eth0;
  	};
  
@@ -23,10 +23,14 @@ index ca0784e6bf..a653d781a6 100644
 +                #size-cells = <1>;
 +                model = "e750";
 +                lan = "eth0";
++		wan = "eth0";
++		usb-port = "1-1";
 +                flash_size = <128>;
-+                radio = "mac80211";
++		noled = "true";
++                radio = "radio0";
 +                build-in-modem = "1-1.2";
 +                reset-button = "gpio-3";
++		switch-button = "gpio-1";
 +                mcu = "/dev/ttyS0,115200";
 +                oled = "sh1106";
 +                factory_data {
@@ -41,31 +45,54 @@ index ca0784e6bf..a653d781a6 100644
  	keys {
  		compatible = "gpio-keys";
  
-@@ -40,6 +62,24 @@
+@@ -27,7 +53,7 @@
+ 
+ 		switch {
+ 			label = "switch";
+-			linux,code = <BTN_0>;
++			linux,code = <KEY_SETUP>;
+ 			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
+ 		};
+ 	};
+@@ -40,6 +66,24 @@
  			gpio-export,output = <1>;
  			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
  		};
 +
 +		gpio13 {
 +			gpio-export,name = "gpio13";
-+			gpio-export,output = <1>;
-+			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
++			gpio-export,output = <0>;
++			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		gpio14 {
 +			gpio-export,name = "gpio14";
-+			gpio-export,output = <1>;
-+			gpios = <&gpio 14 GPIO_ACTIVE_LOW>;
++			gpio-export,output = <0>;
++			gpios = <&gpio 14 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		gpio17 {
 +			gpio-export,name = "gpio17";
-+			gpio-export,output = <1>;
-+			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
++			gpio-export,output = <0>;
++			gpios = <&gpio 17 GPIO_ACTIVE_HIGH>;
 +		};
  	 };
  };
  
+@@ -92,7 +136,12 @@
+ 
+ 			partition@460000 {
+ 				label = "reserved";
+-				reg = <0x460000 0xba0000>;
++				reg = <0x460000 0xb80000>;
++			};
++
++			partition@fe0000 {
++				label = "log";
++				reg = <0xfe0000 0x020000>;
+ 			};
+ 		};
+ 	};
 -- 
 2.17.1
 

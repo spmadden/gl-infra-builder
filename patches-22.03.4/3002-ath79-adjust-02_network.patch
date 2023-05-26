@@ -1,14 +1,14 @@
-From cac92510ab8eaa541003d97dea4b263b79e787f7 Mon Sep 17 00:00:00 2001
+From d87694b1fe8f934a8c365614e6a1147af2e45c1d Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 4 May 2023 19:12:26 +0800
 Subject: [PATCH] ath79 adjust 02_network
 
 ---
- .../nand/base-files/etc/board.d/02_network    | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ .../nand/base-files/etc/board.d/02_network    | 23 +++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
-index 3c5627e2a4..054b569b21 100644
+index 3c5627e2a4..647869d888 100644
 --- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
 +++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
 @@ -69,6 +69,14 @@ ath79_setup_interfaces()
@@ -26,7 +26,7 @@ index 3c5627e2a4..054b569b21 100644
  	*)
  		ucidef_set_interfaces_lan_wan "eth0" "eth1"
  		;;
-@@ -92,6 +100,17 @@ ath79_setup_macs()
+@@ -92,6 +100,21 @@ ath79_setup_macs()
  	netgear,wndr4500-v3)
  		wan_mac=$(mtd_get_mac_binary caldata 0x6)
  		;;
@@ -41,9 +41,13 @@ index 3c5627e2a4..054b569b21 100644
 +		wan_mac=$(mtd_get_mac_binary art 0x0)
 +		lan_mac=$(macaddr_add "$wan_mac" 1)
 +		;;
++	glinet,gl-e750)
++		mac=$(mtd_get_mac_binary art 0x0)
++		lan_mac=$(macaddr_add "$mac" 1)
++		;;
  	esac
  
  	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
 -- 
-2.25.1
+2.17.1
 
