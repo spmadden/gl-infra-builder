@@ -1,7 +1,7 @@
-From fba4523f78948efe7fdfc4ac464e4a3150fa2baa Mon Sep 17 00:00:00 2001
+From 6c8030dafb6933a6ad090b543f2f04d741738f93 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 8 May 2023 09:07:27 +0800
-Subject: [PATCH] target/ramips: gl-mt3000n-v2 adapt to glinet sdk4
+Subject: [PATCH] GL-MT300N-V2: adapted to GL.iNet SDK 4.X
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
  2 files changed, 33 insertions(+), 6 deletions(-)
 
 diff --git a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
-index 48f0fbd92b..e275d3841f 100644
+index 48f0fbd92b..fbea7630e9 100644
 --- a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 +++ b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 @@ -8,13 +8,34 @@

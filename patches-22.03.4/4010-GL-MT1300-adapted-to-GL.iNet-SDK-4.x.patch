@@ -1,15 +1,15 @@
-From 6c5c7e39d9a9767012610b2a836c3d6f54385657 Mon Sep 17 00:00:00 2001
+From 7ba9da2e4ecae3a768a4e4997f8806886993f9bf Mon Sep 17 00:00:00 2001
 From: gl-dengxinfa <xinfa.deng@gl-inet.com>
 Date: Tue, 27 Sep 2022 12:15:27 +0800
-Subject: [PATCH] fix:gl mt1300 adapts to glinet SDK4.0
+Subject: [PATCH] GL-MT1300: adapted to GL.iNet SDK 4.x
 
 ---
- .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 37 ++++++++++++++++---
- target/linux/ramips/image/mt7621.mk           |  2 +
- 2 files changed, 34 insertions(+), 5 deletions(-)
+ .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 38 ++++++++++++++++---
+ target/linux/ramips/image/mt7621.mk           |  4 +-
+ 2 files changed, 36 insertions(+), 6 deletions(-)
 
 diff --git a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
-index 7e3dc8cc03..621a010d3f 100644
+index 7e3dc8cc03..9cc686c4d7 100644
 --- a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
 +++ b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
 @@ -10,13 +10,35 @@
@@ -66,16 +66,25 @@ index 7e3dc8cc03..621a010d3f 100644
  			};
  		};
  	};
+@@ -111,6 +138,7 @@
+ 		compatible = "mediatek,mt76";
+ 		reg = <0x0000 0 0 0 0>;
+ 		mediatek,mtd-eeprom = <&factory 0x0>;
++		dbdc;
+ 	};
+ };
+ 
 diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7621.mk
-index c3e2291a9d..8e45b0b676 100644
+index c3e2291a9d..5468df83c6 100644
 --- a/target/linux/ramips/image/mt7621.mk
 +++ b/target/linux/ramips/image/mt7621.mk
 @@ -721,7 +721,9 @@ define Device/glinet_gl-mt1300
    IMAGE_SIZE := 32448k
    DEVICE_VENDOR := GL.iNet
    DEVICE_MODEL := GL-MT1300
+-  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3
 +  OLD_SUPPORTED_DEVICES := gl-mt1300
-   DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3
++  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3 kmod-sdhci-mt7620
 +  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | check-size | append-gl-metadata
  endef
  TARGET_DEVICES += glinet_gl-mt1300
