@@ -22,6 +22,7 @@ packages:
   - gl-silabs-dfu
   - gl-sdk4-acl
   - gl-sdk4-base-files
+  - gl-sdk4-tethering
   - gl-sdk4-cable
   - gl-sdk4-carrier-monitor
   - gl-sdk4-clients
@@ -51,7 +52,7 @@ packages:
   - gl-sdk4-repeater
   - gl-sdk4-rtty
   - gl-sdk4-s2s
-#  - gl-sdk4-switch-button
+  - gl-sdk4-switch-button
   - gl-sdk4-system
   - gl-sdk4-uci
   - gl-sdk4-upgrade
@@ -61,6 +62,7 @@ packages:
   - gl-sdk4-wg-server
   - gl-sdk4-wifi
   - gl-sdk4-timer
+  - gl-sdk4-tor
   - gl-sdk4-igmp
   - gl-sdk4-mwan3
   - gl-sdk4-mcu
@@ -70,6 +72,15 @@ packages:
   - gl-ble-sdk
   - gl-sdk4-netmode
   - gl-sdk4-keepcfg
+  - gl-sdk4-nas-utils
+  - gl-sdk4-nas-web
+  - gl-sdk4-exfat-utils
+  - gl-sdk4-webdav
+  - kmod-usb-storage-uas
+  - kmod-usb-storage-extras
+  - dosfstools
+  - e2fsprogs
+  - minidlna
 
   - gl-sdk4-ui-adminpw
   - gl-sdk4-ui-advanced
@@ -102,6 +113,7 @@ packages:
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
   - gl-sdk4-ui-timedtask
+  - gl-sdk4-ui-torview
   - gl-sdk4-ui-multiwan
   - gl-sdk4-ui-igmp
   - gl-sdk4-ui-overview
@@ -110,8 +122,12 @@ packages:
   - gl-sdk4-ui-bluetoothremotemanage
   - gl-sdk4-ui-bluetoothreport
   - gl-sdk4-ui-bluetoothsettings
+  - gl-sdk4-ui-btnsettings
   - gl-sdk4-ui-bridge
   - gl-sdk4-ui-sms
+  - gl-sdk4-ui-nasview
+  - gl-sdk4-ui-olede750
+
 diffconfig: |
   CONFIG_PACKAGE_kmod-shortcut-fe-cm=n
   CONFIG_SIGNATURE_CHECK=n

@@ -12,3 +12,6 @@ feeds:
     uri: https://github.com/gl-inet/gl-feeds.git
     branch: 22.03.2
 
+packages:
+  - tor:gl_feeds_common
+  - smstools3:gl_feeds_common
