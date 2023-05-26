@@ -117,7 +117,7 @@ index 0000000000..a464609a82
 +		wan = "eth0";
 +		lan = "eth1";
 +		usb-port = "1-1,2-1";
-+		fan = "pwmchip0";
++		fan = "hwmon0 cooling_device0";
 +		flash_size = <256>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
 +		switch-button = "gpio-455";
