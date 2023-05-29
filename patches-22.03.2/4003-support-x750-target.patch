@@ -36,7 +36,7 @@ index 0000000000..2bb4547c5c
 +                reset-button = "gpio-3";
 +                usb-port = "1-1.3";
 +				flash_size = <16>;
-+				radio = "mac80211";
++				radio = "radio0 radio1";
 +               microsd = "1-1.1";
 +                factory_data {
 +                        device_mac = "art";
