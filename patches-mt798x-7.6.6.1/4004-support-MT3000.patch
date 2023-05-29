@@ -1,19 +1,19 @@
-From 517cbcf8c2237998b23f09257d356edc5dabc3b7 Mon Sep 17 00:00:00 2001
-From: lincolnzh <hongjian.zhang@gl-inet.com>
-Date: Thu, 29 Dec 2022 16:19:53 +0800
+From 42cc9718219697933cbd0e4a0a6e6191528794ed Mon Sep 17 00:00:00 2001
+From: Hongjian Zhang <hongjian.zhang@gl-inet.com>
+Date: Mon, 29 May 2023 14:35:12 +0800
 Subject: [PATCH] support MT3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 277 ++++++++++++++++++
- 1 file changed, 277 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 274 ++++++++++++++++++
+ 1 file changed, 274 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..a464609a82
+index 0000000000..14d5d0894d
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,277 @@
+@@ -0,0 +1,274 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -23,9 +23,6 @@ index 0000000000..a464609a82
 +	compatible = "glinet,mt3000-snand", "mediatek,mt7981";
 +
 +	aliases {
-+		led-boot = &led_run;
-+		led-failsafe = &led_run;
-+		led-running = &led_run;
 +		led-upgrade = &led_run;
 +	};
 +
@@ -292,5 +289,5 @@ index 0000000000..a464609a82
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 -- 
-2.34.1
+2.17.1
 
