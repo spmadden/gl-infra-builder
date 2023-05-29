@@ -27,7 +27,7 @@ index 0eaa1ce37..9608336c4 100644
 +        usb-port = "1-1";
 +        switch-button = "gpio-1";
 +        flash_size = <128>;
-+        radio = "radio0";
++        radio = "radio0 radio1";
 +        nowds = "1";
 +        factory_data {
 +            device_mac = "factory", "0x400";
