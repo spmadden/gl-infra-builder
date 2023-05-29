@@ -1,4 +1,4 @@
-From ed19188e2a150c9bcbac5457969a88fec56d1eef Mon Sep 17 00:00:00 2001
+From 3bb6ae3f6244ee272930e58efe773c6c27beb4e8 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 8 May 2023 09:07:27 +0800
 Subject: [PATCH] GL-MT300N-V2: adapted to GL.iNet SDK 4.X
@@ -7,7 +7,8 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  .../dts/mt7628an_glinet_gl-mt300n-v2.dts      | 42 +++++++++++++++----
  target/linux/ramips/image/mt76x8.mk           |  3 +-
- 2 files changed, 36 insertions(+), 9 deletions(-)
+ .../mt76x8/base-files/etc/board.d/01_leds     |  2 +-
+ 3 files changed, 37 insertions(+), 10 deletions(-)
 
 diff --git a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 index 48f0fbd92b..22ae4b2df4 100644
@@ -94,6 +95,19 @@ index 2106324684..4d12c9aee8 100644
  endef
  TARGET_DEVICES += glinet_gl-mt300n-v2
  
+diff --git a/target/linux/ramips/mt76x8/base-files/etc/board.d/01_leds b/target/linux/ramips/mt76x8/base-files/etc/board.d/01_leds
+index 0af01d4393..28bcca5b1c 100644
+--- a/target/linux/ramips/mt76x8/base-files/etc/board.d/01_leds
++++ b/target/linux/ramips/mt76x8/base-files/etc/board.d/01_leds
+@@ -36,7 +36,7 @@ elecom,wrc-1167fs)
+ 	ucidef_set_led_switch "internet" "internet" "green:internet" "switch0" "0x10"
+ 	;;
+ glinet,gl-mt300n-v2)
+-	ucidef_set_led_netdev "wifi_led" "wifi" "red:wlan" "wlan0"
++	ucidef_set_led_netdev "wifi_led" "wifi" "red:wlan" "ra0"
+ 	ucidef_set_led_switch "wan" "wan" "green:wan" "switch0" "0x1"
+ 	;;
+ hilink,hlk-7628n|\
 -- 
-2.34.1
+2.17.1
 
