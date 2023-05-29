@@ -26,7 +26,7 @@ index a735d8e3ac..1b80d0d742 100644
 +		usb-port = "1-1";
 +		flash_size = <32>;
 +		reset-button = "gpio-63";
-+		radio = "radio0";
++		radio = "radio0 radio1";
 +		factory_data {
 +			device_mac = "ART", "0x0";
 +			device_ddns = "ART", "0x10";
