@@ -60,7 +60,7 @@ index 878a740cfd..41c6cf5c63 100644
 +		switch-button = "gpio-8";
 +		reset-button = "gpio-2";
 +		usb-port = "1-1";
-+		radio = "radio0";
++		radio = "radio0 radio1";
 +		nand;
 +		factory_data {
 +			device_mac = "art";
