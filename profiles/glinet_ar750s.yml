@@ -92,7 +92,6 @@ packages:
   - gl-sdk4-ui-macclone
   - gl-sdk4-ui-modemmanage
   - gl-sdk4-ui-multiwan
-  - gl-sdk4-ui-nasview
   - gl-sdk4-ui-overview
   - gl-sdk4-ui-ovpnclient
   - gl-sdk4-ui-ovpnserver

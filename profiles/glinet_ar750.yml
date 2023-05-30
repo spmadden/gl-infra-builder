@@ -47,6 +47,7 @@ packages:
   - gl-sdk4-qos
   - gl-sdk4-vpn-policy
   - gl-sdk4-tethering 
+  - gl-sdk4-switch-button
 
   - gl-sdk4-ui-clients 
   - gl-sdk4-ui-adminpw 
@@ -77,6 +78,7 @@ packages:
   - gl-sdk4-ui-wgclient
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
+  - gl-sdk4-ui-btnsettings
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n
