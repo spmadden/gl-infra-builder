@@ -112,6 +112,7 @@ packages:
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
   - gl-sdk4-ui-hwnat
+  - gl-sdk4-ui-netnat
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n
