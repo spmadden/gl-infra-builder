@@ -66,6 +66,8 @@ packages:
   - gl-sdk4-ui-bridge
   - gl-sdk4-ui-clients
   - gl-sdk4-ui-cloud
+  - gl-sdk4-mqtt
+  - gl-sdk4-cloud-batch-manage
   - gl-sdk4-ui-core
   - gl-sdk4-ui-dnsview
   - gl-sdk4-ui-dynamicdns

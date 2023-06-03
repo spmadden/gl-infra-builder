@@ -11,5 +11,7 @@ packages:
   - gl-sdk4-adguardhome
   - gl-sdk4-ui-adguardhome
   - gl-sdk4-sms-forward
+  - gl-sdk4-mqtt
+  - gl-sdk4-cloud-batch-manage
 
 diffconfig: |
