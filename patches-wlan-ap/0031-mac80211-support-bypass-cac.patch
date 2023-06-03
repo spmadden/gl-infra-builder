@@ -1,24 +1,22 @@
-From e602938214b1c140a898c61959a6fa1c043d3dfb Mon Sep 17 00:00:00 2001
+From 10c1f9367c4b5464c15728f87b31f321680c856b Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Wed, 22 Mar 2023 09:51:49 +0800
 Subject: [PATCH] mac80211: support bypass cac
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../pending/303-support-bypass-cac.patch      | 53 +++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ .../pending/303-support-bypass-cac.patch      | 64 +++++++++++++++++++
+ 1 file changed, 64 insertions(+)
  create mode 100644 feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch
 
 diff --git a/feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch b/feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch
 new file mode 100644
-index 00000000..acc7815c
+index 00000000..2ac6dbd4
 --- /dev/null
 +++ b/feeds/wifi-ax/mac80211/patches/pending/303-support-bypass-cac.patch
-@@ -0,0 +1,53 @@
-+Index: backports-20210222_001-4.4.60-b157d2276/net/mac80211/debugfs.c
-+===================================================================
-+--- backports-20210222_001-4.4.60-b157d2276.orig/net/mac80211/debugfs.c
-++++ backports-20210222_001-4.4.60-b157d2276/net/mac80211/debugfs.c
+@@ -0,0 +1,64 @@
++--- a/net/mac80211/debugfs.c
+++++ b/net/mac80211/debugfs.c
 +@@ -605,6 +605,42 @@ static const struct file_operations scan
 + 	.llseek = default_llseek,
 + };
@@ -68,6 +66,19 @@ index 00000000..acc7815c
 + 	DEBUGFS_ADD(scanning);
 ++	DEBUGFS_ADD_MODE(bypass_cac, 0200);
 + }
++--- a/net/wireless/mlme.c
+++++ b/net/wireless/mlme.c
++@@ -952,7 +952,9 @@ void cfg80211_cac_event(struct net_devic
++ 		memcpy(&rdev->cac_done_chandef, chandef,
++ 		       sizeof(struct cfg80211_chan_def));
++ 		queue_work(cfg80211_wq, &rdev->propagate_cac_done_wk);
++-		cfg80211_sched_dfs_chan_update(rdev);
+++		cancel_delayed_work(&rdev->dfs_update_channels_wk);
+++		if (wdev->cac_time_ms > 0)
+++			queue_delayed_work(cfg80211_wq, &rdev->dfs_update_channels_wk, 0);
++ 		fallthrough;
++ 	case NL80211_RADAR_CAC_ABORTED:
++ 		wdev->cac_started = false;
 -- 
 2.34.1
 

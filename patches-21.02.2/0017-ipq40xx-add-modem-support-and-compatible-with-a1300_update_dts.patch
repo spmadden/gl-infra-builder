@@ -1,4 +1,4 @@
-From cf238106a885b93e29a93cfd6960695fa216cfe6 Mon Sep 17 00:00:00 2001
+From 3f845f1214061d3ab3cc5eafeacf04e0c3a5de1a Mon Sep 17 00:00:00 2001
 From: gl-yangweiping <weiping.yang@gl-inet.com>
 Date: Tue, 7 Jun 2022 21:57:04 -0400
 Subject: [PATCH] A1300 adapt 21.02.2
@@ -10,13 +10,13 @@ Subject: [PATCH] A1300 adapt 21.02.2
  .../src/gpio-button-hotplug.c                 |   1 +
  .../patches/300-remove-limit-hostname.patch   |  11 +
  package/network/services/ppp/files/ppp.sh     |   1 +
- .../arm/boot/dts/qcom-ipq4018-gl-a1300.dts    |  23 +-
+ .../arm/boot/dts/qcom-ipq4018-gl-a1300.dts    |  32 +-
  target/linux/ipq40xx/image/generic.mk         |   4 +-
  .../patches-5.4/320-add_spi_nor_write.patch   |  11 +
  .../patches-5.4/700-add-modem-support.patch   | 280 ++++++++++++++++
  ...k-events-support-multiple-registrant.patch | 313 ++++++++++++++++++
  ...-linux-kernel-to-support-shortcut-fe.patch | 282 ++++++++++++++++
- 12 files changed, 931 insertions(+), 13 deletions(-)
+ 12 files changed, 936 insertions(+), 17 deletions(-)
  create mode 100644 package/network/services/dnsmasq/patches/300-remove-limit-hostname.patch
  create mode 100644 target/linux/ipq40xx/patches-5.4/320-add_spi_nor_write.patch
  create mode 100644 target/linux/ipq40xx/patches-5.4/700-add-modem-support.patch
@@ -33,7 +33,7 @@ index c07b0bcc1e..3dfca3a7df 100644
  src-git luci https://git.openwrt.org/project/luci.git^cc582ebfb3cb2782db841ad2a4e908d1df4046f9
  src-git routing https://git.openwrt.org/feed/routing.git^10d3ffd8b30186b49538167bac1fa1bf9c88f860
 diff --git a/include/image-commands.mk b/include/image-commands.mk
-index 6908f5b5c1..5c416dfc28 100644
+index 7ed6c60e8f..1f5264c3ae 100644
 --- a/include/image-commands.mk
 +++ b/include/image-commands.mk
 @@ -66,8 +66,13 @@ endef
@@ -52,16 +52,16 @@ index 6908f5b5c1..5c416dfc28 100644
  		"version": { \
  			"release": "$(shell cat $(TOPDIR)/release)", \
  			"date": "$(shell TZ='Asia/Chongqing' date '+%Y%m%d%H%M%S')", \
-@@ -77,15 +82,15 @@ metadata_gl_json = \
+@@ -78,15 +83,15 @@ metadata_gl_json = \
  			"target": "$(call json_quote,$(TARGETID))", \
  			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
  		}, \
 +		"upgrade_control":"$(shell python3 $(TOPDIR)/make_gl_metadata.py)", \
-+		"release_note":"$(shell sed ':a;N;s/\n/\\n/g;s/\r/\\r/g;ta' $(TOPDIR)/gl_release_note)" \
++		"release_note":"$(shell sed ':a;N;s/\n/\\\\n/g;s/\r/\\\\r/g;ta' $(TOPDIR)/gl_release_note | sed "s/'/\\\047/g")" \
  	}'
  
  define Build/append-gl-metadata
- 	$(if $(SUPPORTED_DEVICES),-echo $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
+ 	$(if $(SUPPORTED_DEVICES),-echo -e $(call metadata_gl_json,$(SUPPORTED_DEVICES)) | fwtool -I - $@)
 -	[ ! -s "$(BUILD_KEY)" -o ! -s "$(BUILD_KEY).ucert" -o ! -s "$@"  ] || { \
 -		cp "$(BUILD_KEY).ucert" "$@.ucert" ;\
 +	[ ! -s "$(BUILD_KEY)" -o ! -s "$@"  ] || { \
@@ -212,9 +212,24 @@ index b553effd88..78a712b41a 100755
  		${ip6table:+set IP6TABLE=$ip6table} \
  		${peerdns:+set PEERDNS=$peerdns} \
 diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
-index a6d662e6da..39c9032ac9 100644
+index a6d662e6da..35548085c9 100644
 --- a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
 +++ b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4018-gl-a1300.dts
+@@ -10,10 +10,10 @@
+ 	compatible = "glinet,gl-a1300", "qcom,ipq4019";
+ 
+ 	aliases {
+-		led-boot = &led_run;
+-		led-failsafe = &led_run;
+-		led-running = &led_run;
+-		led-upgrade = &led_run;
++		//led-boot = &led_run;
++		//led-failsafe = &led_run;
++		//led-running = &led_run;
++		//led-upgrade = &led_run;
+ 	};
+ 
+ 	gl_hw {
 @@ -22,14 +22,19 @@
  		#address-cells = <1>;
  		#size-cells = <1>;
@@ -223,7 +238,7 @@ index a6d662e6da..39c9032ac9 100644
 -		lan = "eth1";
 +		wan = "eth1";
 +		lan = "eth0";
-+		usb-port = "1-1";
++		usb-port = "1-1,2-1";
 +		flash_size = <128>;
  		reset-button = "gpio-63";
 +		switch-button = "gpio-0";
@@ -251,7 +266,15 @@ index a6d662e6da..39c9032ac9 100644
  	};
  
  	leds {
-@@ -136,7 +147,7 @@
+@@ -124,6 +135,7 @@
+ 		led_run: blue {
+ 			label = "gl-a1300:blue";
+ 			gpios = <&tlmm 2 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
+ 		};
+ 
+ 		white {
+@@ -136,7 +148,7 @@
  		compatible = "gpio-export";
  
  		usb {
@@ -260,7 +283,7 @@ index a6d662e6da..39c9032ac9 100644
  			gpio-export,output = <1>;
  			gpios = <&tlmm 4 GPIO_ACTIVE_HIGH>;
  		};
-@@ -216,6 +227,10 @@
+@@ -216,6 +228,10 @@
  				reg = <0x00170000 0x00010000>;
  				read-only;
  			};
@@ -1197,5 +1220,5 @@ index 0000000000..6de31b973d
 + void nf_conntrack_unregister_notifier(struct net *net,
 + 				      struct nf_ct_event_notifier *new)
 -- 
-2.25.1
+2.17.1
 
