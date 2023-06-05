@@ -1,13 +1,26 @@
-From ab0df6104a7f267f9140774917c00565c4bcc0ea Mon Sep 17 00:00:00 2001
+From ad36a7e3d5f0fb614db377dbe9ca523fc0b6cca2 Mon Sep 17 00:00:00 2001
 From: gl-dengxinfa <xinfa.deng@gl-inet.com>
 Date: Tue, 27 Sep 2022 12:15:27 +0800
 Subject: [PATCH] GL-MT1300: adapted to GL.iNet SDK 4.x
 
 ---
+ package/boot/uboot-envtools/files/ramips      |  1 +
  .../ramips/dts/mt7621_glinet_gl-mt1300.dts    | 40 ++++++++++++++++---
  target/linux/ramips/image/mt7621.mk           |  4 +-
- 2 files changed, 37 insertions(+), 7 deletions(-)
+ 3 files changed, 38 insertions(+), 7 deletions(-)
 
+diff --git a/package/boot/uboot-envtools/files/ramips b/package/boot/uboot-envtools/files/ramips
+index 2ed394ef40..da966c38d3 100644
+--- a/package/boot/uboot-envtools/files/ramips
++++ b/package/boot/uboot-envtools/files/ramips
+@@ -24,6 +24,7 @@ sitecom,wlr-4100-v1-002)
+ allnet,all0256n-4m|\
+ allnet,all0256n-8m|\
+ allnet,all5002|\
++glinet,gl-mt1300|\
+ glinet,gl-mt300n-v2|\
+ yuncore,ax820)
+ 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x10000" "0x10000"
 diff --git a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts b/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts
 index 7e3dc8cc03..4b5e629c40 100644
 --- a/target/linux/ramips/dts/mt7621_glinet_gl-mt1300.dts

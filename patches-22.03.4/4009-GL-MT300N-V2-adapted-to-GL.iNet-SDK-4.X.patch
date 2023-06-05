@@ -1,15 +1,28 @@
-From 3bb6ae3f6244ee272930e58efe773c6c27beb4e8 Mon Sep 17 00:00:00 2001
+From 891acdb7091238535d72466bff28cda13c94965c Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 8 May 2023 09:07:27 +0800
 Subject: [PATCH] GL-MT300N-V2: adapted to GL.iNet SDK 4.X
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
+ package/boot/uboot-envtools/files/ramips      |  1 +
  .../dts/mt7628an_glinet_gl-mt300n-v2.dts      | 42 +++++++++++++++----
  target/linux/ramips/image/mt76x8.mk           |  3 +-
  .../mt76x8/base-files/etc/board.d/01_leds     |  2 +-
- 3 files changed, 37 insertions(+), 10 deletions(-)
+ 4 files changed, 38 insertions(+), 10 deletions(-)
 
+diff --git a/package/boot/uboot-envtools/files/ramips b/package/boot/uboot-envtools/files/ramips
+index f512015c23..2ed394ef40 100644
+--- a/package/boot/uboot-envtools/files/ramips
++++ b/package/boot/uboot-envtools/files/ramips
+@@ -24,6 +24,7 @@ sitecom,wlr-4100-v1-002)
+ allnet,all0256n-4m|\
+ allnet,all0256n-8m|\
+ allnet,all5002|\
++glinet,gl-mt300n-v2|\
+ yuncore,ax820)
+ 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x10000" "0x10000"
+ 	;;
 diff --git a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 index 48f0fbd92b..22ae4b2df4 100644
 --- a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
@@ -109,5 +122,5 @@ index 0af01d4393..28bcca5b1c 100644
  	;;
  hilink,hlk-7628n|\
 -- 
-2.17.1
+2.34.1
 
