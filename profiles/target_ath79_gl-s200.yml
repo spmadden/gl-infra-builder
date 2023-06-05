@@ -23,6 +23,10 @@ packages:
   - lua-eco-socket
   - lua-eco-sys
   - lua-eco-ubus
+  - iptables-mod-nfqueue
+  - kmod-ipt-raw6
+  - kmod-ip6tables-extra
+  - ip6tables-extra
 
 diffconfig: |
   CONFIG_PACKAGE_kmod-fast-classifier=n
@@ -70,3 +74,4 @@ diffconfig: |
   CONFIG_PACKAGE_kmod-crypto-kpp=n
   CONFIG_PACKAGE_kmod-usb-serial-ch341=n
   CONFIG_PACKAGE_libustream-wolfssl=n
+  CONFIG_IPTABLES_NFTABLES=y
