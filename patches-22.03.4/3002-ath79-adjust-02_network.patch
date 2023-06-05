@@ -1,4 +1,4 @@
-From d87694b1fe8f934a8c365614e6a1147af2e45c1d Mon Sep 17 00:00:00 2001
+From 978c69a34a741c0901a38d48cd0b42159084d831 Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 4 May 2023 19:12:26 +0800
 Subject: [PATCH] ath79 adjust 02_network
@@ -8,7 +8,7 @@ Subject: [PATCH] ath79 adjust 02_network
  1 file changed, 23 insertions(+)
 
 diff --git a/target/linux/ath79/nand/base-files/etc/board.d/02_network b/target/linux/ath79/nand/base-files/etc/board.d/02_network
-index 3c5627e2a4..647869d888 100644
+index 3c5627e2a4..162f1fe16f 100644
 --- a/target/linux/ath79/nand/base-files/etc/board.d/02_network
 +++ b/target/linux/ath79/nand/base-files/etc/board.d/02_network
 @@ -69,6 +69,14 @@ ath79_setup_interfaces()
@@ -43,7 +43,7 @@ index 3c5627e2a4..647869d888 100644
 +		;;
 +	glinet,gl-e750)
 +		mac=$(mtd_get_mac_binary art 0x0)
-+		lan_mac=$(macaddr_add "$mac" 1)
++		lan_mac=$(macaddr_add "$mac" 3)
 +		;;
  	esac
  
