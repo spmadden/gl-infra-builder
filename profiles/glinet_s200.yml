@@ -6,7 +6,7 @@ feeds:
     revision: 178689d06302dfd1901b754022cbe6bb0402e259
   - name: glinet_iot
     uri: https://gitlab.com/gl.sdk4.0/gl.iot/gl-iot-sdk-collect.git
-    revision: dc5fba0075954c22e6543e941de5b9ea680def26
+    revision: 3f6625b6800b3462dd1e81170952dfea29bd066f
     
 packages:
   - gl-iot-sdk-release
