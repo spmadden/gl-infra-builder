@@ -1,13 +1,26 @@
-From fe8082c097f9b2a707b5eb332779f2ab942b5718 Mon Sep 17 00:00:00 2001
+From 7f46d3684d29aaa9bb475d767b400d8254b64838 Mon Sep 17 00:00:00 2001
 From: Yin Ni <yin.ni@gl-inet.com>
 Date: Wed, 15 Mar 2023 07:55:22 -0700
 Subject: [PATCH] e750: support E750 target
 
 Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
 ---
+ package/boot/uboot-envtools/files/ath79       |  1 +
  .../ath79/dts/qca9531_glinet_gl-e750.dts      | 53 ++++++++++++++++++-
- 1 file changed, 51 insertions(+), 2 deletions(-)
+ 2 files changed, 52 insertions(+), 2 deletions(-)
 
+diff --git a/package/boot/uboot-envtools/files/ath79 b/package/boot/uboot-envtools/files/ath79
+index fde99f8b28..c147c6cbee 100644
+--- a/package/boot/uboot-envtools/files/ath79
++++ b/package/boot/uboot-envtools/files/ath79
+@@ -96,6 +96,7 @@ glinet,gl-ar300m-lite|\
+ glinet,gl-ar300m-nand|\
+ glinet,gl-ar300m-nor|\
+ glinet,gl-ar300m16|\
++glinet,gl-e750|\
+ glinet,gl-xe300-nor-nand)
+ 	idx="$(find_mtd_index u-boot-env)"
+ 	[ -n "$idx" ] && \
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
 index ca0784e6bf..ff42797843 100644
 --- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
@@ -94,5 +107,5 @@ index ca0784e6bf..ff42797843 100644
  		};
  	};
 -- 
-2.17.1
+2.34.1
 
