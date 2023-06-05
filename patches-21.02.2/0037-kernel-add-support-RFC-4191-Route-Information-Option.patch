@@ -1,0 +1,24 @@
+From 22de75a612b7c60ea36ec6687400cd3a7ef53fdb Mon Sep 17 00:00:00 2001
+From: lancersky <luoyejiang0701@gmail.com>
+Date: Mon, 5 Jun 2023 16:38:30 +0800
+Subject: [PATCH] kernel: add support RFC 4191 Route Information Options
+
+Signed-off-by: lancersky <luoyejiang0701@gmail.com>
+---
+ target/linux/ath79/config-5.4 | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/target/linux/ath79/config-5.4 b/target/linux/ath79/config-5.4
+index 60f57692e2..a7b7fbe103 100644
+--- a/target/linux/ath79/config-5.4
++++ b/target/linux/ath79/config-5.4
+@@ -248,3 +248,6 @@ CONFIG_TICK_CPU_ACCOUNTING=y
+ CONFIG_TINY_SRCU=y
+ CONFIG_USB_SUPPORT=y
+ CONFIG_USE_OF=y
++CONFIG_IPV6=y
++CONFIG_IPV6_ROUTER_PREF=y
++CONFIG_IPV6_ROUTE_INFO=y
+-- 
+2.40.0
+
