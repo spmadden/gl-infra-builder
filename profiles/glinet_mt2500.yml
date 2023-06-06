@@ -4,7 +4,7 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 7009319c3596ef938db7649c90d2d58f43d7d06e
+    revision: d1aae959096ab8d60d15aa7a4611501d34a5da1b
   - name: mt7981
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: 429ad7722b2b3d73bfaec078390a47f22bdcc175
