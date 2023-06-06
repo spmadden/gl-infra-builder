@@ -1,4 +1,4 @@
-From 891acdb7091238535d72466bff28cda13c94965c Mon Sep 17 00:00:00 2001
+From 426d9268f3288f1f05eba8cecdfd13f5acdad127 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 8 May 2023 09:07:27 +0800
 Subject: [PATCH] GL-MT300N-V2: adapted to GL.iNet SDK 4.X
@@ -6,10 +6,10 @@ Subject: [PATCH] GL-MT300N-V2: adapted to GL.iNet SDK 4.X
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/boot/uboot-envtools/files/ramips      |  1 +
- .../dts/mt7628an_glinet_gl-mt300n-v2.dts      | 42 +++++++++++++++----
+ .../dts/mt7628an_glinet_gl-mt300n-v2.dts      | 47 +++++++++++++++----
  target/linux/ramips/image/mt76x8.mk           |  3 +-
  .../mt76x8/base-files/etc/board.d/01_leds     |  2 +-
- 4 files changed, 38 insertions(+), 10 deletions(-)
+ 4 files changed, 43 insertions(+), 10 deletions(-)
 
 diff --git a/package/boot/uboot-envtools/files/ramips b/package/boot/uboot-envtools/files/ramips
 index f512015c23..2ed394ef40 100644
@@ -24,7 +24,7 @@ index f512015c23..2ed394ef40 100644
  	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x10000" "0x10000"
  	;;
 diff --git a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
-index 48f0fbd92b..22ae4b2df4 100644
+index 48f0fbd92b..d747227778 100644
 --- a/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 +++ b/target/linux/ramips/dts/mt7628an_glinet_gl-mt300n-v2.dts
 @@ -8,13 +8,34 @@
@@ -94,6 +94,18 @@ index 48f0fbd92b..22ae4b2df4 100644
  			};
  		};
  	};
+@@ -135,6 +161,11 @@
+ 	status = "okay";
+ };
+ 
++&esw {
++	mediatek,portmap = <0x3e>;
++	mediatek,portdisable = <0x3c>;
++};
++
+ &factory {
+ 	compatible = "nvmem-cells";
+ 	#address-cells = <1>;
 diff --git a/target/linux/ramips/image/mt76x8.mk b/target/linux/ramips/image/mt76x8.mk
 index 2106324684..4d12c9aee8 100644
 --- a/target/linux/ramips/image/mt76x8.mk
@@ -122,5 +134,5 @@ index 0af01d4393..28bcca5b1c 100644
  	;;
  hilink,hlk-7628n|\
 -- 
-2.34.1
+2.25.1
 
