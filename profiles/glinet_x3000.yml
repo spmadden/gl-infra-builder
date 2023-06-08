@@ -7,7 +7,7 @@ feeds:
     revision: ebc8d5c447e1d2e0e13c0568a8514da68f8aa618
   - name: glinet
     uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: f6bba3c8cba905280fb6eec55c67561a53351bdd
+    revision: b9064d7d35ddd5900b36a755d7fd397cf084a812
 
 packages:
   - kmod-gl-pcie-modem
