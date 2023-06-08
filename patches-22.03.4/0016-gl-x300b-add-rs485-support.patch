@@ -1,18 +1,18 @@
-From acfe10d9101cbdb0d07839b46c4c11bdceb56f07 Mon Sep 17 00:00:00 2001
-From: lincolnzh <hongjian.zhang@gl-inet.com>
-Date: Fri, 11 Nov 2022 15:35:43 +0800
+From 8420e17cbd3a8030da71da0b990047e2983cb7a4 Mon Sep 17 00:00:00 2001
+From: Hongjian Zhang <hongjian.zhang@gl-inet.com>
+Date: Thu, 8 Jun 2023 16:39:42 +0800
 Subject: [PATCH] fix glinet rs485 auto txrx
 
 ---
  .../821-fix-glinet-rs485-auto-txrx.patch      | 78 +++++++++++++++++++
  1 file changed, 78 insertions(+)
- create mode 100644 target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch
+ create mode 100644 target/linux/generic/hack-5.10/821-fix-glinet-rs485-auto-txrx.patch
 
-diff --git a/target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch b/target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch
+diff --git a/target/linux/generic/hack-5.10/821-fix-glinet-rs485-auto-txrx.patch b/target/linux/generic/hack-5.10/821-fix-glinet-rs485-auto-txrx.patch
 new file mode 100644
 index 0000000000..ffbc50138e
 --- /dev/null
-+++ b/target/linux/ath79/patches-5.10/821-fix-glinet-rs485-auto-txrx.patch
++++ b/target/linux/generic/hack-5.10/821-fix-glinet-rs485-auto-txrx.patch
 @@ -0,0 +1,78 @@
 +Index: b/drivers/tty/serial/8250/8250.h
 +===================================================================
