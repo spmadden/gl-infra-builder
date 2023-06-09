@@ -14,3 +14,6 @@ feeds:
 packages:
   - tor:gl_feeds_common
   - smstools3:gl_feeds_common
+
+diffconfig: |
+  CONFIG_TARGET_ROOTFS_PARTSIZE=512
