@@ -10,8 +10,8 @@ Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
  .../mac80211/files/lib/netifd/wireless/mac80211.sh   | 11 ++++++-----
  .../kernel/mac80211/files/lib/wifi/mac80211.sh       | 20 ++++++++++++--------
  .../network/config/firewall/files/firewall.config    |  9 ---------
- .../network/config/netifd/files/etc/init.d/network   |  1 -
- 6 files changed, 21 insertions(+), 26 deletions(-)
+ .../network/config/netifd/files/etc/init.d/network   |  5 ++---
+ 6 files changed, 23 insertions(+), 28 deletions(-)
 
 diff --git a/openwrt-18.06/package/base-files/files/bin/config_generate b/openwrt-18.06/package/base-files/files/bin/config_generate
 index 9de0c3a..f2bee1f 100755
@@ -165,17 +165,29 @@ index d6e311c..584ed85 100644
  	list   network		'wan'
  	list   network		'wan6'
 diff --git a/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network b/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network
-index 2501824..7af9df3 100755
+index 2501824de..cf9f4dedf 100755
 --- a/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network
 +++ b/openwrt-18.06/package/network/config/netifd/files/etc/init.d/network
-@@ -15,7 +15,6 @@ init_switch() {
+@@ -13,9 +13,8 @@ init_switch() {
+ }
+ 
  start_service() {
- 	./usr/bin/hnat_update_interface.sh
+-	./usr/bin/hnat_update_interface.sh
++	/usr/bin/hnat_update_interface.sh
  	local lanip=$(uci get network.lan.ipaddr)
 -	echo ${lanip} siwifi.cn > /etc/hosts
  
  	init_switch
  
+@@ -30,7 +29,7 @@ start_service() {
+ }
+ 
+ reload_service() {
+-	./usr/bin/hnat_update_interface.sh
++	/usr/bin/hnat_update_interface.sh
+ 	local rv=0
+ 
+ 	init_switch
 -- 
 2.7.4
 
