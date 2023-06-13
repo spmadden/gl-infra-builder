@@ -5,7 +5,7 @@ subtarget: 64
 description: Build image for the x86_64
 
 feeds:
-  - name: gl_feeds_common
+  - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
     branch: common
 

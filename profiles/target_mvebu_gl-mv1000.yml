@@ -12,8 +12,8 @@ feeds:
     revision: 195dca0e10af66665aa59e33dc17edb784379732
 
 packages:
-  - tor:gl_feeds_common
-  - smstools3:gl_feeds_common
+  - tor:gl_feed_common
+  - smstools3:gl_feed_common
 
 diffconfig: |
   CONFIG_TARGET_ROOTFS_PARTSIZE=512

@@ -9,7 +9,7 @@ feeds:
     path: ../../feeds/ipq807x
   - name: wifi_ax
     path: ../../feeds/wifi-ax
-  - name: gl_feeds_common
+  - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 4fd97cfe3c89f7277911375d9aa0ce85ac6d27c7
   - name: luci
