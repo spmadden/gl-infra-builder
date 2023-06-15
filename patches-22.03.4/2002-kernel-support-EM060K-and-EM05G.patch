@@ -1,0 +1,65 @@
+From efa85d197d8d0f3cb51b92e72b76a0929be949b0 Mon Sep 17 00:00:00 2001
+From: Yu Zhang <yu.zhang@gl-inet.com>
+Date: Wed, 14 Jun 2023 19:38:28 +0800
+Subject: [PATCH] kernel: support-EM060K-and-EM05G
+
+Signed-off-by: Yu Zhang <yu.zhang@gl-inet.com>
+---
+ .../923-support-EM060K-and-EM05G-modem.patch  | 45 +++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+ create mode 100644 target/linux/generic/hack-5.10/923-support-EM060K-and-EM05G-modem.patch
+
+diff --git a/target/linux/generic/hack-5.10/923-support-EM060K-and-EM05G-modem.patch b/target/linux/generic/hack-5.10/923-support-EM060K-and-EM05G-modem.patch
+new file mode 100644
+index 0000000000..936c103ae4
+--- /dev/null
++++ b/target/linux/generic/hack-5.10/923-support-EM060K-and-EM05G-modem.patch
+@@ -0,0 +1,45 @@
++--- a/drivers/net/usb/qmi_wwan.c
+++++ b/drivers/net/usb/qmi_wwan.c
++@@ -1071,6 +1071,8 @@ static const struct usb_device_id produc
++ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM160R-GL */
++ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0800)},	/* Quectel RM500Q-GL */
++ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0801)},	/* Quectel RM520N */
+++	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x030b)},	/* Quectel EM060K-GL EM120K-GL */
+++	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x030e)},	/* Quectel EM05-G */
++ 	{QMI_MATCH_FF_FF_FF(0x05c6, 0xf601)},   /* MeigLink SLM750 */
++ 
++ 	/* 3. Combined interface devices matching on interface number */
++--- a/drivers/usb/serial/option.c
+++++ b/drivers/usb/serial/option.c
++@@ -646,6 +646,8 @@ static const struct usb_device_id option
++ 	{ USB_DEVICE(0x2C7C, 0x0296) }, /* Quectel BG96 */
++ 	{ USB_DEVICE(0x2C7C, 0x0435) }, /* Quectel AG35 */
++ 	{ USB_DEVICE(0x2C7C, 0x6026) }, /* Quectel EC200t */
+++	{ USB_DEVICE(0x2C7C, 0x030b) }, /* Quectel EM060K-GL EM120K-GL */
+++	{ USB_DEVICE(0x2C7C, 0x030e) }, /* Quectel EM05-G */
++ #endif
++ 	{ USB_DEVICE(0x19d2, 0x0536) },/* MZ386 */
++ 	{ USB_DEVICE(0x19d2, 0x0117) },
++@@ -2364,6 +2366,22 @@ static int option_probe(struct usb_seria
++ 			serial->dev->descriptor.idProduct == cpu_to_le16(0x6026) \
++ 			&& serial->interface->cur_altsetting->desc.bInterfaceNumber<= 1)
++ 		return -ENODEV;
+++	if (serial->dev->descriptor.idVendor == cpu_to_le16(0x2C7C)) {
+++		__u16 idProduct = le16_to_cpu(serial->dev->descriptor.idProduct);
+++		struct usb_interface_descriptor *intf = &serial->interface->cur_altsetting->desc;
+++
+++		if (intf->bInterfaceClass != 0xFF || intf->bInterfaceSubClass == 0x42) {
+++			//ECM, RNDIS, NCM, MBIM, ACM, UAC, ADB
+++			return -ENODEV;
+++		}
+++
+++		if ((idProduct&0xF000) == 0x0000) {
+++			//MDM interface 4 is QMI
+++			if (intf->bInterfaceNumber == 4 && intf->bNumEndpoints == 3
+++					&& intf->bInterfaceSubClass == 0xFF && intf->bInterfaceProtocol == 0xFF)
+++				return -ENODEV;
+++		}
+++	}
++ #endif
++ #if 1 //Added by Quectel
++ 	//For USB Auto Suspend
+-- 
+2.25.1
+
