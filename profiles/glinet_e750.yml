@@ -25,6 +25,7 @@ packages:
   - kmod-fs-ext4
   - kmod-fs-ntfs
   - kmod-fs-vfat
+  - kmod-fs-exfat
   - kmod-inet-diag
   - iptables-mod-tproxy
   - iptables-mod-filter
