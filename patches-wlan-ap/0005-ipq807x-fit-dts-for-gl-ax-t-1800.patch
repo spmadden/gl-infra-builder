@@ -21,7 +21,7 @@ index 77682246..9f98ef6d 100644
 +&gl_hw {
 +	model = "ax1800";
 +	lan = "eth1 eth2 eth3 eth4";
-+	usb-port = "1-1";
++	usb-port = "1-1,2-1";
 +};
 +
  &mdio0 {
@@ -64,7 +64,7 @@ index 25f8717a..3fea6475 100644
 +		model = "axt1800";
 +		wan = "eth0";
 +		reset-button = "gpio-50";
-+		usb-port = "1-1";
++		usb-port = "1-1,2-1";
 +		flash_size = <128>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
 +		factory_data {
@@ -155,7 +155,7 @@ index 0e5de3f1..4da836cf 100644
 +&gl_hw {
 +	model = "axt1800";
 +	lan = "eth1 eth2";
-+	usb-port = "1-1";
++	usb-port = "1-1,2-1";
 +	fan = "hwmon0 cooling_device0";
 +	switch-button = "gpio-16";
 +	dfs;
