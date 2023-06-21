@@ -1,20 +1,33 @@
-From efd3b13e3360712b38caa7be8675e4d287cdf8a7 Mon Sep 17 00:00:00 2001
-From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
-Date: Mon, 11 Jul 2022 15:03:35 +0800
-Subject: [PATCH] ipq807x: fit dts for gl-ax(t)1800
+From 833e3308139d50c819114c0927a9ecf9f62584e9 Mon Sep 17 00:00:00 2001
+From: "GL.iNet-XiBao.Lu" <xibao.lu@gl-inet.com>
+Date: Wed, 21 Jun 2023 01:19:01 -0700
+Subject: [PATCH] dts: fix dts for gl-ax1800
 
-Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+merge patchs:
+0005-ipq807x-fit-dts-for-gl-ax-t-1800.patch
+0018-fix-ax1800-for-i2c-gpio-custom.patch
+0021-fix-axt1800-add-radio-config-to-gl-hw-info.patch
+0022-ax1800-dts-add-ble-uart.patch
+0028-add-usb-reset-to-dts.patch
+
+Signed-off-by: GL.iNet-XiBao.Lu <xibao.lu@gl-inet.com>
 ---
- .../boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts  |  6 ++
- .../boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi | 55 +++++++++++++++----
- .../boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts | 42 +++++++++++---
- 3 files changed, 84 insertions(+), 19 deletions(-)
+ .../boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts  | 42 ++++++++++++++
+ .../boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi | 57 +++++++++++++++----
+ 2 files changed, 87 insertions(+), 12 deletions(-)
 
 diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts
-index 77682246..9f98ef6d 100644
+index 77682246..ad328120 100644
 --- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts
 +++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dts
-@@ -27,6 +27,12 @@
+@@ -22,11 +22,19 @@
+ 	compatible = "glinet,ax1800", "qcom,ipq6018-cp03", "qcom,ipq6018";
+ 
+ 	aliases {
++		serial0 = &blsp1_uart3; //system uart = ttyMSM0
++		serial1 = &blsp1_uart4; //tl8251      = ttyMSM1
+ 		ethernet3 = "/soc/dp4";
+ 		ethernet4 = "/soc/dp5";
  	};
  };
  
@@ -27,8 +40,53 @@ index 77682246..9f98ef6d 100644
  &mdio0 {
  	phy3: ethernet-phy@3 {
  		reg = <3>;
+@@ -52,6 +60,16 @@
+ };
+ 
+ &soc {
++	blsp1_uart4: serial@78b2000 {
++		compatible = "qcom,msm-uartdm-v1.4", "qcom,msm-uartdm";
++		reg = <0x78b2000 0x200>;
++		interrupts = <GIC_SPI 307 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&gcc GCC_BLSP1_UART4_APPS_CLK>,
++			<&gcc GCC_BLSP1_AHB_CLK>;
++		clock-names = "core", "iface";
++		status = "disabled";
++	};
++
+ 	dp4 {
+ 		device_type = "network";
+ 		compatible = "qcom,nss-dp";
+@@ -76,3 +94,27 @@
+ 		phy-mode = "sgmii";
+ 	};
+ };
++
++&tlmm {
++	uart_pins: uart_pins {
++		mux_1 {
++			pins = "gpio42", "gpio43"; // i2c
++			function = "gpio";
++			bias-pull-up;
++		};
++	};
++	uart_tl8251_pins: uart_tl8251_pins {
++		mux {
++			pins = "gpio75", "gpio76"; // gpio 77 reset tl8251
++			function = "blsp3_uart";
++			drive-strength = <8>;
++			bias-pull-down;
++		};
++	};
++};
++
++&blsp1_uart4 {
++	pinctrl-0 = <&uart_tl8251_pins>;
++	pinctrl-names = "default";
++	status = "ok";
++};
 diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
-index 25f8717a..3fea6475 100644
+index 25f8717a..6b6e34bb 100644
 --- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
 +++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-ax1800.dtsi
 @@ -1,5 +1,5 @@
@@ -38,7 +96,7 @@ index 25f8717a..3fea6475 100644
   *
   * Permission to use, copy, modify, and/or distribute this software for any
   * purpose with or without fee is hereby granted, provided that the above
-@@ -28,16 +28,35 @@
+@@ -28,16 +28,37 @@
  		ethernet1 = "/soc/dp2";
  		ethernet2 = "/soc/dp3";
  
@@ -65,8 +123,10 @@ index 25f8717a..3fea6475 100644
 +		wan = "eth0";
 +		reset-button = "gpio-50";
 +		usb-port = "1-1,2-1";
++		usb-reset = "usb_power,1";
 +		flash_size = <128>;
 +		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
++		radio = "radio0";
 +		factory_data {
 +			device_mac = "0:ART", "0x0";
 +			device_ddns = "0:ART", "0x20";
@@ -78,7 +138,7 @@ index 25f8717a..3fea6475 100644
  };
  
  &tlmm {
-@@ -101,7 +120,7 @@
+@@ -101,7 +122,7 @@
  		};
  		qpic_pad {
  			pins = "gpio1", "gpio3", "gpio4",
@@ -87,7 +147,7 @@ index 25f8717a..3fea6475 100644
  			function = "qpic_pad";
  			drive-strength = <8>;
  			bias-pull-down;
-@@ -250,14 +269,14 @@
+@@ -250,14 +271,14 @@
  		pinctrl-0 = <&leds_pins>;
  		pinctrl-names = "default";
  
@@ -107,7 +167,7 @@ index 25f8717a..3fea6475 100644
  			gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
  			default-state = "on";
  		};
-@@ -271,7 +290,7 @@
+@@ -271,7 +292,7 @@
  		switch {
  			label = "switch";
  			linux,code = <KEY_WPS_BUTTON>;
@@ -116,7 +176,7 @@ index 25f8717a..3fea6475 100644
  			linux,input-type = <1>;
  			debounce-interval = <60>;
  		};
-@@ -283,6 +302,18 @@
+@@ -283,6 +304,18 @@
  			debounce-interval = <60>;
  		};
  	};
@@ -135,86 +195,6 @@ index 25f8717a..3fea6475 100644
  };
  
  &blsp1_uart3 {
-diff --git a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
-index 0e5de3f1..4da836cf 100644
---- a/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
-+++ b/feeds/ipq807x/ipq807x/files/arch/arm64/boot/dts/qcom/qcom-ipq6018-gl-axt1800.dts
-@@ -24,16 +24,32 @@
- 	aliases {
- 		sdhc0 = &sdhc_2;
- 	};
-+
-+	gl_fan {
-+		compatible = "gl-fan";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		fan_speed_gpio = <31>;
-+	};
-+};
-+
-+&gl_hw {
-+	model = "axt1800";
-+	lan = "eth1 eth2";
-+	usb-port = "1-1,2-1";
-+	fan = "pwmchip0";
-+	switch-button = "gpio-16";
-+	dfs;
- };
- 
- &tlmm {
- 	sd_pins: sd_pins {
--		sd {
-+		mux_0 {
- 			pins = "gpio62";
- 			function = "sd_card";
- 			bias-pull-up;
- 		};
--		ldo {
-+		mux_1 {
- 			pins = "gpio66";
- 			function = "gpio";
- 			bias-pull-up;
-@@ -41,7 +57,7 @@
- 	};
- 
- 	pwm_pins: pwm_pinmux {
--		pwm {
-+		mux {
- 			pins = "gpio30";
- 			function = "pwm13";
- 			drive-strength = <8>;
-@@ -73,15 +89,27 @@
- 		status = "ok";
- 	};
- 
--	pwm-fan {
-+	fan0: pwm-fan {
- 		compatible = "pwm-fan";
- 		pinctrl-0 = <&fan_pins>;
- 		pinctrl-names = "default";
- 		cooling-min-state = <0>;
--		cooling-max-state = <3>;
-+		cooling-max-state = <255>;
- 		#cooling-cells = <2>;
--		pwms = <&pwm 1 255>;
--		cooling-levels = <0 150 200 255>;
-+		pwms = <&pwm 1 40000 0>;
-+		cooling-levels = <0 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36
-+				36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 37 38 39
-+				40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
-+				60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
-+				80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
-+				100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119
-+				120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
-+				140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159
-+				160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179
-+				180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199
-+				200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219
-+				220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239
-+				240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255>;
- 	};
- };
- 
 -- 
 2.25.1
 
