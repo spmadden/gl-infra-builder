@@ -33,7 +33,7 @@ index 0e5de3f1..05d71d63 100644
 +	model = "axt1800";
 +	lan = "eth1 eth2";
 +	usb-port = "1-1,2-1";
-+	fan = "pwmchip0";
++	fan = "hwmon0 cooling_device0";
 +	switch-button = "gpio-16";
 +	dfs;
  };
