@@ -1,19 +1,19 @@
-From 42cc9718219697933cbd0e4a0a6e6191528794ed Mon Sep 17 00:00:00 2001
+From e0edc46aca7a661db13360431408822baaf473ed Mon Sep 17 00:00:00 2001
 From: Hongjian Zhang <hongjian.zhang@gl-inet.com>
 Date: Mon, 29 May 2023 14:35:12 +0800
 Subject: [PATCH] support MT3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 274 ++++++++++++++++++
- 1 file changed, 274 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 272 ++++++++++++++++++
+ 1 file changed, 272 insertions(+)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..14d5d0894d
+index 0000000000..b70ee8ae56
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,274 @@
+@@ -0,0 +1,272 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -132,18 +132,22 @@ index 0000000000..14d5d0894d
 +		};
 +	};
 +
-+	gl_fan {
-+		compatible = "gl-fan";
-+		interrupt-parent = <&pio>;
-+		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
++	fan_5v: regulator-fan-5v {
++		compatible = "regulator-fixed";
++		regulator-name = "fan";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&pio 28 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
 +	};
 +
 +	pwm-fan {
 +		compatible = "pwm-fan";
-+		cooling-min-state = <0>;
-+		cooling-max-state = <255>;
 +		#cooling-cells = <2>;
 +		pwms = <&pwm 0 40000 0>;
++		fan-supply = <&fan_5v>;
++		interrupt-parent = <&pio>;
++		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
 +		cooling-levels = <0 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36
 +				36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 37 38 39
 +				40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
@@ -166,12 +170,6 @@ index 0000000000..14d5d0894d
 +			gpio-export,name = "usb_power";
 +			gpio-export,output = <1>;
 +			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
-+		};
-+
-+		fan_power {
-+			gpio-export,name = "fan_power";
-+			gpio-export,output = <1>;
-+			gpios = <&pio 28 GPIO_ACTIVE_HIGH>;
 +		};
 +	};
 +};
@@ -289,5 +287,5 @@ index 0000000000..14d5d0894d
 +	pinctrl-0 = <&pwm0_pin>;
 +};
 -- 
-2.17.1
+2.34.1
 
