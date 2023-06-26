@@ -1,4 +1,4 @@
-From 7f46d3684d29aaa9bb475d767b400d8254b64838 Mon Sep 17 00:00:00 2001
+From ecdd49622c9e17d57e7315577cb8083db15b5b40 Mon Sep 17 00:00:00 2001
 From: Yin Ni <yin.ni@gl-inet.com>
 Date: Wed, 15 Mar 2023 07:55:22 -0700
 Subject: [PATCH] e750: support E750 target
@@ -6,8 +6,8 @@ Subject: [PATCH] e750: support E750 target
 Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
 ---
  package/boot/uboot-envtools/files/ath79       |  1 +
- .../ath79/dts/qca9531_glinet_gl-e750.dts      | 53 ++++++++++++++++++-
- 2 files changed, 52 insertions(+), 2 deletions(-)
+ .../ath79/dts/qca9531_glinet_gl-e750.dts      | 54 ++++++++++++++++++-
+ 2 files changed, 53 insertions(+), 2 deletions(-)
 
 diff --git a/package/boot/uboot-envtools/files/ath79 b/package/boot/uboot-envtools/files/ath79
 index fde99f8b28..c147c6cbee 100644
@@ -22,10 +22,10 @@ index fde99f8b28..c147c6cbee 100644
  	idx="$(find_mtd_index u-boot-env)"
  	[ -n "$idx" ] && \
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
-index ca0784e6bf..ff42797843 100644
+index ca0784e6bf..5d3fb0bcd2 100644
 --- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
 +++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
-@@ -13,6 +13,32 @@
+@@ -13,6 +13,33 @@
  		label-mac-device = &eth0;
  	};
  
@@ -41,6 +41,7 @@ index ca0784e6bf..ff42797843 100644
 +                flash_size = <128>;
 +		noled = "true";
 +                radio = "radio0";
++		modem-reset = "1";
 +                build-in-modem = "1-1.2";
 +                reset-button = "gpio-3";
 +		switch-button = "gpio-1";
@@ -58,7 +59,7 @@ index ca0784e6bf..ff42797843 100644
  	keys {
  		compatible = "gpio-keys";
  
-@@ -27,7 +53,7 @@
+@@ -27,7 +54,7 @@
  
  		switch {
  			label = "switch";
@@ -67,7 +68,7 @@ index ca0784e6bf..ff42797843 100644
  			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
  		};
  	};
-@@ -40,6 +66,24 @@
+@@ -40,6 +67,24 @@
  			gpio-export,output = <1>;
  			gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
  		};
@@ -92,7 +93,7 @@ index ca0784e6bf..ff42797843 100644
  	 };
  };
  
-@@ -92,7 +136,12 @@
+@@ -92,7 +137,12 @@
  
  			partition@460000 {
  				label = "reserved";
@@ -107,5 +108,5 @@ index ca0784e6bf..ff42797843 100644
  		};
  	};
 -- 
-2.34.1
+2.17.1
 
