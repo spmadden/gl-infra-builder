@@ -18,6 +18,8 @@ packages:
   - mwan3
   - curl
   - iwinfo
+  - e2fsprogs
+  - fdisk
   - block-mount
   - blkid
   - ntfs-3g
