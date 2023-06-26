@@ -4,9 +4,9 @@ target: ath79
 subtarget: nand
 description: Build image for the GL.iNET S200
 feeds:
-  - name: gl_feed_common
+  - name: gl_feeds_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: ab108888af9ba7d8aa6c35997ca2ccf71325410b
+    revision: e73a053fa6e597343f1be0518d17fbdbd4975650
   - name: gl_feeds_21_02_2
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 68dc5722d4dd9a2f8388998343590be0a8a20b99
