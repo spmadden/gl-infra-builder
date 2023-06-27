@@ -1,19 +1,20 @@
-From e0edc46aca7a661db13360431408822baaf473ed Mon Sep 17 00:00:00 2001
+From c1821967ed4407ea2f5a94bd657183fad01c6b3a Mon Sep 17 00:00:00 2001
 From: Hongjian Zhang <hongjian.zhang@gl-inet.com>
 Date: Mon, 29 May 2023 14:35:12 +0800
 Subject: [PATCH] support MT3000 target
 
 ---
- .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 272 ++++++++++++++++++
- 1 file changed, 272 insertions(+)
+ .../boot/dts/mediatek/mt7981-gl-mt3000.dts    | 269 ++++++++++++++++++
+ target/linux/mediatek/mt7981/config-5.4       |   2 +-
+ 2 files changed, 270 insertions(+), 1 deletion(-)
  create mode 100755 target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
 new file mode 100755
-index 0000000000..b70ee8ae56
+index 0000000000..c419aa28c4
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-mt3000.dts
-@@ -0,0 +1,272 @@
+@@ -0,0 +1,269 @@
 +/dts-v1/;
 +
 +#include "mt7981.dtsi"
@@ -189,11 +190,7 @@ index 0000000000..b70ee8ae56
 +		compatible = "mediatek,eth-mac";
 +		reg = <0>;
 +		phy-mode = "2500base-x";
-+		fixed-link {
-+			speed = <2500>;
-+			full-duplex;
-+			pause;
-+		};
++		phy-handle = <&phy5>;
 +	};
 +
 +	gmac1: mac@1 {
@@ -207,6 +204,10 @@ index 0000000000..b70ee8ae56
 +		#address-cells = <1>;
 +		#size-cells = <0>;
 +
++		reset-gpios = <&pio 14 1>;
++		reset-assert-us = <600>;
++		reset-deassert-us = <20000>;
++
 +		phy0: phy@0 {
 +			compatible = "ethernet-phy-id03a2.9461";
 +			reg = <0>;
@@ -215,11 +216,8 @@ index 0000000000..b70ee8ae56
 +		};
 +
 +		phy5: phy@5 {
-+			compatible = "ethernet-phy-id67c9.de0a";
++			compatible = "ethernet-phy-ieee802.3-c45";
 +			reg = <5>;
-+			reset-gpios = <&pio 14 1>;
-+			reset-assert-us = <600>;
-+			reset-deassert-us = <20000>;
 +		};
 +	};
 +};
@@ -286,6 +284,18 @@ index 0000000000..b70ee8ae56
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pwm0_pin>;
 +};
+diff --git a/target/linux/mediatek/mt7981/config-5.4 b/target/linux/mediatek/mt7981/config-5.4
+index d79d4ff221..f9fea690a3 100644
+--- a/target/linux/mediatek/mt7981/config-5.4
++++ b/target/linux/mediatek/mt7981/config-5.4
+@@ -471,6 +471,6 @@ CONFIG_ZLIB_DEFLATE=y
+ CONFIG_ZLIB_INFLATE=y
+ CONFIG_ZONE_DMA32=y
+ # CONFIG_MTD_SPI_NAND_W25N01KV is not set
+-# CONFIG_MAXLINEAR_GPHY is not set
++CONFIG_MAXLINEAR_GPHY=y
+ # CONFIG_SHORTCUT_FE is not set
+ # CONFIG_NF_CONNTRACK_CHAIN_EVENTS is not set
 -- 
 2.34.1
 

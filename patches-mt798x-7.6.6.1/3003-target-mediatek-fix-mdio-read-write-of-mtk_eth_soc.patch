@@ -1,14 +1,14 @@
-From 140ddd19397760be888eb3aa0a977182a30e9f9e Mon Sep 17 00:00:00 2001
+From 984eea25b8a38184a24af43ceceeaf8c540acf02 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Mon, 19 Sep 2022 14:11:34 +0800
-Subject: [PATCH] target/mediatek: mtk-eth poll gpy211 link state
+Subject: [PATCH] target/mediatek: fix mdio read/write of mtk_eth_soc
 
 Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
- .../net/ethernet/mediatek/mtk_eth_dbg.c       |  8 ++--
- .../net/ethernet/mediatek/mtk_eth_soc.c       | 44 +++++++++++++++++--
- .../drivers/net/ethernet/mediatek/mtk_sgmii.c |  5 ++-
- 3 files changed, 48 insertions(+), 9 deletions(-)
+ .../files-5.4/drivers/net/ethernet/mediatek/mtk_eth_dbg.c | 8 ++++----
+ .../files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c | 8 ++++----
+ .../files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c   | 5 ++++-
+ 3 files changed, 12 insertions(+), 9 deletions(-)
 
 diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_dbg.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_dbg.c
 index 0d5ca16e4f..8977afb21c 100755
@@ -45,7 +45,7 @@ index 0d5ca16e4f..8977afb21c 100755
  
  int mtk_do_priv_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index a05cd19df6..d97776ba00 100755
+index a05cd19df6..acc56a39ef 100755
 --- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
 +++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
 @@ -2765,10 +2765,10 @@ static int mtk_open(struct net_device *dev)
@@ -73,56 +73,6 @@ index a05cd19df6..d97776ba00 100755
  	} else if (eth->sgmii->regmap[mac->id]) {
  		regmap_read(eth->sgmii->regmap[mac->id], SGMSYS_QPHY_PWR_STATE_CTRL, &val);
  		val |= SGMII_PHYA_PWD;
-@@ -3509,6 +3509,40 @@ static const struct net_device_ops mtk_netdev_ops = {
- #endif
- };
- 
-+static void phylink_fixed_state(struct net_device *dev,
-+                                         struct phylink_link_state *state)
-+{
-+#define PHY_MIISTAT            0x18    /* MII state */
-+#define PHY_MIISTAT_SPD_MASK   GENMASK(2, 0)
-+#define PHY_MIISTAT_DPX                BIT(3)
-+#define PHY_MIISTAT_LS         BIT(10)
-+#define PHY_MIISTAT_SPD_10     0
-+#define PHY_MIISTAT_SPD_100    1
-+#define PHY_MIISTAT_SPD_1000   2
-+#define PHY_MIISTAT_SPD_2500   4
-+
-+       struct mtk_mac *mac = netdev_priv(dev);
-+       u32 val = mdiobus_read(mac->hw->mii_bus, 0x05, PHY_MIISTAT);
-+
-+       state->link = (val & PHY_MIISTAT_LS) ? 1 : 0;
-+       state->duplex = (val & PHY_MIISTAT_DPX) ? DUPLEX_FULL : DUPLEX_HALF;
-+
-+       switch (FIELD_GET(PHY_MIISTAT_SPD_MASK, val)) {
-+       case PHY_MIISTAT_SPD_10:
-+               state->speed = SPEED_10;
-+               break;
-+       case PHY_MIISTAT_SPD_100:
-+               state->speed = SPEED_100;
-+               break;
-+       case PHY_MIISTAT_SPD_1000:
-+               state->speed = SPEED_1000;
-+               break;
-+       case PHY_MIISTAT_SPD_2500:
-+               state->speed = SPEED_2500;
-+               break;
-+       }
-+}
-+
- static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
- {
- 	const __be32 *_id = of_get_property(np, "reg", NULL);
-@@ -3590,6 +3624,8 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
- 	fixed_node = fwnode_get_named_child_node(of_fwnode_handle(mac->of_node),
- 						 "fixed-link");
- 	if (fixed_node) {
-+		phylink_fixed_state_cb(phylink, phylink_fixed_state);
-+
- 		desc = fwnode_get_named_gpiod(fixed_node, "link-gpio",
- 					      0, GPIOD_IN, "?");
- 		if (!IS_ERR(desc)) {
 diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
 index 8198c7cb59..e0406e2b86 100755
 --- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
@@ -140,5 +90,5 @@ index 8198c7cb59..e0406e2b86 100755
  	case SPEED_2500:
  	case SPEED_1000:
 -- 
-2.25.1
+2.34.1
 

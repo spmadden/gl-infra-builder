@@ -1,0 +1,30 @@
+From be92c17740592761205cac243f6b153a3b8cc406 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 27 Jun 2023 16:37:06 +0800
+Subject: [PATCH] mtk_eth_soc: fix bug of mtk_stop
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c   | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index acc56a39ef..c616e9e808 100755
+--- a/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -2827,11 +2827,7 @@ static int mtk_stop(struct net_device *dev)
+ 	netif_tx_disable(dev);
+ 
+ 	phy_node = of_parse_phandle(mac->of_node, "phy-handle", 0);
+-	if (phy_node) {
+-		val = mdiobus_read(eth->mii_bus, 0, 0);
+-		val |= BMCR_PDOWN;
+-		mdiobus_write(eth->mii_bus, 0, 0, val);
+-	} else if (eth->sgmii->regmap[mac->id]) {
++	if (!phy_node && eth->sgmii->regmap[mac->id]) {
+ 		regmap_read(eth->sgmii->regmap[mac->id], SGMSYS_QPHY_PWR_STATE_CTRL, &val);
+ 		val |= SGMII_PHYA_PWD;
+ 		regmap_write(eth->sgmii->regmap[mac->id], SGMSYS_QPHY_PWR_STATE_CTRL, val);
+-- 
+2.34.1
+

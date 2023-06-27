@@ -1,0 +1,124 @@
+From bfb8933d2bc01bf55ea4a92857cce91e00ce09a9 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Tue, 27 Jun 2023 16:06:56 +0800
+Subject: [PATCH] mt7981: fix get_features for GPY211C
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../patches-5.4/746-mxl-gpy-phy-support.patch | 34 +++++++++++--------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
+
+diff --git a/target/linux/mediatek/patches-5.4/746-mxl-gpy-phy-support.patch b/target/linux/mediatek/patches-5.4/746-mxl-gpy-phy-support.patch
+index 26bef5fb65..76074a39fc 100644
+--- a/target/linux/mediatek/patches-5.4/746-mxl-gpy-phy-support.patch
++++ b/target/linux/mediatek/patches-5.4/746-mxl-gpy-phy-support.patch
+@@ -1,8 +1,6 @@
+-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+-index e0f724a..1f74ff2 100644
+ --- a/drivers/net/phy/Kconfig
+ +++ b/drivers/net/phy/Kconfig
+-@@ -511,6 +511,12 @@ config MARVELL_10G_PHY
++@@ -516,6 +516,12 @@ config MARVELL_10G_PHY
+  	---help---
+  	  Support for the Marvell Alaska MV88X3310 and compatible PHYs.
+  
+@@ -15,11 +13,9 @@ index e0f724a..1f74ff2 100644
+  config MESON_GXL_PHY
+  	tristate "Amlogic Meson GXL Internal PHY"
+  	depends on ARCH_MESON || COMPILE_TEST
+-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+-index e3c411f..7b44a98 100644
+ --- a/drivers/net/phy/Makefile
+ +++ b/drivers/net/phy/Makefile
+-@@ -94,6 +94,7 @@ obj-$(CONFIG_LSI_ET1011C_PHY)	+= et1011c.o
++@@ -95,6 +95,7 @@ obj-$(CONFIG_LSI_ET1011C_PHY)	+= et1011c
+  obj-$(CONFIG_LXT_PHY)		+= lxt.o
+  obj-$(CONFIG_MARVELL_PHY)	+= marvell.o
+  obj-$(CONFIG_MARVELL_10G_PHY)	+= marvell10g.o
+@@ -27,12 +23,9 @@ index e3c411f..7b44a98 100644
+  obj-$(CONFIG_MEDIATEK_GE_PHY)	+= mediatek-ge.o
+  obj-$(CONFIG_MESON_GXL_PHY)	+= meson-gxl.o
+  obj-$(CONFIG_MICREL_KS8995MA)	+= spi_ks8995.o
+-diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
+-new file mode 100644
+-index 0000000..7304278
+ --- /dev/null
+ +++ b/drivers/net/phy/mxl-gpy.c
+-@@ -0,0 +1,738 @@
++@@ -0,0 +1,751 @@
+ +// SPDX-License-Identifier: GPL-2.0+
+ +/* Copyright (C) 2021 Maxlinear Corporation
+ + * Copyright (C) 2020 Intel Corporation
+@@ -45,6 +38,7 @@ index 0000000..7304278
+ +#include <linux/bitfield.h>
+ +#include <linux/phy.h>
+ +#include <linux/netdevice.h>
+++#include <linux/of.h>
+ +
+ +/* PHY ID */
+ +#define PHY_ID_GPYx15B_MASK	0xFFFFFFFC
+@@ -133,6 +127,10 @@ index 0000000..7304278
+ +{
+ +	int ret;
+ +
+++	/* GPY211 with external flash requires at least 750ms to wait for mdio ready */
+++	if (phy_read_mmd(phydev, MDIO_MMD_VEND1, 8) <= 0)
+++		return -EPROBE_DEFER;
+++
+ +	/* Show GPY PHY FW version in dmesg */
+ +	ret = phy_read(phydev, PHY_FWV);
+ +	if (ret < 0)
+@@ -539,6 +537,14 @@ index 0000000..7304278
+ +	return genphy_soft_reset(phydev);
+ +}
+ +
+++static int gpy211c_get_features(struct phy_device *phydev)
+++{
+++	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+++		phydev->supported, 1);
+++
+++	return genphy_read_abilities(phydev);
+++}
+++
+ +static struct phy_driver gpy_drivers[] = {
+ +	{
+ +		PHY_ID_MATCH_MODEL(PHY_ID_GPY2xx),
+@@ -613,7 +619,7 @@ index 0000000..7304278
+ +	{
+ +		PHY_ID_MATCH_MODEL(PHY_ID_GPY211C),
+ +		.name		= "Maxlinear Ethernet GPY211C",
+-+		.get_features	= genphy_c45_pma_read_abilities,
+++		.get_features	= gpy211c_get_features,
+ +		.config_init	= gpy_config_init,
+ +		.probe		= gpy_probe,
+ +		.suspend	= genphy_suspend,
+@@ -625,7 +631,7 @@ index 0000000..7304278
+ +		.handle_interrupt = gpy_handle_interrupt,
+ +		.set_wol	= gpy_set_wol,
+ +		.get_wol	= gpy_get_wol,
+-+		.set_loopback	= gpy_loopback,
+++		.set_loopback	= gpy_loopback
+ +	},
+ +	{
+ +		.phy_id		= PHY_ID_GPY212B,
+@@ -771,8 +777,6 @@ index 0000000..7304278
+ +MODULE_DESCRIPTION("Maxlinear Ethernet GPY Driver");
+ +MODULE_AUTHOR("Xu Liang");
+ +MODULE_LICENSE("GPL");
+-diff --git a/include/linux/phy.h b/include/linux/phy.h
+-index 19444cd..34bdd16 100644
+ --- a/include/linux/phy.h
+ +++ b/include/linux/phy.h
+ @@ -21,6 +21,7 @@
+@@ -783,7 +787,7 @@ index 19444cd..34bdd16 100644
+  
+  #include <linux/atomic.h>
+  
+-@@ -711,6 +712,18 @@ static inline int phy_read(struct phy_device *phydev, u32 regnum)
++@@ -711,6 +712,18 @@ static inline int phy_read(struct phy_de
+  	return mdiobus_read(phydev->mdio.bus, phydev->mdio.addr, regnum);
+  }
+  
+-- 
+2.34.1
+
