@@ -1,0 +1,24 @@
+From da81c4256f16e8bdd714d6cd92f49247a01061c3 Mon Sep 17 00:00:00 2001
+From: Xinfa Deng <Xinfa Deng>
+Date: Tue, 27 Jun 2023 17:50:03 +0800
+Subject: [PATCH] base-files: mt1300 support upgrade old firmware
+
+---
+ package/base-files/files/lib/upgrade/fwtool.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/base-files/files/lib/upgrade/fwtool.sh b/package/base-files/files/lib/upgrade/fwtool.sh
+index 8bd00a3332..7587c25062 100644
+--- a/package/base-files/files/lib/upgrade/fwtool.sh
++++ b/package/base-files/files/lib/upgrade/fwtool.sh
+@@ -61,6 +61,7 @@ fwtool_check_image() {
+ 	json_get_keys dev_keys
+ 	for k in $dev_keys; do
+ 		json_get_var dev "$k"
++		[ "$dev" = "gl-mt1300" ] && dev="glinet,gl-mt1300" && imagecompat="$devicecompat"
+ 		if [ "$dev" = "$device" ]; then
+ 			# major compat version -> no sysupgrade
+ 			if [ "${devicecompat%.*}" != "${imagecompat%.*}" ]; then
+-- 
+2.34.1
+
