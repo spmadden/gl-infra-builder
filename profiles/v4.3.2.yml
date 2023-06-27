@@ -10,4 +10,4 @@ feeds:
     revision: db00d3e7ce7ef74ec4da95de8fd79bd735899b52
   - name: mt76x8
     uri: https://gitlab.com/gl.sdk4.0/gl.router/mt76x8-feed.git
-    revision: 1930f0d0b5218ef154b7ebcf28b492a3bd688b5d
+    revision: 7746a52617f6f69d5418ff2462b951907f4ac7f5

@@ -65,7 +65,6 @@ packages:
   - gl-sdk4-qos
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
-  - gl-sdk4-init-portal
   - gl-sdk4-s2s
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3

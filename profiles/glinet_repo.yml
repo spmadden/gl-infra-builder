@@ -1,0 +1,33 @@
+---
+description: GL.iNet repository packages
+
+
+
+diffconfig: |
+  CONFIG_SAMBA4_SERVER_VFSX=y
+  CONFIG_SAMBA4_SERVER_AD_DC=y
+  CONFIG_BUSYBOX_CONFIG_ADDGROUP=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_ADDUSER_TO_GROUP=y
+  CONFIG_BUSYBOX_CONFIG_ADDUSER=y
+  CONFIG_BUSYBOX_CONFIG_CHPASSWD=y
+  CONFIG_BUSYBOX_CONFIG_DELUSER=y
+  CONFIG_BUSYBOX_CONFIG_DELGROUP=y
+  CONFIG_BUSYBOX_CONFIG_FEATURE_DEL_USER_FROM_GROUP=y
+  CONFIG_PACKAGE_gl-sdk4-nas-utils=m
+  CONFIG_PACKAGE_gl-sdk4-nas-web=m
+  CONFIG_PACKAGE_gl-sdk4-ui-nasview=m
+  CONFIG_PACKAGE_gl-sdk4-exfat-utils=m
+  CONFIG_PACKAGE_gl-sdk4-webdav=m
+  CONFIG_PACKAGE_gl-sdk4-adguardhome=m
+  CONFIG_PACKAGE_gl-sdk4-ui-adguardhome=m
+  CONFIG_PACKAGE_gl-sdk4-zerotier=m
+  CONFIG_PACKAGE_gl-sdk4-ui-zerotierview=m
+  CONFIG_PACKAGE_gl-sdk4-tailscale=m
+  CONFIG_PACKAGE_gl-sdk4-ui-tailscaleview=m
+  CONFIG_PACKAGE_gl-sdk4-tor=m
+  CONFIG_PACKAGE_gl-sdk4-ui-torview=m
+
+
+
+
+

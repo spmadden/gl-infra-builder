@@ -60,7 +60,6 @@ packages:
   - gl-sdk4-qos
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
-  - gl-sdk4-init-portal
   - gl-sdk4-s2s
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3
@@ -134,6 +133,7 @@ diffconfig: |
   CONFIG_NGINX_HTTP_UPSTREAM_IP_HASH=n
   CONFIG_NGINX_HTTP_UPSTREAM_LEAST_CONN=n
   CONFIG_NGINX_HTTP_UPSTREAM_KEEPALIVE=n
+  CONFIG_GL_SDK4_DNS_USE_DNSCRYPT_PROXY=y
   CONFIG_NGINX_HTTP_CACHE=n
   CONFIG_NGINX_NAXSI=n
   CONFIG_NGINX_HEADERS_MORE=n

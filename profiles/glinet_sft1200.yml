@@ -30,7 +30,6 @@ packages:
   - i2c-tools
   - getdns:packages
   - libtirpc:gl_feed_1806
-  - dnscrypt-proxy2:gl_feed_1806
   - stubby
   - wireguard
   - gl-oui-rpc
@@ -68,7 +67,6 @@ packages:
   - gl-sdk4-qos
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
-  - gl-sdk4-init-portal
   - gl-sdk4-s2s
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3
@@ -105,13 +103,11 @@ packages:
   - gl-sdk4-ui-timedtask
   - gl-sdk4-ui-timezone
   - gl-sdk4-ui-upgrade
-  - gl-sdk4-ui-vlan
   - gl-sdk4-ui-vpndashboard
   - gl-sdk4-ui-welcome
   - gl-sdk4-ui-wgclient
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
-  - gl-sdk4-ui-hwnat
   - gl-sdk4-ui-netnat
 
 diffconfig: |
@@ -120,6 +116,7 @@ diffconfig: |
   CONFIG_PACKAGE_wpad-basic=n
   CONFIG_PACKAGE_wpad=n
   CONFIG_BUSYBOX_CUSTOM=y
+  CONFIG_GL_SDK4_DNS_USE_DNSCRYPT_PROXY=y
   CONFIG_BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP=y
   CONFIG_SIGNED_PACKAGES=n
   CONFIG_NGINX_HTTP_CHARSET=n

@@ -64,7 +64,6 @@ packages:
   - gl-sdk4-qos
   - gl-sdk4-network-diag
   - gl-sdk4-carrier-monitor
-  - gl-sdk4-init-portal
   - gl-sdk4-s2s
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3
@@ -107,7 +106,6 @@ packages:
   - gl-sdk4-ui-wgclient
   - gl-sdk4-ui-wgserver
   - gl-sdk4-ui-wireless
-  - gl-sdk4-ui-hwnat
   - gl-sdk4-ui-netnat
 
 diffconfig: |
