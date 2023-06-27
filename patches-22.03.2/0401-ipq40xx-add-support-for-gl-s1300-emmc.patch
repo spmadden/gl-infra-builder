@@ -1,4 +1,4 @@
-From 37c2155c18b34cc87e684065621008afdc41cb7c Mon Sep 17 00:00:00 2001
+From 6a20142cd6c55d3c1461d3df590b9cc6a8a6c56b Mon Sep 17 00:00:00 2001
 From: Dongming Han <handongming@gl-inet.com>
 Date: Wed, 11 Jan 2023 15:39:46 +0800
 Subject: [PATCH] ipq40xx: add support for gl-s1300-emmc
@@ -6,12 +6,12 @@ Subject: [PATCH] ipq40xx: add support for gl-s1300-emmc
 Signed-off-by: Dongming Han <handongming@gl-inet.com>
 ---
  .../ipq40xx/base-files/etc/board.d/01_leds    |   8 +-
- .../ipq40xx/base-files/etc/board.d/02_network |   9 +
+ .../ipq40xx/base-files/etc/board.d/02_network |  11 +-
  .../base-files/lib/upgrade/platform.sh        |   2 +
  .../boot/dts/qcom-ipq4029-gl-s1300-emmc.dts   | 412 ++++++++++++++++++
  target/linux/ipq40xx/image/generic.mk         |  29 ++
  .../901-arm-boot-add-dts-files.patch          |   3 +-
- 6 files changed, 461 insertions(+), 2 deletions(-)
+ 6 files changed, 462 insertions(+), 3 deletions(-)
  create mode 100644 target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts
 
 diff --git a/target/linux/ipq40xx/base-files/etc/board.d/01_leds b/target/linux/ipq40xx/base-files/etc/board.d/01_leds
@@ -44,10 +44,10 @@ index 0e473534f5..d8e69da700 100644
  	;;
  mikrotik,cap-ac)
 diff --git a/target/linux/ipq40xx/base-files/etc/board.d/02_network b/target/linux/ipq40xx/base-files/etc/board.d/02_network
-index 2aa4886e6a..53a5f3f4cf 100644
+index 2aa4886e6a..2ebc1cca84 100644
 --- a/target/linux/ipq40xx/base-files/etc/board.d/02_network
 +++ b/target/linux/ipq40xx/base-files/etc/board.d/02_network
-@@ -110,6 +110,7 @@ ipq40xx_setup_interfaces()
+@@ -110,10 +110,11 @@ ipq40xx_setup_interfaces()
  		;;
  	glinet,gl-ap1300 |\
  	glinet,gl-b1300 |\
@@ -55,6 +55,11 @@ index 2aa4886e6a..53a5f3f4cf 100644
  	glinet,gl-s1300)
  		ucidef_set_interfaces_lan_wan "eth0" "eth1"
  		ucidef_add_switch "switch0" \
+-			"0u@eth0" "3:lan" "4:lan"
++			"0u@eth0" "3:lan" "4:lan" "0u@eth1" "5:wan"
+ 		;;
+ 	glinet,gl-b2200)
+ 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
 @@ -216,6 +217,14 @@ ipq40xx_setup_macs()
  		lan_mac=$(cat /sys/firmware/mikrotik/hard_config/mac_base)
  		label_mac="$lan_mac"

@@ -1,4 +1,4 @@
-From be29f17fac5f6f38cdda15c2f5f476af1e68ce7c Mon Sep 17 00:00:00 2001
+From d9f400d70e54b341f30d5ab9149560c1eb88c84c Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 19 Jan 2023 12:09:45 +0800
 Subject: [PATCH] support XE3000 target
@@ -10,10 +10,10 @@ Subject: [PATCH] support XE3000 target
 
 diff --git a/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
 new file mode 100755
-index 0000000000..5cbba7f7ba
+index 0000000000..6a21677735
 --- /dev/null
 +++ b/target/linux/mediatek/files-5.4/arch/arm64/boot/dts/mediatek/mt7981-gl-xe3000.dts
-@@ -0,0 +1,313 @@
+@@ -0,0 +1,311 @@
 +/dts-v1/;
 +#include "mt7981.dtsi"
 +/ {
@@ -101,12 +101,6 @@ index 0000000000..5cbba7f7ba
 +			gpio-export,output = <0>;
 +			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 +		};
-+
-+		fan_power {
-+			gpio-export,name = "fan_power";
-+			gpio-export,output = <1>;
-+			gpios = <&pio 28 GPIO_ACTIVE_HIGH>;
-+		};
 +	};
 +
 +	leds {
@@ -161,18 +155,22 @@ index 0000000000..5cbba7f7ba
 +		};
 +	};
 +
-+	gl_fan {
-+		compatible = "gl-fan";
-+		interrupt-parent = <&pio>;
-+		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
++	fan_5v: regulator-fan-5v {
++		compatible = "regulator-fixed";
++		regulator-name = "fan";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&pio 28 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
 +	};
 +
 +	pwm-fan {
 +		compatible = "pwm-fan";
-+		cooling-min-state = <0>;
-+		cooling-max-state = <255>;
 +		#cooling-cells = <2>;
 +		pwms = <&pwm 0 40000 0>;
++		fan-supply = <&fan_5v>;
++		interrupt-parent = <&pio>;
++		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
 +		cooling-levels = <0 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36
 +				36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 37 38 39
 +				40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
