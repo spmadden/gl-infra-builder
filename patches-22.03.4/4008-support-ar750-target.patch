@@ -31,9 +31,9 @@ index 60bd2922a2..1631049de6 100644
 +			wan = "eth0";
 +            lan = "eth1";
 +            flash_size = <16>;
-+            radio = "mac80211";
++            radio = "radio0,radio1";
 +            reset-button = "gpio-3";
-+			usb-port = "1-1.1";
++			usb-port = "1-1.1,1-1.2";
 +			switch-button = "gpio-0";
 +            factory_data {
 +                    device_mac = "art";
