@@ -24,7 +24,7 @@ index 0eaa1ce37..9608336c4 100644
 +        wan = "eth0.2";
 +        lan = "eth0.1";
 +        reset-button = "gpio-27";
-+        usb-port = "1-1";
++        usb-port = "1-1,2-1";
 +        switch-button = "gpio-1";
 +        flash_size = <128>;
 +        radio = "radio0 radio1";
