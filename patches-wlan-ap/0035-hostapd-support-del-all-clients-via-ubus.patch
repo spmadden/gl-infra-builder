@@ -1,0 +1,36 @@
+From dd9af5b25664950c37ea29820f1c802617db9fcb Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 28 Jun 2023 19:23:36 +0800
+Subject: [PATCH] hostapd: support del all clients via ubus
+
+```
+ubus call hostapd.wlan0 del_client '{"addr":"ff:ff:ff:ff:ff:ff"}'
+```
+---
+ ...00-ubus-del-client-support-broadcast-addr.patch | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 feeds/wifi-ax/hostapd/patches/n00-100-ubus-del-client-support-broadcast-addr.patch
+
+diff --git a/feeds/wifi-ax/hostapd/patches/n00-100-ubus-del-client-support-broadcast-addr.patch b/feeds/wifi-ax/hostapd/patches/n00-100-ubus-del-client-support-broadcast-addr.patch
+new file mode 100644
+index 00000000..a5f34b5d
+--- /dev/null
++++ b/feeds/wifi-ax/hostapd/patches/n00-100-ubus-del-client-support-broadcast-addr.patch
+@@ -0,0 +1,14 @@
++--- a/src/ap/ubus.c
+++++ b/src/ap/ubus.c
++@@ -553,6 +553,11 @@ hostapd_bss_del_client(struct ubus_conte
++ 			hostapd_drv_sta_disassoc(hapd, addr, reason);
++ 			ap_sta_disassociate(hapd, sta, reason);
++ 		}
+++	} else if (is_broadcast_ether_addr(addr)) {
+++		if (deauth)
+++			hostapd_drv_sta_deauth(hapd, addr, reason);
+++		else
+++			hostapd_drv_sta_disassoc(hapd, addr, reason);
++ 	}
++ 
++ 	if (tb[DEL_CLIENT_BAN_TIME])
+-- 
+2.34.1
+
