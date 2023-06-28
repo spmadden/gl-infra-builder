@@ -1,0 +1,38 @@
+From f2e8ce343de463a67015f4d5715e5537625e385e Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 28 Jun 2023 19:56:53 +0800
+Subject: [PATCH] hostapd: support del all clients via ubus
+
+```
+ubus call hostapd.wlan0 del_client '{"addr":"ff:ff:ff:ff:ff:ff"}'
+```
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ ...60-ubus-del-client-support-broadcast-addr.patch | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 package/network/services/hostapd/patches/760-ubus-del-client-support-broadcast-addr.patch
+
+diff --git a/package/network/services/hostapd/patches/760-ubus-del-client-support-broadcast-addr.patch b/package/network/services/hostapd/patches/760-ubus-del-client-support-broadcast-addr.patch
+new file mode 100644
+index 0000000000..5c5b9c17f2
+--- /dev/null
++++ b/package/network/services/hostapd/patches/760-ubus-del-client-support-broadcast-addr.patch
+@@ -0,0 +1,14 @@
++--- a/src/ap/ubus.c
+++++ b/src/ap/ubus.c
++@@ -531,6 +531,11 @@ hostapd_bss_del_client(struct ubus_conte
++ 			hostapd_drv_sta_disassoc(hapd, addr, reason);
++ 			ap_sta_disassociate(hapd, sta, reason);
++ 		}
+++	} else if (is_broadcast_ether_addr(addr)) {
+++		if (deauth)
+++			hostapd_drv_sta_deauth(hapd, addr, reason);
+++		else
+++			hostapd_drv_sta_disassoc(hapd, addr, reason);
++ 	}
++ 
++ 	if (tb[DEL_CLIENT_BAN_TIME])
+-- 
+2.34.1
+
