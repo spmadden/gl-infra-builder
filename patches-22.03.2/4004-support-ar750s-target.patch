@@ -59,7 +59,7 @@ index 878a740cfd..41c6cf5c63 100644
 +		flash_size = <128>;
 +		switch-button = "gpio-8";
 +		reset-button = "gpio-2";
-+		usb-port = "1-1";
++		usb-port = "1-1,2-1";
 +		radio = "radio0 radio1";
 +		nand;
 +		factory_data {
