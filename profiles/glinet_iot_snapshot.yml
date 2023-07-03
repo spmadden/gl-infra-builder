@@ -5,3 +5,6 @@ feeds:
     path: /home/glinet/work/iot/gl-sdk4-collect
   - name: glinet_iot
     path: /home/glinet/work/iot/gl-iot-sdk-collect
+
+packages:
+  - ot-br-posix:glinet_iot
