@@ -9,6 +9,7 @@ feeds:
     revision: dbb11e818569d3662b89fdc737dabab99ee81f77
     
 packages:
+  - mdnsresponder:gl_feeds_21_02_2
   - gl-iot-sdk-release
   - gl-oui-rpc
   - ot-br-posix
