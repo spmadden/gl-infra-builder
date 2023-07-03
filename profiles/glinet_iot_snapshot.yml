@@ -1,0 +1,7 @@
+---
+description: Add the glinet dependencies
+feeds:
+  - name: glinet
+    path: /home/glinet/work/iot/gl-sdk4-collect
+  - name: glinet_iot
+    path: /home/glinet/work/iot/gl-iot-sdk-collect
