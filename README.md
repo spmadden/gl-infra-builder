@@ -105,9 +105,10 @@ MT2500
 
 S200
 
-| Firmware version | gl-infra-builder tag | glinet4.x tag        |
-| ---------------- | -------------------- | -------------------- |
-| 4.1.3            | v4.1.3_s200_release7 | v4.1.3_s200_release7 |
+| Firmware version | gl-infra-builder tag      | glinet4.x tag        |
+| ---------------- | ------------------------- | -------------------- |
+| 4.1.3            | v4.1.3_s200_release7      | v4.1.3_s200_release7 |
+| 4.1.4-0200       | v4.1.4-0200_s200_release1 | no record            |
 
 x300b
 
@@ -321,22 +322,12 @@ make V=s -j5
 ```
 7.2 Compile S200 GL.iNet standard firmware
 ```
-git clone -b v4.1.3_s200_release7 https://github.com/gl-inet/glinet4.x.git
+git clone https://github.com/gl-inet/glbuilder && cd glbuilder
+make menuconfig
+--Select GL.iNet router model (GL.iNet s200)
+--Select version for s200 (s200 version 4.1.4-0200)
+make V=s
 ```
-```
-cp glinet4.x/pkg_config/gl_pkg_config_ath79_s200.mk glinet4.x/ath79/gl_pkg_config.mk
-```
-```
-cp glinet4.x/pkg_config/gl_pkg_config_ath79_s200.yml profiles/
-```
-```
-./scripts/gen_config.py target_ath79_gl-s200 gl_pkg_config_ath79_s200
-```
-```
-make V=s -j5 GL_PKGDIR=`pwd`/glinet4.x/ath79/
-```
-Note: Some customers may encounter mDNSResponder-1310.80.1.tar.gz download failed error, please click [Here](https://glinet-hoff-temp-file.oss-cn-shenzhen.aliyuncs.com/mDNSResponder-1310.80.1.tar.gz) to download mDNSResponder-1310.80.1.tar.gz file, and then put it in openwrt-21.02/openwrt-21.02.2/dl directory.
-
 ## 8. Compile x300b(2023.04.20)
 8.1 Compile x300b OpenWrt firmware(No GL.iNet packages)
 ```
@@ -374,6 +365,7 @@ make V=s -j5
 ```
 
 9.2 Compile X3000 GL.iNet standard firmware
+
 ```
 git clone https://github.com/gl-inet/glbuilder && cd glbuilder
 make menuconfig
