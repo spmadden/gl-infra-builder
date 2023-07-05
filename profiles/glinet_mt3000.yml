@@ -9,7 +9,7 @@ feeds:
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 032786d5ff300ebdd83fb1b5fec5344b3da04953
   - name: mt7981_private
-    uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
+    uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: c8031866e73dfb6d7a4912113c1bcab77046fd0b
 
 packages:

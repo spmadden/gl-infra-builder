@@ -15,7 +15,7 @@ feeds:
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 1b1b4feaf649cbf39d6de072fa6a24c2fb18ffc6
   - name: mt7981_private
-    uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
+    uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: c8031866e73dfb6d7a4912113c1bcab77046fd0b
   - name: glinet
     uri: git@gitlab.com:gl.sdk4.0/gl.router/gl-sdk4-collect.git
