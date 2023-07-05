@@ -18,7 +18,7 @@ feeds:
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: da09723846cf25c6b7e288cd1669c89ea4d6071e
   - name: mt7981
-    uri: https://gitlab.com/gl.sdk4.0/gl.router/mt7981-feeds.git
+    uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/mt7981-feeds.git
     revision: 6b61d7a4a848836089f8393440e81f40ab63ba66
   - name: glinet
     path: ../feeds_dir/glinet
