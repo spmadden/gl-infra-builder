@@ -1,0 +1,69 @@
+From 0dfcb66e56c3a6b0888f5db5a0a3440403e3b1b2 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 5 Jul 2023 16:37:50 +0800
+Subject: [PATCH] mac80211: allow scan on dfs channel for sta
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ ...05-allow-scan-on-dfs-channel-for-sta.patch | 30 +++++++++++++++++++
+ .../qca/401-ignore-dfs-violation.patch        | 11 +++++++
+ 2 files changed, 41 insertions(+)
+ create mode 100644 feeds/wifi-ax/mac80211/patches/pending/305-allow-scan-on-dfs-channel-for-sta.patch
+ create mode 100644 feeds/wifi-ax/mac80211/patches/qca/401-ignore-dfs-violation.patch
+
+diff --git a/feeds/wifi-ax/mac80211/patches/pending/305-allow-scan-on-dfs-channel-for-sta.patch b/feeds/wifi-ax/mac80211/patches/pending/305-allow-scan-on-dfs-channel-for-sta.patch
+new file mode 100644
+index 00000000..8443637c
+--- /dev/null
++++ b/feeds/wifi-ax/mac80211/patches/pending/305-allow-scan-on-dfs-channel-for-sta.patch
+@@ -0,0 +1,30 @@
++--- a/net/mac80211/scan.c
+++++ b/net/mac80211/scan.c
++@@ -548,11 +548,11 @@ static bool __ieee80211_can_leave_ch(str
++ 	struct ieee80211_local *local = sdata->local;
++ 	struct ieee80211_sub_if_data *sdata_iter;
++ 
++-	if (!ieee80211_is_radar_required(local))
++-		return true;
+++	// if (!ieee80211_is_radar_required(local))
+++	// 	return true;
++ 
++-	if (!regulatory_pre_cac_allowed(local->hw.wiphy))
++-		return false;
+++	// if (!regulatory_pre_cac_allowed(local->hw.wiphy))
+++	// 	return false;
++ 
++ 	mutex_lock(&local->iflist_mtx);
++ 	list_for_each_entry(sdata_iter, &local->interfaces, list) {
++--- a/net/wireless/nl80211.c
+++++ b/net/wireless/nl80211.c
++@@ -8266,6 +8266,9 @@ static bool cfg80211_off_channel_oper_al
++ 	if (!cfg80211_beaconing_iface_active(wdev))
++ 		return true;
++ 
+++	if (wdev->iftype == NL80211_IFTYPE_STATION)
+++		return true;
+++
++ 	if (!(wdev->chandef.chan->flags & IEEE80211_CHAN_RADAR))
++ 		return true;
++ 
+diff --git a/feeds/wifi-ax/mac80211/patches/qca/401-ignore-dfs-violation.patch b/feeds/wifi-ax/mac80211/patches/qca/401-ignore-dfs-violation.patch
+new file mode 100644
+index 00000000..1f472930
+--- /dev/null
++++ b/feeds/wifi-ax/mac80211/patches/qca/401-ignore-dfs-violation.patch
+@@ -0,0 +1,11 @@
++--- a/drivers/net/wireless/ath/ath11k/wmi.c
+++++ b/drivers/net/wireless/ath/ath11k/wmi.c
++@@ -7442,7 +7442,7 @@ static void ath11k_vdev_start_resp_event
++ 
++ 	status = vdev_start_resp.status;
++ 
++-	if (WARN_ON_ONCE(status)) {
+++	if (status != WMI_VDEV_START_RESPONSE_DFS_VIOLATION && WARN_ON_ONCE(status)) {
++ 		ath11k_warn(ab, "vdev start resp error status %d (%s)\n",
++ 			    status, ath11k_wmi_vdev_resp_print(status));
++ 		ar->last_wmi_vdev_start_status = status;
+-- 
+2.34.1
+
