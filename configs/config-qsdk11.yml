@@ -1,4 +1,4 @@
-repo: https://gitlab.com/gl.router/gl-b1300-gl-s1300-product/qsdk11.git
+repo: http://192.168.17.119:888/gl.router/gl-b1300-gl-s1300-product/qsdk11.git
 branch: master
 git_clone_dir: qsdk11
 openwrt_root_dir: qsdk11

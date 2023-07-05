@@ -2,7 +2,7 @@
 description: Add the glinet dependencies
 feeds:
   - name: glinet
-    uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
     branch: master
     #revision: bc48d8620657a52f80364b59f7de9d6e676b19b4
 

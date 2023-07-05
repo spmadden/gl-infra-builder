@@ -3,5 +3,5 @@ feeds:
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 4fd97cfe3c89f7277911375d9aa0ce85ac6d27c7
   - name: glinet
-    uri: https://gitlab.com/gl.sdk4.0/gl.router/gl-sdk4-collect.git
+    uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
     revision: 8aa234b316edb8876a046e867a15d6bd228eff05
