@@ -61,7 +61,6 @@ packages:
   - gl-sdk4-ui-welcome
   - gl-sdk4-s2s
   - kmod-shortcut-fe-cm
-  - gl-sdk4-ui-netnat
   - gl-sdk4-ui-dynamicdns
   - gl-sdk4-ui-edgerouter
   - gl-sdk4-ui-firewallview

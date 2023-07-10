@@ -67,7 +67,6 @@ packages:
   - gl-sdk4-carrier-monitor
   - gl-sdk4-s2s
   - kmod-shortcut-fe-cm
-  - gl-sdk4-ui-netnat
   - gl-sdk4-edgerouter
   - gl-sdk4-mwan3
   - gl-sdk4-timer
