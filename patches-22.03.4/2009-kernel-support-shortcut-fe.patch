@@ -1,18 +1,32 @@
-From 75f9a26616785c5c5de297604015df5a2dad36f3 Mon Sep 17 00:00:00 2001
+From 9912854cff4f6e52f95c0bea9f08d0cd5944d006 Mon Sep 17 00:00:00 2001
 From: Dongming Han <handongming@gl-inet.com>
 Date: Tue, 4 Jul 2023 15:52:10 +0800
 Subject: [PATCH] kernel: support shortcut fe
 
 Signed-off-by: Dongming Han <handongming@gl-inet.com>
 ---
+ target/linux/generic/config-5.10              |   2 +
  ...k-events-support-multiple-registrant.patch | 312 ++++++++++++++++++
  ...-linux-kernel-to-support-shortcut-fe.patch | 252 ++++++++++++++
  ...-netfilter_optional_tcp_window_check.patch |  73 ++++
- 3 files changed, 637 insertions(+)
+ 4 files changed, 639 insertions(+)
  create mode 100644 target/linux/generic/hack-5.10/952-net-conntrack-events-support-multiple-registrant.patch
  create mode 100644 target/linux/generic/hack-5.10/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
  create mode 100644 target/linux/generic/pending-5.10/613-netfilter_optional_tcp_window_check.patch
 
+diff --git a/target/linux/generic/config-5.10 b/target/linux/generic/config-5.10
+index a348d4821e..61694eeadd 100644
+--- a/target/linux/generic/config-5.10
++++ b/target/linux/generic/config-5.10
+@@ -4105,6 +4105,8 @@ CONFIG_NF_CONNTRACK_PROCFS=y
+ # CONFIG_NF_CONNTRACK_TIMEOUT is not set
+ # CONFIG_NF_CONNTRACK_TIMESTAMP is not set
+ # CONFIG_NF_CONNTRACK_ZONES is not set
++# CONFIG_SHORTCUT_FE is not set
++# CONFIG_NF_CONNTRACK_CHAIN_EVENTS is not set
+ # CONFIG_NF_CT_NETLINK is not set
+ # CONFIG_NF_CT_NETLINK_HELPER is not set
+ # CONFIG_NF_CT_NETLINK_TIMEOUT is not set
 diff --git a/target/linux/generic/hack-5.10/952-net-conntrack-events-support-multiple-registrant.patch b/target/linux/generic/hack-5.10/952-net-conntrack-events-support-multiple-registrant.patch
 new file mode 100644
 index 0000000000..0e5d11d240
