@@ -83,6 +83,7 @@ packages:
   - gl-sdk4-netmode
   - gl-sdk4-keepcfg
   - gl-sdk4-2b
+  - kmod-shortcut-fe-cm
     #  - gl-sdk4-nas-utils
     #  - gl-sdk4-nas-web
     #  - gl-sdk4-exfat-utils
