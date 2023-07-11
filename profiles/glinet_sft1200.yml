@@ -29,6 +29,7 @@ packages:
   - iptables-mod-filter
   - i2c-tools
   - getdns:packages
+  - dnscrypt-proxy:packages
   - libtirpc:gl_feed_1806
   - stubby
   - wireguard

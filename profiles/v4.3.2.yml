@@ -1,13 +1,13 @@
 feeds:
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: c3c41ce7322532125bff463478ce53f18564a45c
+    revision: 798f5a1c13dec90d764fffe33073a5169a1fa3b1
   - name: gl_feeds_22_03
     uri: https://github.com/gl-inet/gl-feeds.git
     revision: 117cdf8b2e376343bb29c01fc2750b3188d6119e
   - name: glinet
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: d201c4cba3de8c0242bc36231fb466e62a10ccaf
+    revision: 742a0fd0cafc0b1e13ed733364343e49bf365c56
   - name: mt76x8
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/mt76x8-feed.git
     revision: da8840fd395d5732e8fafd8b7858585c389087f4
