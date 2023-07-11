@@ -44,7 +44,7 @@ packages:
   - gl-sdk4-ddns
   - gl-sdk4-dns
   - gl-sdk4-firewall
-  - gl-sdk4-init-portal
+    #- gl-sdk4-init-portal
   - gl-sdk4-ipv6
   - gl-sdk4-lan
   - gl-sdk4-led
