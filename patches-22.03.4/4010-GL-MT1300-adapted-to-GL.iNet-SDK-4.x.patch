@@ -52,7 +52,7 @@ index 7e3dc8cc03..4b5e629c40 100644
 +		flash_size = <32>;
 +		switch-button = "gpio-16";
 +		radio = "radio0";
-+		usb-port = "1-1";
++		usb-port = "1-1,2-1";
 +		factory_data {
 +			device_mac = "factory", "0x4000";
 +			device_ddns = "factory", "0x4010";
