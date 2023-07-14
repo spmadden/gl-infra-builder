@@ -1,4 +1,4 @@
-From e6f4d8f94e1afb587ed2ce03b1072bdee08623fd Mon Sep 17 00:00:00 2001
+From d3feb0442f82ec2322a6e400f49ec67dbdeaf183 Mon Sep 17 00:00:00 2001
 From: Dongming Han <handongming@gl-inet.com>
 Date: Sat, 8 Jul 2023 11:25:53 +0800
 Subject: [PATCH] wireguard: use out of tree version for performance
@@ -9,16 +9,16 @@ Signed-off-by: Dongming Han <handongming@gl-inet.com>
  package/network/services/wireguard/Makefile   | 89 +++++++++++++++++++
  .../100-port_wireguard_linux_compat.patch     | 78 ++++++++++++++++
  .../patches/150-support-hotplug-for-gl.patch  | 64 +++++++++++++
- ...MEOUT-hotplug-after-3-consecutive-fa.patch | 30 +++++++
  ...d-server-not-do-handshake-initiation.patch | 26 ++++++
+ ...MEOUT-hotplug-after-3-consecutive-fa.patch | 65 ++++++++++++++
  .../services/wireguard/src/src/hotplug.c      | 82 +++++++++++++++++
  .../services/wireguard/src/src/hotplug.h      | 13 +++
- 8 files changed, 383 insertions(+), 1 deletion(-)
+ 8 files changed, 418 insertions(+), 1 deletion(-)
  create mode 100644 package/network/services/wireguard/Makefile
  create mode 100644 package/network/services/wireguard/patches/100-port_wireguard_linux_compat.patch
  create mode 100644 package/network/services/wireguard/patches/150-support-hotplug-for-gl.patch
- create mode 100644 package/network/services/wireguard/patches/151-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
  create mode 100644 package/network/services/wireguard/patches/152-make-wireguard-server-not-do-handshake-initiation.patch
+ create mode 100644 package/network/services/wireguard/patches/153-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
  create mode 100644 package/network/services/wireguard/src/src/hotplug.c
  create mode 100644 package/network/services/wireguard/src/src/hotplug.h
 
@@ -284,42 +284,6 @@ index 0000000000..f9bb1f0d27
 + 	}
 + }
 + 
-diff --git a/package/network/services/wireguard/patches/151-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch b/package/network/services/wireguard/patches/151-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
-new file mode 100644
-index 0000000000..3fcea6b988
---- /dev/null
-+++ b/package/network/services/wireguard/patches/151-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
-@@ -0,0 +1,30 @@
-+From 82d7f8de2a1b640b5545976e495b16911a105fa2 Mon Sep 17 00:00:00 2001
-+From: Dongming Han <handongming@gl-inet.com>
-+Date: Wed, 1 Feb 2023 19:11:20 +0800
-+Subject: [PATCH] trigger REKEY_TIMEOUT hotplug after 3 consecutive failure of
-+ handshake initiation
-+
-+detect disconnect time change from 0 ~ 2min to 15s ~ 2min15s
-+Optimize the stability in packet loss environment
-+---
-+ src/timers.c | 4 ++--
-+ 1 file changed, 2 insertions(+), 2 deletions(-)
-+
-+diff --git a/src/timers.c b/src/timers.c
-+index 7f0716c..a90addf 100644
-+--- a/src/timers.c
-++++ b/src/timers.c
-+@@ -76,8 +76,8 @@ static void wg_expired_retransmit_handshake(struct timer_list *timer)
-+ 		wg_socket_clear_peer_endpoint_src(peer);
-+ 
-+ 		wg_packet_send_queued_handshake_initiation(peer, true);
-+-
-+-		wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
-++		if(peer->timer_handshake_attempts > 3)
-++			wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
-+ 	}
-+ }
-+ 
-+-- 
-+2.25.1
-+
 diff --git a/package/network/services/wireguard/patches/152-make-wireguard-server-not-do-handshake-initiation.patch b/package/network/services/wireguard/patches/152-make-wireguard-server-not-do-handshake-initiation.patch
 new file mode 100644
 index 0000000000..571073dc60
@@ -349,6 +313,77 @@ index 0000000000..571073dc60
 + 	if (!wg_birthdate_has_expired(atomic64_read(&peer->last_sent_handshake),
 + 				      REKEY_TIMEOUT))
 + 		return; /* This function is rate limited. */
++-- 
++2.25.1
++
+diff --git a/package/network/services/wireguard/patches/153-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch b/package/network/services/wireguard/patches/153-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
+new file mode 100644
+index 0000000000..8875478b39
+--- /dev/null
++++ b/package/network/services/wireguard/patches/153-trigger-REKEY_TIMEOUT-hotplug-after-3-consecutive-fa.patch
+@@ -0,0 +1,65 @@
++From 5aa16c5c878bab30b125c3fd98246750684e9df3 Mon Sep 17 00:00:00 2001
++From: Dongming Han <handongming@gl-inet.com>
++Date: Thu, 13 Jul 2023 19:15:06 +0800
++Subject: [PATCH] trigger REKEY_TIMEOUT hotplug after 3 consecutive failure of
++ handshake initiation
++
++detect disconnect time change from 0 ~ 2min to 15s ~ 2min15s
++Optimize the stability in packet loss environment
++
++Signed-off-by: Dongming Han <handongming@gl-inet.com>
++---
++ src/receive.c | 2 ++
++ src/timers.c  | 9 +++++++--
++ 2 files changed, 9 insertions(+), 2 deletions(-)
++
++diff --git a/src/receive.c b/src/receive.c
++index 214889e..dfbf52d 100644
++--- a/src/receive.c
+++++ b/src/receive.c
++@@ -97,6 +97,7 @@ static int prepare_skb_header(struct sk_buff *skb, struct wg_device *wg)
++ 	return 0;
++ }
++ 
+++extern int is_retry_count_wg;
++ static void wg_receive_handshake_packet(struct wg_device *wg,
++ 					struct sk_buff *skb)
++ {
++@@ -193,6 +194,7 @@ static void wg_receive_handshake_packet(struct wg_device *wg,
++ 			 */
++ 			wg_packet_send_keepalive(peer);
++ 		}
+++		is_retry_count_wg = 0;
++ 		break;
++ 	}
++ 	}
++diff --git a/src/timers.c b/src/timers.c
++index 7f0716c..04c8029 100644
++--- a/src/timers.c
+++++ b/src/timers.c
++@@ -39,6 +39,7 @@ static inline void mod_peer_timer(struct wg_peer *peer,
++ 	rcu_read_unlock_bh();
++ }
++ 
+++int is_retry_count_wg = 0;
++ static void wg_expired_retransmit_handshake(struct timer_list *timer)
++ {
++ 	struct wg_peer *peer = from_timer(peer, timer,
++@@ -76,8 +77,12 @@ static void wg_expired_retransmit_handshake(struct timer_list *timer)
++ 		wg_socket_clear_peer_endpoint_src(peer);
++ 
++ 		wg_packet_send_queued_handshake_initiation(peer, true);
++-
++-		wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
+++		is_retry_count_wg++;
+++		if(is_retry_count_wg > 3)
+++		{
+++			is_retry_count_wg = 0;
+++			wireguard_hotplug(peer->device->dev->name, REKEY_TIMEOUT_EVENT);
+++		}
++ 	}
++ }
++ 
 +-- 
 +2.25.1
 +
