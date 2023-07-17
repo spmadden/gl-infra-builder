@@ -20,7 +20,7 @@ index 0f5b07225c..78847e6ea3 100644
 -  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
    SUPPORTED_DEVICES += glinet,gl-ar300m-nor
 +  IMAGES := factory.img sysupgrade.tar
-+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
 +  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-gl-metadata
  endef
  TARGET_DEVICES += glinet_gl-ar300m-nand
