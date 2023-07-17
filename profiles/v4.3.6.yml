@@ -7,7 +7,7 @@ feeds:
     revision: 117cdf8b2e376343bb29c01fc2750b3188d6119e
   - name: glinet
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 5c07bb469315f8e95d283c81f7d6860c238d7701
+    revision: 7211b6078318f9c6a6a6869bf52e4f2cc146226b
   - name: mt76x8
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/mt76x8-feed.git
     revision: da8840fd395d5732e8fafd8b7858585c389087f4
