@@ -1,19 +1,19 @@
-From 774b95d09340e5a10ae207f88b2ae2be2691dad8 Mon Sep 17 00:00:00 2001
+From 490d3da0509fa3b40e5a90bbdaad5dda03a4c6d4 Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 13 Jul 2023 18:27:49 +0800
-Subject: [PATCH] add -modem support
+Subject: [PATCH] add modem support
 
 ---
- .../hack-5.4/781-add-modem-support.patch      | 282 ++++++++++++++++++
- 1 file changed, 282 insertions(+)
+ .../hack-5.4/781-add-modem-support.patch      | 286 ++++++++++++++++++
+ 1 file changed, 286 insertions(+)
  create mode 100644 target/linux/generic/hack-5.4/781-add-modem-support.patch
 
 diff --git a/target/linux/generic/hack-5.4/781-add-modem-support.patch b/target/linux/generic/hack-5.4/781-add-modem-support.patch
 new file mode 100644
-index 0000000000..58f6e830b1
+index 0000000000..4eb31c3f0d
 --- /dev/null
 +++ b/target/linux/generic/hack-5.4/781-add-modem-support.patch
-@@ -0,0 +1,282 @@
+@@ -0,0 +1,286 @@
 +Index: linux-5.4.179/drivers/net/usb/qmi_wwan.c
 +===================================================================
 +--- linux-5.4.179.orig/drivers/net/usb/qmi_wwan.c
@@ -47,7 +47,7 @@ index 0000000000..58f6e830b1
 + };
 + 
 + static const struct driver_info	qmi_wwan_info_quirk_dtr = {
-+@@ -938,6 +944,19 @@ static const struct driver_info	qmi_wwan
++@@ -938,6 +944,21 @@ static const struct driver_info	qmi_wwan
 + 	.driver_info = (unsigned long)&qmi_wwan_info_quirk_dtr
 + 
 + static const struct usb_device_id products[] = {
@@ -63,11 +63,13 @@ index 0000000000..58f6e830b1
 ++	{ QMI_MATCH_FF_FF_FF(0x2C7C, 0x0435) }, /* Quectel AG35 */
 ++	{ QMI_MATCH_FF_FF_FF(0x2c7c, 0x030b) }, /* Quectel EM060K-GL EM120K-GL */
 ++	{ QMI_MATCH_FF_FF_FF(0x2c7c, 0x030e) }, /* Quectel EM05-G */
+++	{ QMI_MATCH_FF_FF_FF(0x2c7c, 0x030b) },	/* Quectel Quectel EM060K-GL EM120K-GL */
+++	{ QMI_MATCH_FF_FF_FF(0x2c7c, 0x0801) },	/* Quectel RM520N-GL */
 ++#endif
 + 	/* 1. CDC ECM like devices match on the control interface */
 + 	{	/* Huawei E392, E398 and possibly others sharing both device id and more... */
 + 		USB_VENDOR_AND_INTERFACE_INFO(HUAWEI_VENDOR_ID, USB_CLASS_VENDOR_SPEC, 1, 9),
-+@@ -1041,8 +1060,6 @@ static const struct usb_device_id produc
++@@ -1041,8 +1062,6 @@ static const struct usb_device_id produc
 + 		USB_DEVICE_AND_INTERFACE_INFO(0x03f0, 0x581d, USB_CLASS_VENDOR_SPEC, 1, 7),
 + 		.driver_info = (unsigned long)&qmi_wwan_info,
 + 	},
@@ -76,7 +78,7 @@ index 0000000000..58f6e830b1
 + 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0512)},	/* Quectel EG12/EM12 */
 + 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM160R-GL */
 + 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0800)},	/* Quectel RM500Q-GL */
-+@@ -1396,7 +1413,6 @@ static const struct usb_device_id produc
++@@ -1396,7 +1415,6 @@ static const struct usb_device_id produc
 + 	{QMI_GOBI_DEVICE(0x05c6, 0x9225)},	/* Sony Gobi 2000 Modem device (N0279, VU730) */
 + 	{QMI_GOBI_DEVICE(0x05c6, 0x9245)},	/* Samsung Gobi 2000 Modem device (VL176) */
 + 	{QMI_GOBI_DEVICE(0x03f0, 0x251d)},	/* HP Gobi 2000 Modem device (VP412) */
@@ -107,7 +109,7 @@ index 0000000000..58f6e830b1
 + 
 + /* Device flags */
 + 
-+@@ -585,6 +597,31 @@ static void option_instat_callback(struc
++@@ -585,6 +597,33 @@ static void option_instat_callback(struc
 + 
 + 
 + static const struct usb_device_id option_ids[] = {
@@ -126,6 +128,8 @@ index 0000000000..58f6e830b1
 ++	{ USB_DEVICE(0x2C7C, 0x6026) }, /* Quectel EC200t */
 ++	{ USB_DEVICE(0x2C7C, 0x030b) }, /* Quectel EM060K-GL EM120K-GL */
 ++	{ USB_DEVICE(0x2C7C, 0x030e) }, /* Quectel EM05-G */
+++	{ USB_DEVICE(0x2C7C, 0x0620) }, /* Quectel EM160R-GL */
+++	{ USB_DEVICE(0x2C7C, 0x0801) }, /* Quectel RM520N-GL */
 ++#endif
 ++	{ USB_DEVICE(0x19d2, 0x0536) },/* MZ386 */
 ++	{ USB_DEVICE(0x19d2, 0x0117) },
@@ -139,7 +143,7 @@ index 0000000000..58f6e830b1
 + 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_COLT) },
 + 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA) },
 + 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_LIGHT) },
-+@@ -2146,6 +2183,9 @@ static struct usb_serial_driver option_1
++@@ -2146,6 +2185,9 @@ static struct usb_serial_driver option_1
 + #ifdef CONFIG_PM
 + 	.suspend           = usb_wwan_suspend,
 + 	.resume            = usb_wwan_resume,
@@ -149,7 +153,7 @@ index 0000000000..58f6e830b1
 + #endif
 + };
 + 
-+@@ -2168,6 +2208,7 @@ static int option_probe(struct usb_seria
++@@ -2168,6 +2210,7 @@ static int option_probe(struct usb_seria
 + {
 + 	struct usb_interface_descriptor *iface_desc =
 + 				&serial->interface->cur_altsetting->desc;
@@ -157,7 +161,7 @@ index 0000000000..58f6e830b1
 + 	unsigned long device_flags = id->driver_info;
 + 
 + 	/* Never bind to the CD-Rom emulation interface	*/
-+@@ -2189,9 +2230,98 @@ static int option_probe(struct usb_seria
++@@ -2189,9 +2232,98 @@ static int option_probe(struct usb_seria
 + 	if (device_flags & NUMEP2 && iface_desc->bNumEndpoints != 2)
 + 		return -ENODEV;
 + 
