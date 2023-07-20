@@ -1,0 +1,32 @@
+From a37ad9ed537b2453fcb1333464c6ab7c42c055a2 Mon Sep 17 00:00:00 2001
+From: Yin Ni <yin.ni@gl-inet.com>
+Date: Thu, 20 Jul 2023 20:45:51 +0800
+Subject: [PATCH] kmoloader: add kmoloader serial print
+
+Signed-off-by: Yin Ni <yin.ni@gl-inet.com>
+---
+ .../patches/001-add_kmoloaderserial_print.patches    | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100644 package/system/ubox/patches/001-add_kmoloaderserial_print.patches
+
+diff --git a/package/system/ubox/patches/001-add_kmoloaderserial_print.patches b/package/system/ubox/patches/001-add_kmoloaderserial_print.patches
+new file mode 100644
+index 0000000000..ac55d38deb
+--- /dev/null
++++ b/package/system/ubox/patches/001-add_kmoloaderserial_print.patches
+@@ -0,0 +1,12 @@
++Index: b/kmodloader.c
++===================================================================
++--- a/kmodloader.c
+++++ b/kmodloader.c
++@@ -1025,6 +1025,7 @@ static int main_loader(int argc, char **
++ 		}
++ 	} else {
++ 		ULOG_INFO("done loading kernel modules from %s\n", path);
+++		ULOG_INFO("[\"gl_system\": \"kernel_load\"]\n");
++ 	}
++ 
++ out:
+-- 
+2.25.1
+
