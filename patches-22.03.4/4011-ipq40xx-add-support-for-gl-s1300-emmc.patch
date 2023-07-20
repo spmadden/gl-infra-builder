@@ -1,4 +1,4 @@
-From 6a20142cd6c55d3c1461d3df590b9cc6a8a6c56b Mon Sep 17 00:00:00 2001
+From f8f39fd16ce14122138370f758271ae54014974e Mon Sep 17 00:00:00 2001
 From: Dongming Han <handongming@gl-inet.com>
 Date: Wed, 11 Jan 2023 15:39:46 +0800
 Subject: [PATCH] ipq40xx: add support for gl-s1300-emmc
@@ -8,10 +8,11 @@ Signed-off-by: Dongming Han <handongming@gl-inet.com>
  .../ipq40xx/base-files/etc/board.d/01_leds    |   8 +-
  .../ipq40xx/base-files/etc/board.d/02_network |  11 +-
  .../base-files/lib/upgrade/platform.sh        |   2 +
+ target/linux/ipq40xx/config-5.10              |   1 +
  .../boot/dts/qcom-ipq4029-gl-s1300-emmc.dts   | 412 ++++++++++++++++++
  target/linux/ipq40xx/image/generic.mk         |  29 ++
  .../901-arm-boot-add-dts-files.patch          |   3 +-
- 6 files changed, 462 insertions(+), 3 deletions(-)
+ 7 files changed, 463 insertions(+), 3 deletions(-)
  create mode 100644 target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts
 
 diff --git a/target/linux/ipq40xx/base-files/etc/board.d/01_leds b/target/linux/ipq40xx/base-files/etc/board.d/01_leds
@@ -44,7 +45,7 @@ index 0e473534f5..d8e69da700 100644
  	;;
  mikrotik,cap-ac)
 diff --git a/target/linux/ipq40xx/base-files/etc/board.d/02_network b/target/linux/ipq40xx/base-files/etc/board.d/02_network
-index 2aa4886e6a..2ebc1cca84 100644
+index a38d35a10d..236daaea45 100644
 --- a/target/linux/ipq40xx/base-files/etc/board.d/02_network
 +++ b/target/linux/ipq40xx/base-files/etc/board.d/02_network
 @@ -110,10 +110,11 @@ ipq40xx_setup_interfaces()
@@ -60,7 +61,7 @@ index 2aa4886e6a..2ebc1cca84 100644
  		;;
  	glinet,gl-b2200)
  		ucidef_set_interfaces_lan_wan "eth0" "eth1"
-@@ -216,6 +217,14 @@ ipq40xx_setup_macs()
+@@ -221,6 +222,14 @@ ipq40xx_setup_macs()
  		lan_mac=$(cat /sys/firmware/mikrotik/hard_config/mac_base)
  		label_mac="$lan_mac"
  		;;
@@ -76,10 +77,10 @@ index 2aa4886e6a..2ebc1cca84 100644
  
  	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
 diff --git a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
-index e8c94409a7..856a793e19 100644
+index e9c17e5b01..a847f7a31c 100644
 --- a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
-@@ -119,6 +119,7 @@ platform_do_upgrade() {
+@@ -120,6 +120,7 @@ platform_do_upgrade() {
  	qxwlan,e2600ac-c2)
  		nand_do_upgrade "$1"
  		;;
@@ -87,7 +88,7 @@ index e8c94409a7..856a793e19 100644
  	glinet,gl-b2200)
  		CI_KERNPART="0:HLOS"
  		CI_ROOTPART="rootfs"
-@@ -200,6 +201,7 @@ platform_do_upgrade() {
+@@ -202,6 +203,7 @@ platform_do_upgrade() {
  
  platform_copy_config() {
  	case "$(board_name)" in
@@ -95,6 +96,15 @@ index e8c94409a7..856a793e19 100644
  	glinet,gl-b2200)
  		emmc_copy_config
  		;;
+diff --git a/target/linux/ipq40xx/config-5.10 b/target/linux/ipq40xx/config-5.10
+index fda14f0131..c1c3257876 100644
+--- a/target/linux/ipq40xx/config-5.10
++++ b/target/linux/ipq40xx/config-5.10
+@@ -495,3 +495,4 @@ CONFIG_ZLIB_DEFLATE=y
+ CONFIG_ZLIB_INFLATE=y
+ CONFIG_ZSTD_COMPRESS=y
+ CONFIG_ZSTD_DECOMPRESS=y
++CONFIG_SERIAL_OF_PLATFORM=y
 diff --git a/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts b/target/linux/ipq40xx/files/arch/arm/boot/dts/qcom-ipq4029-gl-s1300-emmc.dts
 new file mode 100644
 index 0000000000..1ba67cdea0
@@ -514,7 +524,7 @@ index 0000000000..1ba67cdea0
 +	qcom,ath10k-calibration-variant = "GL-S1300-EMMC";
 +};
 diff --git a/target/linux/ipq40xx/image/generic.mk b/target/linux/ipq40xx/image/generic.mk
-index cf89409b17..3637c50e08 100644
+index 3b0d917cd9..8236e0ba35 100644
 --- a/target/linux/ipq40xx/image/generic.mk
 +++ b/target/linux/ipq40xx/image/generic.mk
 @@ -106,6 +106,17 @@ define Build/qsdk-ipq-app-gpt
@@ -561,19 +571,19 @@ index cf89409b17..3637c50e08 100644
  	$(call Device/FitzImage)
  	DEVICE_VENDOR := GL.iNet
 diff --git a/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch b/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch
-index 4fc0566c73..5add3c7bf0 100644
+index c51586a232..349cdda5d6 100644
 --- a/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch
 +++ b/target/linux/ipq40xx/patches-5.10/901-arm-boot-add-dts-files.patch
 @@ -10,7 +10,7 @@ Signed-off-by: John Crispin <john@phrozen.org>
  
  --- a/arch/arm/boot/dts/Makefile
  +++ b/arch/arm/boot/dts/Makefile
--@@ -904,11 +904,75 @@ dtb-$(CONFIG_ARCH_QCOM) += \
-+@@ -904,11 +904,76 @@ dtb-$(CONFIG_ARCH_QCOM) += \
+-@@ -904,11 +904,76 @@ dtb-$(CONFIG_ARCH_QCOM) += \
++@@ -904,11 +904,77 @@ dtb-$(CONFIG_ARCH_QCOM) += \
   	qcom-apq8074-dragonboard.dtb \
   	qcom-apq8084-ifc6540.dtb \
   	qcom-apq8084-mtp.dtb \
-@@ -82,6 +82,7 @@ Signed-off-by: John Crispin <john@phrozen.org>
+@@ -83,6 +83,7 @@ Signed-off-by: John Crispin <john@phrozen.org>
  +	qcom-ipq4029-gl-b1300.dtb \
  +	qcom-ipq4019-gl-b2200.dtb \
  +	qcom-ipq4029-gl-s1300.dtb \
