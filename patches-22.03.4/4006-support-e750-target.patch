@@ -1,4 +1,4 @@
-From ecdd49622c9e17d57e7315577cb8083db15b5b40 Mon Sep 17 00:00:00 2001
+From 66e3bb19f2ddc52377a862bb1f4d8e50e48fa842 Mon Sep 17 00:00:00 2001
 From: Yin Ni <yin.ni@gl-inet.com>
 Date: Wed, 15 Mar 2023 07:55:22 -0700
 Subject: [PATCH] e750: support E750 target
@@ -22,7 +22,7 @@ index fde99f8b28..c147c6cbee 100644
  	idx="$(find_mtd_index u-boot-env)"
  	[ -n "$idx" ] && \
 diff --git a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
-index ca0784e6bf..5d3fb0bcd2 100644
+index ca0784e6bf..0fa3dfe457 100644
 --- a/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
 +++ b/target/linux/ath79/dts/qca9531_glinet_gl-e750.dts
 @@ -13,6 +13,33 @@
@@ -41,7 +41,7 @@ index ca0784e6bf..5d3fb0bcd2 100644
 +                flash_size = <128>;
 +		noled = "true";
 +                radio = "radio0";
-+		modem-reset = "1";
++		modem-reset = "2";
 +                build-in-modem = "1-1.2";
 +                reset-button = "gpio-3";
 +		switch-button = "gpio-1";
