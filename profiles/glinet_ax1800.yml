@@ -105,6 +105,7 @@ packages:
   - gl-sdk4-ui-tailscaleview
   - gl-sdk4-ui-wireless
   - gl-sdk4-keepcfg
+  - gl-sdk4-bark
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n
