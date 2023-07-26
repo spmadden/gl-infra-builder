@@ -17,7 +17,6 @@ packages:
   - kmod-gl-sdk4-hw-info
   - kmod-gl-sdk4-tertf
   - dnsmasq-full
-  - mwan3
   - curl
   - iwinfo
   - mmc-utils
@@ -48,7 +47,7 @@ packages:
   - gl-sdk4-dns
   - gl-sdk4-timer
   - gl-sdk4-tor
-  - gl-sdk4-mwan3
+  - gl-sdk4-kmwan
   - gl-sdk4-zerotier
   - gl-sdk4-tailscale
   - kmod-gl-sdk4-parental-control

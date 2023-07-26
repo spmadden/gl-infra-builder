@@ -14,7 +14,7 @@ packages:
   - gl-sdk4-adguardhome
   - gl-sdk4-timer
   - gl-sdk4-igmp
-  - gl-sdk4-mwan3
+  - gl-sdk4-kmwan
   - gl-sdk4-ui-hwnat
   - gl-sdk4-cloud
   - gl-sdk4-ui-cloud
