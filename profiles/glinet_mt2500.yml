@@ -97,6 +97,9 @@ packages:
   - gl-sdk4-tailscale
   - gl-sdk4-ui-tailscaleview
   - gl-line-graph
+  - gl-sdk4-local-access
+  - gl-sdk4-ui-guestip
+  - gl-sdk4-ui-security
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n

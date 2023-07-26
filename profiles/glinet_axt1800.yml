@@ -16,5 +16,8 @@ packages:
   - kmod-gl-sdk4-black_white_list
   - gl-sdk4-kmwan
   - gl-line-graph
+  - gl-sdk4-local-access
+  - gl-sdk4-ui-guestip
+  - gl-sdk4-ui-security
 
 diffconfig: |
