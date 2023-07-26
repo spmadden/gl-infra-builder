@@ -4,14 +4,15 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 7009319c3596ef938db7649c90d2d58f43d7d06e
+    revision: 523eb02348931a470a6fcafb9fd44b413f99796d
 
 packages:
   - gl-sdk4-led
   - gl-sdk4-adguardhome
   - gl-sdk4-ui-adguardhome
   - gl-sdk4-sms-forward
-  - gl-sdk4-mqtt
-  - gl-sdk4-cloud-batch-manage
+  - gl-sdk4-cloud
+  - gl-sdk4-ui-cloud
+  - kmod-gl-sdk4-black_white_list
 
 diffconfig: |
