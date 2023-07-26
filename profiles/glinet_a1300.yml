@@ -13,5 +13,6 @@ packages:
   - gl-sdk4-cloud
   - gl-sdk4-ui-cloud
   - kmod-gl-sdk4-black_white_list
+  - gl-line-graph
 
 diffconfig: |

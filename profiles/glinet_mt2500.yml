@@ -96,6 +96,7 @@ packages:
   - gl-sdk4-ui-zerotierview
   - gl-sdk4-tailscale
   - gl-sdk4-ui-tailscaleview
+  - gl-line-graph
 
 diffconfig: |
   CONFIG_SIGNATURE_CHECK=n
