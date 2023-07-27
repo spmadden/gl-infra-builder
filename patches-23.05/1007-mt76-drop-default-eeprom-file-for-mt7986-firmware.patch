@@ -1,0 +1,31 @@
+From 735d29aa612626139c72ff29fe3dac655e65eacc Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Wed, 12 Jul 2023 14:13:38 +0800
+Subject: [PATCH] mt76: drop default eeprom file for mt7986-firmware
+
+The mt76 driver usually reads the eeprom on the mtd partition at dts.
+For emmc device we need to use caldata_extract script to read the
+eeprom. However, the default eeprom file breaks the caldata script
+execution, so remove it.
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/kernel/mt76/Makefile | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/package/kernel/mt76/Makefile b/package/kernel/mt76/Makefile
+index 0dfe7600df..507c78f950 100644
+--- a/package/kernel/mt76/Makefile
++++ b/package/kernel/mt76/Makefile
+@@ -520,8 +520,6 @@ define KernelPackage/mt7986-firmware/install
+ 		$(PKG_BUILD_DIR)/firmware/mt7986_wm.bin \
+ 		$(PKG_BUILD_DIR)/firmware/mt7986_rom_patch_mt7975.bin \
+ 		$(PKG_BUILD_DIR)/firmware/mt7986_rom_patch.bin \
+-		$(PKG_BUILD_DIR)/firmware/mt7986_eeprom_mt7975_dual.bin \
+-		$(PKG_BUILD_DIR)/firmware/mt7986_eeprom_mt7976_dual.bin \
+ 		$(1)/lib/firmware/mediatek
+ endef
+ 
+-- 
+2.34.1
+

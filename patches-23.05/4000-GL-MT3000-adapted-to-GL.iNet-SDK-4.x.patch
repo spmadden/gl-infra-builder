@@ -1,0 +1,101 @@
+From 43691820532ff98c731a5184ea85bba78a174001 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Thu, 25 May 2023 19:09:51 +0800
+Subject: [PATCH] GL-MT3000: adapted to GL.iNet SDK 4.x
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../mediatek/dts/mt7981b-glinet-gl-mt3000.dts | 46 +++++++++++++++++--
+ target/linux/mediatek/image/filogic.mk        |  4 +-
+ 2 files changed, 44 insertions(+), 6 deletions(-)
+
+diff --git a/target/linux/mediatek/dts/mt7981b-glinet-gl-mt3000.dts b/target/linux/mediatek/dts/mt7981b-glinet-gl-mt3000.dts
+index d916ee49ef..5cdec5e778 100644
+--- a/target/linux/mediatek/dts/mt7981b-glinet-gl-mt3000.dts
++++ b/target/linux/mediatek/dts/mt7981b-glinet-gl-mt3000.dts
+@@ -27,12 +27,10 @@
+ 			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+-		mode {
+-			label = "mode";
+-			linux,input-type = <EV_SW>;
+-			linux,code = <BTN_0>;
++		switch {
++			label = "switch";
++			linux,code = <KEY_SETUP>;
+ 			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
+-			debounce-interval = <60>;
+ 		};
+ 	};
+ 
+@@ -69,6 +67,30 @@
+ 		enable-active-high;
+ 		regulator-boot-on;
+ 	};
++
++	gl-hw {
++		compatible = "gl-hw-info";
++		model = "mt3000";
++		wan = "eth0";
++		lan = "eth1";
++		usb-port = "1-1,2-1";
++		flash_size = <256>;
++		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
++		fan = "hwmon1 cooling_device0";
++		switch-button = "gpio-455";
++		reset-button = "gpio-456";
++		radio = "radio0 radio1";
++		dfs;
++
++		factory_data {
++			device_mac = "Factory", "0x0a";
++			device_ddns = "Factory", "0x10";
++			device_sn_bak = "Factory", "0x20";
++			device_sn = "Factory", "0x30";
++			country_code = "Factory", "0x88";
++			device_cert = "Factory", "0x1000";
++		};
++	};
+ };
+ 
+ &uart0 {
+@@ -130,6 +152,20 @@
+ 	interrupt-parent = <&pio>;
+ 	interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+ 	status = "okay";
++
++	cooling-levels = <0 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36
++			36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 37 38 39
++			40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
++			60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
++			80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
++			100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119
++			120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
++			140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159
++			160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179
++			180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199
++			200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219
++			220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239
++			240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255>;
+ };
+ 
+ &spi0 {
+diff --git a/target/linux/mediatek/image/filogic.mk b/target/linux/mediatek/image/filogic.mk
+index 69b5420a1d..d6acf4572c 100644
+--- a/target/linux/mediatek/image/filogic.mk
++++ b/target/linux/mediatek/image/filogic.mk
+@@ -141,7 +141,9 @@ define Device/glinet_gl-mt3000
+   PAGESIZE := 2048
+   IMAGE_SIZE := 246272k
+   KERNEL_IN_UBI := 1
+-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++  IMAGES := factory.img sysupgrade.tar
++  IMAGE/factory.img := append-ubi | check-size $$$$(IMAGE_SIZE)
++  IMAGE/sysupgrade.tar := sysupgrade-tar | append-gl-metadata
+ endef
+ TARGET_DEVICES += glinet_gl-mt3000
+ 
+-- 
+2.34.1
+

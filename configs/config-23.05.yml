@@ -1,0 +1,7 @@
+repo: https://github.com/openwrt/openwrt.git
+git_clone_dir: openwrt-23.05/openwrt-23.05
+openwrt_root_dir: openwrt-23.05/openwrt-23.05
+revision: 476bf135fcec4c1ceb5114029e539a07131e970f
+
+patch_folders:
+  - patches-23.05/

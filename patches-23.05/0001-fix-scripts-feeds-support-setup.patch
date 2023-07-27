@@ -1,0 +1,83 @@
+From f283030999e56d68b612ee5baaa27dd714840531 Mon Sep 17 00:00:00 2001
+From: gl-dengxinfa <xinfa.deng@gl-inet.com>
+Date: Sat, 17 Sep 2022 14:19:14 +0800
+Subject: [PATCH] fix: scripts feeds support setup
+
+---
+ scripts/feeds | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/scripts/feeds b/scripts/feeds
+index aee73e793f..4b68b5e930 100755
+--- a/scripts/feeds
++++ b/scripts/feeds
+@@ -856,6 +856,47 @@ sub update {
+ 	return $failed;
+ }
+ 
++sub setup {
++	my %opts;
++
++	getopts('bh', \%opts);
++
++	if ($opts{h}) {
++		usage();
++		return 0;
++	}
++
++	if (-e "feeds.conf") {
++		warn "The file feeds.conf already exists.\n";
++		return 1;
++	}
++
++	open(my $fd, ">>feeds.conf");
++
++	while (my $entry = shift @ARGV) {
++		my ($type, $name, $src) = split /,/, $entry;
++
++		$update_method{$type} or do {
++			warn "Unknown type '$type' in parameter $entry\n";
++			unlink "feeds.conf";
++			return 1;
++		};
++
++		if ($name =~ /[\s-]/) {
++			warn "Feed names or sources may not contain whitespace or - characters in parameter $entry\n";
++			unlink "feeds.conf";
++			return 1;
++		}
++		printf $fd "%s %s %s\n", $type, $name, $src;
++	}
++
++	if ($opts{b}) {
++		printf $fd "src-include defaults feeds.conf.default\n";
++	}
++
++	return 0;
++}
++
+ sub feed_config() {
+ 	foreach my $feed (@feeds) {
+ 		my $installed = (-f "feeds/$feed->[1].index");
+@@ -907,6 +948,10 @@ Commands:
+ 	    -i :           Recreate the index only. No feed update from repository is performed.
+ 	    -f :           Force updating feeds even if there are changed, uncommitted files.
+ 
++	setup [options] <type,name,link> <type,name,link> ...: generate feeds.conf
++	Options:
++	    -b :           Use feeds.conf.default as base for new feeds.conf.
++
+ 	clean:             Remove downloaded/generated files.
+ 
+ EOF
+@@ -920,6 +965,7 @@ my %commands = (
+ 	'search' => \&search,
+ 	'uninstall' => \&uninstall,
+ 	'feed_config' => \&feed_config,
++	'setup' => \&setup,
+ 	'clean' => sub {
+ 		system("rm -rf ./feeds ./package/feeds ./target/linux/feeds");
+ 	}
+-- 
+2.34.1
+

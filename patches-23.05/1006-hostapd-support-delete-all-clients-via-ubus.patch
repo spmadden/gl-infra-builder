@@ -1,0 +1,61 @@
+From 22bb45193f013f8ccf5b46853e8ed04c789b4b10 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 3 Jul 2023 16:00:19 +0800
+Subject: [PATCH] hostapd: support delete all clients via ubus
+
+```
+ubus call hostapd.phy0-ap0 del_client '{"addr":"ff:ff:ff:ff:ff:ff"}'
+```
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ .../services/hostapd/src/src/ap/ubus.c        | 26 ++++++++++++++-----
+ 1 file changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/package/network/services/hostapd/src/src/ap/ubus.c b/package/network/services/hostapd/src/src/ap/ubus.c
+index ddd86447eb..8c7e7a17c0 100644
+--- a/package/network/services/hostapd/src/src/ap/ubus.c
++++ b/package/network/services/hostapd/src/src/ap/ubus.c
+@@ -512,6 +512,21 @@ static const struct blobmsg_policy del_policy[__DEL_CLIENT_MAX] = {
+ 	[DEL_CLIENT_BAN_TIME] = { "ban_time", BLOBMSG_TYPE_INT32 },
+ };
+ 
++static void
++hostapd_del_client(struct hostapd_data *hapd, struct sta_info *sta,
++			bool deauth, int reason)
++{
++	u8 *addr = sta->addr;
++
++	if (deauth) {
++		hostapd_drv_sta_deauth(hapd, addr, reason);
++		ap_sta_deauthenticate(hapd, sta, reason);
++	} else {
++		hostapd_drv_sta_disassoc(hapd, addr, reason);
++		ap_sta_disassociate(hapd, sta, reason);
++	}
++}
++
+ static int
+ hostapd_bss_del_client(struct ubus_context *ctx, struct ubus_object *obj,
+ 			struct ubus_request_data *req, const char *method,
+@@ -540,13 +555,10 @@ hostapd_bss_del_client(struct ubus_context *ctx, struct ubus_object *obj,
+ 
+ 	sta = ap_get_sta(hapd, addr);
+ 	if (sta) {
+-		if (deauth) {
+-			hostapd_drv_sta_deauth(hapd, addr, reason);
+-			ap_sta_deauthenticate(hapd, sta, reason);
+-		} else {
+-			hostapd_drv_sta_disassoc(hapd, addr, reason);
+-			ap_sta_disassociate(hapd, sta, reason);
+-		}
++		hostapd_del_client(hapd, sta, deauth, reason);
++	} else {
++		for (sta = hapd->sta_list; sta; sta = sta->next)
++			hostapd_del_client(hapd, sta, deauth, reason);
+ 	}
+ 
+ 	if (tb[DEL_CLIENT_BAN_TIME])
+-- 
+2.34.1
+

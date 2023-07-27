@@ -1,0 +1,52 @@
+From 5a32ac9feca73581f715526989fee5c032cf3188 Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Mon, 3 Jul 2023 20:11:43 +0800
+Subject: [PATCH] mt76: mt7615 dbdc configurable via dts
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ ...100-mt7615-dbdc-configurable-via-dts.patch | 32 +++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100644 package/kernel/mt76/patches/100-mt7615-dbdc-configurable-via-dts.patch
+
+diff --git a/package/kernel/mt76/patches/100-mt7615-dbdc-configurable-via-dts.patch b/package/kernel/mt76/patches/100-mt7615-dbdc-configurable-via-dts.patch
+new file mode 100644
+index 0000000000..d093d01abc
+--- /dev/null
++++ b/package/kernel/mt76/patches/100-mt7615-dbdc-configurable-via-dts.patch
+@@ -0,0 +1,32 @@
++--- a/mt7615/pci_init.c
+++++ b/mt7615/pci_init.c
++@@ -68,6 +68,7 @@ static int mt7615_init_hardware(struct m
++ 
++ int mt7615_register_device(struct mt7615_dev *dev)
++ {
+++	bool dbdc = false;
++ 	int ret;
++ 
++ 	mt7615_init_device(dev);
++@@ -87,6 +88,12 @@ int mt7615_register_device(struct mt7615
++ 	if (ret)
++ 		return ret;
++ 
+++	if (dev->dbdc_support) {
+++		dbdc = device_property_present(dev->mt76.dev, "dbdc");
+++		if (dbdc)
+++			dev->mt76.phy.cap.has_5ghz = false;
+++	}
+++
++ 	ret = mt76_register_device(&dev->mt76, true, mt76_rates,
++ 				   ARRAY_SIZE(mt76_rates));
++ 	if (ret)
++@@ -100,7 +107,7 @@ int mt7615_register_device(struct mt7615
++ 	mt7615_init_txpower(dev, &dev->mphy.sband_2g.sband);
++ 	mt7615_init_txpower(dev, &dev->mphy.sband_5g.sband);
++ 
++-	if (dev->dbdc_support) {
+++	if (dev->dbdc_support && dbdc) {
++ 		ret = mt7615_register_ext_phy(dev);
++ 		if (ret)
++ 			return ret;
+-- 
+2.34.1
+

@@ -1,0 +1,27 @@
+From 1885851ef53a0e08ea9901970bf71c042fa1472c Mon Sep 17 00:00:00 2001
+From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+Date: Fri, 26 May 2023 15:20:14 +0800
+Subject: [PATCH] dnsmasq: mount /tmp/resolv.conf.xxx
+
+/tmp/resolv.conf.vpn /tmp/resolv.conf.auto /tmp/resolv.conf.wg /tmp/resolv.conf.ovpn
+
+Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
+---
+ package/network/services/dnsmasq/files/dnsmasq.init | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/network/services/dnsmasq/files/dnsmasq.init b/package/network/services/dnsmasq/files/dnsmasq.init
+index 2a3327b0c6..b3255c734d 100755
+--- a/package/network/services/dnsmasq/files/dnsmasq.init
++++ b/package/network/services/dnsmasq/files/dnsmasq.init
+@@ -1209,6 +1209,7 @@ dnsmasq_start()
+ 	procd_add_jail_mount $EXTRA_MOUNT $RFC6761FILE $TRUSTANCHORSFILE
+ 	procd_add_jail_mount $dnsmasqconffile $dnsmasqconfdir $resolvdir $user_dhcpscript
+ 	procd_add_jail_mount /etc/passwd /etc/group /etc/TZ /etc/hosts /etc/ethers
++	procd_add_jail_mount /tmp/resolv.conf.vpn /tmp/resolv.conf.auto /tmp/resolv.conf.wg /tmp/resolv.conf.ovpn
+ 	procd_add_jail_mount_rw /var/run/dnsmasq/ $leasefile
+ 	case "$logfacility" in */*)
+ 		[ ! -e "$logfacility" ] && touch "$logfacility"
+-- 
+2.34.1
+
