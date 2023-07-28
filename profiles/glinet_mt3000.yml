@@ -15,7 +15,7 @@ packages:
   - gl-sdk4-timer
   - gl-sdk4-igmp
   - gl-sdk4-kmwan
-  - gl-sdk4-ui-hwnat
+  - gl-sdk4-ui-netnat
   - gl-sdk4-cloud
   - gl-sdk4-ui-cloud
   - kmod-gl-sdk4-black_white_list
