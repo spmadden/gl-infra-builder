@@ -36,3 +36,5 @@ packages:
   - mtkhnat_util
   - gdisk
   - mmc-utils
+  - kmod-shortcut-fe
+  - kmod-shortcut-fe-cm

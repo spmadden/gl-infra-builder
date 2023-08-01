@@ -34,3 +34,5 @@ packages:
   - fwdd
   - kmod-mtfwd
   - kmod-mtqos
+  - kmod-shortcut-fe
+  - kmod-shortcut-fe-cm
