@@ -1,4 +1,4 @@
-From 708c112895f13999a930470976b0459f2ce10944 Mon Sep 17 00:00:00 2001
+From ee91f0b7ad12078548ff99306a047472bda47f64 Mon Sep 17 00:00:00 2001
 From: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 Date: Fri, 1 Jul 2022 11:27:42 +0800
 Subject: [PATCH] iwinfo: support mtk private wifi driver
@@ -7,9 +7,9 @@ Signed-off-by: Jianhui Zhao <jianhui.zhao@gl-inet.com>
 ---
  package/network/utils/iwinfo/Makefile         |   2 +-
  .../iwinfo/patches/0001-fix-wext-h.patch      |  32 +
- .../iwinfo/patches/0100-support-mtk.patch     | 113 ++++
+ .../iwinfo/patches/0100-support-mtk.patch     | 105 ++++
  package/network/utils/iwinfo/src/iwinfo_mtk.c | 576 ++++++++++++++++++
- 4 files changed, 722 insertions(+), 1 deletion(-)
+ 4 files changed, 714 insertions(+), 1 deletion(-)
  create mode 100644 package/network/utils/iwinfo/patches/0001-fix-wext-h.patch
  create mode 100644 package/network/utils/iwinfo/patches/0100-support-mtk.patch
  create mode 100644 package/network/utils/iwinfo/src/iwinfo_mtk.c
@@ -67,14 +67,12 @@ index 0000000000..be03cb5c26
 + 	int32_t		min_rts;	/* Minimal RTS threshold */
 diff --git a/package/network/utils/iwinfo/patches/0100-support-mtk.patch b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
 new file mode 100644
-index 0000000000..892e750d00
+index 0000000000..d5b6d22ca2
 --- /dev/null
 +++ b/package/network/utils/iwinfo/patches/0100-support-mtk.patch
-@@ -0,0 +1,113 @@
-+Index: libiwinfo-2022-04-26-dc6847eb/Makefile
-+===================================================================
-+--- libiwinfo-2022-04-26-dc6847eb.orig/Makefile
-++++ libiwinfo-2022-04-26-dc6847eb/Makefile
+@@ -0,0 +1,105 @@
++--- a/Makefile
+++++ b/Makefile
 +@@ -35,6 +35,11 @@ ifneq ($(filter nl80211,$(IWINFO_BACKEND
 + endif
 + 
@@ -87,10 +85,8 @@ index 0000000000..892e750d00
 + compile: clean $(IWINFO_LIB) $(IWINFO_LUA) $(IWINFO_CLI)
 + 
 + %.o: %.c
-+Index: libiwinfo-2022-04-26-dc6847eb/include/iwinfo.h
-+===================================================================
-+--- libiwinfo-2022-04-26-dc6847eb.orig/include/iwinfo.h
-++++ libiwinfo-2022-04-26-dc6847eb/include/iwinfo.h
++--- a/include/iwinfo.h
+++++ b/include/iwinfo.h
 +@@ -311,6 +311,7 @@ extern const struct iwinfo_ops wext_ops;
 + extern const struct iwinfo_ops madwifi_ops;
 + extern const struct iwinfo_ops nl80211_ops;
@@ -99,10 +95,8 @@ index 0000000000..892e750d00
 + 
 + #include "iwinfo/utils.h"
 + 
-+Index: libiwinfo-2022-04-26-dc6847eb/iwinfo_lib.c
-+===================================================================
-+--- libiwinfo-2022-04-26-dc6847eb.orig/iwinfo_lib.c
-++++ libiwinfo-2022-04-26-dc6847eb/iwinfo_lib.c
++--- a/iwinfo_lib.c
+++++ b/iwinfo_lib.c
 +@@ -339,6 +339,9 @@ static const struct iwinfo_ops *backends
 + #ifdef USE_WL
 + 	&wl_ops,
@@ -113,10 +107,8 @@ index 0000000000..892e750d00
 + 	&wext_ops,
 + };
 + 
-+Index: libiwinfo-2022-04-26-dc6847eb/include/iwinfo/lua.h
-+===================================================================
-+--- libiwinfo-2022-04-26-dc6847eb.orig/include/iwinfo/lua.h
-++++ libiwinfo-2022-04-26-dc6847eb/include/iwinfo/lua.h
++--- a/include/iwinfo/lua.h
+++++ b/include/iwinfo/lua.h
 +@@ -41,6 +41,9 @@
 + #define IWINFO_NL80211_META	"iwinfo.nl80211"
 + #endif
@@ -127,11 +119,9 @@ index 0000000000..892e750d00
 + 
 + #define LUA_REG(type,op) \
 + 	{ #op, iwinfo_L_##type##_##op }
-+Index: libiwinfo-2022-04-26-dc6847eb/iwinfo_lua.c
-+===================================================================
-+--- libiwinfo-2022-04-26-dc6847eb.orig/iwinfo_lua.c
-++++ libiwinfo-2022-04-26-dc6847eb/iwinfo_lua.c
-+@@ -769,6 +769,16 @@ LUA_WRAP_STRUCT_OP(nl80211,mbssid_suppor
++--- a/iwinfo_lua.c
+++++ b/iwinfo_lua.c
++@@ -769,6 +769,17 @@ LUA_WRAP_STRUCT_OP(nl80211,mbssid_suppor
 + LUA_WRAP_STRUCT_OP(nl80211,hardware_id)
 + #endif
 + 
@@ -139,6 +129,7 @@ index 0000000000..892e750d00
 ++LUA_WRAP_INT_OP(mtk,channel)
 ++LUA_WRAP_STRING_OP(mtk,ssid)
 ++LUA_WRAP_STRING_OP(mtk,bssid)
+++LUA_WRAP_INT_OP(mtk,signal)
 ++LUA_WRAP_STRING_OP(mtk,phyname)
 ++LUA_WRAP_STRUCT_OP(mtk,mode)
 ++LUA_WRAP_STRUCT_OP(mtk,assoclist)
@@ -148,7 +139,7 @@ index 0000000000..892e750d00
 + /* Wext */
 + LUA_WRAP_INT_OP(wext,channel)
 + LUA_WRAP_INT_OP(wext,frequency)
-+@@ -896,6 +906,19 @@ static const luaL_reg R_nl80211[] = {
++@@ -896,6 +907,20 @@ static const luaL_reg R_nl80211[] = {
 + };
 + #endif
 + 
@@ -158,6 +149,7 @@ index 0000000000..892e750d00
 ++	LUA_REG(mtk,mode),
 ++	LUA_REG(mtk,ssid),
 ++	LUA_REG(mtk,bssid),
+++	LUA_REG(mtk,signal),
 ++	LUA_REG(mtk,assoclist),
 ++	LUA_REG(mtk,freqlist),
 ++	LUA_REG(mtk,phyname),
@@ -168,7 +160,7 @@ index 0000000000..892e750d00
 + /* Wext table */
 + static const luaL_reg R_wext[] = {
 + 	LUA_REG(wext,channel),
-+@@ -965,6 +988,15 @@ LUALIB_API int luaopen_iwinfo(lua_State
++@@ -965,6 +990,15 @@ LUALIB_API int luaopen_iwinfo(lua_State
 + 	lua_setfield(L, -2, "nl80211");
 + #endif
 + 
