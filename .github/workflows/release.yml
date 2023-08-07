@@ -25,7 +25,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body_path: /home/glinet/work2/_github/gl_release_note
+          body_path: /home/glinet/work/_github/gl_release_note
           prerelease: true
 
       - name: notify
