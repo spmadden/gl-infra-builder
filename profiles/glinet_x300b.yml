@@ -3,7 +3,7 @@ description: Add the glinet dependencies
 feeds:
   - name: glinet
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    branch: master
+    branch: db3f622bb9d6f004c48684073637ab78dc239c8e
 
 packages:
   - kmod-usb2
@@ -15,7 +15,9 @@ packages:
   - wpad-openssl
   - wget-ssl
   - dnsmasq-full
-  - mwan3
+  - kmod-gl-sdk4-black_white_list
+  - gl-sdk4-kmwan
+  - gl-line-graph
   - iwinfo
   - gl-oui-rpc
 #  - ot-br-posix
@@ -62,7 +64,6 @@ packages:
   - gl-sdk4-wifi
   - gl-sdk4-timer
   - gl-sdk4-igmp
-  - gl-sdk4-mwan3
 #  - gl-led-daemon
   - gl-ble-daemon
   - gl-ble-to-remote

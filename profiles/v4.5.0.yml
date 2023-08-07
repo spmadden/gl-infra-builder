@@ -1,7 +1,7 @@
 feeds:
   - name: gl_feed_common
     uri: https://github.com/gl-inet/gl-feeds.git
-    revision: 9654671f8960795787cbd70e827f9c9afeac1d38
+    revision: c924c76a4161d31587ccb6ae0dc160ba1aea0791
   - name: glinet
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 40f539d68a12791ed14376ee8aef3da60f1c88a6
+    revision: db3f622bb9d6f004c48684073637ab78dc239c8e

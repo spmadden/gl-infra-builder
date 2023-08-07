@@ -4,10 +4,10 @@ description: Add the glinet dependencies for the GL.iNET MT3000
 feeds:
   - name: mt7981_private
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/mt7981-feeds.git
-    revision: ebc8d5c447e1d2e0e13c0568a8514da68f8aa618
+    revision: 70d17e32dadf849385a0a7f9f00efebd414982d2
   - name: glinet
     uri: http://192.168.17.119:888/gl.sdk4.0/gl.router/gl-sdk4-collect.git
-    revision: 40f539d68a12791ed14376ee8aef3da60f1c88a6
+    revision: db3f622bb9d6f004c48684073637ab78dc239c8e
 
 packages:
   - gl-sdk4-led
