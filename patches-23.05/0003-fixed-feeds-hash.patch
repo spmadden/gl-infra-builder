@@ -1,0 +1,25 @@
+From 65a5e5a9e0735f23decde28233e1e375789de51d Mon Sep 17 00:00:00 2001
+From: Luo Chongjun <luochongjun@gl-inet.com>
+Date: Thu, 10 Aug 2023 12:36:18 +0800
+Subject: [PATCH] fix feeds hash
+
+---
+ feeds.conf.default | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/feeds.conf.default b/feeds.conf.default
+index d467db5627..f1d47a1bed 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,4 +1,4 @@
+-src-git packages https://git.openwrt.org/feed/packages.git;openwrt-23.05
+-src-git luci https://git.openwrt.org/project/luci.git;openwrt-23.05
+-src-git routing https://git.openwrt.org/feed/routing.git;openwrt-23.05
+-src-git telephony https://git.openwrt.org/feed/telephony.git;openwrt-23.05
++src-git packages https://git.openwrt.org/feed/packages.git^e1015ca0ec24b5e5e6b816f064a25e09ab183bc4
++src-git luci https://git.openwrt.org/project/luci.git^4cb534196147bfaed7392968813f7a245f8fbb9c
++src-git routing https://git.openwrt.org/feed/routing.git^36d862e94a9c4279b89286e63d049a9b336675f0
++src-git telephony https://git.openwrt.org/feed/telephony.git^f7fbaea4c7bfe9203b037ad616553c9e5ed12405
+-- 
+2.25.1
+

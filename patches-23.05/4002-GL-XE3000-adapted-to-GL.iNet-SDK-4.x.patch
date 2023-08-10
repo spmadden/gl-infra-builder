@@ -1,0 +1,450 @@
+From 5cc93ddf490046158a354c6f87c65f5789d1aba0 Mon Sep 17 00:00:00 2001
+From: Luo Chongjun <luochongjun@gl-inet.com>
+Date: Thu, 10 Aug 2023 11:48:12 +0800
+Subject: [PATCH] support xe3000 target
+
+---
+ .../lib/preinit/05_set_preinit_iface          |   1 +
+ .../mediatek/dts/mt7981b-glinet-gl-xe3000.dts | 316 ++++++++++++++++++
+ .../filogic/base-files/etc/board.d/01_leds    |   5 +
+ .../filogic/base-files/etc/board.d/02_network |   6 +
+ .../etc/hotplug.d/firmware/11-mt76-caldata    |   8 +
+ .../etc/hotplug.d/ieee80211/11_fix_wifi_mac   |   5 +
+ target/linux/mediatek/image/filogic.mk        |  11 +
+ 7 files changed, 352 insertions(+)
+ create mode 100644 target/linux/mediatek/dts/mt7981b-glinet-gl-xe3000.dts
+
+diff --git a/target/linux/mediatek/base-files/lib/preinit/05_set_preinit_iface b/target/linux/mediatek/base-files/lib/preinit/05_set_preinit_iface
+index 5e7fc81ad8..3c4f4b09e4 100644
+--- a/target/linux/mediatek/base-files/lib/preinit/05_set_preinit_iface
++++ b/target/linux/mediatek/base-files/lib/preinit/05_set_preinit_iface
+@@ -1,5 +1,6 @@
+ set_preinit_iface() {
+ 	case $(board_name) in
++	glinet,gl-xe3000|\
+ 	glinet,gl-mt3000)
+ 		ip link set eth1 up
+ 		ifname=eth1
+diff --git a/target/linux/mediatek/dts/mt7981b-glinet-gl-xe3000.dts b/target/linux/mediatek/dts/mt7981b-glinet-gl-xe3000.dts
+new file mode 100644
+index 0000000000..f95830d8fa
+--- /dev/null
++++ b/target/linux/mediatek/dts/mt7981b-glinet-gl-xe3000.dts
+@@ -0,0 +1,316 @@
++/dts-v1/;
++
++#include "mt7981.dtsi"
++
++/ {
++	model = "GL.iNet GL-XE3000";
++	compatible = "glinet,gl-xe3000", "mediatek,mt7981";
++
++	aliases {
++		serial0 = &uart0;
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++		bootargs = "console=ttyS0,115200n1 loglevel=8  \
++				earlycon=uart8250,mmio32,0x11002000 \
++				root=PARTLABEL=rootfs rootwait";
++	};
++
++	reg_3p3v: regulator-3p3v {
++		compatible = "regulator-fixed";
++		regulator-name = "fixed-3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
++	gpio-keys {
++		compatible = "gpio-keys";
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	gpio-export {
++		compatible = "gpio-export";
++
++		hub_power {
++			gpio-export,name = "hub_power";
++			gpio-export,output = <1>;
++			gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
++		};
++
++		5G_power {
++			gpio-export,name = "5G_power";
++			gpio-export,output = <1>;
++			gpios = <&pio 11 GPIO_ACTIVE_HIGH>;
++		};
++
++		5G_control {
++			gpio-export,name = "5G_control";
++			gpio-export,output = <1>;
++			gpios = <&pio 9 GPIO_ACTIVE_HIGH>;
++		};
++
++		5G_reset {
++			gpio-export,name = "5G_reset";
++			gpio-export,output = <0>;
++			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led@0 {
++			label = "wifi:2g";
++			gpios = <&pio 30 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++
++		led@1 {
++			label = "wifi:5g";
++			gpios = <&pio 38 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++
++		led@2 {
++			label = "5G:signal:led1";
++			gpios = <&pio 6 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++
++		led@3 {
++			label = "5G:signal:led2";
++			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++
++		led@4 {
++			label = "5G:signal:led3";
++			gpios = <&pio 8 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++
++		led@5 {
++			label = "5G:signal:led4";
++			gpios = <&pio 4 GPIO_ACTIVE_HIGH>;
++			default-state = "off";
++		};
++
++		led@6 {
++			label = "power";
++			gpios = <&pio 39 GPIO_ACTIVE_LOW>;
++			default-state = "on";
++		};
++
++		led@7 {
++			label = "internet";
++			gpios = <&pio 31 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++	};
++
++	fan_5v: regulator-fan-5v {
++		compatible = "regulator-fixed";
++		regulator-name = "fan";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&pio 28 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	usb_vbus: regulator-usb-vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb_vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&pio 12 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-boot-on;
++	};
++
++	gl-hw {
++		compatible = "gl-hw-info";
++		model = "xe3000";
++		wan = "eth0";
++		lan = "eth1";
++		build-in-modem = "0001:01:00.0,1-1.2";
++		usb-port = "1-1.3";
++		modem-reset="0";
++		fan = "hwmon0 cooling_device0";
++		flash_size = <7456>;
++		temperature = "/sys/devices/virtual/thermal/thermal_zone0/temp";
++		reset-button = "gpio-456";
++		radio = "mt798111 mt798112";
++		mcu = "/dev/ttyS1,9600";
++		cfg-partition = "/dev/mmcblk0p5";
++		dfs;
++		sim = "dual";
++		factory_data {
++			device_mac = "/dev/mmcblk0p3", "0x0a";
++			device_ddns = "/dev/mmcblk0p3", "0x10";
++			device_sn_bak = "/dev/mmcblk0p3", "0x20";
++			device_sn = "/dev/mmcblk0p3", "0x30";
++			country_code = "/dev/mmcblk0p3", "0x88";
++			device_cert = "/dev/mmcblk0p3", "0x1000";
++		};
++	};
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&watchdog {
++	status = "okay";
++};
++
++&mmc0 {
++         pinctrl-names = "default", "state_uhs";
++         pinctrl-0 = <&mmc0_pins_default>;
++         pinctrl-1 = <&mmc0_pins_uhs>;
++         bus-width = <8>;
++         max-frequency = <52000000>;
++         cap-mmc-highspeed;
++         vmmc-supply = <&reg_3p3v>;
++         non-removable;
++         status = "okay";
++};
++
++&eth {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mdio_pins>;
++
++	status = "okay";
++
++	gmac0: mac@0 {
++		compatible = "mediatek,eth-mac";
++		reg = <0>;
++		phy-mode = "2500base-x";
++		phy-handle = <&phy0>;
++	};
++
++	gmac1: mac@1 {
++		compatible = "mediatek,eth-mac";
++		reg = <1>;
++		phy-mode = "gmii";
++		phy-handle = <&int_gbe_phy>;
++	};
++};
++
++&mdio_bus {
++	reset-gpios = <&pio 14 GPIO_ACTIVE_LOW>;
++	reset-delay-us = <600>;
++	reset-post-delay-us = <20000>;
++
++	phy0: ethernet-phy@5 {
++		reg = <5>;
++		compatible = "ethernet-phy-ieee802.3-c45";
++		phy-mode = "2500base-x";
++	};
++};
++
++&fan {
++	pwms = <&pwm 0 40000 0>;
++	fan-supply = <&fan_5v>;
++	interrupt-parent = <&pio>;
++	interrupts = <29 IRQ_TYPE_EDGE_RISING>;
++	status = "okay";
++
++	cooling-levels = <0 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36
++			36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 36 37 38 39
++			40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
++			60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
++			80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
++			100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119
++			120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
++			140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159
++			160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179
++			180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199
++			200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219
++			220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239
++			240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255>;
++};
++
++&spi1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&spic_pins>;
++	status = "disabled";
++};
++
++&pio {
++	spic_pins: spi1-pins {
++		mux {
++			function = "spi";
++			groups = "spi1_1";
++		};
++	};
++	mmc0_pins_default: mmc0-pins-default {
++		mux {
++			function = "flash";
++			groups =  "emmc_45";
++		};
++	};
++	mmc0_pins_uhs: mmc0-pins-uhs {
++		mux {
++			function = "flash";
++			groups =  "emmc_45";
++		};
++	};
++	pcie_pins: pcie-pins {
++		mux {
++			function = "pcie";
++			groups = "pcie_pereset", "pcie_clk", "pcie_wake";
++		};
++	};
++	pwm0_pin: pwm0-pin-g0 {
++		mux {
++			function = "pwm";
++			groups = "pwm0_1";
++		};
++	};
++
++	uart1_pins: uart1-pins-g1 {
++		mux {
++                        function = "uart";
++                        groups = "uart1_1_no_cts_rts";
++		};
++	};
++};
++
++&uart1 {
++	pinctrl-names = "default";
++        pinctrl-0 = <&uart1_pins>;
++	status = "okay";
++};
++
++&usb_phy {
++	status = "okay";
++};
++
++&xhci {
++	vbus-supply = <&usb_vbus>;
++
++	status = "okay";
++};
++
++&pcie {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pcie_pins>;
++	status = "okay";
++};
++
++&pwm {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pwm0_pin>;
++};
++
++&wifi {
++	status = "okay";
++};
+diff --git a/target/linux/mediatek/filogic/base-files/etc/board.d/01_leds b/target/linux/mediatek/filogic/base-files/etc/board.d/01_leds
+index c81bd2cd97..6adc632eda 100644
+--- a/target/linux/mediatek/filogic/base-files/etc/board.d/01_leds
++++ b/target/linux/mediatek/filogic/base-files/etc/board.d/01_leds
+@@ -6,6 +6,11 @@ board=$(board_name)
+ board_config_update
+ 
+ case $board in
++glinet,xe3000)
++        ucidef_set_led_netdev  "wlan2g" "WLAN2G" "wifi:2g"  "ra0"
++        ucidef_set_led_netdev  "wlan5g" "WLAN5G" "wifi:5g"  "rax0"
++	ucidef_set_led_default "power"  "POWER"  "power"    "1"
++        ;;
+ cudy,wr3000-v1)
+ 	ucidef_set_led_netdev "wan" "wan" "blue:wan" "wan"
+ 	;;
+diff --git a/target/linux/mediatek/filogic/base-files/etc/board.d/02_network b/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
+index 3b170ddc18..d97dfe9b46 100644
+--- a/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
++++ b/target/linux/mediatek/filogic/base-files/etc/board.d/02_network
+@@ -21,6 +21,7 @@ mediatek_setup_interfaces()
+ 	cudy,wr3000-v1)
+ 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"
+ 		;;
++	glinet,gl-xe3000|\
+ 	glinet,gl-mt3000)
+ 		ucidef_set_interfaces_lan_wan eth1 eth0
+ 		;;
+@@ -76,6 +77,11 @@ mediatek_setup_macs()
+ 	bananapi,bpi-r3)
+ 		wan_mac=$(macaddr_add $(cat /sys/class/net/eth0/address) 1)
+ 		;;
++	glinet,gl-xe3000)
++		label_mac=$(mmc_get_mac_binary factory 0x0a)
++		wan_mac=$label_mac
++		lan_mac=$(macaddr_add "$label_mac" 1)
++		;;
+ 	h3c,magic-nx30-pro)
+ 		wan_mac=$(mtd_get_mac_ascii pdt_data_1 ethaddr)
+ 		lan_mac=$(macaddr_add "$wan_mac" 1)
+diff --git a/target/linux/mediatek/filogic/base-files/etc/hotplug.d/firmware/11-mt76-caldata b/target/linux/mediatek/filogic/base-files/etc/hotplug.d/firmware/11-mt76-caldata
+index 0fe4c69988..86c6ad84be 100644
+--- a/target/linux/mediatek/filogic/base-files/etc/hotplug.d/firmware/11-mt76-caldata
++++ b/target/linux/mediatek/filogic/base-files/etc/hotplug.d/firmware/11-mt76-caldata
+@@ -6,7 +6,15 @@
+ 
+ board=$(board_name)
+ 
++
+ case "$FIRMWARE" in
++"mediatek/mt7981_eeprom_mt7976_dbdc.bin")
++        case "$board" in
++        glinet,gl-xe3000)
++                caldata_extract_mmc "factory" 0x0 0x1000
++                ;;
++        esac
++        ;;
+ "mediatek/mt7986_eeprom_mt7976_dbdc.bin")
+ 	case "$board" in
+ 	asus,tuf-ax4200)
+diff --git a/target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac b/target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac
+index 3620e3a6fb..0605cbf871 100644
+--- a/target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac
++++ b/target/linux/mediatek/filogic/base-files/etc/hotplug.d/ieee80211/11_fix_wifi_mac
+@@ -32,6 +32,11 @@ case "$board" in
+ 		[ "$PHYNBR" = "0" ] && echo "$addr" > /sys${DEVPATH}/macaddress
+ 		[ "$PHYNBR" = "1" ] && macaddr_setbit_la $(macaddr_add $addr 1) > /sys${DEVPATH}/macaddress
+ 		;;
++	glinet,gl-xe3000)
++		addr=$(mmc_get_mac_binary factory 0x04)
++		[ "$PHYNBR" = "0" ] && echo "$addr" > /sys${DEVPATH}/macaddress
++		[ "$PHYNBR" = "1" ] && macaddr_add $addr 1 > /sys${DEVPATH}/macaddress
++		;;
+ 	h3c,magic-nx30-pro)
+ 		addr=$(mtd_get_mac_ascii pdt_data_1 ethaddr)
+ 		[ "$PHYNBR" = "0" ] && macaddr_add $addr 2 > /sys${DEVPATH}/macaddress
+diff --git a/target/linux/mediatek/image/filogic.mk b/target/linux/mediatek/image/filogic.mk
+index 702902405e..661edd9a6e 100644
+--- a/target/linux/mediatek/image/filogic.mk
++++ b/target/linux/mediatek/image/filogic.mk
+@@ -186,6 +186,17 @@ define Device/glinet_gl-mt3000
+ endef
+ TARGET_DEVICES += glinet_gl-mt3000
+ 
++define Device/glinet_gl-xe3000
++  DEVICE_VENDOR := GL.iNet
++  DEVICE_MODEL := GL-XE3000
++  DEVICE_DTS := mt7981b-glinet-gl-xe3000
++  DEVICE_DTS_DIR := ../dts
++  SUPPORTED_DEVICES += glinet,xe3000-emmc
++  DEVICE_PACKAGES := kmod-hwmon-pwmfan mkf2fs kmod-mmc kmod-fs-f2fs gdisk
++  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
++endef
++TARGET_DEVICES += glinet_gl-xe3000
++
+ define Device/h3c_magic-nx30-pro
+   DEVICE_VENDOR := H3C
+   DEVICE_MODEL := Magic NX30 Pro
+-- 
+2.25.1
+
