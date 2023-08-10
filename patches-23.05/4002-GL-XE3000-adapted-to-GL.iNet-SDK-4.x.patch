@@ -1,4 +1,4 @@
-From 5cc93ddf490046158a354c6f87c65f5789d1aba0 Mon Sep 17 00:00:00 2001
+From 85a9b3521430aeedf517eeb88c37f32a835251e4 Mon Sep 17 00:00:00 2001
 From: Luo Chongjun <luochongjun@gl-inet.com>
 Date: Thu, 10 Aug 2023 11:48:12 +0800
 Subject: [PATCH] support xe3000 target
@@ -10,8 +10,9 @@ Subject: [PATCH] support xe3000 target
  .../filogic/base-files/etc/board.d/02_network |   6 +
  .../etc/hotplug.d/firmware/11-mt76-caldata    |   8 +
  .../etc/hotplug.d/ieee80211/11_fix_wifi_mac   |   5 +
+ .../base-files/lib/upgrade/platform.sh        |  17 +
  target/linux/mediatek/image/filogic.mk        |  11 +
- 7 files changed, 352 insertions(+)
+ 8 files changed, 369 insertions(+)
  create mode 100644 target/linux/mediatek/dts/mt7981b-glinet-gl-xe3000.dts
 
 diff --git a/target/linux/mediatek/base-files/lib/preinit/05_set_preinit_iface b/target/linux/mediatek/base-files/lib/preinit/05_set_preinit_iface
@@ -423,6 +424,48 @@ index 3620e3a6fb..0605cbf871 100644
  	h3c,magic-nx30-pro)
  		addr=$(mtd_get_mac_ascii pdt_data_1 ethaddr)
  		[ "$PHYNBR" = "0" ] && macaddr_add $addr 2 > /sys${DEVPATH}/macaddress
+diff --git a/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh b/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+index 186abfa5a8..f031adc1c1 100755
+--- a/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
++++ b/target/linux/mediatek/filogic/base-files/lib/upgrade/platform.sh
+@@ -70,6 +70,9 @@ platform_do_upgrade() {
+ 	cudy,wr3000-v1)
+ 		default_do_upgrade "$1"
+ 		;;
++	glinet,gl-xe3000)
++		emmc_do_upgrade "$1"
++		;;
+ 	mercusys,mr90x-v1)
+ 		CI_UBIPART="ubi0"
+ 		nand_do_upgrade "$1"
+@@ -110,6 +113,16 @@ platform_check_image() {
+ 		}
+ 		return 0
+ 		;;
++	glinet,gl-xe3000)
++		# tar magic `ustar`
++		magic="$(dd if="$1" bs=1 skip=257 count=5 2>/dev/null)"
++		[ "$magic" != "ustar" ] && {
++			echo "Invalid image type."
++			return 1
++		}
++		return 0
++		;;
++
+ 	*)
+ 		nand_do_platform_check "$board" "$1"
+ 		return $?
+@@ -128,6 +141,10 @@ platform_copy_config() {
+ 			;;
+ 		esac
+ 		;;
++	glinet,gl-xe3000)
++		emmc_copy_config
++		;;
++
+ 	esac
+ }
+ 
 diff --git a/target/linux/mediatek/image/filogic.mk b/target/linux/mediatek/image/filogic.mk
 index 702902405e..661edd9a6e 100644
 --- a/target/linux/mediatek/image/filogic.mk
