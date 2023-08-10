@@ -1,0 +1,25 @@
+---
+profile: glinet_gl-xe3000
+target: mediatek
+subtarget: filogic
+description: Build image for the GL.iNET XE3000
+
+feeds:
+  - name: gl_feed_common
+    uri: https://github.com/gl-inet/gl-feeds.git
+    revision: c3c41ce7322532125bff463478ce53f18564a45c
+
+packages:
+  - ethtool
+  - iwinfo
+  - mmc-utils
+  - losetup
+  - mkf2fs
+  - blockdev
+  - gdisk
+  - kmod-mt7981-firmware
+  - kmod-gl-sdk4-fan
+  - mii_mgr
+  - regs
+  - 8021xd
+  - fwdd
