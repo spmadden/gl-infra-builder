@@ -7,7 +7,7 @@ name: Create Release
 jobs:
   build:
     name: Create Release
-    runs-on: self-hosted
+    runs-on: ci-server
     timeout-minutes: 720
     steps:
       - name: Checkout code
@@ -29,3 +29,4 @@ jobs:
         run: |
           echo "send notify"
           cd ~/work/runner-script/util && ./send_resease_notify $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF_NAME $GITHUB_RUN_ID $GITHUB_ACTOR release
+
