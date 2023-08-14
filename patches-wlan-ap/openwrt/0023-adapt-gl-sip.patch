@@ -1,0 +1,26 @@
+From f15ade00d76fbc6e60b8c084f14a09384d08c1a7 Mon Sep 17 00:00:00 2001
+From: Yu Zhang <yu.zhang@gl-inet.com>
+Date: Mon, 14 Aug 2023 09:29:36 +0800
+Subject: [PATCH] adapt gl-sip
+
+Signed-off-by: Yu Zhang <yu.zhang@gl-inet.com>
+---
+ include/netfilter.mk | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/include/netfilter.mk b/include/netfilter.mk
+index 1e22ad7169..54c9587ede 100644
+--- a/include/netfilter.mk
++++ b/include/netfilter.mk
+@@ -225,8 +225,6 @@ $(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_CONNTRACK_H323, $(P_XT)nf_conn
+ $(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_NAT_H323, $(P_V4)nf_nat_h323))
+ $(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_CONNTRACK_PPTP, $(P_XT)nf_conntrack_pptp))
+ $(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_NAT_PPTP, $(P_V4)nf_nat_pptp))
+-$(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_CONNTRACK_SIP, $(P_XT)nf_conntrack_sip))
+-$(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_NAT_SIP, $(P_XT)nf_nat_sip))
+ $(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_CONNTRACK_SNMP, $(P_XT)nf_conntrack_snmp))
+ $(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_NAT_SNMP_BASIC, $(P_V4)nf_nat_snmp_basic))
+ $(eval $(call nf_add,NF_NATHELPER_EXTRA,CONFIG_NF_CONNTRACK_TFTP, $(P_XT)nf_conntrack_tftp))
+-- 
+2.25.1
+

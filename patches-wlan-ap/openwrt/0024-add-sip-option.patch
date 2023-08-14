@@ -1,0 +1,66 @@
+From 4d2f97d82663bb35c031babbb36705b76ef822a6 Mon Sep 17 00:00:00 2001
+From: Yu Zhang <yu.zhang@gl-inet.com>
+Date: Mon, 14 Aug 2023 09:32:07 +0800
+Subject: [PATCH] add sip option
+
+Signed-off-by: Yu Zhang <yu.zhang@gl-inet.com>
+---
+ package/kernel/linux/modules/netfilter.mk | 35 ++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/netfilter.mk b/package/kernel/linux/modules/netfilter.mk
+index 83b2237bd7..b5be240c63 100644
+--- a/package/kernel/linux/modules/netfilter.mk
++++ b/package/kernel/linux/modules/netfilter.mk
+@@ -441,6 +441,38 @@ endef
+ $(eval $(call KernelPackage,nf-ipvs-sip))
+ 
+ 
++define KernelPackage/nf-conntrack-sip
++  SUBMENU:=$(NF_MENU)
++  TITLE:=Supports SIP connection tracing
++  KCONFIG:=CONFIG_NF_CONNTRACK_SIP=y
++  DEPENDS:=+kmod-nf-conntrack
++  FILES:=$(LINUX_DIR)/net/netfilter/nf_conntrack_sip.ko
++  AUTOLOAD:=$(call AutoProbe, $(notdir $(NF_CONNTRACK_SIP-m)))
++endef
++
++define KernelPackage/nf-conntrack-sip/description
++  This package contains the Netfilter SIP connection tracking module
++endef
++
++$(eval $(call KernelPackage,nf-conntrack-sip))
++
++
++define KernelPackage/nf-nat-sip
++  SUBMENU:=$(NF_MENU)
++  TITLE:=Supports SIP nat
++  KCONFIG:=CONFIG_NF_CONNTRACK_SIP=y CONFIG_NF_NAT_SIP=y
++  DEPENDS:=+kmod-nf-conntrack-sip +kmod-nf-nat
++  FILES:=$(LINUX_DIR)/net/netfilter/nf_nat_sip.ko
++  AUTOLOAD:=$(call AutoProbe, $(notdir $(NF_NAT_SIP-m)))
++endef
++
++define KernelPackage/nf-nat-sip/description
++  This package contains the Netfilter SIP NAT module
++endef
++
++$(eval $(call KernelPackage,nf-nat-sip))
++
++
+ define KernelPackage/ipt-nat
+   TITLE:=Basic NAT targets
+   KCONFIG:=$(KCONFIG_IPT_NAT)
+@@ -543,7 +575,8 @@ define KernelPackage/nf-nathelper-extra
+   FILES:=$(foreach mod,$(NF_NATHELPER_EXTRA-m),$(LINUX_DIR)/net/$(mod).ko)
+   FILES+= $(LINUX_DIR)/net/netfilter/nf_conntrack_proto_gre.ko  $(LINUX_DIR)/net/ipv4/netfilter/nf_nat_proto_gre.ko
+   AUTOLOAD:=$(call AutoProbe,$(notdir $(NF_NATHELPER_EXTRA-m)))
+-  DEPENDS:=+kmod-nf-nat +kmod-lib-textsearch +kmod-ipt-raw +!LINUX_4_14:kmod-asn1-decoder kmod-pptp
++  DEPENDS:=+kmod-nf-nat +kmod-lib-textsearch +kmod-ipt-raw \
++	  +kmod-nf-nat-sip +!LINUX_4_14:kmod-asn1-decoder kmod-pptp
+ endef
+ 
+ define KernelPackage/nf-nathelper-extra/description
+-- 
+2.25.1
+
