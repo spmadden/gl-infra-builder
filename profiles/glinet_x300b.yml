@@ -80,6 +80,7 @@ packages:
   - gl-sdk4-ui-cloud
   - gl-sdk4-ui-core
   - gl-sdk4-ui-dnsview
+  - gl-sdk4-ui-rs485view
   - gl-sdk4-ui-dynamicdns
   - gl-sdk4-ui-firewallview
   - gl-sdk4-ui-home
