@@ -20,13 +20,31 @@ jobs:
           echo "COMPILE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
           cd ~/work/runner-script/sdk4_script && ./build_firmware_by_source $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF $GITHUB_RUN_ID $GITHUB_ACTOR release
 
-      - name: Release
+  release_glinet:
+    needs: build
+    steps:
+      - name: Create Release for glinet
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body_path: |
-            $HOME/work/_github/gl_release_note
+          body_path: /home/glinet/work/_github/gl_release_note
+          prerelease: true
+          
+      - name: notify
+        run: |
+          echo "send notify"
+          cd ~/work/runner-script/util && ./send_resease_notify $GITHUB_REPOSITORY $GITHUB_WORKSPACE $GITHUB_REF_NAME $GITHUB_RUN_ID $GITHUB_ACTOR release
+
+  release_gl-ci:
+    needs: build
+    steps:
+      - name: Create Release for gl-ci
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body_path: /home/gl-ci/work/_github/gl_release_note
           prerelease: true
 
       - name: notify
