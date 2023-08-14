@@ -1,0 +1,65 @@
+From dbed05b210ca6cca04c16092c091971c0dbb589c Mon Sep 17 00:00:00 2001
+From: Yu Zhang <yu.zhang@gl-inet.com>
+Date: Mon, 14 Aug 2023 11:12:31 +0800
+Subject: [PATCH] add sip option
+
+Signed-off-by: Yu Zhang <yu.zhang@gl-inet.com>
+---
+ package/kernel/linux/modules/netfilter.mk | 34 ++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/netfilter.mk b/package/kernel/linux/modules/netfilter.mk
+index 44c0e829bb..debb28294c 100644
+--- a/package/kernel/linux/modules/netfilter.mk
++++ b/package/kernel/linux/modules/netfilter.mk
+@@ -487,6 +487,38 @@ endef
+ $(eval $(call KernelPackage,nf-ipvs-sip))
+ 
+ 
++define KernelPackage/nf-conntrack-sip
++  SUBMENU:=$(NF_MENU)
++  TITLE:=Supports SIP connection tracing
++  KCONFIG:=CONFIG_NF_CONNTRACK_SIP=y
++  DEPENDS:=+kmod-nf-conntrack
++  FILES:=$(LINUX_DIR)/net/netfilter/nf_conntrack_sip.ko
++  AUTOLOAD:=$(call AutoProbe, $(notdir $(NF_CONNTRACK_SIP-m)))
++endef
++
++define KernelPackage/nf-conntrack-sip/description
++  This package contains the Netfilter SIP connection tracking module
++endef
++
++$(eval $(call KernelPackage,nf-conntrack-sip))
++
++
++define KernelPackage/nf-nat-sip
++  SUBMENU:=$(NF_MENU)
++  TITLE:=Supports SIP nat
++  KCONFIG:=CONFIG_NF_CONNTRACK_SIP=y CONFIG_NF_NAT_SIP=y
++  DEPENDS:=+kmod-nf-conntrack-sip +kmod-nf-nat
++  FILES:=$(LINUX_DIR)/net/netfilter/nf_nat_sip.ko
++  AUTOLOAD:=$(call AutoProbe, $(notdir $(NF_NAT_SIP-m)))
++endef
++
++define KernelPackage/nf-nat-sip/description
++  This package contains the Netfilter SIP NAT module
++endef
++
++$(eval $(call KernelPackage,nf-nat-sip))
++
++
+ define KernelPackage/ipt-nat
+   TITLE:=Basic NAT targets
+   KCONFIG:=$(KCONFIG_IPT_NAT)
+@@ -588,7 +620,7 @@ define KernelPackage/nf-nathelper-extra
+   KCONFIG:=$(KCONFIG_NF_NATHELPER_EXTRA)
+   FILES:=$(foreach mod,$(NF_NATHELPER_EXTRA-m),$(LINUX_DIR)/net/$(mod).ko)
+   AUTOLOAD:=$(call AutoProbe,$(notdir $(NF_NATHELPER_EXTRA-m)))
+-  DEPENDS:=+kmod-nf-nat +kmod-lib-textsearch +kmod-asn1-decoder
++  DEPENDS:=+kmod-nf-nat +kmod-lib-textsearch +kmod-asn1-decoder +kmod-nf-nat-sip
+ endef
+ 
+ define KernelPackage/nf-nathelper-extra/description
+-- 
+2.25.1
+
