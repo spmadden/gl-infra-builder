@@ -159,7 +159,7 @@ index 0000000000..f95830d8fa
 +		enable-active-high;
 +	};
 +
-+	usb_vbus: regulator-usb-vbus {
++	/*usb_vbus: regulator-usb-vbus {
 +		compatible = "regulator-fixed";
 +		regulator-name = "usb_vbus";
 +		regulator-min-microvolt = <5000000>;
@@ -167,14 +167,14 @@ index 0000000000..f95830d8fa
 +		gpio = <&pio 12 GPIO_ACTIVE_HIGH>;
 +		enable-active-high;
 +		regulator-boot-on;
-+	};
++	};*/
 +
 +	gl-hw {
 +		compatible = "gl-hw-info";
 +		model = "xe3000";
 +		wan = "eth0";
 +		lan = "eth1";
-+		build-in-modem = "0001:01:00.0,1-1.2";
++		build-in-modem = "0000:01:00.0,1-1.2";
 +		usb-port = "1-1.3";
 +		modem-reset="0";
 +		fan = "hwmon0 cooling_device0";
@@ -329,7 +329,7 @@ index 0000000000..f95830d8fa
 +};
 +
 +&xhci {
-+	vbus-supply = <&usb_vbus>;
++	phys = <&u2port0 PHY_TYPE_USB2>;
 +
 +	status = "okay";
 +};
@@ -480,7 +480,7 @@ index 702902405e..661edd9a6e 100644
 +  DEVICE_DTS := mt7981b-glinet-gl-xe3000
 +  DEVICE_DTS_DIR := ../dts
 +  SUPPORTED_DEVICES += glinet,xe3000-emmc
-+  DEVICE_PACKAGES := kmod-hwmon-pwmfan mkf2fs kmod-mmc kmod-fs-f2fs gdisk
++  DEVICE_PACKAGES := kmod-hwmon-pwmfan mkf2fs kmod-mmc kmod-fs-f2fs gdisk kmod-usb3
 +  IMAGE/sysupgrade.bin := sysupgrade-tar | append-gl-metadata
 +endef
 +TARGET_DEVICES += glinet_gl-xe3000

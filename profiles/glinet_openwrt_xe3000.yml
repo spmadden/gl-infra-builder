@@ -136,6 +136,7 @@ packages:
   - mptcp
   - v2ray-core
   - iperf3
+  - gl-sdk4-mpifd
 
 
 diffconfig: |
