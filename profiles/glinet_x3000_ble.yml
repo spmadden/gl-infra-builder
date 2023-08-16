@@ -1,0 +1,20 @@
+---
+description: Add the glinet dependencies
+feeds:
+  - name: glinet_iot
+    uri: http://192.168.17.119:888/gl.sdk4.0/gl.iot/gl-iot-sdk-collect.git
+    revision: e8ec00f2df58ce8b88014f7f1fe917054fd2e8ad
+  - name: glinet_iot_ui
+    uri: http://192.168.17.119:888/gl.sdk4.0/gl.web/gl-ui-iot.git
+    revision: dd948d15e218d2304fb3d5da0908d075f6b9fc7b
+    
+packages:
+  - gl-ble-daemon
+  - gl-ble-to-remote
+  - gl-ble-sdk
+  - kmod-usb-serial-ch343
+  - gl-sdk4-ui-bluetoothdevices
+  - gl-sdk4-ui-bluetoothremotemanage
+  - gl-sdk4-ui-bluetoothreport
+  - gl-sdk4-ui-bluetoothscanningmode
+  - gl-sdk4-ui-bluetoothsettings
